@@ -974,10 +974,6 @@ Diagnostics:
           />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <button className="secondary-button" style={{ color: 'var(--color-critical)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={stopStream}>
-              Close Camera Connection
-            </button>
-
             <WaterCalibration
               waterLineY={displayLineY}
               isCalibrating={isCalibrating}
@@ -996,6 +992,14 @@ Diagnostics:
         onDownloadRecording={downloadRecording}
         onDeleteRecording={deleteRecording}
       />
+      
+      {isStreaming && (
+        <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px' }}>
+          <button className="secondary-button" style={{ color: 'var(--color-critical)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={stopStream}>
+            Close Camera Connection
+          </button>
+        </div>
+      )}
     </div>
   );
 };
