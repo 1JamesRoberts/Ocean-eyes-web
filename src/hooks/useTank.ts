@@ -5,6 +5,13 @@ import type { TankBrief } from '../types/aquarium';
 
 export const useTank = () => {
   const [tankId, setTankId] = useState<string | null>(() => {
+    const lastTankId = localStorage.getItem('oceaneyes_last_tank_id');
+    if (lastTankId) {
+      const linked = MockFirestore.getLinkedTanks();
+      if (linked.includes(lastTankId)) {
+        return lastTankId;
+      }
+    }
     const list = MockFirestore.getLinkedTanks();
     return list.length > 0 ? list[0] : null;
   });
@@ -24,14 +31,29 @@ export const useTank = () => {
     return subscribeToDb(syncTanks);
   }, [tankId]);
 
-  const selectTank = (id: string) => {
+  useEffect(() => {
+    const handleTankSelect = (e: Event) => {
+      const customEvent = e as CustomEvent<string | null>;
+      setTankId(customEvent.detail);
+    };
+    window.addEventListener('oceaneyes_tank_select_changed', handleTankSelect);
+    return () => window.removeEventListener('oceaneyes_tank_select_changed', handleTankSelect);
+  }, []);
+
+  const selectTank = (id: string | null) => {
+    if (id) {
+      localStorage.setItem('oceaneyes_last_tank_id', id);
+    } else {
+      localStorage.removeItem('oceaneyes_last_tank_id');
+    }
     setTankId(id);
+    window.dispatchEvent(new CustomEvent('oceaneyes_tank_select_changed', { detail: id }));
   };
 
   const linkTank = async (targetId: string): Promise<boolean> => {
     const success = await MockFirestore.joinTank(targetId);
     if (success) {
-      setTankId(targetId);
+      selectTank(targetId);
     }
     return success;
   };
@@ -40,14 +62,15 @@ export const useTank = () => {
     if (tankId) {
       MockFirestore.unlinkTank(tankId);
       const remaining = MockFirestore.getLinkedTanks();
-      setTankId(remaining.length > 0 ? remaining[0] : null);
+      const nextId = remaining.length > 0 ? remaining[0] : null;
+      selectTank(nextId);
     }
   };
 
   const createAndLinkTank = async (name: string, cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }): Promise<string> => {
     const newId = await MockFirestore.createTank(name, cameraSource);
     await MockFirestore.joinTank(newId);
-    setTankId(newId);
+    selectTank(newId);
     return newId;
   };
 
