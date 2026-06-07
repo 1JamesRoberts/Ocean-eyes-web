@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useTank } from '../../hooks/useTank';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
 }
 
 export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
-  const { tankId, tanks } = useApp();
+  const { tankId, tanks } = useTank();
   const [copied, setCopied] = useState(false);
 
   const activeTankId = tankId || (tanks.length > 0 ? tanks[0].id : 'living-room-tank-77');

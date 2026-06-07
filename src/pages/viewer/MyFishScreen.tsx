@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useNavigation } from '../../context/NavigationContext';
+import { useTank } from '../../hooks/useTank';
+import { useFish } from '../../hooks/useFish';
 import { Plus, Trash2, Fish, Eye, Hash, BarChart3 } from 'lucide-react';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
 import { getSpeciesById, getSpeciesColor, getSpeciesInitials, type SpeciesInfo } from '../../data/speciesCatalog';
@@ -87,7 +89,9 @@ const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
 };
 
 export const MyFishScreen: React.FC = () => {
-  const { fishList, addFish, removeFish, updateFishCount, setActiveTab } = useApp();
+  const { setActiveTab } = useNavigation();
+  const { tankId } = useTank();
+  const { fishList, addFish, removeFish, updateFishCount } = useFish(tankId);
   const [name, setName] = useState('');
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);

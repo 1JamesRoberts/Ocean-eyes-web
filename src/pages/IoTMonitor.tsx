@@ -1,6 +1,6 @@
 // IoTMonitor.tsx - Recreating Flutter UI screens for the Smart Tank Monitor unit
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useTank } from '../hooks/useTank';
 import { Cpu } from 'lucide-react';
 import { MonitorWelcomeScreen } from './monitor/MonitorWelcomeScreen';
 import { MonitorQrDisplayScreen } from './monitor/MonitorQrDisplayScreen';
@@ -8,7 +8,7 @@ import { MonitorCalibrationScreen } from './monitor/MonitorCalibrationScreen';
 import { ActiveMonitoringScreen } from './monitor/ActiveMonitoringScreen';
 
 export const IoTMonitor: React.FC = () => {
-  const { tankId } = useApp();
+  const { tankId } = useTank();
   const [monitorScreen, setMonitorScreen] = useState<'welcome' | 'qr' | 'calibration' | 'active'>('welcome');
 
   const renderScreen = () => {

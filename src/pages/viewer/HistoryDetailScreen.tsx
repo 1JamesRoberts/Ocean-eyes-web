@@ -1,8 +1,10 @@
 import React from 'react';
-import { useApp } from '../../context/AppContext';
+import { useNavigation } from '../../context/NavigationContext';
+import { useReadings } from '../../hooks/useReadings';
 
 export const HistoryDetailScreen: React.FC = () => {
-  const { readings, setActiveTab } = useApp();
+  const { setActiveTab } = useNavigation();
+  const { readings } = useReadings();
 
   // Draw a beautiful custom SVG area chart representing historical clarity values
   const drawClarityChart = () => {

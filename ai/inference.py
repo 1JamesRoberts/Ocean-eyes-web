@@ -293,3 +293,78 @@ class FishAIPipeline:
         }
 
         return result
+
+    def predict_turbidity_only(self, image_bytes: bytes) -> dict:
+        """Run only turbidity estimation on image bytes."""
+        pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img_array = np.array(pil_image)
+        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+        img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+        img_w, img_h = pil_image.size
+
+        turbidity_result = run_turbidity(img_cv, self.turbidity_session, self.turbidity_metadata)
+
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "image_dimensions": {"width": img_w, "height": img_h},
+            "models": {
+                "turbidity": {"provider": self.turbidity_provider},
+            },
+            "turbidity": turbidity_result,
+        }
+
+    def predict_detection_only(self, image_bytes: bytes, conf: float = 0.35) -> dict:
+        """Run only fish detection + species classification (no turbidity)."""
+        pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img_array = np.array(pil_image)
+        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+        img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+        img_w, img_h = pil_image.size
+
+        detections_raw = run_detection(img_cv, self.detect_session, conf)
+
+        detections = []
+        species_counts = {}
+
+        for x1, y1, x2, y2, det_confidence in detections_raw:
+            x1 = max(0, x1)
+            y1 = max(0, y1)
+            x2 = min(img_w, x2)
+            y2 = min(img_h, y2)
+
+            crop = img_array[y1:y2, x1:x2]
+            species_result = run_species(crop, self.species_session, self.species_metadata)
+
+            detection_entry = {
+                "bbox": [x1, y1, x2, y2],
+                "bbox_normalized": [
+                    round(x1 / img_w, 6),
+                    round(y1 / img_h, 6),
+                    round(x2 / img_w, 6),
+                    round(y2 / img_h, 6),
+                ],
+                "detection_confidence": round(det_confidence, 6),
+                **species_result,
+            }
+            detections.append(detection_entry)
+
+            count_key = (
+                species_result["species"]
+                if not species_result["below_threshold"]
+                else "unknown"
+            )
+            species_counts[count_key] = species_counts.get(count_key, 0) + 1
+
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "image_dimensions": {"width": img_w, "height": img_h},
+            "models": {
+                "detection": {"provider": self.detect_provider},
+                "species": {"provider": self.species_provider},
+            },
+            "detections": detections,
+            "summary": {
+                "total_detections": len(detections),
+                "species_counts": species_counts,
+            },
+        }

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useTank } from '../../hooks/useTank';
 import { QrCode } from 'lucide-react';
 
 export const RootGateOnboarding: React.FC = () => {
-  const { linkTank, createAndLinkTank } = useApp();
+  const { linkTank, createAndLinkTank } = useTank();
   const [qrInput, setQrInput] = useState('');
   const [tankName, setTankName] = useState('');
   const [showCreate, setShowCreate] = useState(false);

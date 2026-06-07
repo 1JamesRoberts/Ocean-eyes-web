@@ -399,7 +399,6 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   background-color: var(--color-camera-bg);
   border-radius: 20px;
-  aspect-ratio: 1 / 1;
   border: 1px solid var(--color-camera-border);
   box-shadow: var(--shadow-premium);
 }
@@ -417,7 +416,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 768px) {
   .live-camera-feed {
-    aspect-ratio: 1 / 1;
+    border-radius: 12px;
   }
 }
 

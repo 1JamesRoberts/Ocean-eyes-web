@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useNavigation } from '../../context/NavigationContext';
+import { useTank } from '../../hooks/useTank';
+import { useTheme } from '../../hooks/useTheme';
 import { MockFirestore } from '../../services/mock_service';
 import { ChevronRight, Sun, Moon } from 'lucide-react';
 
 export const SettingsScreen: React.FC = () => {
-  const { activeTank, unlinkTank, updateTankName, setActiveTab, isDarkMode, setIsDarkMode } = useApp();
+  const { setActiveTab } = useNavigation();
+  const { activeTank, unlinkTank, updateTankName } = useTank();
+  const { isDarkMode, setIsDarkMode } = useTheme();
   const [name, setName] = useState(activeTank?.name || 'Living Room Reef');
   const [editing, setEditing] = useState(false);
   const [showConfirmUnlink, setShowConfirmUnlink] = useState(false);
@@ -171,15 +175,15 @@ export const SettingsScreen: React.FC = () => {
         
         <div style={{ marginBottom: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '6px' }}>
-            <span style={{ color: 'var(--color-text-secondary)' }}>Minimum Water Clarity</span>
-            <strong style={{ color: 'var(--color-primary)' }}>{activeTank?.thresholds.clarity_min || 6.0} / 10</strong>
+            <span style={{ color: 'var(--color-text-secondary)' }}>Maximum FNU Threshold</span>
+            <strong style={{ color: 'var(--color-primary)' }}>{activeTank?.thresholds.clarity_min || 6.0} FNU</strong>
           </div>
-          <input 
-            type="range" 
-            min="4.0" 
-            max="8.0" 
-            step="0.5" 
-            value={activeTank?.thresholds.clarity_min || 6.0} 
+          <input
+            type="range"
+            min="1.0"
+            max="10.0"
+            step="0.5"
+            value={activeTank?.thresholds.clarity_min || 6.0}
             onChange={(e) => {
               const val = parseFloat(e.target.value);
               const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
@@ -230,7 +234,7 @@ export const SettingsScreen: React.FC = () => {
             <button 
               className="primary-button" 
               style={{ flex: 1, padding: '8px', fontSize: '12px', borderRadius: '10px', backgroundColor: 'var(--color-critical)', borderColor: 'var(--color-critical)' }}
-              onClick={unlinkTank}
+              onClick={() => { unlinkTank(); setActiveTab('home'); }}
             >
               Yes, Disconnect
             </button>

@@ -1,9 +1,11 @@
 import React from 'react';
-import { useApp } from '../../context/AppContext';
-import { Check } from 'lucide-react';
+import { useNavigation } from '../../context/NavigationContext';
+import { useAlerts } from '../../hooks/useAlerts';
+import { Check, AlertTriangle } from 'lucide-react';
 
 export const AlertsScreen: React.FC = () => {
-  const { alerts, resolveAlert, setActiveTab, selectedAlertId, setSelectedAlertId } = useApp();
+  const { setActiveTab, selectedAlertId, setSelectedAlertId } = useNavigation();
+  const { alerts, resolveAlert } = useAlerts();
 
   const handleBack = () => {
     setSelectedAlertId(null);
@@ -29,7 +31,7 @@ export const AlertsScreen: React.FC = () => {
 
         <div className="card-decoration" style={{ padding: '24px', marginBottom: '20px', borderLeft: `6px solid ${selectedAlert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)'}` }}>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ fontSize: '20px' }}>⚠️</span>
+            <AlertTriangle size={20} color="var(--color-warning)" />
             <h2 style={{ fontSize: '20px', fontWeight: 800 }}>{selectedAlert.title}</h2>
           </div>
           <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '6px' }}>{selectedAlert.timeAgo}</p>

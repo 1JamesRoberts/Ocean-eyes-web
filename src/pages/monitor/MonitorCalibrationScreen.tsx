@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useTank } from '../../hooks/useTank';
+import { useLiveState } from '../../hooks/useLiveState';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
 }
 
 export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
-  const { activeTank: contextActiveTank, tanks, updateCalibration } = useApp();
+  const { activeTank: contextActiveTank, tanks } = useTank();
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
+  const { updateCalibration } = useLiveState(activeTank?.id ?? null);
   const [lineY, setLineY] = useState(activeTank?.calibration?.water_line_y || 120);
   const [saved, setSaved] = useState(false);
   const staticWaterLineY = activeTank?.calibration?.water_line_y || 120; // Static camera feed reference
@@ -87,13 +89,6 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
           pointerEvents: 'none'
         }}>
           {/* Bubbles */}
-          <div style={{ position: 'absolute', bottom: '15%', left: '20%', fontSize: '14px', opacity: 0.3 }} className="anim-float-1">🫧</div>
-          <div style={{ position: 'absolute', bottom: '45%', right: '15%', fontSize: '12px', opacity: 0.2 }} className="anim-float-2">🫧</div>
-          <div style={{ position: 'absolute', bottom: '70%', left: '50%', fontSize: '16px', opacity: 0.4 }} className="anim-float-1">🫧</div>
-
-          {/* Swimming fish inside water */}
-          <span style={{ fontSize: '32px', position: 'absolute', bottom: '30%', left: '20%', opacity: 0.65 }} className="anim-float-1">🐟</span>
-          <span style={{ fontSize: '28px', position: 'absolute', bottom: '50%', right: '20%', opacity: 0.65 }} className="anim-float-2">🐠</span>
         </div>
 
         {/* Sand/Substrate Bed */}
@@ -108,10 +103,6 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
           zIndex: 2,
           pointerEvents: 'none'
         }} />
-
-        {/* Aquatic Plants */}
-        <div style={{ position: 'absolute', bottom: '22px', left: '6%', fontSize: '26px', zIndex: 3, opacity: 0.7 }} className="anim-float-1">🌿</div>
-        <div style={{ position: 'absolute', bottom: '22px', right: '8%', fontSize: '28px', zIndex: 3, opacity: 0.6 }} className="anim-float-2">🍀</div>
 
         {/* Glass Tank Frame Reflection */}
         <div style={{

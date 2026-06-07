@@ -1,5 +1,5 @@
 // ai_service.ts - Frontend service for FishAI FastAPI backend communication
-import type { AIPredictionResult } from '../types/aquarium';
+import type { AIDetectionResult, AITurbidityResult } from '../types/aquarium';
 
 const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
 
@@ -85,16 +85,16 @@ export async function captureFrameFromUrl(
 }
 
 /**
- * Send an image Blob to the AI backend for inference.
+ * Send an image Blob to the AI backend for detection + species inference (no turbidity).
  */
-export async function sendFrameForInference(
+export async function sendFrameForDetection(
   blob: Blob,
   conf: number = 0.35
-): Promise<AIPredictionResult> {
+): Promise<AIDetectionResult> {
   const formData = new FormData();
   formData.append('file', blob, 'frame.jpg');
 
-  const res = await fetch(`${AI_API_URL}/predict?conf=${conf}`, {
+  const res = await fetch(`${AI_API_URL}/predict/detection?conf=${conf}`, {
     method: 'POST',
     body: formData,
   });
@@ -105,7 +105,28 @@ export async function sendFrameForInference(
   }
 
   const data = await res.json();
-  return data as AIPredictionResult;
+  return data as AIDetectionResult;
+}
+
+/**
+ * Send an image Blob to the AI backend for turbidity-only inference.
+ */
+export async function sendFrameForTurbidity(blob: Blob): Promise<AITurbidityResult> {
+  const formData = new FormData();
+  formData.append('file', blob, 'frame.jpg');
+
+  const res = await fetch(`${AI_API_URL}/predict/turbidity`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new Error(err.error || `AI backend error: ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data as AITurbidityResult;
 }
 
 /**

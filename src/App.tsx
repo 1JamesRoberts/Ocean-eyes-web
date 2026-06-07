@@ -1,6 +1,9 @@
 // App.tsx - Full-Screen Desktop Dashboard Playground Coordinator
 import React from 'react';
-import { AppProvider, useApp } from './context/AppContext';
+import { NavigationProvider, useNavigation } from './context/NavigationContext';
+import { useTank } from './hooks/useTank';
+import { useAlerts } from './hooks/useAlerts';
+import { useSimulation } from './hooks/useSimulation';
 import { ViewerApp } from './pages/ViewerApp';
 import { IoTMonitor } from './pages/IoTMonitor';
 import { 
@@ -12,16 +15,10 @@ import {
 } from 'lucide-react';
 
 const OceanEyesDashboard: React.FC = () => {
-  const { 
-    activeTab, 
-    setActiveTab, 
-    tankId, 
-    activeTank, 
-    alerts, 
-    simulationActive, 
-    setSimulationActive, 
-    triggerManualReading 
-  } = useApp();
+  const { activeTab, setActiveTab } = useNavigation();
+  const { tankId, activeTank } = useTank();
+  const { alerts } = useAlerts();
+  const { simulationActive, setSimulationActive, triggerManualReading } = useSimulation();
 
   const activeAlertCount = alerts.filter(a => !a.resolved).length;
 
@@ -174,9 +171,9 @@ const OceanEyesDashboard: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <AppProvider>
+    <NavigationProvider>
       <OceanEyesDashboard />
-    </AppProvider>
+    </NavigationProvider>
   );
 };
 

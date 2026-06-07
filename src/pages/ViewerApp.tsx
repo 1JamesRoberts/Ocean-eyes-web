@@ -1,6 +1,7 @@
 // ViewerApp.tsx - Recreating Flutter UI screens for the Mobile Viewer Portal
 import React from 'react';
-import { useApp } from '../context/AppContext';
+import { useNavigation } from '../context/NavigationContext';
+import { useTank } from '../hooks/useTank';
 import { RootGateOnboarding } from './viewer/RootGateOnboarding';
 import { HomeScreen } from './viewer/HomeScreen';
 import { LiveScreen } from './viewer/LiveScreen';
@@ -10,7 +11,8 @@ import { HistoryDetailScreen } from './viewer/HistoryDetailScreen';
 import { MyFishScreen } from './viewer/MyFishScreen';
 
 export const ViewerApp: React.FC = () => {
-  const { tankId, activeTab } = useApp();
+  const { tankId } = useTank();
+  const { activeTab } = useNavigation();
 
   return (
     <div className="scaffold">
@@ -21,7 +23,7 @@ export const ViewerApp: React.FC = () => {
 
 // ─── Main Shell Component (ViewerShell equivalent) ───
 const ViewerShell: React.FC = () => {
-  const { activeTab } = useApp();
+  const { activeTab } = useNavigation();
 
   const renderActiveScreen = () => {
     switch (activeTab) {

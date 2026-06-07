@@ -140,6 +140,68 @@ async def predict(
         )
 
 
+@app.post("/predict/turbidity")
+async def predict_turbidity(
+    file: UploadFile = File(...),
+):
+    """
+    Run turbidity estimation only on uploaded image.
+    
+    Returns:
+        JSON with turbidity result only.
+    """
+    if pipeline is None:
+        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
+
+    try:
+        contents = await file.read()
+        if not contents:
+            return JSONResponse(status_code=400, content={"error": "Empty file"})
+
+        result = pipeline.predict_turbidity_only(contents)
+        return result
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e), "type": type(e).__name__},
+        )
+
+
+@app.post("/predict/detection")
+async def predict_detection(
+    file: UploadFile = File(...),
+    conf: float = Query(0.35, ge=0.0, le=1.0, description="Detection confidence threshold"),
+):
+    """
+    Run fish detection + species classification only (no turbidity).
+
+    Returns:
+        JSON with detections and species summary only.
+    """
+    if pipeline is None:
+        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
+
+    try:
+        contents = await file.read()
+        if not contents:
+            return JSONResponse(status_code=400, content={"error": "Empty file"})
+
+        original_conf = pipeline.conf
+        pipeline.conf = conf
+
+        result = pipeline.predict_detection_only(contents, conf)
+        pipeline.conf = original_conf
+
+        return result
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e), "type": type(e).__name__},
+        )
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

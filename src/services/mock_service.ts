@@ -3,7 +3,6 @@ import type {
   FishEntry, 
   AlertItem, 
   ReadingItem, 
-  CameraFeed, 
   LiveState, 
   TankBrief 
 } from '../types/aquarium';
@@ -34,37 +33,37 @@ const SEED_TANKS: TankBrief[] = [
     name: 'Office Nano Reef',
     owner_id: 'anon-user-123',
     created_at: new Date().toISOString(),
-    thresholds: { clarity_min: 7.0, fish_change_pct: 40.0 },
+    thresholds: { clarity_min: 4.0, fish_change_pct: 40.0 },
     calibration: { water_line_y: 100 }
   }
 ];
 
 const SEED_FISH: FishEntry[] = [
-  { id: 'f1', speciesId: 'neon_tetra', name: 'Neon Tetra', imageUrl: 'species-neon-tetra', count: 6, detected: 5 },
-  { id: 'f2', speciesId: 'guppy', name: 'Guppy', imageUrl: 'species-guppy', count: 3, detected: 3 },
-  { id: 'f3', speciesId: 'corydoras', name: 'Corydoras', imageUrl: 'species-corydoras', count: 2, detected: 2 }
+  { id: 'f1', speciesId: 'neon_tetra', name: 'Neon Tetra', imageUrl: 'species-neon-tetra', count: 6, detected: 0 },
+  { id: 'f2', speciesId: 'guppy', name: 'Guppy', imageUrl: 'species-guppy', count: 3, detected: 0 },
+  { id: 'f3', speciesId: 'corydoras', name: 'Corydoras', imageUrl: 'species-corydoras', count: 2, detected: 0 }
 ];
 
 const SEED_READINGS: ReadingItem[] = [
-  { id: 'r7', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 60000 * 2).toISOString(), clarity: 7.8, fish_count: 10, fish_count_confidence: 0.95, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.1 },
-  { id: 'r6', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 1).toISOString(), clarity: 8.0, fish_count: 10, fish_count_confidence: 0.98, frame_url: '', ph: 7.2, temp: 26.0, ammonia: 0.0, nitrite: 0.1 },
-  { id: 'r5', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), clarity: 7.5, fish_count: 9, fish_count_confidence: 0.88, frame_url: '', ph: 7.3, temp: 25.9, ammonia: 0.01, nitrite: 0.1 },
-  { id: 'r4', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 5).toISOString(), clarity: 8.2, fish_count: 11, fish_count_confidence: 0.92, frame_url: '', ph: 7.1, temp: 26.2, ammonia: 0.0, nitrite: 0.08 },
-  { id: 'r3', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 12).toISOString(), clarity: 8.5, fish_count: 11, fish_count_confidence: 0.95, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.07 },
-  { id: 'r2', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 86400000 * 1).toISOString(), clarity: 8.6, fish_count: 11, fish_count_confidence: 0.97, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.05 },
-  { id: 'r1', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 86400000 * 2).toISOString(), clarity: 8.8, fish_count: 11, fish_count_confidence: 0.96, frame_url: '', ph: 7.2, temp: 25.8, ammonia: 0.0, nitrite: 0.05 }
+  { id: 'r7', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 60000 * 2).toISOString(), clarity: 1.2, fish_count: 0, fish_count_confidence: 0.95, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.1 },
+  { id: 'r6', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 1).toISOString(), clarity: 1.0, fish_count: 0, fish_count_confidence: 0.98, frame_url: '', ph: 7.2, temp: 26.0, ammonia: 0.0, nitrite: 0.1 },
+  { id: 'r5', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), clarity: 1.5, fish_count: 0, fish_count_confidence: 0.88, frame_url: '', ph: 7.3, temp: 25.9, ammonia: 0.01, nitrite: 0.1 },
+  { id: 'r4', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 5).toISOString(), clarity: 0.8, fish_count: 0, fish_count_confidence: 0.92, frame_url: '', ph: 7.1, temp: 26.2, ammonia: 0.0, nitrite: 0.08 },
+  { id: 'r3', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 12).toISOString(), clarity: 0.5, fish_count: 0, fish_count_confidence: 0.95, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.07 },
+  { id: 'r2', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 86400000 * 1).toISOString(), clarity: 0.4, fish_count: 0, fish_count_confidence: 0.97, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.05 },
+  { id: 'r1', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 86400000 * 2).toISOString(), clarity: 0.3, fish_count: 0, fish_count_confidence: 0.96, frame_url: '', ph: 7.2, temp: 25.8, ammonia: 0.0, nitrite: 0.05 }
 ];
 
 const SEED_ALERTS: AlertItem[] = [
   {
     id: 'a1',
     title: 'Water clarity dropped',
-    message: 'Clarity dropped from 8.5 to 7.5 in 2 hours. Possible filter issue.',
+    message: 'Turbidity rose from 0.5 to 1.5 FNU in 2 hours. Possible filter issue.',
     tip: 'Check your filter intake for debris. A sudden clarity drop often indicates a clogged filter sponge or disturbed substrate. Consider a 20–30% water change if it persists after cleaning.',
     severity: 'warning',
     timeAgo: '3 hours ago',
-    clarityBefore: '8.5',
-    clarityAfter: '7.5',
+    clarityBefore: '0.5',
+    clarityAfter: '1.5',
     fishBefore: '10',
     fishAfter: '10',
     resolved: false,
@@ -166,8 +165,8 @@ export class MockFirestore {
       stream_url: 'rtsp://oceaneyes.iot/live-stream-09',
       started_at: null,
       last_ping_at: null,
-      current_clarity: 7.8,
-      current_fish_count: 10,
+      current_clarity: 1.2,
+      current_fish_count: 0,
       selected_feed_id: 'feed-main',
       feeds: [
         {
@@ -176,37 +175,21 @@ export class MockFirestore {
           stream_url: 'rtsp://oceaneyes.iot/live-stream-09',
           is_live: false,
           started_at: null,
-          current_clarity: 7.8,
-          current_fish_count: 10,
+          current_clarity: 1.2,
+          current_fish_count: 0,
           mock_image: '/mock_camera_main.png'
-        },
-        {
-          id: 'feed-angle',
-          name: 'Angle View',
-          stream_url: 'rtsp://oceaneyes.iot/angle-stream-02',
-          is_live: false,
-          started_at: null,
-          current_clarity: 8.2,
-          current_fish_count: 8,
-          mock_image: '/mock_camera_angle.png'
-        },
-        {
-          id: 'feed-mobile',
-          name: 'Mobile Feed',
-          stream_url: 'rtsp://oceaneyes.iot/mobile-stream-05',
-          is_live: false,
-          started_at: null,
-          current_clarity: 7.5,
-          current_fish_count: 9,
-          mock_image: '/mock_camera_mobile.png'
         }
       ]
     };
     const state = getOrSet(key, defaultState);
-    
-    // Schema Migration for backward compatibility (e.g. if the user has an older saved state in LocalStorage)
+
+    // Schema Migration: enforce strictly 1 camera feed
     let needsSave = false;
     if (!state.feeds || !Array.isArray(state.feeds) || state.feeds.length === 0) {
+      state.feeds = defaultState.feeds;
+      needsSave = true;
+    }
+    if (state.feeds.length > 1) {
       state.feeds = defaultState.feeds;
       needsSave = true;
     }
@@ -214,22 +197,16 @@ export class MockFirestore {
       state.selected_feed_id = defaultState.selected_feed_id;
       needsSave = true;
     }
-    
-    // Ensure all feeds have their mock_image defined (backward compatibility for previous multi-cam schema)
-    state.feeds.forEach(f => {
-      if (!f.mock_image) {
-        if (f.id === 'feed-main') f.mock_image = '/mock_camera_main.png';
-        else if (f.id === 'feed-angle') f.mock_image = '/mock_camera_angle.png';
-        else if (f.id === 'feed-mobile') f.mock_image = '/mock_camera_mobile.png';
-        else f.mock_image = '/mock_camera_custom.png';
-        needsSave = true;
-      }
-    });
+
+    if (state.feeds[0].mock_image !== '/mock_camera_main.png') {
+      state.feeds[0].mock_image = '/mock_camera_main.png';
+      needsSave = true;
+    }
 
     if (needsSave) {
       this.saveLiveState(tankId, state);
     }
-    
+
     return state;
   };
 
@@ -238,37 +215,8 @@ export class MockFirestore {
     notifyUpdate();
   };
 
-  static addCameraFeed = (tankId: string, name: string, streamUrl: string) => {
-    const liveState = this.getLiveState(tankId);
-    const newFeed: CameraFeed = {
-      id: `feed-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      name,
-      stream_url: streamUrl,
-      is_live: liveState.is_live,
-      started_at: liveState.is_live ? new Date().toISOString() : null,
-      current_clarity: parseFloat((7.0 + Math.random() * 2.0).toFixed(1)),
-      current_fish_count: Math.floor(Math.random() * 5) + 5,
-      mock_image: '/mock_camera_custom.png'
-    };
-    liveState.feeds.push(newFeed);
-    this.saveLiveState(tankId, liveState);
-  };
-
-  static deleteCameraFeed = (tankId: string, feedId: string) => {
-    const liveState = this.getLiveState(tankId);
-    if (liveState.feeds.length <= 1) return; // Must have at least one feed
-    
-    liveState.feeds = liveState.feeds.filter(f => f.id !== feedId);
-    if (liveState.selected_feed_id === feedId) {
-      liveState.selected_feed_id = liveState.feeds[0].id;
-      const activeFeed = liveState.feeds[0];
-      liveState.stream_url = activeFeed.stream_url;
-      liveState.current_clarity = activeFeed.current_clarity;
-      liveState.current_fish_count = activeFeed.current_fish_count;
-      liveState.started_at = activeFeed.started_at;
-    }
-    this.saveLiveState(tankId, liveState);
-  };
+  // Prototype constraint: strictly 1 camera per tank
+  // addCameraFeed and deleteCameraFeed removed - single camera only
 
   static switchActiveFeed = (tankId: string, feedId: string) => {
     const liveState = this.getLiveState(tankId);
@@ -293,7 +241,7 @@ export class MockFirestore {
       name,
       owner_id: 'anon-user-123',
       created_at: new Date().toISOString(),
-      thresholds: { clarity_min: 6.0, fish_change_pct: 50.0 },
+    thresholds: { clarity_min: 5.0, fish_change_pct: 50.0 },
       calibration: { water_line_y: 120 }
     };
     tanks.push(newTank);

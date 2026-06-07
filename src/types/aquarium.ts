@@ -138,3 +138,23 @@ export interface AIPredictionResult {
   detections: AIDetection[];
   summary: AISummary;
 }
+
+export interface AIDetectionResult {
+  timestamp: string;
+  image_dimensions: { width: number; height: number };
+  models: {
+    detection: { provider: string };
+    species: { provider: string };
+  };
+  detections: AIDetection[];
+  summary: AISummary;
+}
+
+export interface AITurbidityResult {
+  timestamp: string;
+  image_dimensions: { width: number; height: number };
+  models: {
+    turbidity: { provider: string };
+  };
+  turbidity: AITurbidity;
+}
