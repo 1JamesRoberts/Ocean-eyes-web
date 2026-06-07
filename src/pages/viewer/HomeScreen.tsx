@@ -5,6 +5,7 @@ import { useReadings } from '../../hooks/useReadings';
 import { useFish } from '../../hooks/useFish';
 import { useAlerts } from '../../hooks/useAlerts';
 import { useLiveState } from '../../hooks/useLiveState';
+import type { ReadingItem } from '../../types/aquarium';
 import { TankHeader } from '../../components/home/TankHeader';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { LiveFeedPreview } from '../../components/home/LiveFeedPreview';
@@ -24,9 +25,14 @@ export const HomeScreen: React.FC = () => {
 
   const [showAddTankModal, setShowAddTankModal] = useState(false);
 
-  const latestReading = readings[0] || {
+  const latestReading: ReadingItem = readings[0] || {
+    id: 'fallback',
+    tank_id: tankId || 'unknown',
+    timestamp: new Date().toISOString(),
     clarity: 1.2,
     fish_count: 0,
+    fish_count_confidence: 1,
+    frame_url: '',
     ph: 7.2,
     temp: 26.1,
     ammonia: 0,
@@ -45,7 +51,7 @@ export const HomeScreen: React.FC = () => {
 
   const handleSelectAlert = (alertId: string) => {
     setSelectedAlertId(alertId);
-    setActiveTab('settings');
+    setActiveTab('alerts');
   };
 
   const handleCreateTank = async (name: string) => {
