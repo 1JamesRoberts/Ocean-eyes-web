@@ -71,6 +71,39 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
     current_fish_count: 0,
     mock_image: '/mock_camera_main.png'
   };
+  const isWebcam = activeFeed.stream_url?.startsWith('webcam:');
+
+  const [webcamStream, setWebcamStream] = React.useState<MediaStream | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+
+  React.useEffect(() => {
+    let activeStream: MediaStream | null = null;
+    if (liveState?.is_live && isWebcam) {
+      const deviceId = activeFeed.stream_url.split(':')[1];
+      navigator.mediaDevices.getUserMedia({
+        video: deviceId && deviceId !== 'default' ? { deviceId: { exact: deviceId } } : true
+      })
+      .then(stream => {
+        activeStream = stream;
+        setWebcamStream(stream);
+      })
+      .catch(err => {
+        console.error('Failed to access webcam in preview:', err);
+      });
+    }
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+      }
+      setWebcamStream(null);
+    };
+  }, [liveState?.is_live, isWebcam, activeFeed.stream_url]);
+
+  React.useEffect(() => {
+    if (videoRef.current && webcamStream) {
+      videoRef.current.srcObject = webcamStream;
+    }
+  }, [webcamStream]);
 
   return (
     <div className="card-decoration" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -99,15 +132,29 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
           <>
             <div className="camera-grid" />
 
-            <img
-              src={activeFeed.mock_image || ''}
-              alt="Live feed"
-              style={{
-                width: '100%',
-                height: 'auto',
-                display: 'block'
-              }}
-            />
+            {isWebcam ? (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block'
+                }}
+              />
+            ) : (
+              <img
+                src={activeFeed.mock_image || ''}
+                alt="Live feed"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block'
+                }}
+              />
+            )}
             <div style={{
               position: 'absolute',
               top: 0,

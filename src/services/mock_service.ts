@@ -198,7 +198,8 @@ export class MockFirestore {
       needsSave = true;
     }
 
-    if (state.feeds[0].mock_image !== '/mock_camera_main.png') {
+    const isWebcam = state.feeds[0].stream_url?.startsWith('webcam:');
+    if (!isWebcam && state.feeds[0].mock_image !== '/mock_camera_main.png') {
       state.feeds[0].mock_image = '/mock_camera_main.png';
       needsSave = true;
     }
@@ -233,7 +234,7 @@ export class MockFirestore {
 
   // ─── Tank Operations ─────────────────────────────────────────────────────────
 
-  static async createTank(name: string): Promise<string> {
+  static async createTank(name: string, cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }): Promise<string> {
     const id = `tank-${Math.floor(Math.random() * 900000) + 100000}`;
     const tanks = this.getTanks();
     const newTank: TankBrief = {
@@ -241,11 +242,36 @@ export class MockFirestore {
       name,
       owner_id: 'anon-user-123',
       created_at: new Date().toISOString(),
-    thresholds: { clarity_min: 5.0, fish_change_pct: 50.0 },
+      thresholds: { clarity_min: 5.0, fish_change_pct: 50.0 },
       calibration: { water_line_y: 120 }
     };
     tanks.push(newTank);
     this.saveTanks(tanks);
+
+    // Initialize LiveState for the tank using selected webcam or default mock settings
+    const isWebcam = cameraSource?.type === 'webcam';
+    const liveState: LiveState = {
+      is_live: false,
+      stream_url: isWebcam ? `webcam:${cameraSource?.deviceId || 'default'}` : 'rtsp://oceaneyes.iot/live-stream-09',
+      started_at: null,
+      last_ping_at: null,
+      current_clarity: 1.2,
+      current_fish_count: 0,
+      selected_feed_id: 'feed-main',
+      feeds: [
+        {
+          id: 'feed-main',
+          name: isWebcam ? 'Local Webcam' : 'Main View',
+          stream_url: isWebcam ? `webcam:${cameraSource?.deviceId || 'default'}` : 'rtsp://oceaneyes.iot/live-stream-09',
+          is_live: false,
+          started_at: null,
+          current_clarity: 1.2,
+          current_fish_count: 0,
+          mock_image: isWebcam ? '' : '/mock_camera_main.png'
+        }
+      ]
+    };
+    this.saveLiveState(id, liveState);
 
     // Initial reading
     await this.writeReading({

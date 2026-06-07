@@ -54,8 +54,8 @@ export const HomeScreen: React.FC = () => {
     setActiveTab('alerts');
   };
 
-  const handleCreateTank = async (name: string) => {
-    await createAndLinkTank(name);
+  const handleCreateTank = async (name: string, cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }) => {
+    await createAndLinkTank(name, cameraSource);
   };
 
   const handleLinkTank = async (tankId: string): Promise<boolean> => {

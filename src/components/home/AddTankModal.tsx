@@ -4,7 +4,7 @@ import { AlertTriangle } from 'lucide-react';
 interface AddTankModalProps {
   show: boolean;
   onClose: () => void;
-  onCreateTank: (name: string) => Promise<void>;
+  onCreateTank: (name: string, cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }) => Promise<void>;
   onLinkTank: (tankId: string) => Promise<boolean>;
 }
 
@@ -19,6 +19,28 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
   const [linkTankCode, setLinkTankCode] = useState('');
   const [addError, setAddError] = useState('');
 
+  const [cameraType, setCameraType] = useState<'mock' | 'webcam'>('mock');
+  const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
+  const [selectedCamera, setSelectedCamera] = useState('');
+  const [permissionError, setPermissionError] = useState('');
+
+  const requestCameraAccess = async () => {
+    try {
+      setPermissionError('');
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach(track => track.stop());
+      
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(d => d.kind === 'videoinput');
+      setCameras(videoDevices);
+      if (videoDevices.length > 0) {
+        setSelectedCamera(videoDevices[0].deviceId);
+      }
+    } catch {
+      setPermissionError('Camera access denied or unavailable.');
+    }
+  };
+
   if (!show) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,7 +50,10 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
     if (addMode === 'create') {
       if (!newTankName.trim()) return;
       try {
-        await onCreateTank(newTankName.trim());
+        await onCreateTank(newTankName.trim(), {
+          type: cameraType,
+          deviceId: cameraType === 'webcam' ? selectedCamera : undefined
+        });
         setNewTankName('');
         onClose();
       } catch {
@@ -51,6 +76,10 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
     setLinkTankCode('');
     setAddError('');
     setAddMode('create');
+    setCameraType('mock');
+    setCameras([]);
+    setSelectedCamera('');
+    setPermissionError('');
     onClose();
   };
 
@@ -126,26 +155,93 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
         )}
 
         {addMode === 'create' ? (
-          <div>
-            <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px', fontWeight: 600 }}>AQUARIUM NAME</label>
-            <input 
-              type="text" 
-              placeholder="e.g. Bedroom Reef" 
-              value={newTankName}
-              onChange={e => setNewTankName(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: '10px',
-                border: '1px solid var(--color-border)',
-                outline: 'none',
-                fontFamily: 'var(--font-main)',
-                fontSize: '13px',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text-primary)'
-              }}
-              required
-            />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px', fontWeight: 600 }}>AQUARIUM NAME</label>
+              <input 
+                type="text" 
+                placeholder="e.g. Bedroom Reef" 
+                value={newTankName}
+                onChange={e => setNewTankName(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--color-border)',
+                  outline: 'none',
+                  fontFamily: 'var(--font-main)',
+                  fontSize: '13px',
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text-primary)'
+                }}
+                required
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '6px', fontWeight: 600 }}>CAMERA SOURCE</label>
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '8px' }}>
+                <label style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--color-text-primary)' }}>
+                  <input 
+                    type="radio" 
+                    name="cameraType" 
+                    checked={cameraType === 'mock'} 
+                    onChange={() => setCameraType('mock')} 
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  Mock Feed
+                </label>
+                <label style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--color-text-primary)' }}>
+                  <input 
+                    type="radio" 
+                    name="cameraType" 
+                    checked={cameraType === 'webcam'} 
+                    onChange={async () => {
+                      setCameraType('webcam');
+                      await requestCameraAccess();
+                    }} 
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  Local Webcam
+                </label>
+              </div>
+
+              {cameraType === 'webcam' && (
+                <div>
+                  {permissionError ? (
+                    <div style={{ color: 'var(--color-critical)', fontSize: '12px', marginTop: '4px' }}>
+                      {permissionError}
+                    </div>
+                  ) : (
+                    <select
+                      value={selectedCamera}
+                      onChange={e => setSelectedCamera(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        borderRadius: '10px',
+                        border: '1px solid var(--color-border)',
+                        outline: 'none',
+                        fontFamily: 'var(--font-main)',
+                        fontSize: '13px',
+                        backgroundColor: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)'
+                      }}
+                    >
+                      {cameras.length === 0 ? (
+                        <option value="">Searching for cameras...</option>
+                      ) : (
+                        cameras.map(cam => (
+                          <option key={cam.deviceId} value={cam.deviceId}>
+                            {cam.label || `Webcam ${cam.deviceId.slice(0, 5)}`}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div>

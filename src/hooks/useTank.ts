@@ -44,8 +44,8 @@ export const useTank = () => {
     }
   };
 
-  const createAndLinkTank = async (name: string): Promise<string> => {
-    const newId = await MockFirestore.createTank(name);
+  const createAndLinkTank = async (name: string, cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }): Promise<string> => {
+    const newId = await MockFirestore.createTank(name, cameraSource);
     await MockFirestore.joinTank(newId);
     setTankId(newId);
     return newId;

@@ -7,7 +7,7 @@ import { MockFirestore } from '../../services/mock_service';
 import type { CameraFilters, AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
 
 import { Video } from 'lucide-react';
-import { isBackendAvailable, captureFrameFromUrl, sendFrameForDetection, sendFrameForTurbidity } from '../../services/ai_service';
+import { isBackendAvailable, captureFrame, captureFrameFromUrl, sendFrameForDetection, sendFrameForTurbidity } from '../../services/ai_service';
 import { AIBoundingBoxes } from '../../components/live/AIBoundingBoxes';
 import { CameraControls } from '../../components/live/CameraControls';
 import { FullscreenInventory } from '../../components/live/FullscreenInventory';
@@ -22,6 +22,50 @@ export const LiveScreen: React.FC = () => {
   const { liveState, updateCalibration } = useLiveState(activeTank?.id ?? null);
   const { fishList } = useFish(activeTank?.id ?? null);
   const [isStreaming, setIsStreaming] = useState(liveState?.is_live || false);
+
+  const feeds = liveState?.feeds || [];
+  const activeFeed = feeds.find(f => f.id === liveState?.selected_feed_id) || feeds[0] || {
+    id: 'feed-main',
+    name: 'Main View',
+    stream_url: 'rtsp://oceaneyes.iot/live-stream-09',
+    is_live: false,
+    started_at: null,
+    current_clarity: 7.8,
+    current_fish_count: 0
+  };
+  const isWebcam = activeFeed.stream_url?.startsWith('webcam:');
+
+  const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    let activeStream: MediaStream | null = null;
+    if (isStreaming && isWebcam) {
+      const deviceId = activeFeed.stream_url.split(':')[1];
+      navigator.mediaDevices.getUserMedia({
+        video: deviceId && deviceId !== 'default' ? { deviceId: { exact: deviceId } } : true
+      })
+      .then(stream => {
+        activeStream = stream;
+        setWebcamStream(stream);
+      })
+      .catch(err => {
+        console.error('Failed to access webcam:', err);
+      });
+    }
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+      }
+      setWebcamStream(null);
+    };
+  }, [isStreaming, isWebcam, activeFeed.stream_url]);
+
+  useEffect(() => {
+    if (videoRef.current && webcamStream) {
+      videoRef.current.srcObject = webcamStream;
+    }
+  }, [webcamStream]);
 
   useEffect(() => {
     if (liveState) {
@@ -219,16 +263,6 @@ export const LiveScreen: React.FC = () => {
     }
   };
 
-  const feeds = liveState?.feeds || [];
-  const activeFeed = feeds.find(f => f.id === liveState?.selected_feed_id) || feeds[0] || {
-    id: 'feed-main',
-    name: 'Main View',
-    stream_url: 'rtsp://oceaneyes.iot/live-stream-09',
-    is_live: false,
-    started_at: null,
-    current_clarity: 7.8,
-    current_fish_count: 0
-  };
   const activeFeedCalibration = activeFeed?.calibration || activeTank?.calibration;
   const displayLineY = dragLineY !== null ? dragLineY : (activeFeedCalibration?.water_line_y ?? 120);
 
@@ -251,11 +285,16 @@ export const LiveScreen: React.FC = () => {
     }
 
     const processFrame = async () => {
-      if (!activeFeed.mock_image || aiLoading) return;
+      if (((!isWebcam && !activeFeed.mock_image) || aiLoading)) return;
       setAiLoading(true);
       setAiError(null);
       try {
-        const blob = await captureFrameFromUrl(activeFeed.mock_image, 640, 360);
+        let blob: Blob;
+        if (isWebcam && videoRef.current) {
+          blob = await captureFrame(videoRef.current);
+        } else {
+          blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360);
+        }
         const result = await sendFrameForDetection(blob, 0.35);
         setLastPrediction(result);
 
@@ -311,7 +350,7 @@ export const LiveScreen: React.FC = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAIActive, isStreaming, backendAvailable, activeFeed.mock_image]);
+  }, [isAIActive, isStreaming, backendAvailable, activeFeed.mock_image, isWebcam, webcamStream]);
 
   const toggleAI = useCallback(() => {
     if (!backendAvailable) {
@@ -323,10 +362,15 @@ export const LiveScreen: React.FC = () => {
   }, [backendAvailable]);
 
   const measureTurbidity = useCallback(async () => {
-    if (!activeFeed.mock_image || turbidityLoading) return;
+    if (((!isWebcam && !activeFeed.mock_image) || turbidityLoading)) return;
     setTurbidityLoading(true);
     try {
-      const blob = await captureFrameFromUrl(activeFeed.mock_image, 640, 360);
+      let blob: Blob;
+      if (isWebcam && videoRef.current) {
+        blob = await captureFrame(videoRef.current);
+      } else {
+        blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360);
+      }
       const result = await sendFrameForTurbidity(blob);
       setLastTurbidityResult(result);
 
@@ -360,7 +404,7 @@ export const LiveScreen: React.FC = () => {
     } finally {
       setTurbidityLoading(false);
     }
-  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading]);
+  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isWebcam]);
 
   const stateClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
   const stateFish = isStreaming && liveState?.is_live ? activeFeed.current_fish_count : 0;
@@ -492,6 +536,15 @@ export const LiveScreen: React.FC = () => {
     }
   }, [updateCalibration]);
 
+  const handleVideoLoadedMetadata = () => {
+    if (videoRef.current) {
+      setImageNaturalSize({
+        width: videoRef.current.videoWidth,
+        height: videoRef.current.videoHeight
+      });
+    }
+  };
+
   const takeSnapshot = () => {
     if (!isStreaming) return;
     setFlashActive(true);
@@ -503,7 +556,7 @@ export const LiveScreen: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const renderAllToCanvas = (bgImg?: HTMLImageElement) => {
+    const renderAllToCanvas = (bgImg?: HTMLImageElement | HTMLVideoElement) => {
       ctx.filter = `contrast(${filters.contrast}%) brightness(${filters.brightness}%) saturate(${filters.saturation}%)`;
       if (bgImg) {
         ctx.drawImage(bgImg, 0, 0, 640, 360);
@@ -608,7 +661,9 @@ export const LiveScreen: React.FC = () => {
       setSnapshots(prev => [newSnapshot, ...prev]);
     };
 
-    if (activeFeed.mock_image) {
+    if (isWebcam && videoRef.current) {
+      renderAllToCanvas(videoRef.current);
+    } else if (activeFeed.mock_image) {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
@@ -739,16 +794,32 @@ Diagnostics:
               transformOrigin: 'center',
               transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
-              <img
-                src={activeFeed.mock_image || ''}
-                alt="Live feed"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  display: 'block',
-                  filter: `contrast(${filters.contrast}%) brightness(${filters.brightness}%) saturate(${filters.saturation}%)`
-                }}
-              />
+              {isWebcam ? (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  onLoadedMetadata={handleVideoLoadedMetadata}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    filter: `contrast(${filters.contrast}%) brightness(${filters.brightness}%) saturate(${filters.saturation}%)`
+                  }}
+                />
+              ) : (
+                <img
+                  src={activeFeed.mock_image || ''}
+                  alt="Live feed"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    filter: `contrast(${filters.contrast}%) brightness(${filters.brightness}%) saturate(${filters.saturation}%)`
+                  }}
+                />
+              )}
               {filters.temperature !== 0 && (
                 <div style={{
                   position: 'absolute',
