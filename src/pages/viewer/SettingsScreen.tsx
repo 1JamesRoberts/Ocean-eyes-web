@@ -190,7 +190,7 @@ export const SettingsScreen: React.FC = () => {
               MockFirestore.updateThresholds(activeTank!.id, val, fishPct);
               window.dispatchEvent(new CustomEvent('oceaneyes_db_update'));
             }}
-            style={{ width: '100%', accentColor: 'var(--color-primary)' }}
+            style={{ width: '100%', accentColor: 'var(--color-primary-dark)' }}
           />
         </div>
 
@@ -199,19 +199,19 @@ export const SettingsScreen: React.FC = () => {
             <span style={{ color: 'var(--color-text-secondary)' }}>Discrepancy Alarm Trigger</span>
             <strong style={{ color: 'var(--color-primary)' }}>{activeTank?.thresholds.fish_change_pct || 50.0}% visibility</strong>
           </div>
-          <input 
-            type="range" 
-            min="20" 
-            max="80" 
-            step="10" 
-            value={activeTank?.thresholds.fish_change_pct || 50.0} 
+          <input
+            type="range"
+            min="20"
+            max="80"
+            step="10"
+            value={activeTank?.thresholds.fish_change_pct || 50.0}
             onChange={(e) => {
               const val = parseInt(e.target.value);
               const clar = activeTank?.thresholds.clarity_min || 6.0;
               MockFirestore.updateThresholds(activeTank!.id, clar, val);
               window.dispatchEvent(new CustomEvent('oceaneyes_db_update'));
             }}
-            style={{ width: '100%', accentColor: 'var(--color-primary)' }}
+            style={{ width: '100%', accentColor: 'var(--color-primary-dark)' }}
           />
         </div>
       </div>

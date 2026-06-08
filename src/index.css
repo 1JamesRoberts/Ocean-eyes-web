@@ -35,8 +35,8 @@
 }
 
 body.dark {
-  --color-background: radial-gradient(circle at 80% 20%, #12154d 0%, #080920 60%, #03030c 100%);
-  --color-surface: linear-gradient(145deg, #121447 0%, #07081a 100%);
+  --color-background: radial-gradient(circle at 80% 20%, #12154d 0%, #0e0f39 60%, #03030c 100%);
+  --color-surface: linear-gradient(145deg, #121447 0%, #60a7ff14 100%);
   --color-surface-hover: linear-gradient(145deg, #191c5e 0%, #0a0b24 100%);
   --color-primary: linear-gradient(135deg, #00d2ff 0%, #005bbf 100%);
   --color-primary-hover: linear-gradient(135deg, #3de0ff 0%, #0074d9 100%);
