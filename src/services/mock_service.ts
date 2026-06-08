@@ -18,141 +18,41 @@ export const subscribeToDb = (callback: () => void) => {
   return () => window.removeEventListener(DB_UPDATE_EVENT, callback);
 };
 
-// Initial Seed Data (if localStorage is empty)
-const SEED_TANKS: TankBrief[] = [
-  {
-    id: 'living-room-tank-77',
-    name: 'Living Room Reef',
-    owner_id: 'anon-user-123',
-    created_at: new Date().toISOString(),
-    thresholds: { clarity_min: 6.0, fish_change_pct: 50.0 },
-    calibration: { water_line_y: 120 }
-  },
-  {
-    id: 'office-reef-55',
-    name: 'Office Nano Reef',
-    owner_id: 'anon-user-123',
-    created_at: new Date().toISOString(),
-    thresholds: { clarity_min: 4.0, fish_change_pct: 40.0 },
-    calibration: { water_line_y: 100 }
-  }
-];
-
-const SEED_FISH: FishEntry[] = [
-  { id: 'f1', speciesId: 'neon_tetra', name: 'Neon Tetra', imageUrl: 'species-neon-tetra', count: 6, detected: 0 },
-  { id: 'f2', speciesId: 'guppy', name: 'Guppy', imageUrl: 'species-guppy', count: 3, detected: 0 },
-  { id: 'f3', speciesId: 'corydoras', name: 'Corydoras', imageUrl: 'species-corydoras', count: 2, detected: 0 }
-];
-
-const SEED_READINGS: ReadingItem[] = [
-  { id: 'r7', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 60000 * 2).toISOString(), clarity: 1.2, fish_count: 0, fish_count_confidence: 0.95, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.1 },
-  { id: 'r6', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 1).toISOString(), clarity: 1.0, fish_count: 0, fish_count_confidence: 0.98, frame_url: '', ph: 7.2, temp: 26.0, ammonia: 0.0, nitrite: 0.1 },
-  { id: 'r5', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), clarity: 1.5, fish_count: 0, fish_count_confidence: 0.88, frame_url: '', ph: 7.3, temp: 25.9, ammonia: 0.01, nitrite: 0.1 },
-  { id: 'r4', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 5).toISOString(), clarity: 0.8, fish_count: 0, fish_count_confidence: 0.92, frame_url: '', ph: 7.1, temp: 26.2, ammonia: 0.0, nitrite: 0.08 },
-  { id: 'r3', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 3600000 * 12).toISOString(), clarity: 0.5, fish_count: 0, fish_count_confidence: 0.95, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.07 },
-  { id: 'r2', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 86400000 * 1).toISOString(), clarity: 0.4, fish_count: 0, fish_count_confidence: 0.97, frame_url: '', ph: 7.2, temp: 26.1, ammonia: 0.0, nitrite: 0.05 },
-  { id: 'r1', tank_id: 'living-room-tank-77', timestamp: new Date(Date.now() - 86400000 * 2).toISOString(), clarity: 0.3, fish_count: 0, fish_count_confidence: 0.96, frame_url: '', ph: 7.2, temp: 25.8, ammonia: 0.0, nitrite: 0.05 }
-];
-
-const SEED_ALERTS: AlertItem[] = [
-  {
-    id: 'a1',
-    title: 'Water clarity dropped',
-    message: 'Turbidity rose from 0.5 to 1.5 FNU in 2 hours. Possible filter issue.',
-    tip: 'Check your filter intake for debris. A sudden clarity drop often indicates a clogged filter sponge or disturbed substrate. Consider a 20–30% water change if it persists after cleaning.',
-    severity: 'warning',
-    timeAgo: '3 hours ago',
-    clarityBefore: '0.5',
-    clarityAfter: '1.5',
-    fishBefore: '10',
-    fishAfter: '10',
-    resolved: false,
-    timestamp: new Date(Date.now() - 3600000 * 3).toISOString()
-  },
-  {
-    id: 'a2',
-    title: 'Only 4 of 6 Neon Tetras visible',
-    message: 'Neon Tetra count below 50% of expected for 35 minutes.',
-    tip: 'Fish may be hiding behind plants or decor. Check if lights are on and the filter is running. Tetras sometimes school tightly in one corner when stressed. Test water parameters if hiding persists.',
-    severity: 'warning',
-    timeAgo: 'Yesterday',
-    clarityBefore: '8.1',
-    clarityAfter: '8.1',
-    fishBefore: '6',
-    fishAfter: '4',
-    resolved: true,
-    timestamp: new Date(Date.now() - 86400000).toISOString()
-  },
-  {
-    id: 'a3',
-    title: 'Daily report',
-    message: 'Clarity 8/10 · 10 fish visible · All healthy',
-    tip: 'Your tank looks great! No action needed. Continue your regular maintenance schedule.',
-    severity: 'info',
-    timeAgo: 'Yesterday 8:00 AM',
-    clarityBefore: '',
-    clarityAfter: '',
-    fishBefore: '',
-    fishAfter: '',
-    resolved: true,
-    timestamp: new Date(Date.now() - 86400000 - 3600000 * 4).toISOString()
-  }
-];
-
-const getOrSet = <T>(key: string, seed: T): T => {
+const getOrDefault = <T>(key: string, defaultValue: T): T => {
   const data = localStorage.getItem(key);
   if (data === null) {
-    localStorage.setItem(key, JSON.stringify(seed));
-    return seed;
+    return defaultValue;
   }
-  return JSON.parse(data);
+  try {
+    return JSON.parse(data) as T;
+  } catch {
+    return defaultValue;
+  }
 };
 
 export class MockFirestore {
   // Local storage lists
   static getTanks = (): TankBrief[] => {
-    const defaultTanks = SEED_TANKS;
-    const stored = localStorage.getItem('tanks');
-    if (!stored) {
-      localStorage.setItem('tanks', JSON.stringify(defaultTanks));
-      return defaultTanks;
-    }
-    try {
-      const parsed = JSON.parse(stored) as TankBrief[];
-      let updated = false;
-      defaultTanks.forEach(dt => {
-        if (!parsed.some(t => t.id === dt.id)) {
-          parsed.push(dt);
-          updated = true;
-        }
-      });
-      if (updated) {
-        localStorage.setItem('tanks', JSON.stringify(parsed));
-      }
-      return parsed;
-    } catch {
-      localStorage.setItem('tanks', JSON.stringify(defaultTanks));
-      return defaultTanks;
-    }
+    return getOrDefault<TankBrief[]>('tanks', []);
   };
   static saveTanks = (tanks: TankBrief[]) => {
     localStorage.setItem('tanks', JSON.stringify(tanks));
     notifyUpdate();
   };
 
-  static getFish = (): FishEntry[] => getOrSet('tank_fish', SEED_FISH);
+  static getFish = (): FishEntry[] => getOrDefault<FishEntry[]>('tank_fish', []);
   static saveFish = (fish: FishEntry[]) => {
     localStorage.setItem('tank_fish', JSON.stringify(fish));
     notifyUpdate();
   };
 
-  static getReadings = (): ReadingItem[] => getOrSet('readings', SEED_READINGS);
+  static getReadings = (): ReadingItem[] => getOrDefault<ReadingItem[]>('readings', []);
   static saveReadings = (readings: ReadingItem[]) => {
     localStorage.setItem('readings', JSON.stringify(readings));
     notifyUpdate();
   };
 
-  static getAlerts = (): AlertItem[] => getOrSet('alerts', SEED_ALERTS);
+  static getAlerts = (): AlertItem[] => getOrDefault<AlertItem[]>('alerts', []);
   static saveAlerts = (alerts: AlertItem[]) => {
     localStorage.setItem('alerts', JSON.stringify(alerts));
     notifyUpdate();
@@ -181,7 +81,7 @@ export class MockFirestore {
         }
       ]
     };
-    const state = getOrSet(key, defaultState);
+    const state = getOrDefault<LiveState>(key, defaultState);
 
     // Schema Migration: enforce strictly 1 camera feed
     let needsSave = false;
@@ -293,7 +193,7 @@ export class MockFirestore {
     if (!found) return false;
 
     // Save in user linked tanks
-    const userTanks = getOrSet<string[]>('user_tanks', ['living-room-tank-77', 'office-reef-55']);
+    const userTanks = getOrDefault<string[]>('user_tanks', []);
     if (!userTanks.includes(tankId)) {
       userTanks.push(tankId);
       localStorage.setItem('user_tanks', JSON.stringify(userTanks));
@@ -303,29 +203,7 @@ export class MockFirestore {
   }
 
   static getLinkedTanks(): string[] {
-    const defaultLinked = ['living-room-tank-77', 'office-reef-55'];
-    const stored = localStorage.getItem('user_tanks');
-    if (!stored) {
-      localStorage.setItem('user_tanks', JSON.stringify(defaultLinked));
-      return defaultLinked;
-    }
-    try {
-      const parsed = JSON.parse(stored) as string[];
-      let updated = false;
-      defaultLinked.forEach(id => {
-        if (!parsed.includes(id)) {
-          parsed.push(id);
-          updated = true;
-        }
-      });
-      if (updated) {
-        localStorage.setItem('user_tanks', JSON.stringify(parsed));
-      }
-      return parsed;
-    } catch {
-      localStorage.setItem('user_tanks', JSON.stringify(defaultLinked));
-      return defaultLinked;
-    }
+    return getOrDefault<string[]>('user_tanks', []);
   }
 
   static unlinkTank(tankId: string) {

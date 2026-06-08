@@ -55,7 +55,7 @@ export const RootGateOnboarding: React.FC = () => {
           <div style={{ position: 'relative' }}>
             <input 
               type="text" 
-              placeholder="Enter Tank ID (e.g. living-room-tank-77)" 
+              placeholder="Enter Tank ID" 
               value={qrInput}
               onChange={(e) => setQrInput(e.target.value)}
               style={{
@@ -78,22 +78,6 @@ export const RootGateOnboarding: React.FC = () => {
 
           <button type="submit" className="primary-button" style={{ width: '100%' }}>
             Link Tank
-          </button>
-
-          <div style={{ textAlign: 'center', margin: '16px 0' }}>
-            <span style={{ color: 'var(--color-text-secondary)', fontSize: '14px' }}>or</span>
-          </div>
-
-          <button 
-            type="button" 
-            className="secondary-button" 
-            style={{ width: '100%', borderRadius: '24px' }}
-            onClick={() => {
-              // Quick mock link
-              linkTank('living-room-tank-77');
-            }}
-          >
-            Link Demo Tank (Living Room Reef)
           </button>
 
           <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>

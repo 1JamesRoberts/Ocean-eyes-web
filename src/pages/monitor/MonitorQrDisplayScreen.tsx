@@ -9,7 +9,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
   const { tankId, tanks } = useTank();
   const [copied, setCopied] = useState(false);
 
-  const activeTankId = tankId || (tanks.length > 0 ? tanks[0].id : 'living-room-tank-77');
+  const activeTankId = tankId || (tanks.length > 0 ? tanks[0].id : '');
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(activeTankId);
@@ -29,44 +29,52 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
       background: '#090D11'
     }}>
       <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px', color: '#E2E8F0' }}>Pairing QR Code</h3>
-      
-      {/* Visual Scannable QR mock */}
-      <div className="qr-container" style={{ marginBottom: '20px' }}>
-        <div className="qr-code-canvas" />
-        <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600, marginTop: '12px' }}>
-          SCAN ME IN APP
-        </span>
-      </div>
 
-      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 600 }}>Manual Pairing ID</span>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          background: '#0F172A',
-          padding: '10px 16px',
-          borderRadius: '10px',
-          border: '1px solid #1E293B',
-          marginTop: '6px'
-        }}>
-          <code style={{ fontSize: '13px', color: '#38BDF8' }}>{activeTankId}</code>
-          <button 
-            onClick={copyToClipboard}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--color-primary)',
-              fontSize: '11px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            {copied ? 'Copied!' : 'Copy'}
-          </button>
-        </div>
-      </div>
+      {activeTankId ? (
+        <>
+          {/* Visual Scannable QR mock */}
+          <div className="qr-container" style={{ marginBottom: '20px' }}>
+            <div className="qr-code-canvas" />
+            <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600, marginTop: '12px' }}>
+              SCAN ME IN APP
+            </span>
+          </div>
+
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 600 }}>Manual Pairing ID</span>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              background: '#0F172A',
+              padding: '10px 16px',
+              borderRadius: '10px',
+              border: '1px solid #1E293B',
+              marginTop: '6px'
+            }}>
+              <code style={{ fontSize: '13px', color: '#38BDF8' }}>{activeTankId}</code>
+              <button 
+                onClick={copyToClipboard}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-primary)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <p style={{ color: '#64748B', fontSize: '14px', marginBottom: '24px', textAlign: 'center' }}>
+          No tank configured. Create a tank first to generate a pairing code.
+        </p>
+      )}
 
       <button 
         className="primary-button" 
