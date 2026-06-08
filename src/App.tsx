@@ -4,6 +4,7 @@ import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import { useTank } from './hooks/useTank';
 import { useAlerts } from './hooks/useAlerts';
 import { useSimulation } from './hooks/useSimulation';
+import { ThemeProvider } from './hooks/useTheme';
 import { ViewerApp } from './pages/ViewerApp';
 import { IoTMonitor } from './pages/IoTMonitor';
 import { 
@@ -171,9 +172,11 @@ const OceanEyesDashboard: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <NavigationProvider>
-      <OceanEyesDashboard />
-    </NavigationProvider>
+    <ThemeProvider>
+      <NavigationProvider>
+        <OceanEyesDashboard />
+      </NavigationProvider>
+    </ThemeProvider>
   );
 };
 
