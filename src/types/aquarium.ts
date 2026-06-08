@@ -158,3 +158,22 @@ export interface AITurbidityResult {
   };
   turbidity: AITurbidity;
 }
+
+// ─── History API Types ──────────────────────────────────────────────────────
+
+export interface HistoryDetectionResponse {
+  date: string;
+  count: number;
+  records: AIDetectionResult[];
+}
+
+export interface HistoryTurbidityResponse {
+  date: string;
+  count: number;
+  records: AITurbidityResult[];
+}
+
+export interface HistoryDatesResponse {
+  detections: string[];
+  turbidity: string[];
+}

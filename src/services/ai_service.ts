@@ -1,5 +1,5 @@
 // ai_service.ts - Frontend service for FishAI FastAPI backend communication
-import type { AIDetectionResult, AITurbidityResult } from '../types/aquarium';
+import type { AIDetectionResult, AITurbidityResult, HistoryDetectionResponse, HistoryTurbidityResponse } from '../types/aquarium';
 
 const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
 
@@ -165,4 +165,54 @@ export async function getSpeciesList(): Promise<{ id: string; display: string }[
   if (!res.ok) return [];
   const data = await res.json();
   return data.species || [];
+}
+
+/**
+ * Fetch detection history for a given date from the backend.
+ */
+export async function fetchDetectionHistory(
+  date?: string,
+  limit: number = 1000,
+  signal?: AbortSignal
+): Promise<HistoryDetectionResponse> {
+  const params = new URLSearchParams();
+  if (date) params.append('date', date);
+  params.append('limit', String(limit));
+
+  const res = await fetch(`${AI_API_URL}/history/detections?${params.toString()}`, {
+    method: 'GET',
+    signal,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new Error(err.error || `AI backend error: ${res.status}`);
+  }
+
+  return (await res.json()) as HistoryDetectionResponse;
+}
+
+/**
+ * Fetch turbidity history for a given date from the backend.
+ */
+export async function fetchTurbidityHistory(
+  date?: string,
+  limit: number = 1000,
+  signal?: AbortSignal
+): Promise<HistoryTurbidityResponse> {
+  const params = new URLSearchParams();
+  if (date) params.append('date', date);
+  params.append('limit', String(limit));
+
+  const res = await fetch(`${AI_API_URL}/history/turbidity?${params.toString()}`, {
+    method: 'GET',
+    signal,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new Error(err.error || `AI backend error: ${res.status}`);
+  }
+
+  return (await res.json()) as HistoryTurbidityResponse;
 }

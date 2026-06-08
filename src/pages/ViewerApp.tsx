@@ -9,6 +9,7 @@ import { SettingsScreen } from './viewer/SettingsScreen';
 import { AlertsScreen } from './viewer/AlertsScreen';
 import { HistoryDetailScreen } from './viewer/HistoryDetailScreen';
 import { MyFishScreen } from './viewer/MyFishScreen';
+import { AnalyticsScreen } from './viewer/AnalyticsScreen';
 
 export const ViewerApp: React.FC = () => {
   const { tankId } = useTank();
@@ -39,6 +40,8 @@ const ViewerShell: React.FC = () => {
         return <HistoryDetailScreen />;
       case 'my_fish':
         return <MyFishScreen />;
+      case 'analytics':
+        return <AnalyticsScreen />;
       default:
         return <HomeScreen />;
     }

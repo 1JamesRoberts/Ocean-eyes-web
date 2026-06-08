@@ -1,0 +1,156 @@
+.analyticsContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.analyticsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.headerSubtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0 0;
+}
+
+.dateInput {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+.dateInput:focus {
+  border-color: var(--color-info);
+}
+
+.dateControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.refreshButtonNeutral {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.refreshButtonNeutral:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 240px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.loadingText {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.emptyCardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.emptyCardHint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.chartCard {
+  composes: card-decoration from global;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chartTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.chartSubtitle {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 8px;
+  text-align: center;
+}
+
+.errorBanner {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid var(--color-critical);
+  color: var(--color-critical);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.retryButton {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-critical);
+  background: transparent;
+  color: var(--color-critical);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.retryButton:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+@media (min-width: 1024px) {
+  .chartGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState } from 'react';
 
 export type AppMode = 'viewer' | 'monitor' | 'both';
-export type ViewerTab = 'home' | 'live' | 'settings' | 'alerts' | 'history' | 'my_fish' | 'monitor';
+export type ViewerTab = 'home' | 'live' | 'settings' | 'alerts' | 'history' | 'my_fish' | 'monitor' | 'analytics';
 
 interface NavigationContextType {
   activeMode: AppMode;

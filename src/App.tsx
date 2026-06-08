@@ -12,7 +12,8 @@ import {
   Video, 
   Settings, 
   RefreshCw,
-  Fish
+  Fish,
+  BarChart3
 } from 'lucide-react';
 
 const OceanEyesDashboard: React.FC = () => {
@@ -78,6 +79,14 @@ const OceanEyesDashboard: React.FC = () => {
           >
             <Fish size={18} />
             <span>My Fish</span>
+          </button>
+
+          <button 
+            className={`sidebar-link ${activeTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            <BarChart3 size={18} />
+            <span>Analytics</span>
           </button>
 
           <button 
