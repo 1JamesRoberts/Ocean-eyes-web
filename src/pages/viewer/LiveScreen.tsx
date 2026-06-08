@@ -923,7 +923,6 @@ Diagnostics:
               aiLoading={aiLoading}
               backendAvailable={backendAvailable}
               turbidityLoading={turbidityLoading}
-              lastTurbidityResult={lastTurbidityResult}
               isFullscreen={isFullscreen}
               showFsInventory={showFsInventory}
               onZoomIn={() => setZoomLevel(prev => Math.min(3, prev + 0.5))}

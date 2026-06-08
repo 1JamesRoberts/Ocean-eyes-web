@@ -12,7 +12,7 @@ import {
   Minimize,
   Fish
 } from 'lucide-react';
-import type { AITurbidityResult } from '../../types/aquarium';
+
 
 interface CameraControlsProps {
   zoomLevel: number;
@@ -21,7 +21,6 @@ interface CameraControlsProps {
   aiLoading: boolean;
   backendAvailable: boolean;
   turbidityLoading: boolean;
-  lastTurbidityResult: AITurbidityResult | null;
   isFullscreen: boolean;
   showFsInventory: boolean;
   onZoomIn: () => void;
@@ -41,7 +40,6 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   aiLoading,
   backendAvailable,
   turbidityLoading,
-  lastTurbidityResult,
   isFullscreen,
   showFsInventory,
   onZoomIn,
@@ -127,27 +125,23 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       </button>
 
       <button
-        className={`camera-control-btn ${lastTurbidityResult ? 'turbidity-active' : ''}`}
+        className="camera-control-btn"
         onClick={onMeasureTurbidity}
         disabled={turbidityLoading || !backendAvailable}
         title={
           !backendAvailable
             ? 'AI Backend Offline'
-            : lastTurbidityResult
-              ? `FNU: ${lastTurbidityResult.turbidity.fnu.toFixed(2)}`
-              : 'Measure Water Clarity'
+            : 'Measure Water Clarity'
         }
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: lastTurbidityResult
-            ? 'var(--color-info)'
-            : backendAvailable
-              ? 'rgba(15, 23, 42, 0.75)'
-              : 'rgba(100, 100, 100, 0.5)',
-          borderColor: lastTurbidityResult ? 'var(--color-info-light)' : 'rgba(255, 255, 255, 0.2)',
-          color: lastTurbidityResult ? '#FFF' : backendAvailable ? '#FFF' : '#AAA',
+          backgroundColor: backendAvailable
+            ? 'rgba(15, 23, 42, 0.75)'
+            : 'rgba(100, 100, 100, 0.5)',
+          borderColor: 'rgba(255, 255, 255, 0.2)',
+          color: backendAvailable ? '#FFF' : '#AAA',
           cursor: turbidityLoading || !backendAvailable ? 'not-allowed' : 'pointer'
         }}
       >
