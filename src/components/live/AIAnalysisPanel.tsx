@@ -4,7 +4,7 @@ import { getSpeciesById } from '../../data/speciesCatalog';
 import type { AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
 
 interface AIAnalysisPanelProps {
-  lastPrediction: AIDetectionResult;
+  lastPrediction: AIDetectionResult | null;
   lastTurbidityResult: AITurbidityResult | null;
 }
 
@@ -12,6 +12,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
   lastPrediction,
   lastTurbidityResult
 }) => {
+  if (!lastPrediction) return null;
   return (
     <div style={{
       marginBottom: '24px',

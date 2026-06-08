@@ -14,13 +14,17 @@ import {
 } from 'lucide-react';
 
 
+type BackendStatus = 'unknown' | 'checking' | 'online' | 'offline';
+
 interface CameraControlsProps {
   zoomLevel: number;
   isRecording: boolean;
+  isStreaming: boolean;
   isAIActive: boolean;
   aiLoading: boolean;
-  backendAvailable: boolean;
+  backendStatus: BackendStatus;
   turbidityLoading: boolean;
+  hasImageSource: boolean;
   isFullscreen: boolean;
   showFsInventory: boolean;
   onZoomIn: () => void;
@@ -36,10 +40,12 @@ interface CameraControlsProps {
 export const CameraControls: React.FC<CameraControlsProps> = ({
   zoomLevel,
   isRecording,
+  isStreaming,
   isAIActive,
   aiLoading,
-  backendAvailable,
+  backendStatus,
   turbidityLoading,
+  hasImageSource,
   isFullscreen,
   showFsInventory,
   onZoomIn,
@@ -51,6 +57,37 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   onToggleFullscreen,
   onToggleFsInventory
 }) => {
+  const isChecking = backendStatus === 'checking';
+  const isOnline = backendStatus === 'online';
+
+  const btnStyle = (active: boolean, disabled: boolean): React.CSSProperties => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: active
+      ? 'var(--color-primary)'
+      : disabled
+        ? 'rgba(100, 100, 100, 0.5)'
+        : 'rgba(15, 23, 42, 0.75)',
+    borderColor: active ? 'var(--color-primary-light)' : 'rgba(255, 255, 255, 0.2)',
+    color: active ? '#FFF' : disabled ? '#AAA' : '#FFF',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+  });
+
+  const getAIButtonTitle = (): string => {
+    if (!isStreaming) return 'Start stream to enable AI Analysis';
+    if (isChecking) return 'Checking AI Backend…';
+    if (!isOnline) return 'AI Backend Offline - Click to retry';
+    return isAIActive ? 'Stop AI Analysis' : 'Start AI Analysis';
+  };
+
+  const getTurbidityButtonTitle = (): string => {
+    if (!isStreaming) return 'Start stream to measure turbidity';
+    if (!hasImageSource) return 'No image source available';
+    if (isChecking) return 'Checking AI Backend…';
+    if (!isOnline) return 'AI Backend Offline - Click to retry';
+    return 'Measure Water Clarity';
+  };
   return (
     <div style={{
       position: 'absolute',
@@ -127,52 +164,21 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       <button
         className="camera-control-btn"
         onClick={onMeasureTurbidity}
-        disabled={turbidityLoading || !backendAvailable}
-        title={
-          !backendAvailable
-            ? 'AI Backend Offline'
-            : 'Measure Water Clarity'
-        }
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: backendAvailable
-            ? 'rgba(15, 23, 42, 0.75)'
-            : 'rgba(100, 100, 100, 0.5)',
-          borderColor: 'rgba(255, 255, 255, 0.2)',
-          color: backendAvailable ? '#FFF' : '#AAA',
-          cursor: turbidityLoading || !backendAvailable ? 'not-allowed' : 'pointer'
-        }}
+        disabled={turbidityLoading || isChecking || !isStreaming || !hasImageSource}
+        title={getTurbidityButtonTitle()}
+        style={btnStyle(false, turbidityLoading || isChecking || !isStreaming || !hasImageSource)}
       >
-        {turbidityLoading ? <Loader2 size={16} className="anim-spin" /> : <Eye size={16} />}
+        {turbidityLoading || isChecking ? <Loader2 size={16} className="anim-spin" /> : <Eye size={16} />}
       </button>
 
       <button
         className={`camera-control-btn ${isAIActive ? 'ai-active' : ''}`}
         onClick={onToggleAI}
-        title={
-          !backendAvailable
-            ? 'AI Backend Offline - Click for help'
-            : isAIActive
-              ? 'Stop AI Analysis'
-              : 'Start AI Analysis'
-        }
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: isAIActive
-            ? 'var(--color-primary)'
-            : backendAvailable
-              ? 'rgba(15, 23, 42, 0.75)'
-              : 'rgba(100, 100, 100, 0.5)',
-          borderColor: isAIActive ? 'var(--color-primary-light)' : 'rgba(255, 255, 255, 0.2)',
-          color: isAIActive ? '#FFF' : backendAvailable ? '#FFF' : '#AAA',
-          cursor: 'pointer'
-        }}
+        disabled={aiLoading || isChecking || !isStreaming}
+        title={getAIButtonTitle()}
+        style={btnStyle(isAIActive, aiLoading || isChecking || !isStreaming)}
       >
-        {aiLoading ? <Loader2 size={16} className="anim-spin" /> : <Brain size={16} />}
+        {aiLoading || isChecking ? <Loader2 size={16} className="anim-spin" /> : <Brain size={16} />}
       </button>
 
       {isFullscreen && (

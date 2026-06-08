@@ -110,22 +110,18 @@ export const LiveScreen: React.FC = () => {
   const [flashActive, setFlashActive] = useState(false);
 
   const [isAIActive, setIsAIActive] = useState(false);
-  const [backendAvailable, setBackendAvailable] = useState(false);
+  const [backendStatus, setBackendStatus] = useState<'unknown' | 'checking' | 'online' | 'offline'>('unknown');
   const [lastPrediction, setLastPrediction] = useState<AIDetectionResult | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
-  const aiIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const aiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const aiAbortControllerRef = useRef<AbortController | null>(null);
+  const aiMountedRef = useRef(true);
 
   const [turbidityLoading, setTurbidityLoading] = useState(false);
+  const [turbidityError, setTurbidityError] = useState<string | null>(null);
+  const turbidityAbortControllerRef = useRef<AbortController | null>(null);
   const [lastTurbidityResult, setLastTurbidityResult] = useState<AITurbidityResult | null>(null);
-
-  useEffect(() => {
-    isBackendAvailable().then(setBackendAvailable);
-    const interval = setInterval(() => {
-      isBackendAvailable().then(setBackendAvailable);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   const [isCalibrating, setIsCalibrating] = useState(false);
   const [isCalibDragging, setIsCalibDragging] = useState(false);
@@ -203,6 +199,28 @@ export const LiveScreen: React.FC = () => {
     localStorage.setItem('oceaneyes_recordings', JSON.stringify(recordings));
   }, [recordings]);
 
+  // Background health check every 30s when stream is active
+  useEffect(() => {
+    if (!isStreaming) return;
+    const check = async () => {
+      const ok = await isBackendAvailable();
+      setBackendStatus(prev => (prev === 'checking' ? prev : ok ? 'online' : 'offline'));
+    };
+    check();
+    const interval = setInterval(check, 30000);
+    return () => clearInterval(interval);
+  }, [isStreaming]);
+
+  // Cleanup turbidity abort on unmount
+  useEffect(() => {
+    return () => {
+      if (turbidityAbortControllerRef.current) {
+        turbidityAbortControllerRef.current.abort();
+        turbidityAbortControllerRef.current = null;
+      }
+    };
+  }, []);
+
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     if (isRecording) {
@@ -276,26 +294,39 @@ export const LiveScreen: React.FC = () => {
   }, [activeFeed.mock_image]);
 
   useEffect(() => {
-    if (!isAIActive || !isStreaming || !backendAvailable) {
-      if (aiIntervalRef.current) {
-        clearInterval(aiIntervalRef.current);
-        aiIntervalRef.current = null;
+    if (!isAIActive || !isStreaming || backendStatus !== 'online') {
+      if (aiTimeoutRef.current) {
+        clearTimeout(aiTimeoutRef.current);
+        aiTimeoutRef.current = null;
+      }
+      if (aiAbortControllerRef.current) {
+        aiAbortControllerRef.current.abort();
+        aiAbortControllerRef.current = null;
       }
       return;
     }
 
+    aiMountedRef.current = true;
+
     const processFrame = async () => {
+      if (!aiMountedRef.current) return;
       if (((!isWebcam && !activeFeed.mock_image) || aiLoading)) return;
+
       setAiLoading(true);
       setAiError(null);
+      const controller = new AbortController();
+      aiAbortControllerRef.current = controller;
+
       try {
         let blob: Blob;
         if (isWebcam && videoRef.current) {
           blob = await captureFrame(videoRef.current);
         } else {
-          blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360);
+          blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360, controller.signal);
         }
-        const result = await sendFrameForDetection(blob, 0.35);
+        const result = await sendFrameForDetection(blob, 0.35, controller.signal);
+
+        if (!aiMountedRef.current) return;
         setLastPrediction(result);
 
         if (activeTank) {
@@ -334,44 +365,95 @@ export const LiveScreen: React.FC = () => {
           });
         }
       } catch (err) {
+        if (!aiMountedRef.current) return;
+        if (err instanceof Error && err.name === 'AbortError') return;
         setAiError(err instanceof Error ? err.message : 'AI inference failed');
       } finally {
-        setAiLoading(false);
+        if (aiMountedRef.current) {
+          setAiLoading(false);
+        }
+        aiAbortControllerRef.current = null;
+        if (aiMountedRef.current) {
+          aiTimeoutRef.current = setTimeout(processFrame, 2000);
+        }
       }
     };
 
     processFrame();
-    aiIntervalRef.current = setInterval(processFrame, 3000);
 
     return () => {
-      if (aiIntervalRef.current) {
-        clearInterval(aiIntervalRef.current);
-        aiIntervalRef.current = null;
+      aiMountedRef.current = false;
+      if (aiTimeoutRef.current) {
+        clearTimeout(aiTimeoutRef.current);
+        aiTimeoutRef.current = null;
+      }
+      if (aiAbortControllerRef.current) {
+        aiAbortControllerRef.current.abort();
+        aiAbortControllerRef.current = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAIActive, isStreaming, backendAvailable, activeFeed.mock_image, isWebcam, webcamStream]);
+  }, [isAIActive, isStreaming, backendStatus, activeFeed.mock_image, activeFeed.id, isWebcam, webcamStream]);
 
-  const toggleAI = useCallback(() => {
-    if (!backendAvailable) {
-      alert('AI Backend is offline.\n\nPlease start it first:\ncd ai && python api_server.py');
+  const ensureBackendOnline = useCallback(async (signal?: AbortSignal): Promise<boolean> => {
+    if (backendStatus === 'online') return true;
+    setBackendStatus('checking');
+    const ok = await isBackendAvailable(signal);
+    if (ok) {
+      setBackendStatus('online');
+      return true;
+    }
+    setBackendStatus('offline');
+    return false;
+  }, [backendStatus]);
+
+  const toggleAI = useCallback(async () => {
+    if (aiLoading || backendStatus === 'checking' || !isStreaming) return;
+
+    // If turning OFF, immediately disable without checking backend
+    if (isAIActive) {
+      setIsAIActive(false);
+      setAiError(null);
+      if (aiTimeoutRef.current) {
+        clearTimeout(aiTimeoutRef.current);
+        aiTimeoutRef.current = null;
+      }
+      if (aiAbortControllerRef.current) {
+        aiAbortControllerRef.current.abort();
+        aiAbortControllerRef.current = null;
+      }
       return;
     }
-    setIsAIActive(prev => !prev);
+
+    // Turning ON: verify backend first
+    if (!(await ensureBackendOnline())) {
+      setAiError('AI Backend is offline. Please start it first: cd ai && python api_server.py');
+      return;
+    }
+    setIsAIActive(true);
     setAiError(null);
-  }, [backendAvailable]);
+  }, [isAIActive, aiLoading, backendStatus, isStreaming, ensureBackendOnline]);
 
   const measureTurbidity = useCallback(async () => {
-    if (((!isWebcam && !activeFeed.mock_image) || turbidityLoading)) return;
+    if (((!isWebcam && !activeFeed.mock_image) || turbidityLoading || backendStatus === 'checking' || !isStreaming)) return;
+    if (!(await ensureBackendOnline())) {
+      setTurbidityError('AI Backend is offline. Please start it first: cd ai && python api_server.py');
+      return;
+    }
+
     setTurbidityLoading(true);
+    setTurbidityError(null);
+    const controller = new AbortController();
+    turbidityAbortControllerRef.current = controller;
+
     try {
       let blob: Blob;
       if (isWebcam && videoRef.current) {
         blob = await captureFrame(videoRef.current);
       } else {
-        blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360);
+        blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360, controller.signal);
       }
-      const result = await sendFrameForTurbidity(blob);
+      const result = await sendFrameForTurbidity(blob, controller.signal);
       setLastTurbidityResult(result);
 
       if (activeTank) {
@@ -400,11 +482,13 @@ export const LiveScreen: React.FC = () => {
         });
       }
     } catch (err) {
-      console.error('Turbidity measurement failed:', err);
+      if (err instanceof Error && err.name === 'AbortError') return;
+      setTurbidityError(err instanceof Error ? err.message : 'Turbidity measurement failed');
     } finally {
       setTurbidityLoading(false);
+      turbidityAbortControllerRef.current = null;
     }
-  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isWebcam]);
+  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isWebcam, isStreaming, backendStatus, ensureBackendOnline]);
 
   const stateClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
   const stateFish = isStreaming && liveState?.is_live ? activeFeed.current_fish_count : 0;
@@ -900,6 +984,34 @@ Diagnostics:
               </div>
             )}
 
+            {turbidityError && (
+              <div style={{
+                position: 'absolute',
+                top: '44px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 16,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(15, 23, 42, 0.85)',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                border: '1px solid var(--color-critical)',
+                color: '#FFF',
+                fontSize: '11px',
+                fontWeight: 600
+              }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: 'var(--color-critical)'
+                }} />
+                <span>{`Turbidity Error: ${turbidityError}`}</span>
+              </div>
+            )}
+
             <div className="live-overlay-pill" style={{ left: '12px' }}>
               <div className="live-badge" />
               <span>{activeFeed.name} (LIVE)</span>
@@ -919,10 +1031,12 @@ Diagnostics:
             <CameraControls
               zoomLevel={zoomLevel}
               isRecording={isRecording}
+              isStreaming={isStreaming}
               isAIActive={isAIActive}
               aiLoading={aiLoading}
-              backendAvailable={backendAvailable}
+              backendStatus={backendStatus}
               turbidityLoading={turbidityLoading}
+              hasImageSource={isWebcam || !!activeFeed.mock_image}
               isFullscreen={isFullscreen}
               showFsInventory={showFsInventory}
               onZoomIn={() => setZoomLevel(prev => Math.min(3, prev + 0.5))}

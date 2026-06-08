@@ -6,13 +6,18 @@ const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
 /**
  * Check if the AI backend is available and models are loaded.
  */
-export async function isBackendAvailable(): Promise<boolean> {
+export async function isBackendAvailable(signal?: AbortSignal): Promise<boolean> {
   try {
-    const res = await fetch(`${AI_API_URL}/health`, { method: 'GET' });
-    if (!res.ok) return false;
+    const res = await fetch(`${AI_API_URL}/health`, { method: 'GET', signal });
+    if (!res.ok) {
+      console.warn('[AI Service] Health check HTTP error:', res.status);
+      return false;
+    }
     const data = await res.json();
     return data.status === 'healthy' && data.models_loaded === true;
-  } catch {
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') return false;
+    console.warn('[AI Service] Health check failed:', err);
     return false;
   }
 }
@@ -54,13 +59,30 @@ export async function captureFrame(
 export async function captureFrameFromUrl(
   imageUrl: string,
   width: number = 640,
-  height: number = 360
+  height: number = 360,
+  signal?: AbortSignal
 ): Promise<Blob> {
   const img = new Image();
-  img.crossOrigin = 'anonymous';
+  // Only set crossOrigin for non-local URLs to avoid CORS failures on local mocks
+  if (!imageUrl.startsWith('/') && !imageUrl.startsWith(window.location.origin)) {
+    img.crossOrigin = 'anonymous';
+  }
 
   return new Promise((resolve, reject) => {
+    const onAbort = () => {
+      img.src = '';
+      reject(new Error('Image load aborted'));
+    };
+    if (signal) {
+      signal.addEventListener('abort', onAbort);
+      if (signal.aborted) {
+        onAbort();
+        return;
+      }
+    }
+
     img.onload = () => {
+      if (signal) signal.removeEventListener('abort', onAbort);
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
@@ -79,7 +101,10 @@ export async function captureFrameFromUrl(
         0.92
       );
     };
-    img.onerror = () => reject(new Error(`Failed to load image: ${imageUrl}`));
+    img.onerror = () => {
+      if (signal) signal.removeEventListener('abort', onAbort);
+      reject(new Error(`Failed to load image: ${imageUrl}`));
+    };
     img.src = imageUrl;
   });
 }
@@ -89,7 +114,8 @@ export async function captureFrameFromUrl(
  */
 export async function sendFrameForDetection(
   blob: Blob,
-  conf: number = 0.35
+  conf: number = 0.35,
+  signal?: AbortSignal
 ): Promise<AIDetectionResult> {
   const formData = new FormData();
   formData.append('file', blob, 'frame.jpg');
@@ -97,6 +123,7 @@ export async function sendFrameForDetection(
   const res = await fetch(`${AI_API_URL}/predict/detection?conf=${conf}`, {
     method: 'POST',
     body: formData,
+    signal,
   });
 
   if (!res.ok) {
@@ -111,13 +138,14 @@ export async function sendFrameForDetection(
 /**
  * Send an image Blob to the AI backend for turbidity-only inference.
  */
-export async function sendFrameForTurbidity(blob: Blob): Promise<AITurbidityResult> {
+export async function sendFrameForTurbidity(blob: Blob, signal?: AbortSignal): Promise<AITurbidityResult> {
   const formData = new FormData();
   formData.append('file', blob, 'frame.jpg');
 
   const res = await fetch(`${AI_API_URL}/predict/turbidity`, {
     method: 'POST',
     body: formData,
+    signal,
   });
 
   if (!res.ok) {
