@@ -203,9 +203,8 @@ def run_species(crop: np.ndarray, session: ort.InferenceSession, metadata: dict)
     return {
         "species": class_name,
         "species_display": fmt_class_name(class_name),
-        "confidence": round(top_prob, 6),
+        "confidence": round(top_prob, 4),
         "below_threshold": top_prob < threshold,
-        "threshold": threshold,
     }
 
 
@@ -259,12 +258,12 @@ class FishAIPipeline:
             detection_entry = {
                 "bbox": [x1, y1, x2, y2],
                 "bbox_normalized": [
-                    round(x1 / img_w, 6),
-                    round(y1 / img_h, 6),
-                    round(x2 / img_w, 6),
-                    round(y2 / img_h, 6),
+                    round(x1 / img_w, 4),
+                    round(y1 / img_h, 4),
+                    round(x2 / img_w, 4),
+                    round(y2 / img_h, 4),
                 ],
-                "detection_confidence": round(det_confidence, 6),
+                "detection_confidence": round(det_confidence, 4),
                 **species_result,
             }
             detections.append(detection_entry)
@@ -278,7 +277,6 @@ class FishAIPipeline:
 
         result = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "image_dimensions": {"width": img_w, "height": img_h},
             "models": {
                 "detection": {"provider": self.detect_provider},
                 "species": {"provider": self.species_provider},
@@ -306,7 +304,6 @@ class FishAIPipeline:
 
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "image_dimensions": {"width": img_w, "height": img_h},
             "models": {
                 "turbidity": {"provider": self.turbidity_provider},
             },
@@ -338,12 +335,12 @@ class FishAIPipeline:
             detection_entry = {
                 "bbox": [x1, y1, x2, y2],
                 "bbox_normalized": [
-                    round(x1 / img_w, 6),
-                    round(y1 / img_h, 6),
-                    round(x2 / img_w, 6),
-                    round(y2 / img_h, 6),
+                    round(x1 / img_w, 4),
+                    round(y1 / img_h, 4),
+                    round(x2 / img_w, 4),
+                    round(y2 / img_h, 4),
                 ],
-                "detection_confidence": round(det_confidence, 6),
+                "detection_confidence": round(det_confidence, 4),
                 **species_result,
             }
             detections.append(detection_entry)
@@ -357,7 +354,6 @@ class FishAIPipeline:
 
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "image_dimensions": {"width": img_w, "height": img_h},
             "models": {
                 "detection": {"provider": self.detect_provider},
                 "species": {"provider": self.species_provider},

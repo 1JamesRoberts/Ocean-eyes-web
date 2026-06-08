@@ -374,7 +374,7 @@ export const LiveScreen: React.FC = () => {
         }
         aiAbortControllerRef.current = null;
         if (aiMountedRef.current) {
-          aiTimeoutRef.current = setTimeout(processFrame, 2000);
+          aiTimeoutRef.current = setTimeout(processFrame, 10000);
         }
       }
     };

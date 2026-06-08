@@ -9,8 +9,11 @@ Endpoints:
 """
 
 import io
+import json
 import sys
+import threading
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -29,6 +32,28 @@ MODELS_DIR = SCRIPT_DIR / "models"
 DETECT_MODEL = MODELS_DIR / "fish_detection.onnx"
 SPECIES_MODEL = MODELS_DIR / "species_classifier.onnx"
 TURBIDITY_MODEL = MODELS_DIR / "turbidity.onnx"
+
+# ---------------------------------------------------------------------------
+# Detection output persistence
+# ---------------------------------------------------------------------------
+DETECTION_OUTPUT_DIR = SCRIPT_DIR / "output" / "detections"
+_detection_lock = threading.Lock()
+
+
+def append_detection_jsonl(result: dict) -> None:
+    """Append a detection result to today's JSONL file. Best-effort: never raises."""
+    try:
+        DETECTION_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        file_path = DETECTION_OUTPUT_DIR / f"{today}.jsonl"
+        line = json.dumps(result, ensure_ascii=False) + "\n"
+        with _detection_lock:
+            with open(file_path, "a", encoding="utf-8") as f:
+                f.write(line)
+                f.flush()
+    except OSError as e:
+        print(f"[FishAI] Warning: failed to write detection JSONL: {e}", file=sys.stderr)
+
 
 # ---------------------------------------------------------------------------
 # Global pipeline instance (loaded once at startup)
@@ -131,6 +156,7 @@ async def predict(
         result = pipeline.predict(contents)
         pipeline.conf = original_conf
 
+        append_detection_jsonl(result)
         return result
 
     except Exception as e:
@@ -193,6 +219,7 @@ async def predict_detection(
         result = pipeline.predict_detection_only(contents, conf)
         pipeline.conf = original_conf
 
+        append_detection_jsonl(result)
         return result
 
     except Exception as e:

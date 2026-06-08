@@ -1,7 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Fish } from 'lucide-react';
 import { getSpeciesById, getSpeciesColor, getSpeciesInitials } from '../../data/speciesCatalog';
 import type { FishEntry } from '../../types/aquarium';
+
+const SpeciesAvatar: React.FC<{ speciesId: string }> = ({ speciesId }) => {
+  const [hasError, setHasError] = useState(false);
+  const species = getSpeciesById(speciesId);
+  if (!species || hasError) {
+    return (
+      <div style={{
+        width: '32px',
+        height: '32px',
+        borderRadius: '8px',
+        backgroundColor: getSpeciesColor(speciesId),
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '11px',
+        fontWeight: 700,
+        color: '#fff',
+        flexShrink: 0
+      }}>
+        {getSpeciesInitials(speciesId)}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={species.imagePath}
+      alt={species.initials}
+      style={{
+        width: '32px',
+        height: '32px',
+        borderRadius: '8px',
+        objectFit: 'contain',
+        flexShrink: 0
+      }}
+      onError={() => setHasError(true)}
+    />
+  );
+};
 
 interface FullscreenInventoryProps {
   fishList: FishEntry[];
@@ -108,21 +146,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: display.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: '#fff',
-                  flexShrink: 0
-                }}>
-                  {display.initials}
-                </div>
+                <SpeciesAvatar speciesId={fish.speciesId} />
                 <span style={{ fontSize: '13px', fontWeight: 600 }}>{display.name}</span>
               </div>
 

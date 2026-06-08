@@ -29,4 +29,7 @@ ai/models/*.onnx
 # Python cache
 ai/__pycache__
 
+# AI detection output (generated at runtime)
+ai/output/
+
 /github/

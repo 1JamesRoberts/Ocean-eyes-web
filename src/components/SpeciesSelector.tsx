@@ -2,6 +2,46 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Search, Check } from 'lucide-react';
 import { SPECIES_CATALOG, searchSpecies, getSpeciesByName, type SpeciesInfo } from '../data/speciesCatalog';
 
+const SpeciesThumbnail: React.FC<{ species: SpeciesInfo }> = ({ species }) => {
+  const [hasError, setHasError] = useState(false);
+  if (hasError) {
+    return (
+      <div
+        style={{
+          width: '32px',
+          height: '32px',
+          borderRadius: '6px',
+          backgroundColor: species.color,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '11px',
+          fontWeight: 700,
+          color: '#fff',
+          flexShrink: 0,
+          textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+        }}
+      >
+        {species.initials}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={species.imagePath}
+      alt={species.initials}
+      style={{
+        width: '32px',
+        height: '32px',
+        borderRadius: '6px',
+        objectFit: 'contain',
+        flexShrink: 0
+      }}
+      onError={() => setHasError(true)}
+    />
+  );
+};
+
 interface SpeciesSelectorProps {
   selectedSpeciesId: string | null;
   onSelect: (species: SpeciesInfo | null, customName?: string) => void;
@@ -142,24 +182,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                   }
                 }}
               >
-                <div
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '6px',
-                    backgroundColor: species.color,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: '#fff',
-                    flexShrink: 0,
-                    textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {species.initials}
-                </div>
+                <SpeciesThumbnail species={species} />
                 <span style={{ flex: 1 }}>{species.displayName}</span>
                 {selectedSpeciesId === species.id && (
                   <Check size={16} color="var(--color-primary)" />

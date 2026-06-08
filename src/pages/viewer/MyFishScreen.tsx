@@ -118,8 +118,8 @@ export const MyFishScreen: React.FC = () => {
     if (!name.trim()) return;
     
     const species = selectedSpeciesId ? getSpeciesById(selectedSpeciesId) : null;
-    const imageUrl = species ? species.imageClass : 'species-unknown';
-    
+    const imageUrl = species ? species.imagePath : '/species-placeholder.png';
+
     addFish(name.trim(), imageUrl, 1);
     setName('');
     setSelectedSpeciesId(null);
@@ -167,6 +167,7 @@ export const MyFishScreen: React.FC = () => {
       style={{
         width: '40px',
         height: '40px',
+        borderRadius: '8px',
         objectFit: 'contain',
         flexShrink: 0
       }}

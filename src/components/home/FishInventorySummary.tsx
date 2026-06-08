@@ -1,7 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Fish } from 'lucide-react';
-import { getSpeciesColor, getSpeciesInitials } from '../../data/speciesCatalog';
+import { getSpeciesById, getSpeciesColor, getSpeciesInitials } from '../../data/speciesCatalog';
 import type { FishEntry } from '../../types/aquarium';
+
+const SpeciesAvatar: React.FC<{ speciesId: string }> = ({ speciesId }) => {
+  const [hasError, setHasError] = useState(false);
+  const species = getSpeciesById(speciesId);
+  if (!species || hasError) {
+    return (
+      <div style={{
+        width: '32px',
+        height: '32px',
+        borderRadius: '6px',
+        backgroundColor: getSpeciesColor(speciesId),
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '11px',
+        fontWeight: 700,
+        color: '#fff',
+        flexShrink: 0,
+        textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+      }}>
+        {getSpeciesInitials(speciesId)}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={species.imagePath}
+      alt={species.initials}
+      style={{
+        width: '32px',
+        height: '32px',
+        borderRadius: '6px',
+        objectFit: 'contain',
+        flexShrink: 0
+      }}
+      onError={() => setHasError(true)}
+    />
+  );
+};
 
 interface FishInventorySummaryProps {
   fishList: FishEntry[];
@@ -55,22 +94,7 @@ export const FishInventorySummary: React.FC<FishInventorySummaryProps> = ({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '6px',
-                backgroundColor: getSpeciesColor(fish.speciesId),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '11px',
-                fontWeight: 700,
-                color: '#fff',
-                flexShrink: 0,
-                textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-              }}>
-                {getSpeciesInitials(fish.speciesId)}
-              </div>
+              <SpeciesAvatar speciesId={fish.speciesId} />
               <div>
                 <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{fish.name}</span>
                 <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', fontWeight: 500, marginTop: '2px' }}>
