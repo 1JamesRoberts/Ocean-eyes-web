@@ -28,3 +28,5 @@ ai/models/*.onnx
 
 # Python cache
 ai/__pycache__
+
+/github/

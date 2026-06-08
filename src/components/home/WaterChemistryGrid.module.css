@@ -1,0 +1,38 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-surface);
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.015);
+  box-shadow: var(--shadow-card);
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  display: block;
+  font-weight: 600;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.valueCritical {
+  composes: value;
+  color: var(--color-critical);
+}

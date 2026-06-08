@@ -1,6 +1,7 @@
 import React from 'react';
 import { Droplet, Thermometer, Shield, Activity } from 'lucide-react';
 import type { ReadingItem } from '../../types/aquarium';
+import styles from './WaterChemistryGrid.module.css';
 
 interface WaterChemistryGridProps {
   reading: ReadingItem;
@@ -45,39 +46,16 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
   return (
     <div className="chemistry-grid">
       {parameters.map(param => (
-        <div 
-          key={param.label}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '12px', 
-            background: 'var(--color-surface)', 
-            padding: '16px', 
-            borderRadius: '16px', 
-            border: '1px solid rgba(0,0,0,0.015)', 
-            boxShadow: 'var(--shadow-card)' 
-          }}
-        >
-          <div style={{ 
-            width: '40px', 
-            height: '40px', 
-            borderRadius: '12px', 
-            backgroundColor: param.bgColor, 
-            color: param.color, 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            flexShrink: 0 
-          }}>
+        <div key={param.label} className={styles.card}>
+          <div
+            className={styles.iconWrapper}
+            style={{ backgroundColor: param.bgColor, color: param.color }}
+          >
             <param.icon size={18} />
           </div>
           <div>
-            <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', display: 'block', fontWeight: 600 }}>{param.label}</span>
-            <span style={{ 
-              fontSize: '16px', 
-              fontWeight: 700, 
-              color: param.isCritical ? 'var(--color-critical)' : 'var(--color-text-primary)' 
-            }}>
+            <span className={styles.label}>{param.label}</span>
+            <span className={param.isCritical ? styles.valueCritical : styles.value}>
               {param.value}
             </span>
           </div>
