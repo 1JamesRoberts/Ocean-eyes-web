@@ -6,6 +6,7 @@ import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { SpeciesDistributionChart } from '../../components/analytics/SpeciesDistributionChart';
 import { TurbidityTrendChart } from '../../components/analytics/TurbidityTrendChart';
 import { SpeciesPresenceHeatmap } from '../../components/analytics/SpeciesPresenceHeatmap';
+import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
 import { todayUTC } from '../../utils/analytics';
 import styles from './AnalyticsScreen.module.css';
 
@@ -86,6 +87,17 @@ export const AnalyticsScreen: React.FC = () => {
       {/* Charts grid */}
       {!loading && !error && hasAnyData && (
         <div className={styles.chartGrid}>
+          {/* Spatial Detection Heatmap */}
+          <div className={`${styles.chartCard} ${styles.chartCardWide}`}>
+            <div>
+              <h3 className={styles.chartTitle}>Detection Density Heatmap</h3>
+              <p className={styles.chartSubtitle}>
+                Spatial distribution across camera frame
+              </p>
+            </div>
+            <SpatialDetectionHeatmap records={detectionRecords} />
+          </div>
+
           {/* Fish Count Timeline */}
           <div className={styles.chartCard}>
             <div>

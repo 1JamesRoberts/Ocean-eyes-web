@@ -62,6 +62,7 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
         const width = (nx2 - nx1) * renderedWidth;
         const height = (ny2 - ny1) * renderedHeight;
 
+        const fontSize = Math.max(10, Math.min(22, width * 0.12));
         return (
           <div key={idx} style={{
             position: 'absolute',
@@ -70,29 +71,22 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
             width: `${width}px`,
             height: `${height}px`,
             border: `2px solid ${boxColor}`,
-            borderRadius: '4px',
             boxShadow: `0 0 8px ${boxColor}40`
           }}>
-            <div style={{
+            <span style={{
               position: 'absolute',
-              top: '-22px',
-              left: 0,
-              backgroundColor: boxColor,
-              color: '#FFF',
-              fontSize: '10px',
-              fontWeight: 700,
-              padding: '2px 6px',
-              borderRadius: '4px',
+              top: `-${fontSize + 4}px`,
+              left: '2px',
+              fontSize: `${fontSize}px`,
+              fontWeight: 400,
+              color: boxColor,
+              textShadow: '0 1px 2px rgba(0,0,0,0.6)',
               whiteSpace: 'nowrap',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
+              opacity: 0.85,
+              pointerEvents: 'none'
             }}>
-              <span>{det.species_display}</span>
-              <span style={{ opacity: 0.8 }}>
-                {(det.confidence * 100).toFixed(0)}%
-              </span>
-            </div>
+              {det.species_display} {(det.confidence * 100).toFixed(0)}%
+            </span>
           </div>
         );
       })}

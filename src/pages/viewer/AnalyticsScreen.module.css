@@ -153,4 +153,8 @@
   .chartGrid {
     grid-template-columns: 1fr 1fr;
   }
+
+  .chartCardWide {
+    grid-column: 1 / -1;
+  }
 }
