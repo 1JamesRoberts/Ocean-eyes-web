@@ -11,32 +11,17 @@ interface AIBoundingBoxesProps {
   isDragging: boolean;
 }
 
-function getCoverOffsets(
+function getWidthAutoRenderInfo(
   imgWidth: number,
   imgHeight: number,
   containerWidth: number,
-  containerHeight: number
+  _containerHeight: number
 ) {
-  const imgRatio = imgWidth / imgHeight;
-  const containerRatio = containerWidth / containerHeight;
-
-  let renderedWidth: number;
-  let renderedHeight: number;
-  let offsetX: number;
-  let offsetY: number;
-
-  if (containerRatio > imgRatio) {
-    renderedWidth = containerWidth;
-    renderedHeight = containerWidth / imgRatio;
-    offsetX = 0;
-    offsetY = (containerHeight - renderedHeight) / 2;
-  } else {
-    renderedHeight = containerHeight;
-    renderedWidth = containerHeight * imgRatio;
-    offsetX = (containerWidth - renderedWidth) / 2;
-    offsetY = 0;
-  }
-
+  // Models the actual DOM rendering: img { width: 100%; height: auto; }
+  const renderedWidth = containerWidth;
+  const renderedHeight = containerWidth * (imgHeight / imgWidth);
+  const offsetX = 0;
+  const offsetY = 0;
   return { renderedWidth, renderedHeight, offsetX, offsetY };
 }
 
@@ -52,7 +37,7 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
   const ch = containerSize.height;
   const iw = imageNaturalSize.width || lastPrediction.image_dimensions.width || cw;
   const ih = imageNaturalSize.height || lastPrediction.image_dimensions.height || ch;
-  const { renderedWidth, renderedHeight, offsetX, offsetY } = getCoverOffsets(iw, ih, cw, ch);
+  const { renderedWidth, renderedHeight, offsetX, offsetY } = getWidthAutoRenderInfo(iw, ih, cw, ch);
 
   return (
     <div style={{

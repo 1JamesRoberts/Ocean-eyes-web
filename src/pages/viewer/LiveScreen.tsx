@@ -146,15 +146,15 @@ export const LiveScreen: React.FC = () => {
   const [containerSize, setContainerSize] = useState({ width: 640, height: 360 });
 
   useEffect(() => {
+    if (!imageContainerRef.current) return;
+    const el = imageContainerRef.current;
     const updateSize = () => {
-      if (imageContainerRef.current) {
-        const rect = imageContainerRef.current.getBoundingClientRect();
-        setContainerSize({ width: rect.width, height: rect.height });
-      }
+      setContainerSize({ width: el.offsetWidth, height: el.offsetHeight });
     };
     updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    const ro = new ResizeObserver(updateSize);
+    ro.observe(el);
+    return () => ro.disconnect();
   }, []);
 
   const [imageNaturalSize, setImageNaturalSize] = useState({ width: 0, height: 0 });
