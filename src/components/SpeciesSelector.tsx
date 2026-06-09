@@ -42,6 +42,21 @@ const SpeciesThumbnail: React.FC<{ species: SpeciesInfo }> = ({ species }) => {
   );
 };
 
+/** Small coloured badge showing the creature type (shrimp/snail/crab) */
+const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
+  const emoji = type === 'shrimp' ? '🦐' : type === 'snail' ? '🐌' : type === 'crab' ? '🦀' : '';
+  const bgColor = type === 'shrimp' ? '#FF9800' : type === 'snail' ? '#8BC34A' : type === 'crab' ? '#E91E63' : 'var(--color-border)';
+  return (
+    <span style={{
+      fontSize: '10px', padding: '2px 6px', borderRadius: '4px',
+      backgroundColor: bgColor, color: '#fff', fontWeight: 600,
+      textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: '1.2'
+    }}>
+      {emoji} {type}
+    </span>
+  );
+};
+
 interface SpeciesSelectorProps {
   selectedSpeciesId: string | null;
   onSelect: (species: SpeciesInfo | null, customName?: string) => void;
@@ -184,6 +199,9 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
               >
                 <SpeciesThumbnail species={species} />
                 <span style={{ flex: 1 }}>{species.displayName}</span>
+                {species.creatureType && species.creatureType !== 'fish' && (
+                  <CreatureBadge type={species.creatureType} />
+                )}
                 {selectedSpeciesId === species.id && (
                   <Check size={16} color="var(--color-primary)" />
                 )}

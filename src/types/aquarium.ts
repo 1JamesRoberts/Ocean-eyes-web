@@ -18,6 +18,50 @@ export interface FishEntry {
   detected: number;
 }
 
+// ─── Species Detail Types (from selectyourfish.com) ────────────────────────
+
+export type Difficulty = 'beginner' | 'easy' | 'medium' | 'difficult';
+export type Availability = 'very_common' | 'common' | 'rare' | 'very_rare';
+export type BehaviorType = 'schooling' | 'social' | 'solitary';
+export type Aggression = 'peaceful' | 'mostly_peaceful' | 'aggressive';
+export type SwimLocation = 'bottom' | 'middle' | 'top';
+export type BreedingDifficulty = 'easy' | 'medium' | 'hard' | 'no_record';
+export type Region =
+  | 'south_america' | 'central_america' | 'north_america'
+  | 'africa' | 'europe' | 'australia'
+  | 'southeast_asia' | 'south_asia' | 'east_asia' | 'west_asia'
+  | 'artificial';
+
+export type CreatureType = 'fish' | 'shrimp' | 'snail' | 'crab';
+
+export interface SpeciesDetail {
+  scientificName: string;
+  sizeCm: number;
+  tempMin: number;
+  tempMax: number;
+  phMin: number;
+  phMax: number;
+  minTankSizeL: number;
+  difficulty: Difficulty;
+  availability: Availability;
+  behavior: BehaviorType;
+  aggression: Aggression;
+  swimLocation: SwimLocation;
+  breeding: BreedingDifficulty;
+  origin: string;
+  region: Region[];
+  /** Alternative/common name (e.g. "Siamese fighting fish" for Betta) */
+  altName?: string;
+  /** Taxonomic family (e.g. "Characidae", "Cichlidae") */
+  family?: string;
+  /** Original numeric ID from selectyourfish.com (enables image URL lookup) */
+  fishId?: string;
+  /** Creature classification */
+  creatureType?: CreatureType;
+  /** Whether extended info/detail page exists on the source */
+  hasExtendedInfo?: boolean;
+}
+
 export interface AlertItem {
   id: string;
   title: string;

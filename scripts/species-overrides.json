@@ -1,0 +1,162 @@
+{
+  "angelfish": {
+    "matchName": "Angelfish",
+    "initials": "AF",
+    "color": "#E8D5B7",
+    "imagePath": "/fish_crops/angelfish.png"
+  },
+  "betta": {
+    "matchName": "Betta",
+    "initials": "BT",
+    "color": "#FFB6C1",
+    "imagePath": "/fish_crops/betta.png"
+  },
+  "cardinal_tetra": {
+    "matchName": "Cardinal tetra",
+    "initials": "CT",
+    "color": "#4169E1",
+    "imagePath": "/fish_crops/cardinal_tetra.png"
+  },
+  "cherry_barb": {
+    "matchName": "Cherry barb",
+    "initials": "CB",
+    "color": "#DC143C",
+    "imagePath": "/fish_crops/cherry_barb.png"
+  },
+  "clown_loach": {
+    "matchName": "Clown loach",
+    "initials": "CL",
+    "color": "#FF8C00",
+    "imagePath": "/fish_crops/clown_loach.png"
+  },
+  "corydoras": {
+    "matchFishId": "16",
+    "matchName": "Bronze cory",
+    "name": "Corydoras",
+    "displayName": "Corydoras",
+    "initials": "CR",
+    "color": "#DAA520",
+    "imagePath": "/fish_crops/corydoras.png"
+  },
+  "discus": {
+    "matchName": "Discus",
+    "initials": "DS",
+    "color": "#9370DB",
+    "imagePath": "/fish_crops/discus.png"
+  },
+  "dwarf_gourami": {
+    "matchName": "Dwarf gourami",
+    "initials": "DG",
+    "color": "#20B2AA",
+    "imagePath": "/fish_crops/dwarf_gourami.png"
+  },
+  "german_blue_ram": {
+    "matchFishId": "225",
+    "matchName": "Blue ram",
+    "name": "German Blue Ram",
+    "displayName": "German Blue Ram",
+    "initials": "GBR",
+    "color": "#1E90FF",
+    "imagePath": "/fish_crops/german_blue_ram.png"
+  },
+  "goldfish": {
+    "matchFishId": "277",
+    "matchName": "Common goldfish",
+    "name": "Goldfish",
+    "displayName": "Goldfish",
+    "initials": "GF",
+    "color": "#FFD700",
+    "imagePath": "/fish_crops/goldfish.png"
+  },
+  "guppy": {
+    "matchName": "Guppy",
+    "initials": "GP",
+    "color": "#FF69B4",
+    "imagePath": "/fish_crops/guppy.png"
+  },
+  "harlequin_rasbora": {
+    "matchName": "Harlequin rasbora",
+    "initials": "HR",
+    "color": "#FF6347",
+    "imagePath": "/fish_crops/harlequin_rasbora.png"
+  },
+  "molly": {
+    "matchFishId": "312",
+    "matchName": "Black molly",
+    "name": "Molly",
+    "displayName": "Molly",
+    "initials": "ML",
+    "color": "#B0C4DE",
+    "imagePath": "/fish_crops/molly.png"
+  },
+  "neon_tetra": {
+    "matchName": "Neon tetra",
+    "initials": "NT",
+    "color": "#00CED1",
+    "imagePath": "/fish_crops/neon_tetra.png"
+  },
+  "oscar": {
+    "matchName": "Oscar",
+    "initials": "OS",
+    "color": "#8B4513",
+    "imagePath": "/fish_crops/oscar.png"
+  },
+  "otocinclus": {
+    "matchFishId": "59",
+    "matchName": "Golden dwarf sucker",
+    "initials": "OT",
+    "color": "#A9A9A9",
+    "imagePath": "/fish_crops/otocinclus.png"
+  },
+  "platy": {
+    "matchFishId": "316",
+    "matchName": "Southern platy",
+    "initials": "PL",
+    "color": "#FF4500",
+    "imagePath": "/fish_crops/platy.png"
+  },
+  "plecostomus": {
+    "matchFishId": "239",
+    "matchName": "Common pleco",
+    "initials": "PC",
+    "color": "#556B2F",
+    "imagePath": "/fish_crops/plecotmus.png"
+  },
+  "rummy_nose_tetra": {
+    "matchName": "Rummy-nose tetra",
+    "initials": "RNT",
+    "color": "#FF0000",
+    "imagePath": "/fish_crops/rummy_nose_tetra.png"
+  },
+  "siamese_algae_eater": {
+    "matchName": "Siamese algae eater",
+    "initials": "SAE",
+    "color": "#C0C0C0",
+    "imagePath": "/fish_crops/siamese_algae_eater.png"
+  },
+  "swordtail": {
+    "matchFishId": "318",
+    "matchName": "Green swordtail",
+    "initials": "SW",
+    "color": "#FF8C00",
+    "imagePath": "/fish_crops/swordtail.png"
+  },
+  "tiger_barb": {
+    "matchName": "Tiger barb",
+    "initials": "TB",
+    "color": "#FF6347",
+    "imagePath": "/fish_crops/tiger_barb.png"
+  },
+  "zebra_danio": {
+    "matchName": "Zebra danio",
+    "initials": "ZD",
+    "color": "#4169E1",
+    "imagePath": "/fish_crops/zebra_danio.png"
+  },
+  "dwarf_rasbora": {
+    "matchName": "Dwarf rasbora",
+    "initials": "DR",
+    "color": "#FF69B4",
+    "imagePath": "/fish_crops/dwarf_rasbora.png"
+  }
+}
