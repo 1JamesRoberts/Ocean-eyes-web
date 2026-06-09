@@ -25,29 +25,18 @@ export const HomeScreen: React.FC = () => {
 
   const [showAddTankModal, setShowAddTankModal] = useState(false);
 
-  const latestReading: ReadingItem = readings[0] || {
-    id: 'fallback',
-    tank_id: tankId || 'unknown',
-    timestamp: new Date().toISOString(),
-    clarity: 1.2,
-    fish_count: 0,
-    fish_count_confidence: 1,
-    frame_url: '',
-    ph: 7.2,
-    temp: 26.1,
-    ammonia: 0,
-    nitrite: 0.1
-  };
+  const latestReading: ReadingItem | undefined = readings[0];
 
   const displayClarity = liveState?.is_live 
-    ? (liveState.feeds.find(f => f.id === liveState.selected_feed_id)?.current_clarity ?? latestReading.clarity)
-    : latestReading.clarity;
+    ? (liveState.feeds.find(f => f.id === liveState.selected_feed_id)?.current_clarity ?? latestReading?.clarity ?? 0)
+    : (latestReading?.clarity ?? 0);
   
   const displayFishCount = liveState?.is_live
-    ? (liveState.feeds.find(f => f.id === liveState.selected_feed_id)?.current_fish_count ?? latestReading.fish_count)
-    : latestReading.fish_count;
+    ? (liveState.feeds.find(f => f.id === liveState.selected_feed_id)?.current_fish_count ?? latestReading?.fish_count ?? 0)
+    : (latestReading?.fish_count ?? 0);
 
   const activeAlertCount = alerts.filter(a => !a.resolved).length;
+  const hasReadingData = latestReading !== undefined;
 
   const handleSelectAlert = (alertId: string) => {
     setSelectedAlertId(alertId);
@@ -75,53 +64,65 @@ export const HomeScreen: React.FC = () => {
         onViewAlerts={() => setActiveTab('alerts')}
       />
 
-      <div className="dashboard-grid">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <HealthScoreCard
-            reading={{
-              ph: latestReading.ph,
-              clarity: displayClarity,
-              ammonia: latestReading.ammonia,
-              nitrite: latestReading.nitrite
-            }}
-          />
+      {!hasReadingData ? (
+        <div className="card-decoration" style={{ padding: '40px', textAlign: 'center' }}>
+          <span style={{ fontSize: '32px', display: 'block', marginBottom: '12px' }}>🐠</span>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
+            Waiting for monitor data…
+          </h3>
+          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', maxWidth: '420px', margin: '0 auto', lineHeight: '150%' }}>
+            The AI backend has not yet returned any readings for today. Make sure the OceanEyes inference service is running and has processed at least one frame.
+          </p>
+        </div>
+      ) : (
+        <div className="dashboard-grid">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <HealthScoreCard
+              reading={{
+                ph: latestReading.ph,
+                clarity: displayClarity,
+                ammonia: latestReading.ammonia,
+                nitrite: latestReading.nitrite
+              }}
+            />
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <LiveFeedPreview
+                activeTank={activeTank}
+                liveState={liveState}
+                displayClarity={displayClarity}
+                displayFishCount={displayFishCount}
+                onViewAdvanced={() => setActiveTab('live')}
+              />
+
+              <FishInventorySummary
+                fishList={fishList}
+                displayFishCount={displayFishCount}
+                onManageFish={() => setActiveTab('my_fish')}
+              />
+            </div>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <LiveFeedPreview
-              activeTank={activeTank}
-              liveState={liveState}
+            <WaterClarityCard
               displayClarity={displayClarity}
-              displayFishCount={displayFishCount}
-              onViewAdvanced={() => setActiveTab('live')}
+              onClick={() => setActiveTab('history')}
             />
 
-            <FishInventorySummary
-              fishList={fishList}
-              displayFishCount={displayFishCount}
-              onManageFish={() => setActiveTab('my_fish')}
+            <div>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>
+                Water Chemistry Parameters
+              </h3>
+              <WaterChemistryGrid reading={latestReading} />
+            </div>
+
+            <ActiveAlertsList
+              alerts={alerts}
+              onSelectAlert={handleSelectAlert}
             />
           </div>
         </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <WaterClarityCard
-            displayClarity={displayClarity}
-            onClick={() => setActiveTab('history')}
-          />
-
-          <div>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>
-              Water Chemistry Parameters
-            </h3>
-            <WaterChemistryGrid reading={latestReading} />
-          </div>
-
-          <ActiveAlertsList
-            alerts={alerts}
-            onSelectAlert={handleSelectAlert}
-          />
-        </div>
-      </div>
+      )}
 
       <AddTankModal
         show={showAddTankModal}
