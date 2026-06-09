@@ -80,6 +80,28 @@ npm run build
 
 ---
 
+## 🩺 AI Disease Diagnosis Setup
+
+The OceanEyes diagnostics portal supports automated hourly fish disease diagnosis using a vision-capable LLM (such as Gemini 2.5 Flash, OpenAI GPT-4o-mini, or a local model running via Ollama).
+
+To configure the LLM integration on the backend:
+
+1. Create a `.env` file inside the `ai/` directory:
+   ```ini
+   # ai/.env
+   LLM_API_URL=your-url
+   LLM_MODEL=your-model-name
+   LLM_API_KEY=your-api-key
+   ```
+
+2. Launch the FastAPI server:
+   ```bash
+   python ai/api_server.py
+   ```
+   The backend will automatically load these variables on boot, slice fish crops during scheduled diagnostic runs, and query the LLM. Results will populate the dashboard panel and generate critical system alerts if diseases are detected.
+
+---
+
 ## 🤖 Custom AI Agent Tooling
 
 This project integrates specialized AI assistant skills located inside the `.agents/` folder. Developers or AI assistants can invoke these tools during pair programming sessions:
