@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, Check } from 'lucide-react';
 import { SPECIES_CATALOG, searchSpecies, getSpeciesByName, type SpeciesInfo } from '../data/speciesCatalog';
 
@@ -72,8 +73,10 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedSpecies = selectedSpeciesId ? SPECIES_CATALOG.find((s: SpeciesInfo) => s.id === selectedSpeciesId) : null;
   const filteredSpecies = useMemo(() => {
@@ -83,13 +86,43 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
+      ) {
         setIsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (!inputRef.current) return;
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999
+      });
+    };
+
+    if (isOpen) {
+      updatePosition();
+      window.addEventListener('resize', updatePosition);
+      window.addEventListener('scroll', updatePosition, true);
+      return () => {
+        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener('scroll', updatePosition, true);
+      };
+    }
+  }, [isOpen]);
 
   const handleSelect = (species: SpeciesInfo) => {
     onSelect(species);
@@ -150,20 +183,17 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
         />
       </div>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <div 
+          ref={dropdownRef}
           style={{
-            position: 'absolute',
-            top: 'calc(100% + 4px)',
-            left: 0,
-            right: 0,
+            ...dropdownStyle,
             maxHeight: '280px',
             overflowY: 'auto',
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
             borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            zIndex: 100
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
           }}
         >
           <div style={{ padding: '8px 0' }}>
@@ -258,7 +288,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             )}
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   );
 };
