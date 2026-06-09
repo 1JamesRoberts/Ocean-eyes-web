@@ -360,8 +360,19 @@ class FishAIPipeline:
             diagnosis_result = None
             if i == diagnose_index:
                 try:
-                    # crop is RGB, convert to BGR for cv2.imencode to save correct color order
-                    crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
+                    # Slice a padded crop (15% margin) to give the LLM better surrounding context and sharper features
+                    w = x2 - x1
+                    h = y2 - y1
+                    pad_w = int(w * 0.15)
+                    pad_h = int(h * 0.15)
+                    
+                    x1_pad = max(0, x1 - pad_w)
+                    y1_pad = max(0, y1 - pad_h)
+                    x2_pad = min(img_w, x2 + pad_w)
+                    y2_pad = min(img_h, y2 + pad_h)
+                    
+                    diag_crop = img_array[y1_pad:y2_pad, x1_pad:x2_pad]
+                    crop_bgr = cv2.cvtColor(diag_crop, cv2.COLOR_RGB2BGR)
                     _, encoded_img = cv2.imencode(".jpg", crop_bgr)
                     crop_bytes = encoded_img.tobytes()
                     diagnosis_result = diagnose_fish_image_openai(crop_bytes)
@@ -453,8 +464,19 @@ class FishAIPipeline:
             diagnosis_result = None
             if i == diagnose_index:
                 try:
-                    # crop is RGB, convert to BGR for cv2.imencode to save correct color order
-                    crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
+                    # Slice a padded crop (15% margin) to give the LLM better surrounding context and sharper features
+                    w = x2 - x1
+                    h = y2 - y1
+                    pad_w = int(w * 0.15)
+                    pad_h = int(h * 0.15)
+                    
+                    x1_pad = max(0, x1 - pad_w)
+                    y1_pad = max(0, y1 - pad_h)
+                    x2_pad = min(img_w, x2 + pad_w)
+                    y2_pad = min(img_h, y2 + pad_h)
+                    
+                    diag_crop = img_array[y1_pad:y2_pad, x1_pad:x2_pad]
+                    crop_bgr = cv2.cvtColor(diag_crop, cv2.COLOR_RGB2BGR)
                     _, encoded_img = cv2.imencode(".jpg", crop_bgr)
                     crop_bytes = encoded_img.tobytes()
                     diagnosis_result = diagnose_fish_image_openai(crop_bytes)
