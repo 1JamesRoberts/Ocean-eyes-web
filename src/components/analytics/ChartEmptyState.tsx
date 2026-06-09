@@ -5,17 +5,21 @@ import styles from './ChartEmptyState.module.css';
 interface Props {
   message: string;
   hint?: string;
+  action?: React.ReactNode;
 }
 
-export const ChartEmptyState: React.FC<Props> = ({ message, hint }) => {
-  if (hint) {
-    return (
-      <div className={styles.emptyStateStacked}>
-        <span>{message}</span>
-        <span className={styles.emptyStateHint}>{hint}</span>
-      </div>
-    );
-  }
+export const ChartEmptyState: React.FC<Props> = ({ message, hint, action }) => {
+  const layout = hint || action ? styles.emptyStateStacked : styles.emptyState;
 
-  return <div className={styles.emptyState}>{message}</div>;
+  return (
+    <div className={layout}>
+      <span>{message}</span>
+      {hint && <span className={styles.emptyStateHint}>{hint}</span>}
+      {action && (
+        <div className={hint ? styles.emptyStateActionWithHint : styles.emptyStateAction}>
+          {action}
+        </div>
+      )}
+    </div>
+  );
 };

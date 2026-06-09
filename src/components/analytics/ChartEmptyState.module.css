@@ -19,3 +19,11 @@
   font-size: 12px;
   opacity: 0.7;
 }
+
+.emptyStateAction {
+  margin-top: 8px;
+}
+
+.emptyStateActionWithHint {
+  margin-top: 12px;
+}

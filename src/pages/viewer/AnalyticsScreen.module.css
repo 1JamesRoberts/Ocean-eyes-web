@@ -97,6 +97,43 @@
   gap: 12px;
 }
 
+.chartCardClickable {
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chartCardClickable:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary-light);
+}
+
+.chartCardArrow {
+  color: var(--color-text-secondary);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.chartCardClickable:hover .chartCardArrow {
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+.emptyActionButton {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.emptyActionButton:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
 .chartTitle {
   font-size: 14px;
   font-weight: 700;

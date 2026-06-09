@@ -1,16 +1,20 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React, { useState, useCallback } from 'react';
-import { Calendar, RotateCcw, Loader2 } from 'lucide-react';
+import { Calendar, RotateCcw, Loader2, ArrowRight } from 'lucide-react';
+import { useNavigation } from '../../context/NavigationContext';
+import { useReadings } from '../../hooks/useReadings';
 import { useHistory } from '../../hooks/useHistory';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { SpeciesDistributionChart } from '../../components/analytics/SpeciesDistributionChart';
-import { TurbidityTrendChart } from '../../components/analytics/TurbidityTrendChart';
+import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpeciesPresenceHeatmap } from '../../components/analytics/SpeciesPresenceHeatmap';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
 import { todayUTC } from '../../utils/analytics';
 import styles from './AnalyticsScreen.module.css';
 
 export const AnalyticsScreen: React.FC = () => {
+  const { setActiveTab } = useNavigation();
+  const { readings } = useReadings();
   const [selectedDate, setSelectedDate] = useState<string>(todayUTC);
   const { detectionData, turbidityData, loading, error, refetch } = useHistory(selectedDate);
 
@@ -20,7 +24,7 @@ export const AnalyticsScreen: React.FC = () => {
 
   const detectionRecords = detectionData?.records ?? [];
   const turbidityRecords = turbidityData?.records ?? [];
-  const hasAnyData = detectionRecords.length > 0 || turbidityRecords.length > 0;
+  const hasAnyData = detectionRecords.length > 0 || turbidityRecords.length > 0 || readings.length > 0;
 
   return (
     <div className={styles.analyticsContainer}>
@@ -109,15 +113,35 @@ export const AnalyticsScreen: React.FC = () => {
             <FishCountChart records={detectionRecords} />
           </div>
 
-          {/* Turbidity Trend */}
-          <div className={styles.chartCard}>
-            <div>
-              <h3 className={styles.chartTitle}>Turbidity Trend</h3>
-              <p className={styles.chartSubtitle}>
-                {turbidityRecords.length} turbidity readings
-              </p>
+          {/* Water Clarity Trend */}
+          <div
+            className={`${styles.chartCard} ${styles.chartCardClickable}`}
+            onClick={() => setActiveTab('history')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter') setActiveTab('history'); }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 className={styles.chartTitle}>Water Clarity Trend</h3>
+                <p className={styles.chartSubtitle}>
+                  {(readings.length > 0 ? readings.length : turbidityRecords.length) || 'No'} clarity readings
+                </p>
+              </div>
+              <ArrowRight size={16} className={styles.chartCardArrow} />
             </div>
-            <TurbidityTrendChart records={turbidityRecords} />
+            <ClarityTrendChart
+              records={turbidityRecords}
+              readings={readings}
+              emptyAction={
+                <button
+                  className={styles.emptyActionButton}
+                  onClick={(e) => { e.stopPropagation(); setActiveTab('history'); }}
+                >
+                  View Clarity Analytics →
+                </button>
+              }
+            />
           </div>
 
           {/* Species Distribution */}
