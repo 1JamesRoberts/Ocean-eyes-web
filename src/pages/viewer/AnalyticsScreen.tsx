@@ -26,6 +26,18 @@ export const AnalyticsScreen: React.FC = () => {
   const turbidityRecords = turbidityData?.records ?? [];
   const hasAnyData = detectionRecords.length > 0 || turbidityRecords.length > 0 || readings.length > 0;
 
+  const diagnoses = detectionRecords
+    .flatMap(record => 
+      record.detections
+        .filter(det => det.diagnosis)
+        .map(det => ({
+          timestamp: record.timestamp,
+          species: det.species_display,
+          diagnosis: det.diagnosis!
+        }))
+    )
+    .reverse();
+
   return (
     <div className={styles.analyticsContainer}>
       {/* Header */}
@@ -164,6 +176,89 @@ export const AnalyticsScreen: React.FC = () => {
               </p>
             </div>
             <SpeciesPresenceHeatmap records={detectionRecords} />
+          </div>
+
+          {/* AI Health Diagnostics Log */}
+          <div className={`${styles.chartCard} ${styles.chartCardWide}`}>
+            <div>
+              <h3 className={styles.chartTitle}>AI Health Diagnostics History</h3>
+              <p className={styles.chartSubtitle}>
+                Disease diagnosis runs executed on this date
+              </p>
+            </div>
+            {diagnoses.length === 0 ? (
+              <div className={styles.emptyDiagnostics}>
+                No health diagnostic records found for {selectedDate}.
+              </div>
+            ) : (
+              <div className={styles.diagnosesList}>
+                {diagnoses.map((diag, index) => {
+                  const isErr = !!diag.diagnosis.error;
+                  const isHealthy = diag.diagnosis.healthy;
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className={styles.diagnosesItem}
+                      style={{
+                        border: `1px solid ${
+                          isErr 
+                            ? 'var(--color-critical)' 
+                            : isHealthy 
+                              ? 'var(--color-good)' 
+                              : 'var(--color-warning)'
+                        }`,
+                      }}
+                    >
+                      <div className={styles.diagnosesItemHeader}>
+                        <div className={styles.diagnosesItemSubject}>
+                          <span className={styles.diagnosesSubjectName}>
+                            {diag.species}
+                          </span>
+                          <span 
+                            className={styles.diagnosesBadge}
+                            style={{
+                              background: isErr 
+                                ? 'rgba(239, 68, 68, 0.12)' 
+                                : isHealthy 
+                                  ? 'rgba(16, 185, 129, 0.12)' 
+                                  : 'rgba(245, 158, 11, 0.12)',
+                              color: isErr 
+                                ? 'var(--color-critical)' 
+                                : isHealthy 
+                                  ? 'var(--color-good)' 
+                                  : 'var(--color-warning)'
+                            }}
+                          >
+                            {isErr ? 'Error' : isHealthy ? 'Healthy' : `Disease: ${diag.diagnosis.disease}`}
+                          </span>
+                        </div>
+                        <span className={styles.diagnosesTime}>
+                          {new Date(diag.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      
+                      {isErr ? (
+                        <p className={styles.diagnosesErrorText}>
+                          <strong>Configuration Error:</strong> {diag.diagnosis.error}
+                        </p>
+                      ) : (
+                        <div className={styles.diagnosesContent}>
+                          <p className={styles.diagnosesObservation}>
+                            <strong>Observation:</strong> {diag.diagnosis.description}
+                          </p>
+                          {!isHealthy && diag.diagnosis.treatment && (
+                            <p className={styles.diagnosesTreatment}>
+                              <strong>Recommended Treatment:</strong> {diag.diagnosis.treatment}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

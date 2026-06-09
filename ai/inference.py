@@ -8,6 +8,11 @@ Load models once and reuse across predictions.
 import io
 import json
 import sys
+import os
+import base64
+import random
+import urllib.request
+import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -208,6 +213,99 @@ def run_species(crop: np.ndarray, session: ort.InferenceSession, metadata: dict)
     }
 
 
+def diagnose_fish_image_openai(crop_bytes: bytes) -> dict:
+    """
+    Sends the cropped fish image to an OpenAI-compatible API for disease diagnosis.
+    Configured via LLM_API_URL, LLM_MODEL, and LLM_API_KEY environment variables.
+    """
+    api_url = os.getenv("LLM_API_URL")
+    model = os.getenv("LLM_MODEL")
+    api_key = os.getenv("LLM_API_KEY")
+
+    if not api_url:
+        return {"error": "LLM endpoint not configured"}
+
+    # Base64 encode the crop image
+    b64_image = base64.b64encode(crop_bytes).decode('utf-8')
+    
+    # Construct OpenAI-compatible Chat Completions payload
+    payload = {
+        "model": model,
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "Analyze this cropped image of a fish from an aquarium monitoring system. "
+                            "Examine it for any visible signs of diseases (e.g., Ich/white spot, fin rot, "
+                            "dropsy, velvet, skin lesions, ulcers, cloudy eyes, bloating). "
+                            "Return a JSON object with the following schema:\n"
+                            "{\n"
+                            "  \"healthy\": boolean,\n"
+                            "  \"disease\": string or null,\n"
+                            "  \"confidence\": float (value between 0.0 and 1.0 representing your certainty),\n"
+                            "  \"description\": string (your clinical observations, physical abnormalities, colors, etc.),\n"
+                            "  \"treatment\": string (recommended remedies/actions, temperature changes, quarantine, or chemical treatments)\n"
+                            "}"
+                        )
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{b64_image}"
+                        }
+                    }
+                ]
+            }
+        ],
+        "response_format": { "type": "json_object" }
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+
+    req = urllib.request.Request(
+        api_url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers=headers,
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=20) as response:
+            res_body = response.read().decode("utf-8")
+            res_json = json.loads(res_body)
+            text_response = res_json['choices'][0]['message']['content'].strip()
+            
+            # Sanitize markdown formatting codeblocks if returned by models ignoring JSON response_format
+            if text_response.startswith("```json"):
+                text_response = text_response.split("```json", 1)[1]
+                if text_response.endswith("```"):
+                    text_response = text_response.rsplit("```", 1)[0]
+            elif text_response.startswith("```"):
+                text_response = text_response.split("```", 1)[1]
+                if text_response.endswith("```"):
+                    text_response = text_response.rsplit("```", 1)[0]
+            text_response = text_response.strip()
+
+            return json.loads(text_response)
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode("utf-8")
+        try:
+            err_json = json.loads(err_body)
+            err_msg = err_json.get("error", {}).get("message", err_body)
+        except Exception:
+            err_msg = err_body
+        return {"error": f"LLM API HTTP Error {e.code}: {err_msg}"}
+    except Exception as e:
+        return {"error": f"Failed to call LLM API: {str(e)}"}
+
+
 class FishAIPipeline:
     """Cached ONNX inference pipeline. Load once, predict many times."""
 
@@ -232,7 +330,7 @@ class FishAIPipeline:
         with open(turbidity_model_path.parent / (turbidity_model_path.stem + "_metadata.json")) as f:
             self.turbidity_metadata = json.load(f)
 
-    def predict(self, image_bytes: bytes) -> dict:
+    def predict(self, image_bytes: bytes, diagnose: bool = False) -> dict:
         """Run full pipeline on image bytes and return structured JSON."""
         pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         img_array = np.array(pil_image)
@@ -246,7 +344,11 @@ class FishAIPipeline:
         detections = []
         species_counts = {}
 
-        for x1, y1, x2, y2, det_confidence in detections_raw:
+        diagnose_index = -1
+        if diagnose and detections_raw:
+            diagnose_index = random.randint(0, len(detections_raw) - 1)
+
+        for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             x1 = max(0, x1)
             y1 = max(0, y1)
             x2 = min(img_w, x2)
@@ -254,6 +356,17 @@ class FishAIPipeline:
 
             crop = img_array[y1:y2, x1:x2]
             species_result = run_species(crop, self.species_session, self.species_metadata)
+
+            diagnosis_result = None
+            if i == diagnose_index:
+                try:
+                    # crop is RGB, convert to BGR for cv2.imencode to save correct color order
+                    crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
+                    _, encoded_img = cv2.imencode(".jpg", crop_bgr)
+                    crop_bytes = encoded_img.tobytes()
+                    diagnosis_result = diagnose_fish_image_openai(crop_bytes)
+                except Exception as e:
+                    diagnosis_result = {"error": f"Failed to slice or encode crop: {str(e)}"}
 
             detection_entry = {
                 "bbox": [x1, y1, x2, y2],
@@ -264,6 +377,7 @@ class FishAIPipeline:
                     round(y2 / img_h, 4),
                 ],
                 "detection_confidence": round(det_confidence, 4),
+                "diagnosis": diagnosis_result,
                 **species_result,
             }
             detections.append(detection_entry)
@@ -310,7 +424,7 @@ class FishAIPipeline:
             "turbidity": turbidity_result,
         }
 
-    def predict_detection_only(self, image_bytes: bytes, conf: float = 0.35) -> dict:
+    def predict_detection_only(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False) -> dict:
         """Run only fish detection + species classification (no turbidity)."""
         pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         img_array = np.array(pil_image)
@@ -323,7 +437,11 @@ class FishAIPipeline:
         detections = []
         species_counts = {}
 
-        for x1, y1, x2, y2, det_confidence in detections_raw:
+        diagnose_index = -1
+        if diagnose and detections_raw:
+            diagnose_index = random.randint(0, len(detections_raw) - 1)
+
+        for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             x1 = max(0, x1)
             y1 = max(0, y1)
             x2 = min(img_w, x2)
@@ -331,6 +449,17 @@ class FishAIPipeline:
 
             crop = img_array[y1:y2, x1:x2]
             species_result = run_species(crop, self.species_session, self.species_metadata)
+
+            diagnosis_result = None
+            if i == diagnose_index:
+                try:
+                    # crop is RGB, convert to BGR for cv2.imencode to save correct color order
+                    crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
+                    _, encoded_img = cv2.imencode(".jpg", crop_bgr)
+                    crop_bytes = encoded_img.tobytes()
+                    diagnosis_result = diagnose_fish_image_openai(crop_bytes)
+                except Exception as e:
+                    diagnosis_result = {"error": f"Failed to slice or encode crop: {str(e)}"}
 
             detection_entry = {
                 "bbox": [x1, y1, x2, y2],
@@ -341,6 +470,7 @@ class FishAIPipeline:
                     round(y2 / img_h, 4),
                 ],
                 "detection_confidence": round(det_confidence, 4),
+                "diagnosis": diagnosis_result,
                 **species_result,
             }
             detections.append(detection_entry)

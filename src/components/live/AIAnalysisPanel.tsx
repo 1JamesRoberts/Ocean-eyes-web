@@ -13,6 +13,9 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
   lastTurbidityResult
 }) => {
   if (!lastPrediction) return null;
+
+  const diagnosisDetection = lastPrediction.detections.find(d => d.diagnosis);
+  const diagnosis = diagnosisDetection?.diagnosis;
   return (
     <div style={{
       marginBottom: '24px',
@@ -178,6 +181,106 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Disease Diagnosis Section */}
+      {diagnosis && (
+        <div style={{
+          marginTop: '16px',
+          padding: '14px',
+          borderRadius: '12px',
+          background: diagnosis.error 
+            ? 'rgba(239, 68, 68, 0.08)' 
+            : diagnosis.healthy 
+              ? 'rgba(16, 185, 129, 0.08)' 
+              : 'rgba(245, 158, 11, 0.08)',
+          border: `1px solid ${
+            diagnosis.error 
+              ? 'var(--color-critical)' 
+              : diagnosis.healthy 
+                ? 'var(--color-good)' 
+                : 'var(--color-warning)'
+          }`,
+        }}>
+          <h4 style={{
+            margin: '0 0 8px 0',
+            fontSize: '12px',
+            fontWeight: 700,
+            color: diagnosis.error 
+              ? 'var(--color-critical)' 
+              : diagnosis.healthy 
+                ? 'var(--color-good)' 
+                : 'var(--color-warning)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            🩺 Fish Health Diagnosis
+          </h4>
+          {diagnosis.error ? (
+            <p style={{
+              margin: 0,
+              fontSize: '12px',
+              color: 'var(--color-text-primary)',
+              lineHeight: '1.4',
+              fontWeight: 500
+            }}>
+              <strong>Error:</strong> {diagnosis.error}
+            </p>
+          ) : (
+            <>
+              <div style={{ marginBottom: '8px', fontSize: '13px' }}>
+                <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>Status: </span>
+                <span style={{ 
+                  fontWeight: 800, 
+                  color: diagnosis.healthy ? 'var(--color-good)' : 'var(--color-warning)' 
+                }}>
+                  {diagnosis.healthy ? 'HEALTHY' : `DISEASE DETECTED (${diagnosis.disease})`}
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginLeft: '8px' }}>
+                  (Confidence: {Math.round(diagnosis.confidence * 100)}%)
+                </span>
+              </div>
+              
+              {diagnosisDetection && (
+                <div style={{ 
+                  fontSize: '11px', 
+                  color: 'var(--color-text-secondary)', 
+                  marginBottom: '8px',
+                  fontStyle: 'italic'
+                }}>
+                  Diagnosed Subject: {diagnosisDetection.species_display}
+                </div>
+              )}
+
+              <p style={{
+                margin: '0 0 8px 0',
+                fontSize: '12px',
+                color: 'var(--color-text-primary)',
+                lineHeight: '1.4'
+              }}>
+                <strong>Observation:</strong> {diagnosis.description}
+              </p>
+
+              {!diagnosis.healthy && diagnosis.treatment && (
+                <p style={{
+                  margin: 0,
+                  fontSize: '12px',
+                  color: 'var(--color-text-secondary)',
+                  lineHeight: '1.4',
+                  padding: '8px',
+                  background: 'var(--color-background)',
+                  borderRadius: '6px',
+                  borderLeft: '3px solid var(--color-warning)'
+                }}>
+                  <strong>Recommended Treatment:</strong> {diagnosis.treatment}
+                </p>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

@@ -22,6 +22,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from inference import FishAIPipeline
+import os
+
+# Load local environment variables from .env if present
+env_file = Path(__file__).parent / ".env"
+if env_file.exists():
+    with open(env_file, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if "=" in line and not line.startswith("#"):
+                k, v = line.split("=", 1)
+                os.environ[k.strip()] = v.strip().strip("'").strip('"')
 
 # ---------------------------------------------------------------------------
 # Model paths (relative to this file)
@@ -155,6 +166,7 @@ async def list_species():
 async def predict(
     file: UploadFile = File(...),
     conf: float = Query(0.35, ge=0.0, le=1.0, description="Detection confidence threshold"),
+    diagnose: bool = Query(False, description="Run disease diagnosis on cropped fish"),
 ):
     """
     Run full AI pipeline on uploaded image.
@@ -174,7 +186,7 @@ async def predict(
         original_conf = pipeline.conf
         pipeline.conf = conf
 
-        result = pipeline.predict(contents)
+        result = pipeline.predict(contents, diagnose=diagnose)
         pipeline.conf = original_conf
 
         append_detection_jsonl(result)
@@ -234,6 +246,7 @@ async def predict_turbidity(
 async def predict_detection(
     file: UploadFile = File(...),
     conf: float = Query(0.35, ge=0.0, le=1.0, description="Detection confidence threshold"),
+    diagnose: bool = Query(False, description="Run disease diagnosis on cropped fish"),
 ):
     """
     Run fish detection + species classification only (no turbidity).
@@ -252,7 +265,7 @@ async def predict_detection(
         original_conf = pipeline.conf
         pipeline.conf = conf
 
-        result = pipeline.predict_detection_only(contents, conf)
+        result = pipeline.predict_detection_only(contents, conf, diagnose=diagnose)
         pipeline.conf = original_conf
 
         append_detection_jsonl(result)

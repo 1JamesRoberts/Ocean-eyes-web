@@ -103,6 +103,15 @@ export interface FilterPreset {
 
 // ─── AI Inference Types ─────────────────────────────────────────────────────
 
+export interface FishDiagnosis {
+  healthy: boolean;
+  disease: string | null;
+  confidence: number;
+  description: string;
+  treatment: string;
+  error?: string;
+}
+
 export interface AIDetection {
   bbox: [number, number, number, number];
   bbox_normalized: [number, number, number, number];
@@ -112,6 +121,7 @@ export interface AIDetection {
   confidence: number;
   below_threshold: boolean;
   threshold: number;
+  diagnosis?: FishDiagnosis | null;
 }
 
 export interface AITurbidity {

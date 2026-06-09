@@ -186,6 +186,93 @@
   background: rgba(239, 68, 68, 0.12);
 }
 
+.emptyDiagnostics {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.diagnosesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.diagnosesItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.diagnosesItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.diagnosesItemSubject {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.diagnosesSubjectName {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.diagnosesBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.diagnosesTime {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.diagnosesErrorText {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.diagnosesContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.diagnosesObservation {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-primary);
+}
+
+.diagnosesTreatment {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding: 8px;
+  background: var(--color-background);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-warning);
+}
+
 @media (min-width: 1024px) {
   .chartGrid {
     grid-template-columns: 1fr 1fr;

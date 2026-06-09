@@ -115,12 +115,13 @@ export async function captureFrameFromUrl(
 export async function sendFrameForDetection(
   blob: Blob,
   conf: number = 0.35,
+  diagnose: boolean = false,
   signal?: AbortSignal
 ): Promise<AIDetectionResult> {
   const formData = new FormData();
   formData.append('file', blob, 'frame.jpg');
 
-  const res = await fetch(`${AI_API_URL}/predict/detection?conf=${conf}`, {
+  const res = await fetch(`${AI_API_URL}/predict/detection?conf=${conf}&diagnose=${diagnose}`, {
     method: 'POST',
     body: formData,
     signal,

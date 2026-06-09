@@ -324,10 +324,41 @@ export const LiveScreen: React.FC = () => {
         } else {
           blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360, controller.signal);
         }
-        const result = await sendFrameForDetection(blob, 0.35, controller.signal);
+
+        const ONE_HOUR = 3600000;
+        const lastDiagStr = localStorage.getItem('oceaneyes_last_diagnosis_time');
+        const lastDiag = lastDiagStr ? parseInt(lastDiagStr, 10) : 0;
+        const shouldDiagnose = Date.now() - lastDiag > ONE_HOUR;
+
+        const result = await sendFrameForDetection(blob, 0.35, shouldDiagnose, controller.signal);
 
         if (!aiMountedRef.current) return;
         setLastPrediction(result);
+
+        if (shouldDiagnose) {
+          localStorage.setItem('oceaneyes_last_diagnosis_time', Date.now().toString());
+
+          const diagnosedFish = result.detections.find(d => d.diagnosis);
+          if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
+            const diag = diagnosedFish.diagnosis;
+            const alerts = MockFirestore.getAlerts();
+            const newAlert = {
+              id: `alert-disease-${Date.now()}`,
+              title: `Disease Alert: ${diag.disease}`,
+              message: `AI detected signs of ${diag.disease} on a ${diagnosedFish.species_display}: ${diag.description}`,
+              tip: `Recommended Action: ${diag.treatment}`,
+              severity: 'critical' as const,
+              timeAgo: 'Just now',
+              clarityBefore: '',
+              clarityAfter: '',
+              fishBefore: '',
+              fishAfter: '',
+              resolved: false,
+              timestamp: new Date().toISOString()
+            };
+            MockFirestore.saveAlerts([newAlert, ...alerts]);
+          }
+        }
 
         if (activeTank) {
           const totalFish = result.summary.total_detections;

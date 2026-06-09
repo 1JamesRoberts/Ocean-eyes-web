@@ -33,3 +33,6 @@ ai/__pycache__
 ai/output/
 
 /github/
+
+# Local credentials env files
+ai/.env
