@@ -154,6 +154,8 @@ export interface FishDiagnosis {
   description: string;
   treatment: string;
   error?: string;
+  /** URL path to the cropped fish image that was sent to the LLM for diagnosis */
+  crop_url?: string;
 }
 
 export interface AIDetection {

@@ -20,6 +20,7 @@ import numpy as np
 from fastapi import FastAPI, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from inference import FishAIPipeline
 import os
@@ -49,37 +50,23 @@ TURBIDITY_MODEL = MODELS_DIR / "turbidity.onnx"
 # ---------------------------------------------------------------------------
 DETECTION_OUTPUT_DIR = SCRIPT_DIR / "output" / "detections"
 TURBIDITY_OUTPUT_DIR = SCRIPT_DIR / "output" / "turbidity"
+CROP_OUTPUT_DIR = SCRIPT_DIR / "output" / "crops"
 _io_lock = threading.Lock()
 
 
-def append_detection_jsonl(result: dict) -> None:
-    """Append a detection result to today's JSONL file. Best-effort: never raises."""
+def append_jsonl(output_dir: Path, result: dict, label: str = "entry") -> None:
+    """Append a result dict to today's JSONL file in the given output directory. Best-effort: never raises."""
     try:
-        DETECTION_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        file_path = DETECTION_OUTPUT_DIR / f"{today}.jsonl"
+        file_path = output_dir / f"{today}.jsonl"
         line = json.dumps(result, ensure_ascii=False) + "\n"
         with _io_lock:
             with open(file_path, "a", encoding="utf-8") as f:
                 f.write(line)
                 f.flush()
     except OSError as e:
-        print(f"[FishAI] Warning: failed to write detection JSONL: {e}", file=sys.stderr)
-
-
-def append_turbidity_jsonl(result: dict) -> None:
-    """Append a turbidity result to today's JSONL file. Best-effort: never raises."""
-    try:
-        TURBIDITY_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        file_path = TURBIDITY_OUTPUT_DIR / f"{today}.jsonl"
-        line = json.dumps(result, ensure_ascii=False) + "\n"
-        with _io_lock:
-            with open(file_path, "a", encoding="utf-8") as f:
-                f.write(line)
-                f.flush()
-    except OSError as e:
-        print(f"[FishAI] Warning: failed to write turbidity JSONL: {e}", file=sys.stderr)
+        print(f"[FishAI] Warning: failed to write {label} JSONL: {e}", file=sys.stderr)
 
 
 # ---------------------------------------------------------------------------
@@ -92,12 +79,20 @@ pipeline: FishAIPipeline | None = None
 async def lifespan(app: FastAPI):
     """Load models once at startup."""
     global pipeline
+
+    # Ensure output directories exist
+    CROP_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Mount static file serving for saved crop images
+    app.mount("/crops", StaticFiles(directory=str(CROP_OUTPUT_DIR)), name="crops")
+
     print("[FishAI] Loading ONNX models...", file=sys.stderr)
     pipeline = FishAIPipeline(
         detect_model_path=DETECT_MODEL,
         species_model_path=SPECIES_MODEL,
         turbidity_model_path=TURBIDITY_MODEL,
         conf=0.35,
+        crops_dir=CROP_OUTPUT_DIR,
     )
     print(f"[FishAI] Models loaded successfully.", file=sys.stderr)
     print(f"[FishAI] Detection provider: {pipeline.detect_provider}", file=sys.stderr)
@@ -115,7 +110,6 @@ app = FastAPI(
 )
 
 # CORS for local development
-import os
 _cors_origins = os.getenv(
     "CORS_ORIGINS",
     "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
@@ -189,7 +183,7 @@ async def predict(
         result = pipeline.predict(contents, diagnose=diagnose)
         pipeline.conf = original_conf
 
-        append_detection_jsonl(result)
+        append_jsonl(DETECTION_OUTPUT_DIR, result, label="detection")
 
         # Save turbidity data separately (flattened)
         turbidity_entry = {
@@ -197,7 +191,7 @@ async def predict(
             "model_provider": result.get("models", {}).get("turbidity", {}).get("provider"),
             **result.get("turbidity", {}),
         }
-        append_turbidity_jsonl(turbidity_entry)
+        append_jsonl(TURBIDITY_OUTPUT_DIR, turbidity_entry, label="turbidity")
 
         return result
 
@@ -232,7 +226,7 @@ async def predict_turbidity(
             "model_provider": result.get("models", {}).get("turbidity", {}).get("provider"),
             **result.get("turbidity", {}),
         }
-        append_turbidity_jsonl(turbidity_entry)
+        append_jsonl(TURBIDITY_OUTPUT_DIR, turbidity_entry, label="turbidity")
         return result
 
     except Exception as e:
@@ -268,7 +262,7 @@ async def predict_detection(
         result = pipeline.predict_detection_only(contents, conf, diagnose=diagnose)
         pipeline.conf = original_conf
 
-        append_detection_jsonl(result)
+        append_jsonl(DETECTION_OUTPUT_DIR, result, label="detection")
         return result
 
     except Exception as e:

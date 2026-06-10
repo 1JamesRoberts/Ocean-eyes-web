@@ -232,16 +232,15 @@ def diagnose_fish_image_openai(crop_bytes: bytes) -> dict:
     payload = {
         "model": model,
         "temperature": 0.1,
-        "response_format": {"type": "json_object"},
         "messages": [
             {
                 "role": "system",
                 "content": (
                     "You are an aquatic veterinarian. Diagnose fish diseases from cropped images.\n\n"
                     "RULES:\n"
-                    "- If image is blurry/dark/obstructed → healthy=false, disease='unclear_image', confidence<0.3\n"
+                    "- Always attempt a best-effort diagnosis from whatever visual details are visible, even if the image is blurry, dark, obstructed, or low-resolution. Do NOT refuse to diagnose due to image quality.\n"
+                    "- If truly no features are discernible → healthy=true, disease=null, confidence=0.0, description='No visible features discernible in this crop.'\n"
                     "- If uncertain → healthy=false, disease='suspicious', confidence 0.3-0.6\n"
-                    "- For medications, ALWAYS prefix with 'Consult a veterinarian before use — '\n"
                     "- Never give specific doses or concentrations\n"
                     "- Return ONLY valid JSON, no markdown, no code fences"
                 )
@@ -328,8 +327,12 @@ class FishAIPipeline:
         species_model_path: Path,
         turbidity_model_path: Path,
         conf: float = 0.35,
+        crops_dir: Path | None = None,
     ):
         self.conf = conf
+        self.crops_dir = crops_dir
+        if self.crops_dir is not None:
+            self.crops_dir.mkdir(parents=True, exist_ok=True)
 
         self.detect_session, self.detect_provider = load_session(detect_model_path)
         with open(detect_model_path.parent / (detect_model_path.stem + "_metadata.json")) as f:
@@ -343,13 +346,84 @@ class FishAIPipeline:
         with open(turbidity_model_path.parent / (turbidity_model_path.stem + "_metadata.json")) as f:
             self.turbidity_metadata = json.load(f)
 
-    def predict(self, image_bytes: bytes, diagnose: bool = False) -> dict:
-        """Run full pipeline on image bytes and return structured JSON."""
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _load_image(image_bytes: bytes) -> tuple[np.ndarray, np.ndarray, int, int]:
+        """Load image bytes into RGB array and BGR cv2 format. Returns (img_array, img_cv, width, height)."""
         pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         img_array = np.array(pil_image)
         img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
         img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
-        img_w, img_h = pil_image.size
+        return img_array, img_cv, pil_image.size[0], pil_image.size[1]
+
+    @staticmethod
+    def _select_diagnosis_candidate(detections_raw: list, img_w: int, img_h: int) -> int:
+        """Choose a random detection whose padded crop is large enough for diagnosis. Returns -1 if none viable."""
+        viable = []
+        for i, (x1, y1, x2, y2, _) in enumerate(detections_raw):
+            pad_w = int((x2 - x1) * 0.15)
+            pad_h = int((y2 - y1) * 0.15)
+            pw = min(img_w, x2 + pad_w) - max(0, x1 - pad_w)
+            ph = min(img_h, y2 + pad_h) - max(0, y1 - pad_h)
+            if pw >= 32 and ph >= 32:
+                viable.append(i)
+        return random.choice(viable) if viable else -1
+
+    def _run_diagnosis(
+        self,
+        img_array: np.ndarray,
+        img_w: int,
+        img_h: int,
+        x1: int, y1: int, x2: int, y2: int,
+        species_result: dict,
+        i: int,
+    ) -> dict | None:
+        """Run disease diagnosis on a padded crop. Returns diagnosis dict or error dict."""
+        try:
+            w = x2 - x1
+            h = y2 - y1
+            pad_w = int(w * 0.15)
+            pad_h = int(h * 0.15)
+
+            x1_pad = max(0, x1 - pad_w)
+            y1_pad = max(0, y1 - pad_h)
+            x2_pad = min(img_w, x2 + pad_w)
+            y2_pad = min(img_h, y2 + pad_h)
+
+            diag_crop = img_array[y1_pad:y2_pad, x1_pad:x2_pad]
+            crop_bgr = cv2.cvtColor(diag_crop, cv2.COLOR_RGB2BGR)
+            _, encoded_img = cv2.imencode(".jpg", crop_bgr)
+            crop_bytes = encoded_img.tobytes()
+            diagnosis_result = diagnose_fish_image_openai(crop_bytes)
+
+            # Save the crop image to disk for later viewing in the UI
+            if self.crops_dir is not None and diagnosis_result is not None:
+                try:
+                    ts_safe = (
+                        datetime.now(timezone.utc)
+                        .strftime("%Y%m%d_%H%M%S_%f")[:-3]
+                    )
+                    species_slug = species_result["species"]
+                    crop_filename = f"{ts_safe}_{species_slug}_{i}.jpg"
+                    crop_path = self.crops_dir / crop_filename
+                    with open(crop_path, "wb") as f:
+                        f.write(crop_bytes)
+                    if isinstance(diagnosis_result, dict):
+                        diagnosis_result["crop_url"] = f"/crops/{crop_filename}"
+                except Exception as save_err:
+                    print(
+                        f"[FishAI] Warning: failed to save crop: {save_err}",
+                        file=sys.stderr,
+                    )
+            return diagnosis_result
+        except Exception as e:
+            return {"error": f"Failed to slice or encode crop: {str(e)}"}
+
+    def predict(self, image_bytes: bytes, diagnose: bool = False) -> dict:
+        """Run full pipeline on image bytes and return structured JSON."""
+        img_array, img_cv, img_w, img_h = self._load_image(image_bytes)
 
         turbidity_result = run_turbidity(img_cv, self.turbidity_session, self.turbidity_metadata)
         detections_raw = run_detection(img_cv, self.detect_session, self.conf)
@@ -357,9 +431,7 @@ class FishAIPipeline:
         detections = []
         species_counts = {}
 
-        diagnose_index = -1
-        if diagnose and detections_raw:
-            diagnose_index = random.randint(0, len(detections_raw) - 1)
+        diagnose_index = self._select_diagnosis_candidate(detections_raw, img_w, img_h) if diagnose else -1
 
         for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             x1 = max(0, x1)
@@ -370,27 +442,7 @@ class FishAIPipeline:
             crop = img_array[y1:y2, x1:x2]
             species_result = run_species(crop, self.species_session, self.species_metadata)
 
-            diagnosis_result = None
-            if i == diagnose_index:
-                try:
-                    # Slice a padded crop (15% margin) to give the LLM better surrounding context and sharper features
-                    w = x2 - x1
-                    h = y2 - y1
-                    pad_w = int(w * 0.15)
-                    pad_h = int(h * 0.15)
-                    
-                    x1_pad = max(0, x1 - pad_w)
-                    y1_pad = max(0, y1 - pad_h)
-                    x2_pad = min(img_w, x2 + pad_w)
-                    y2_pad = min(img_h, y2 + pad_h)
-                    
-                    diag_crop = img_array[y1_pad:y2_pad, x1_pad:x2_pad]
-                    crop_bgr = cv2.cvtColor(diag_crop, cv2.COLOR_RGB2BGR)
-                    _, encoded_img = cv2.imencode(".jpg", crop_bgr)
-                    crop_bytes = encoded_img.tobytes()
-                    diagnosis_result = diagnose_fish_image_openai(crop_bytes)
-                except Exception as e:
-                    diagnosis_result = {"error": f"Failed to slice or encode crop: {str(e)}"}
+            diagnosis_result = self._run_diagnosis(img_array, img_w, img_h, x1, y1, x2, y2, species_result, i) if i == diagnose_index else None
 
             detection_entry = {
                 "bbox": [x1, y1, x2, y2],
@@ -413,7 +465,7 @@ class FishAIPipeline:
             )
             species_counts[count_key] = species_counts.get(count_key, 0) + 1
 
-        result = {
+        return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "models": {
                 "detection": {"provider": self.detect_provider},
@@ -428,15 +480,9 @@ class FishAIPipeline:
             },
         }
 
-        return result
-
     def predict_turbidity_only(self, image_bytes: bytes) -> dict:
         """Run only turbidity estimation on image bytes."""
-        pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        img_array = np.array(pil_image)
-        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
-        img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
-        img_w, img_h = pil_image.size
+        _, img_cv, img_w, img_h = self._load_image(image_bytes)
 
         turbidity_result = run_turbidity(img_cv, self.turbidity_session, self.turbidity_metadata)
 
@@ -450,20 +496,14 @@ class FishAIPipeline:
 
     def predict_detection_only(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False) -> dict:
         """Run only fish detection + species classification (no turbidity)."""
-        pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        img_array = np.array(pil_image)
-        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
-        img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
-        img_w, img_h = pil_image.size
+        img_array, img_cv, img_w, img_h = self._load_image(image_bytes)
 
         detections_raw = run_detection(img_cv, self.detect_session, conf)
 
         detections = []
         species_counts = {}
 
-        diagnose_index = -1
-        if diagnose and detections_raw:
-            diagnose_index = random.randint(0, len(detections_raw) - 1)
+        diagnose_index = self._select_diagnosis_candidate(detections_raw, img_w, img_h) if diagnose else -1
 
         for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             x1 = max(0, x1)
@@ -474,27 +514,7 @@ class FishAIPipeline:
             crop = img_array[y1:y2, x1:x2]
             species_result = run_species(crop, self.species_session, self.species_metadata)
 
-            diagnosis_result = None
-            if i == diagnose_index:
-                try:
-                    # Slice a padded crop (15% margin) to give the LLM better surrounding context and sharper features
-                    w = x2 - x1
-                    h = y2 - y1
-                    pad_w = int(w * 0.15)
-                    pad_h = int(h * 0.15)
-                    
-                    x1_pad = max(0, x1 - pad_w)
-                    y1_pad = max(0, y1 - pad_h)
-                    x2_pad = min(img_w, x2 + pad_w)
-                    y2_pad = min(img_h, y2 + pad_h)
-                    
-                    diag_crop = img_array[y1_pad:y2_pad, x1_pad:x2_pad]
-                    crop_bgr = cv2.cvtColor(diag_crop, cv2.COLOR_RGB2BGR)
-                    _, encoded_img = cv2.imencode(".jpg", crop_bgr)
-                    crop_bytes = encoded_img.tobytes()
-                    diagnosis_result = diagnose_fish_image_openai(crop_bytes)
-                except Exception as e:
-                    diagnosis_result = {"error": f"Failed to slice or encode crop: {str(e)}"}
+            diagnosis_result = self._run_diagnosis(img_array, img_w, img_h, x1, y1, x2, y2, species_result, i) if i == diagnose_index else None
 
             detection_entry = {
                 "bbox": [x1, y1, x2, y2],

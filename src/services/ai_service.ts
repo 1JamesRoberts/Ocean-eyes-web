@@ -1,7 +1,37 @@
 // ai_service.ts - Frontend service for FishAI FastAPI backend communication
 import type { AIDetectionResult, AITurbidityResult, HistoryDetectionResponse, HistoryTurbidityResponse } from '../types/aquarium';
 
-const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
+export const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+async function handleResponse<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new Error(err.error || `AI backend error: ${res.status}`);
+  }
+  return (await res.json()) as T;
+}
+
+async function fetchHistory<T>(
+  endpoint: string,
+  date?: string,
+  limit: number = 1000,
+  signal?: AbortSignal
+): Promise<T> {
+  const params = new URLSearchParams();
+  if (date) params.append('date', date);
+  params.append('limit', String(limit));
+
+  const res = await fetch(`${AI_API_URL}${endpoint}?${params.toString()}`, {
+    method: 'GET',
+    signal,
+  });
+
+  return handleResponse<T>(res);
+}
 
 /**
  * Check if the AI backend is available and models are loaded.
@@ -127,13 +157,7 @@ export async function sendFrameForDetection(
     signal,
   });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-    throw new Error(err.error || `AI backend error: ${res.status}`);
-  }
-
-  const data = await res.json();
-  return data as AIDetectionResult;
+  return handleResponse<AIDetectionResult>(res);
 }
 
 /**
@@ -149,13 +173,7 @@ export async function sendFrameForTurbidity(blob: Blob, signal?: AbortSignal): P
     signal,
   });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-    throw new Error(err.error || `AI backend error: ${res.status}`);
-  }
-
-  const data = await res.json();
-  return data as AITurbidityResult;
+  return handleResponse<AITurbidityResult>(res);
 }
 
 /**
@@ -171,49 +189,30 @@ export async function getSpeciesList(): Promise<{ id: string; display: string }[
 /**
  * Fetch detection history for a given date from the backend.
  */
-export async function fetchDetectionHistory(
+export function fetchDetectionHistory(
   date?: string,
-  limit: number = 1000,
+  limit?: number,
   signal?: AbortSignal
 ): Promise<HistoryDetectionResponse> {
-  const params = new URLSearchParams();
-  if (date) params.append('date', date);
-  params.append('limit', String(limit));
-
-  const res = await fetch(`${AI_API_URL}/history/detections?${params.toString()}`, {
-    method: 'GET',
-    signal,
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-    throw new Error(err.error || `AI backend error: ${res.status}`);
-  }
-
-  return (await res.json()) as HistoryDetectionResponse;
+  return fetchHistory<HistoryDetectionResponse>('/history/detections', date, limit, signal);
 }
 
 /**
  * Fetch turbidity history for a given date from the backend.
  */
-export async function fetchTurbidityHistory(
+export function fetchTurbidityHistory(
   date?: string,
-  limit: number = 1000,
+  limit?: number,
   signal?: AbortSignal
 ): Promise<HistoryTurbidityResponse> {
-  const params = new URLSearchParams();
-  if (date) params.append('date', date);
-  params.append('limit', String(limit));
+  return fetchHistory<HistoryTurbidityResponse>('/history/turbidity', date, limit, signal);
+}
 
-  const res = await fetch(`${AI_API_URL}/history/turbidity?${params.toString()}`, {
-    method: 'GET',
-    signal,
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-    throw new Error(err.error || `AI backend error: ${res.status}`);
-  }
-
-  return (await res.json()) as HistoryTurbidityResponse;
+/**
+ * Resolve a relative crop_url to an absolute URL using the backend base URL.
+ */
+export function resolveCropUrl(cropUrl?: string): string | undefined {
+  if (!cropUrl) return undefined;
+  if (cropUrl.startsWith('http')) return cropUrl;
+  return `${AI_API_URL}${cropUrl}`;
 }

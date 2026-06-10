@@ -1,9 +1,10 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Calendar, RotateCcw, Loader2, ArrowRight } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useReadings } from '../../hooks/useReadings';
 import { useHistory } from '../../hooks/useHistory';
+import { resolveCropUrl } from '../../services/ai_service';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
@@ -16,9 +17,9 @@ export const AnalyticsScreen: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>(todayUTC);
   const { detectionData, turbidityData, loading, error, refetch } = useHistory(selectedDate);
 
-  const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDate(e.target.value);
-  }, []);
+  };
 
   const detectionRecords = detectionData?.records ?? [];
   const turbidityRecords = turbidityData?.records ?? [];
@@ -31,6 +32,7 @@ export const AnalyticsScreen: React.FC = () => {
         .map(det => ({
           timestamp: record.timestamp,
           species: det.species_display,
+          cropUrl: det.diagnosis!.crop_url,
           diagnosis: det.diagnosis!
         }))
     )
@@ -214,6 +216,17 @@ export const AnalyticsScreen: React.FC = () => {
                         </span>
                       </div>
                       
+                      {diag.cropUrl && (
+                        <img
+                          src={resolveCropUrl(diag.cropUrl)}
+                          alt={`Crop of ${diag.species} sent to LLM`}
+                          className={styles.diagnosesCropImage}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      )}
+
                       {isErr ? (
                         <p className={styles.diagnosesErrorText}>
                           <strong>Configuration Error:</strong> {diag.diagnosis.error}

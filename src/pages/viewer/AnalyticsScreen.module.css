@@ -233,6 +233,15 @@
   font-weight: 600;
 }
 
+.diagnosesCropImage {
+  max-width: 200px;
+  max-height: 140px;
+  border-radius: 4px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+}
+
 .diagnosesErrorText {
   margin: 0;
   font-size: 12px;

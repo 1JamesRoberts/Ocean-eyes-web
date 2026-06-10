@@ -1,6 +1,7 @@
 import React from 'react';
 import { Brain } from 'lucide-react';
 import { getSpeciesById } from '../../data/speciesCatalog';
+import { resolveCropUrl } from '../../services/ai_service';
 import type { AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
 
 interface AIAnalysisPanelProps {
@@ -254,6 +255,24 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                 }}>
                   Diagnosed Subject: {diagnosisDetection.species_display}
                 </div>
+              )}
+
+              {diagnosis.crop_url && (
+                <img
+                  src={resolveCropUrl(diagnosis.crop_url)}
+                  alt="Fish crop sent to LLM"
+                  style={{
+                    maxWidth: '200px',
+                    maxHeight: '140px',
+                    borderRadius: '4px',
+                    objectFit: 'contain',
+                    marginBottom: '10px',
+                    display: 'block'
+                  }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                  }}
+                />
               )}
 
               <p style={{
