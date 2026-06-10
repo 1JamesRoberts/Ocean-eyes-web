@@ -231,7 +231,21 @@ def diagnose_fish_image_openai(crop_bytes: bytes) -> dict:
     # Construct OpenAI-compatible Chat Completions payload
     payload = {
         "model": model,
+        "temperature": 0.1,
+        "response_format": {"type": "json_object"},
         "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "You are an aquatic veterinarian. Diagnose fish diseases from cropped images.\n\n"
+                    "RULES:\n"
+                    "- If image is blurry/dark/obstructed → healthy=false, disease='unclear_image', confidence<0.3\n"
+                    "- If uncertain → healthy=false, disease='suspicious', confidence 0.3-0.6\n"
+                    "- For medications, ALWAYS prefix with 'Consult a veterinarian before use — '\n"
+                    "- Never give specific doses or concentrations\n"
+                    "- Return ONLY valid JSON, no markdown, no code fences"
+                )
+            },
             {
                 "role": "user",
                 "content": [
@@ -245,7 +259,7 @@ def diagnose_fish_image_openai(crop_bytes: bytes) -> dict:
                             "{\n"
                             "  \"healthy\": boolean,\n"
                             "  \"disease\": string or null,\n"
-                            "  \"confidence\": float (value between 0.0 and 1.0 representing your certainty),\n"
+                            "  \"confidence\": float (0.0-1.0),\n"
                             "  \"description\": string (your clinical observations, physical abnormalities, colors, etc.),\n"
                             "  \"treatment\": string (recommended remedies/actions, temperature changes, quarantine, or chemical treatments)\n"
                             "}"
@@ -260,7 +274,6 @@ def diagnose_fish_image_openai(crop_bytes: bytes) -> dict:
                 ]
             }
         ],
-        "response_format": { "type": "json_object" }
     }
 
     headers = {

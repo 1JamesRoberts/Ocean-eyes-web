@@ -12,8 +12,8 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
     {
       label: 'pH Value',
       value: `${reading.ph} pH`,
-      color: 'var(--color-info)',
-      bgColor: '#EFF6FF',
+      color: 'var(--color-good)',
+      bgColor: '#ECFDF5',
       icon: Droplet,
       isCritical: false
     },

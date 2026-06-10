@@ -99,22 +99,10 @@
 
 .chartCardClickable {
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.chartCardClickable:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 1px var(--color-primary-light);
 }
 
 .chartCardArrow {
   color: var(--color-text-secondary);
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.chartCardClickable:hover .chartCardArrow {
-  color: var(--color-primary);
-  transform: translateX(2px);
 }
 
 .emptyActionButton {

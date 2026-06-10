@@ -21,7 +21,7 @@ export const WaterClarityCard: React.FC<WaterClarityCardProps> = ({ displayClari
         <div>
           <span className={styles.label}>Clarity</span>
           <span className={styles.value}>
-            {displayClarity.toFixed(2)} <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>FNU</span>
+            {displayClarity.toFixed(2)} FNU
           </span>
         </div>
       </div>
