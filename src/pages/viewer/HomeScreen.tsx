@@ -106,6 +106,7 @@ export const HomeScreen: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <WaterClarityCard
               displayClarity={displayClarity}
+              readings={readings}
               onClick={() => setActiveTab('history')}
             />
 

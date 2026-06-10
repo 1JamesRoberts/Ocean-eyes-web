@@ -1,12 +1,15 @@
 import React from 'react';
 import { Droplet } from 'lucide-react';
+import type { ReadingItem } from '../../types/aquarium';
+import { MiniClarityChart } from '../analytics/MiniClarityChart';
 
 interface WaterClarityCardProps {
   displayClarity: number;
+  readings: ReadingItem[];
   onClick: () => void;
 }
 
-export const WaterClarityCard: React.FC<WaterClarityCardProps> = ({ displayClarity, onClick }) => {
+export const WaterClarityCard: React.FC<WaterClarityCardProps> = ({ displayClarity, readings, onClick }) => {
   return (
     <div>
       <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>Water Clarity</h3>
@@ -19,17 +22,7 @@ export const WaterClarityCard: React.FC<WaterClarityCardProps> = ({ displayClari
           </div>
           <Droplet size={20} style={{ color: 'var(--color-info)', marginTop: '4px' }} />
         </div>
-        <div style={{ height: '32px' }}>
-          <svg width="100%" height="32" style={{ overflow: 'visible' }}>
-            <polyline
-              fill="none"
-              stroke="var(--color-info)"
-              strokeWidth="2"
-              points="0,28 30,24 60,30 90,20 120,22 150,14 180,10 210,16"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
+        <MiniClarityChart readings={readings} />
       </div>
     </div>
   );
