@@ -238,7 +238,8 @@ def diagnose_fish_image_openai(crop_bytes: bytes) -> dict:
                 "content": (
                     "You are an aquatic veterinarian. Diagnose fish diseases from cropped images.\n\n"
                     "RULES:\n"
-                    "- Always attempt a best-effort diagnosis from whatever visual details are visible, even if the image is blurry, dark, obstructed, or low-resolution. Do NOT refuse to diagnose due to image quality.\n"
+                    "- Always provide a best-effort diagnosis based on whatever visual details are present. Do NOT refuse to diagnose.\n"
+                    "- Do NOT mention or comment on image quality (e.g., blurriness, darkness, resolution, obstruction) in your response. Focus solely on the fish's condition.\n"
                     "- If truly no features are discernible → healthy=true, disease=null, confidence=0.0, description='No visible features discernible in this crop.'\n"
                     "- If uncertain → healthy=false, disease='suspicious', confidence 0.3-0.6\n"
                     "- Never give specific doses or concentrations\n"
@@ -254,13 +255,14 @@ def diagnose_fish_image_openai(crop_bytes: bytes) -> dict:
                             "Analyze this cropped image of a fish from an aquarium monitoring system. "
                             "Examine it for any visible signs of diseases (e.g., Ich/white spot, fin rot, "
                             "dropsy, velvet, skin lesions, ulcers, cloudy eyes, bloating). "
+                            "Remember: do not comment on photographic quality. "
                             "Return a JSON object with the following schema:\n"
                             "{\n"
                             "  \"healthy\": boolean,\n"
                             "  \"disease\": string or null,\n"
                             "  \"confidence\": float (0.0-1.0),\n"
-                            "  \"description\": string (your clinical observations, physical abnormalities, colors, etc.),\n"
-                            "  \"treatment\": string (recommended remedies/actions, temperature changes, quarantine, or chemical treatments)\n"
+                            "  \"description\": string (your clinical observations, physical abnormalities, colors, etc. — exactly 1 sentence),\n"
+                            "  \"treatment\": string (recommended remedies/actions, temperature changes, quarantine, or chemical treatments, etc. — exactly 1 sentence)\n"
                             "}"
                         )
                     },

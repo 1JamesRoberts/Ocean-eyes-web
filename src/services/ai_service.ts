@@ -216,3 +216,39 @@ export function resolveCropUrl(cropUrl?: string): string | undefined {
   if (cropUrl.startsWith('http')) return cropUrl;
   return `${AI_API_URL}${cropUrl}`;
 }
+
+/**
+ * Clear detection history for a given date on the backend.
+ */
+export async function clearDetectionHistory(
+  date?: string,
+  signal?: AbortSignal
+): Promise<{ status: string; deleted: string }> {
+  const params = new URLSearchParams();
+  if (date) params.append('date', date);
+
+  const res = await fetch(`${AI_API_URL}/history/detections?${params.toString()}`, {
+    method: 'DELETE',
+    signal,
+  });
+
+  return handleResponse<{ status: string; deleted: string }>(res);
+}
+
+/**
+ * Clear turbidity history for a given date on the backend.
+ */
+export async function clearTurbidityHistory(
+  date?: string,
+  signal?: AbortSignal
+): Promise<{ status: string; deleted: string }> {
+  const params = new URLSearchParams();
+  if (date) params.append('date', date);
+
+  const res = await fetch(`${AI_API_URL}/history/turbidity?${params.toString()}`, {
+    method: 'DELETE',
+    signal,
+  });
+
+  return handleResponse<{ status: string; deleted: string }>(res);
+}

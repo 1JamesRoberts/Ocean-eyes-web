@@ -325,6 +325,48 @@ async def history_turbidity(
     return {"date": date_str, "count": len(records), "records": records[:limit]}
 
 
+@app.delete("/history/detections")
+async def clear_detection_history(
+    date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
+):
+    """Delete detection history JSONL file for a given date."""
+    if pipeline is None:
+        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
+
+    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    file_path = DETECTION_OUTPUT_DIR / f"{date_str}.jsonl"
+    try:
+        if file_path.exists():
+            file_path.unlink()
+            return {"status": "ok", "deleted": date_str}
+        return {"status": "ok", "deleted": date_str, "message": "No file found"}
+    except OSError as e:
+        return JSONResponse(
+            status_code=500, content={"error": f"Failed to delete history: {e}"}
+        )
+
+
+@app.delete("/history/turbidity")
+async def clear_turbidity_history(
+    date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
+):
+    """Delete turbidity history JSONL file for a given date."""
+    if pipeline is None:
+        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
+
+    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    file_path = TURBIDITY_OUTPUT_DIR / f"{date_str}.jsonl"
+    try:
+        if file_path.exists():
+            file_path.unlink()
+            return {"status": "ok", "deleted": date_str}
+        return {"status": "ok", "deleted": date_str, "message": "No file found"}
+    except OSError as e:
+        return JSONResponse(
+            status_code=500, content={"error": f"Failed to delete history: {e}"}
+        )
+
+
 @app.get("/history/dates")
 async def history_dates():
     """List available history dates for which JSONL files exist."""

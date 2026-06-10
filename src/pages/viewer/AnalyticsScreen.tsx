@@ -1,10 +1,10 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React, { useState } from 'react';
-import { Calendar, RotateCcw, Loader2, ArrowRight } from 'lucide-react';
+import { Calendar, RotateCcw, Loader2, ArrowRight, Trash2 } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useReadings } from '../../hooks/useReadings';
 import { useHistory } from '../../hooks/useHistory';
-import { resolveCropUrl } from '../../services/ai_service';
+import { resolveCropUrl, clearDetectionHistory, clearTurbidityHistory } from '../../services/ai_service';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
@@ -37,6 +37,25 @@ export const AnalyticsScreen: React.FC = () => {
         }))
     )
     .reverse();
+
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
+
+  const handleClearHistory = async () => {
+    setClearing(true);
+    try {
+      await Promise.all([
+        clearDetectionHistory(selectedDate),
+        clearTurbidityHistory(selectedDate),
+      ]);
+      setConfirmClear(false);
+      refetch();
+    } catch (err) {
+      console.error('Failed to clear history:', err);
+    } finally {
+      setClearing(false);
+    }
+  };
 
   return (
     <div className={styles.analyticsContainer}>
@@ -158,11 +177,42 @@ export const AnalyticsScreen: React.FC = () => {
 
           {/* AI Health Diagnostics Log */}
           <div className={`${styles.chartCard} ${styles.chartCardWide}`}>
-            <div>
-              <h3 className={styles.chartTitle}>AI Health Diagnostics History</h3>
-              <p className={styles.chartSubtitle}>
-                Disease diagnosis runs executed on this date
-              </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <h3 className={styles.chartTitle}>AI Health Diagnostics History</h3>
+                <p className={styles.chartSubtitle}>
+                  Disease diagnosis runs executed on this date
+                </p>
+              </div>
+              {diagnoses.length > 0 && !confirmClear && (
+                <button
+                  className={styles.clearHistoryBtn}
+                  onClick={() => setConfirmClear(true)}
+                  title="Clear all diagnostics for this date"
+                >
+                  <Trash2 size={14} />
+                  Clear history
+                </button>
+              )}
+              {confirmClear && (
+                <div className={styles.clearConfirmGroup}>
+                  <span className={styles.clearConfirmText}>Delete all records for this date?</span>
+                  <button
+                    className={styles.clearConfirmYes}
+                    onClick={handleClearHistory}
+                    disabled={clearing}
+                  >
+                    {clearing ? 'Deleting…' : 'Yes, clear'}
+                  </button>
+                  <button
+                    className={styles.clearConfirmNo}
+                    onClick={() => setConfirmClear(false)}
+                    disabled={clearing}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
             {diagnoses.length === 0 ? (
               <div className={styles.emptyDiagnostics}>
@@ -216,33 +266,35 @@ export const AnalyticsScreen: React.FC = () => {
                         </span>
                       </div>
                       
-                      {diag.cropUrl && (
-                        <img
-                          src={resolveCropUrl(diag.cropUrl)}
-                          alt={`Crop of ${diag.species} sent to LLM`}
-                          className={styles.diagnosesCropImage}
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      )}
+                      <div className={styles.diagnosesBody}>
+                        {diag.cropUrl && (
+                          <img
+                            src={resolveCropUrl(diag.cropUrl)}
+                            alt={`Crop of ${diag.species} sent to LLM`}
+                            className={styles.diagnosesCropImage}
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        )}
 
-                      {isErr ? (
-                        <p className={styles.diagnosesErrorText}>
-                          <strong>Configuration Error:</strong> {diag.diagnosis.error}
-                        </p>
-                      ) : (
-                        <div className={styles.diagnosesContent}>
-                          <p className={styles.diagnosesObservation}>
-                            <strong>Observation:</strong> {diag.diagnosis.description}
+                        {isErr ? (
+                          <p className={styles.diagnosesErrorText}>
+                            <strong>Configuration Error:</strong> {diag.diagnosis.error}
                           </p>
-                          {!isHealthy && diag.diagnosis.treatment && (
-                            <p className={styles.diagnosesTreatment}>
-                              <strong>Recommended Treatment:</strong> {diag.diagnosis.treatment}
+                        ) : (
+                          <div className={styles.diagnosesContent}>
+                            <p className={styles.diagnosesObservation}>
+                              <strong>Observation:</strong> {diag.diagnosis.description}
                             </p>
-                          )}
-                        </div>
-                      )}
+                            {!isHealthy && diag.diagnosis.treatment && (
+                              <p className={styles.diagnosesTreatment}>
+                                <strong>Recommended Treatment:</strong> {diag.diagnosis.treatment}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

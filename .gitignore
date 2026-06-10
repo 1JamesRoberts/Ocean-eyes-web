@@ -36,3 +36,5 @@ ai/output/
 
 # Local credentials env files
 ai/.env
+# History data (generated at runtime)
+history.json
