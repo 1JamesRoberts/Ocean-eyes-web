@@ -14,7 +14,6 @@ import {
 } from '../../data/speciesCatalog';
 import { checkTankCompatibility, getCompatibilityLevel, getCompatibilityColor } from '../../data/speciesCatalog';
 import type { Difficulty, Aggression, BehaviorType, SwimLocation, Availability, BreedingDifficulty } from '../../types/aquarium';
-import styles from './MyFishScreen.module.css';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -46,7 +45,7 @@ interface DonutChartProps {
 const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
   if (speciesDistribution.length === 0) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px', color: 'var(--color-text-secondary)' }}>
+      <div className="flex items-center justify-center h-[200px] text-text-muted">
         No fish data available
       </div>
     );
@@ -68,8 +67,8 @@ const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-      <div style={{ position: 'relative', width: '200px', height: '200px' }}>
+    <div className="flex flex-col items-center gap-4">
+      <div className="relative w-[200px] h-[200px]">
         <svg width="200" height="200" viewBox="0 0 200 200">
           <g transform="rotate(-90 100 100)">
             {segmentsWithOffsets.map(({ species, dashLength, gapLength, offset, index }) => (
@@ -88,29 +87,21 @@ const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
             ))}
           </g>
         </svg>
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{total}</div>
-          <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>TOTAL FISH</div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+          <div className="text-[28px] font-extrabold text-text-main">{total}</div>
+          <div className="text-[11px] text-text-muted font-semibold">TOTAL FISH</div>
         </div>
       </div>
 
       {/* Legend */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', width: '100%' }}>
+      <div className="flex flex-wrap gap-2 justify-center w-full">
         {speciesDistribution.map((species, index) => (
-          <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600 }}>
-            <div style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '3px',
-              backgroundColor: species.color
-            }} />
-            <span style={{ color: 'var(--color-text-secondary)' }}>
+          <div key={index} className="flex items-center gap-1.5 text-xs font-semibold">
+            <div 
+              className="w-2.5 h-2.5 rounded-[3px]"
+              style={{ backgroundColor: species.color }} 
+            />
+            <span className="text-text-muted">
               {species.name} ({species.count})
             </span>
           </div>
@@ -128,20 +119,22 @@ const FishThumbnail: React.FC<{ imagePath?: string; initials: string; color: str
     const s = size;
     if (!imagePath || hasError) {
       return (
-        <div style={{
-          width: s, height: s, borderRadius: '8px',
-          backgroundColor: color, display: 'flex', alignItems: 'center',
-          justifyContent: 'center', fontSize: Math.round(s * 0.3),
-          fontWeight: 700, color: '#fff', flexShrink: 0,
-          textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-        }}>
+        <div 
+          className="rounded-lg flex items-center justify-center font-bold text-white shrink-0 shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
+          style={{
+            width: s, height: s,
+            backgroundColor: color, fontSize: Math.round(s * 0.3),
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+          }}
+        >
           {initials}
         </div>
       );
     }
     return (
       <img src={imagePath} alt={initials}
-        style={{ width: s, height: s, borderRadius: '8px', objectFit: 'contain', flexShrink: 0 }}
+        className="rounded-lg object-contain shrink-0"
+        style={{ width: s, height: s }}
         onError={() => setHasError(true)}
       />
     );
@@ -151,9 +144,9 @@ const FishThumbnail: React.FC<{ imagePath?: string; initials: string; color: str
 
 const DetailChip: React.FC<{ icon: React.ReactNode; label: string; value: string; colorClass?: string }> =
   ({ icon, label, value, colorClass }) => (
-    <div className={`${styles.chip} ${colorClass || styles.chipGray}`}>
+    <div className={`flex items-center gap-1.5 p-[8px_12px] rounded-xl text-xs font-semibold text-text-main ${colorClass || 'bg-[rgba(148,163,184,0.12)]'}`}>
       {icon}
-      <span className={styles.chipLabel}>{label}</span>
+      <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider mr-0.5">{label}</span>
       {value}
     </div>
   );
@@ -236,15 +229,15 @@ export const MyFishScreen: React.FC = () => {
   // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
-    <div className={styles.container}>
-      <div className={styles.titleRow}>
-        <button className={styles.backButton} onClick={() => setActiveTab('home')}>
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-between items-center pb-3 border-b border-border-card mb-6">
+        <button className="bg-none border-none text-primary-dark text-sm font-semibold cursor-pointer font-main" onClick={() => setActiveTab('home')}>
           ← Back
         </button>
-        <h1 className="canvas-title" style={{ fontSize: '24px' }}>Fish Inventory</h1>
+        <h1 className="text-2xl font-extrabold text-text-main">Fish Inventory</h1>
         <button
           aria-label={showAddForm ? 'Close' : 'Add fish'}
-          style={{ background: 'none', border: 'none', color: 'var(--color-primary-dark)', padding: '6px', cursor: 'pointer' }}
+          className="bg-none border-none text-primary-dark p-1.5 cursor-pointer"
           onClick={() => setShowAddForm(!showAddForm)}
         >
           <Plus size={24} />
@@ -252,11 +245,13 @@ export const MyFishScreen: React.FC = () => {
       </div>
 
       {/* ─── Add Form ─── */}
-      <div className={`${styles.addFormContainer} ${showAddForm ? styles.open : ''}`}>
-        <form onSubmit={handleAdd} className={`card-decoration ${styles.addForm}`}>
-          <h4 className={styles.addFormHeader}>Add New Species Entry</h4>
+      <div className={`overflow-hidden transition-[max-height_0.4s_cubic-bezier(0.4,0,0.2,1),opacity_0.3s_ease,transform_0.4s_cubic-bezier(0.4,0,0.2,1),margin_0.4s_ease] -translate-y-3 origin-top relative z-50 ${
+        showAddForm ? 'max-h-[500px] opacity-100 translate-y-0 mb-5' : 'max-h-0 opacity-0 pointer-events-none'
+      }`}>
+        <form onSubmit={handleAdd} className="bg-surface-card rounded-[20px] p-6 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3.5">
+          <h4 className="text-sm font-bold text-text-main">Add New Species Entry</h4>
           <div>
-            <label className={styles.label}>SPECIES</label>
+            <label className="block text-[11px] text-text-muted mb-1 font-semibold uppercase tracking-wider">SPECIES</label>
             <SpeciesSelector
               selectedSpeciesId={selectedSpeciesId}
               onSelect={handleSpeciesSelect}
@@ -264,7 +259,7 @@ export const MyFishScreen: React.FC = () => {
               excludeSpeciesIds={fishList.map(f => f.speciesId)}
             />
           </div>
-          <div className={styles.formActions}>
+          <div className="flex gap-2.5 mt-1.5">
             <button className="primary-button" style={{ flex: 1, padding: '10px', fontSize: '13px' }} type="submit">
               Add Species
             </button>
@@ -277,35 +272,35 @@ export const MyFishScreen: React.FC = () => {
       </div>
 
       {/* ─── Layout ─── */}
-      <div className={styles.gridLayout}>
+      <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-6">
         {/* Left Column — Chart & Stats */}
-        <div className={styles.leftColumn}>
-          <div className="card-decoration" style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <BarChart3 size={18} color="var(--color-primary-dark)" />
-              <h3 style={{ fontSize: '15px', fontWeight: 700 }}>Species Distribution</h3>
+        <div className="flex flex-col gap-4">
+          <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)]">
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 size={18} className="text-primary-dark" />
+              <h3 className="text-base font-bold text-text-main">Species Distribution</h3>
             </div>
             <DonutChart speciesDistribution={speciesDistribution} />
           </div>
 
-          <div className="card-decoration" style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <Fish size={18} color="var(--color-primary-dark)" />
-              <h3 style={{ fontSize: '15px', fontWeight: 700 }}>Aquarium Overview</h3>
+          <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)]">
+            <div className="flex items-center gap-2 mb-4">
+              <Fish size={18} className="text-primary-dark" />
+              <h3 className="text-base font-bold text-text-main">Aquarium Overview</h3>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="grid grid-cols-2 gap-3">
               {[
                 { icon: <Hash size={14} />, color: 'var(--color-primary-dark)', bg: 'var(--color-primary-light)', label: 'Total Fish', value: stats.totalFish },
                 { icon: <Fish size={14} />, color: 'var(--color-info)', bg: 'rgba(59, 130, 246, 0.08)', label: 'Species', value: stats.uniqueSpecies },
                 { icon: <Eye size={14} />, color: 'var(--color-good)', bg: 'rgba(16, 185, 129, 0.08)', label: 'Detected', value: stats.totalDetected },
                 { icon: <BarChart3 size={14} />, color: 'var(--color-warning)', bg: 'rgba(245, 158, 11, 0.08)', label: 'Detection', value: `${stats.detectionRate}%` },
               ].map((item, i) => (
-                <div key={i} style={{ background: item.bg, borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div key={i} style={{ background: item.bg }} className="rounded-xl p-3.5 flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5">
                     <span style={{ color: item.color }}>{item.icon}</span>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: item.color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{item.label}</span>
+                    <span style={{ color: item.color }} className="text-[11px] font-bold uppercase tracking-wider">{item.label}</span>
                   </div>
-                  <span style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{item.value}</span>
+                  <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
                 </div>
               ))}
             </div>
@@ -313,12 +308,12 @@ export const MyFishScreen: React.FC = () => {
         </div>
 
         {/* Right Column — Fish Cards */}
-        <div className={styles.rightColumn}>
+        <div className="flex flex-col gap-3">
           {fishList.length === 0 && (
-            <div className={`card-decoration ${styles.emptyState}`}>
-              <span style={{ fontSize: '48px' }}>🐟</span>
-              <p style={{ fontSize: '16px', fontWeight: 600 }}>No fish in your inventory</p>
-              <p style={{ fontSize: '13px' }}>Tap + to add your first species</p>
+            <div className="bg-surface-card rounded-[20px] p-10 shadow-card border border-[rgba(13,148,136,0.02)] flex flex-col items-center justify-center gap-3 text-text-muted">
+              <span className="text-5xl">🐟</span>
+              <p className="text-base font-bold text-text-main">No fish in your inventory</p>
+              <p className="text-xs">Tap + to add your first species</p>
             </div>
           )}
 
@@ -338,25 +333,25 @@ export const MyFishScreen: React.FC = () => {
 
             return (
               <div key={fish.id} data-fish-card
-                className={`card-decoration ${styles.fishCard}`}
+                className="bg-surface-card rounded-[20px] shadow-card border border-[rgba(13,148,136,0.02)] cursor-pointer overflow-hidden transition-[box-shadow_0.25s_cubic-bezier(0.4,0,0.2,1)] hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)] flex flex-col"
                 onClick={() => setActiveFishId(isActive ? null : fish.id)}
               >
                 {/* Main row — always visible */}
-                <div className={styles.cardMainRow}>
-                  <div className={styles.fishInfo}>
+                <div className="flex justify-between items-center p-3">
+                  <div className="flex items-center gap-3 flex-1">
                     <FishThumbnail imagePath={display.imagePath} initials={display.initials} color={display.color} />
-                    <div style={{ flex: 1 }}>
-                      <span className={styles.fishName}>{display.name}</span>
+                    <div className="flex-1">
+                      <span className="text-base font-bold text-text-main block">{display.name}</span>
                       {species?.scientificName && (
-                        <span className={styles.scientificName}>{species.scientificName}</span>
+                        <span className="text-xs italic text-text-muted mb-1 block font-medium">{species.scientificName}</span>
                       )}
-                      <span className={styles.fishSubtext}>
+                      <span className="block text-xs text-text-muted mt-0.5">
                         Visible: {fish.detected} / {fish.count}
                       </span>
                     </div>
                   </div>
 
-                  <div className={styles.cardControls} onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center gap-3.5" onClick={e => e.stopPropagation()}>
                     {/* Visibility ring */}
                     {(() => {
                       const pct = fish.count > 0 ? Math.round((fish.detected / fish.count) * 100) : 0;
@@ -364,31 +359,31 @@ export const MyFishScreen: React.FC = () => {
                       const r = 20, circ = 2 * Math.PI * r;
                       const dash = (circ * pct) / 100;
                       return (
-                        <div className={styles.visibilityContainer}>
-                          <div className={styles.visibilityRing}>
+                        <div className="flex items-center gap-2.5">
+                          <div className="relative w-11 h-11">
                             <svg width="44" height="44" viewBox="0 0 44 44" style={{ overflow: 'visible' }}>
-                              <circle cx="22" cy="22" r={r} fill="none" stroke="#E2E8F0" strokeWidth="5" />
+                              <circle cx="22" cy="22" r={r} fill="none" stroke="var(--color-border)" strokeWidth="5" />
                               <circle cx="22" cy="22" r={r} fill="none" stroke={c} strokeWidth="5"
                                 strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
                                 transform="rotate(-90 22 22)" style={{ transition: 'stroke-dasharray 0.3s ease' }} />
                             </svg>
-                            <div className={styles.visibilityEye}><Eye size={16} color={c} /></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"><Eye size={16} color={c} /></div>
                           </div>
-                          <span className={styles.visibilityLabel} style={{ color: c }}>{pct}%</span>
+                          <span className="text-[13px] font-bold min-w-[40px]" style={{ color: c }}>{pct}%</span>
                         </div>
                       );
                     })()}
 
                     {isActive && (
                       <>
-                        <div className={styles.countControls}>
-                          <button className={styles.countBtn}
+                        <div className="flex items-center bg-background-app rounded-xl p-0.5">
+                          <button className="w-6 h-6 border-none bg-transparent text-base font-extrabold cursor-pointer flex items-center justify-center text-text-main"
                             onClick={() => updateFishCount(fish.id, Math.max(1, fish.count - 1))}>−</button>
-                          <span className={styles.countValue}>{fish.count}</span>
-                          <button className={styles.countBtn}
+                          <span className="w-6 text-center text-[13px] font-bold text-text-main">{fish.count}</span>
+                          <button className="w-6 h-6 border-none bg-transparent text-base font-extrabold cursor-pointer flex items-center justify-center text-text-main"
                             onClick={() => updateFishCount(fish.id, fish.count + 1)}>+</button>
                         </div>
-                        <button className={styles.deleteBtn} onClick={() => setFishToDelete(fish.id)}>
+                        <button className="bg-transparent border-none text-[#94A3B8] cursor-pointer flex p-1 transition-colors duration-200 hover:text-critical" onClick={() => setFishToDelete(fish.id)}>
                           <Trash2 size={16} />
                         </button>
                       </>
@@ -398,40 +393,40 @@ export const MyFishScreen: React.FC = () => {
 
                 {/* ─── Expanded Detail Panel ─── */}
                 {isActive && species && (
-                  <div className={styles.detailPanel}>
+                  <div className="p-[0_12px_16px_12px] animate-slide-up">
                     {/* Parameter chips — 2-column grid */}
-                    <div className={styles.detailGrid}>
-                      <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} colorClass={styles.chipBlue} />
-                      <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass={styles.chipGreen} />
-                      <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass={styles.chipAmber} />
-                      <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} colorClass={styles.chipPurple} />
-                      <DetailChip icon={<HelpCircle size={14} />} label="Difficulty" value={difficultyLabel[species.difficulty ?? 'medium']} colorClass={styles.chipTeal} />
-                      <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} colorClass={styles.chipGreen} />
-                      <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} colorClass={styles.chipRed} />
-                      <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} colorClass={styles.chipBlue} />
-                      <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass={styles.chipPurple} />
-                      <DetailChip icon={<HelpCircle size={14} />} label="Breeding" value={breedingLabel[species.breeding ?? 'no_record']} colorClass={styles.chipGray} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3.5">
+                      <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} colorClass="bg-[rgba(59,130,246,0.08)]" />
+                      <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass="bg-[rgba(16,185,129,0.08)]" />
+                      <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass="bg-[rgba(245,158,11,0.08)]" />
+                      <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} colorClass="bg-[rgba(147,112,219,0.08)]" />
+                      <DetailChip icon={<HelpCircle size={14} />} label="Difficulty" value={difficultyLabel[species.difficulty ?? 'medium']} colorClass="bg-[rgba(13,148,136,0.08)]" />
+                      <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} colorClass="bg-[rgba(16,185,129,0.08)]" />
+                      <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} colorClass="bg-[rgba(239,68,68,0.08)]" />
+                      <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} colorClass="bg-[rgba(59,130,246,0.08)]" />
+                      <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass="bg-[rgba(147,112,219,0.08)]" />
+                      <DetailChip icon={<HelpCircle size={14} />} label="Breeding" value={breedingLabel[species.breeding ?? 'no_record']} colorClass="bg-[rgba(148,163,184,0.12)]" />
                     </div>
 
                     {/* Origin */}
                     {species.origin && (
-                      <span className={styles.originBadge}>{species.origin}</span>
+                      <span className="text-[11px] p-[4px_10px] rounded-[20px] bg-[rgba(13,148,136,0.08)] text-primary-dark font-semibold inline-block">{species.origin}</span>
                     )}
 
                     {/* Compatibility section */}
                     {compResults.length > 0 && (
-                      <div className={styles.compatibilitySection}>
-                        <div className={styles.compatibilityTitle}>
+                      <div className="mt-4">
+                        <div className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">
                           Tank Compatibility
                         </div>
                         {compResults.map(cr => {
                           const level = getCompatibilityLevel(cr.score);
                           const color = getCompatibilityColor(level);
                           return (
-                            <div key={cr.speciesId} className={styles.compRow}>
-                              <div className={styles.compDot} style={{ backgroundColor: color }} />
-                              <span className={styles.compName}>{cr.speciesName}</span>
-                              <span className={styles.compScore} style={{ color }}>{cr.score}%</span>
+                            <div key={cr.speciesId} className="flex items-center gap-2 py-1.5 border-b border-border-card last:border-b-0">
+                              <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                              <span className="text-xs font-semibold text-text-main flex-1">{cr.speciesName}</span>
+                              <span className="text-[11px] font-bold" style={{ color }}>{cr.score}%</span>
                             </div>
                           );
                         })}
@@ -442,8 +437,8 @@ export const MyFishScreen: React.FC = () => {
 
                 {/* Empty detail when no species data */}
                 {isActive && !species && (
-                  <div className={styles.detailPanel}>
-                    <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                  <div className="p-[0_12px_16px_12px] animate-slide-up">
+                    <p className="text-xs text-text-muted">
                       No detailed species data available for this entry.
                     </p>
                   </div>
@@ -458,11 +453,11 @@ export const MyFishScreen: React.FC = () => {
       {fishToDelete && (
         <div className="modal-overlay" onClick={() => setFishToDelete(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>Delete Fish Entry</h3>
-            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>
+            <h3 className="text-lg font-bold text-text-main mb-2">Delete Fish Entry</h3>
+            <p className="text-sm text-text-muted mb-6">
               Are you sure you want to delete this fish entry? This action cannot be undone.
             </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <div className="flex gap-3 justify-end">
               <button className="secondary-button" style={{ padding: '10px 20px', fontSize: '14px' }}
                 onClick={() => setFishToDelete(null)}>Cancel</button>
               <button className="primary-button" style={{

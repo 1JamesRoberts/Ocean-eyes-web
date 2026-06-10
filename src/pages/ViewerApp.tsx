@@ -12,11 +12,11 @@ import { MyFishScreen } from './viewer/MyFishScreen';
 import { AnalyticsScreen } from './viewer/AnalyticsScreen';
 
 export const ViewerApp: React.FC = () => {
-  const { tankId } = useTank();
+  const tankId = useTank().tankId;
   const { activeTab } = useNavigation();
 
   return (
-    <div className="scaffold">
+    <div className="flex-1 flex flex-col w-full">
       {tankId === null && activeTab !== 'live' ? <RootGateOnboarding /> : <ViewerShell />}
     </div>
   );
@@ -48,7 +48,7 @@ const ViewerShell: React.FC = () => {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+    <div className="flex-1 flex flex-col">
       {renderActiveScreen()}
     </div>
   );

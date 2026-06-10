@@ -49,7 +49,7 @@ export const HistoryDetailScreen: React.FC = () => {
         {/* Data points dots */}
         {points.map((p, idx) => (
           <g key={idx}>
-            <circle cx={p.x} cy={p.y} r="5" fill="var(--color-info)" stroke="#FFFFFF" strokeWidth="2.5" />
+            <circle cx={p.x} cy={p.y} r="5" fill="var(--color-info)" stroke="var(--color-surface)" strokeWidth="2.5" />
             <text x={p.x} y={p.y - 10} fontSize="10" fontWeight="700" textAnchor="middle" fill="var(--color-text-primary)">
               {p.clarity}
             </text>

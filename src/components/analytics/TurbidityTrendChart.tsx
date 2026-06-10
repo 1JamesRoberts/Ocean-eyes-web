@@ -21,12 +21,6 @@ interface Props {
 }
 
 export const ClarityTrendChart: React.FC<Props> = ({ records, readings, emptyAction }) => {
-  const hasReadingsClarity = readings && readings.length > 0 && readings.some((r) => r.clarity != null);
-
-  if (hasReadingsClarity) {
-    return <MiniClarityChart readings={readings} />;
-  }
-
   const data = useMemo(() => {
     return records
       .filter((r) => r.turbidity?.fnu != null)
@@ -35,6 +29,12 @@ export const ClarityTrendChart: React.FC<Props> = ({ records, readings, emptyAct
         fnu: r.turbidity.fnu,
       }));
   }, [records]);
+
+  const hasReadingsClarity = readings && readings.length > 0 && readings.some((r) => r.clarity != null);
+
+  if (hasReadingsClarity) {
+    return <MiniClarityChart readings={readings} />;
+  }
 
   if (data.length === 0) {
     return (

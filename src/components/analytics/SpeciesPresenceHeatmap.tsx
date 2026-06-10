@@ -3,7 +3,6 @@ import React, { useMemo } from 'react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/analytics';
 import { ChartEmptyState } from './ChartEmptyState';
-import styles from './SpeciesPresenceHeatmap.module.css';
 
 interface Props {
   records: AIDetectionResult[];
@@ -83,18 +82,18 @@ export const SpeciesPresenceHeatmap: React.FC<Props> = ({ records }) => {
   const gridTemplateColumns = `120px repeat(${buckets.length}, minmax(40px, 1fr))`;
 
   return (
-    <div className={styles.heatmapScroll}>
+    <div className="overflow-x-auto pb-1">
       <div
-        className={styles.heatmapGrid}
+        className="grid gap-1"
         style={{
           gridTemplateColumns,
           minWidth: buckets.length * 44 + 120,
         }}
       >
         {/* Header row */}
-        <div className={styles.headerCellLabel}>Species / Time</div>
+        <div className="text-[11px] font-semibold text-text-muted text-left">Species / Time</div>
         {buckets.map((b) => (
-          <div key={b.label} className={styles.headerCell}>
+          <div key={b.label} className="text-[11px] font-semibold text-text-muted text-center">
             {b.label}
           </div>
         ))}
@@ -102,7 +101,7 @@ export const SpeciesPresenceHeatmap: React.FC<Props> = ({ records }) => {
         {/* Data rows */}
         {speciesList.map((species) => (
           <React.Fragment key={species}>
-            <div className={styles.speciesLabel} title={formatSpeciesName(species)}>
+            <div className="text-xs text-text-main self-center overflow-hidden text-ellipsis whitespace-nowrap" title={formatSpeciesName(species)}>
               {formatSpeciesName(species)}
             </div>
             {buckets.map((b) => {
@@ -110,7 +109,7 @@ export const SpeciesPresenceHeatmap: React.FC<Props> = ({ records }) => {
               return (
                 <div
                   key={`${species}-${b.label}`}
-                  className={styles.dataCell}
+                  className="h-7 rounded flex items-center justify-center text-[11px] font-semibold transition-opacity duration-200"
                   style={{
                     backgroundColor: getIntensityColor(count, maxCount),
                     opacity: getIntensityOpacity(count, maxCount),

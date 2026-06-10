@@ -6,7 +6,6 @@ import { Loader2 } from 'lucide-react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/analytics';
 import { ChartEmptyState } from './ChartEmptyState';
-import styles from './SpatialDetectionHeatmap.module.css';
 
 interface Props {
   records: AIDetectionResult[];
@@ -214,9 +213,9 @@ export const SpatialDetectionHeatmap: React.FC<Props> = ({ records }) => {
 
   if (bgLoading) {
     return (
-      <div className={styles.loadingWrap}>
-        <Loader2 size={24} className="anim-float-1" style={{ color: 'var(--color-info)' }} />
-        <span className={styles.loadingText}>Loading camera frame...</span>
+      <div className="flex items-center justify-center gap-2.5 h-[200px] text-text-muted text-[13px]">
+        <Loader2 size={24} className="animate-float-1 text-info" />
+        <span className="text-[13px] text-text-muted">Loading camera frame...</span>
       </div>
     );
   }
@@ -226,10 +225,10 @@ export const SpatialDetectionHeatmap: React.FC<Props> = ({ records }) => {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.controls}>
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <select
-          className={styles.speciesSelect}
+          className="py-1.5 px-2.5 rounded-lg border border-border-card bg-surface-card text-text-main text-[13px] font-inherit cursor-pointer outline-none focus:border-info"
           value={selectedSpecies}
           onChange={(e) => setSelectedSpecies(e.target.value)}
         >
@@ -240,11 +239,11 @@ export const SpatialDetectionHeatmap: React.FC<Props> = ({ records }) => {
             </option>
           ))}
         </select>
-        <span className={styles.countBadge}>
+        <span className="text-xs text-text-muted font-medium">
           {centers.length} detection{centers.length !== 1 ? 's' : ''}
         </span>
       </div>
-      <canvas ref={canvasRef} className={styles.canvas} />
+      <canvas ref={canvasRef} className="w-full h-auto block rounded-xl bg-camera-bg" />
     </div>
   );
 };

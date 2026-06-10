@@ -29,7 +29,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
       setPermissionError('');
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       stream.getTracks().forEach(track => track.stop());
-      
+
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(d => d.kind === 'videoinput');
       setCameras(videoDevices);
@@ -46,7 +46,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddError('');
-    
+
     if (addMode === 'create') {
       if (!newTankName.trim()) return;
       try {
@@ -97,20 +97,20 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
       alignItems: 'center',
       zIndex: 1000
     }}>
-      <form 
+      <form
         onSubmit={handleSubmit}
-        className="card-decoration" 
-        style={{ 
-          padding: '24px', 
-          width: '380px', 
-          display: 'flex', 
-          flexDirection: 'column', 
+        className="card-decoration"
+        style={{
+          padding: '24px',
+          width: '380px',
+          display: 'flex',
+          flexDirection: 'column',
           gap: '16px',
           boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)'
         }}
       >
         <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>Add Aquarium Tank</h3>
-        
+
         <div style={{ display: 'flex', background: 'var(--color-border)', padding: '2px', borderRadius: '10px', gap: '2px' }}>
           <button
             type="button"
@@ -158,9 +158,9 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px', fontWeight: 600 }}>AQUARIUM NAME</label>
-              <input 
-                type="text" 
-                placeholder="e.g. Bedroom Reef" 
+              <input
+                type="text"
+                placeholder="e.g. Bedroom Reef"
                 value={newTankName}
                 onChange={e => setNewTankName(e.target.value)}
                 style={{
@@ -182,24 +182,24 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
               <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '6px', fontWeight: 600 }}>CAMERA SOURCE</label>
               <div style={{ display: 'flex', gap: '16px', marginBottom: '8px' }}>
                 <label style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--color-text-primary)' }}>
-                  <input 
-                    type="radio" 
-                    name="cameraType" 
-                    checked={cameraType === 'mock'} 
-                    onChange={() => setCameraType('mock')} 
+                  <input
+                    type="radio"
+                    name="cameraType"
+                    checked={cameraType === 'mock'}
+                    onChange={() => setCameraType('mock')}
                     style={{ accentColor: 'var(--color-primary)' }}
                   />
                   Mock Feed
                 </label>
                 <label style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--color-text-primary)' }}>
-                  <input 
-                    type="radio" 
-                    name="cameraType" 
-                    checked={cameraType === 'webcam'} 
+                  <input
+                    type="radio"
+                    name="cameraType"
+                    checked={cameraType === 'webcam'}
                     onChange={async () => {
                       setCameraType('webcam');
                       await requestCameraAccess();
-                    }} 
+                    }}
                     style={{ accentColor: 'var(--color-primary)' }}
                   />
                   Local Webcam
@@ -246,9 +246,9 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
         ) : (
           <div>
             <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px', fontWeight: 600 }}>TANK REFERENCE ID / CODE</label>
-            <input 
-              type="text" 
-              placeholder="e.g. tank-123456" 
+            <input
+              type="text"
+              placeholder="e.g. tank-123456"
               value={linkTankCode}
               onChange={e => setLinkTankCode(e.target.value)}
               style={{
@@ -268,17 +268,17 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
         )}
 
         <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-          <button 
+          <button
             type="button"
-            className="secondary-button" 
+            className="secondary-button"
             style={{ flex: 1, padding: '10px', fontSize: '13px', borderRadius: '10px' }}
             onClick={handleClose}
           >
             Cancel
           </button>
-          <button 
+          <button
             type="submit"
-            className="primary-button" 
+            className="primary-button"
             style={{ flex: 1, padding: '10px', fontSize: '13px', borderRadius: '10px' }}
           >
             {addMode === 'create' ? 'Create Tank' : 'Link Tank'}

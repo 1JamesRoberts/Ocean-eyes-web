@@ -14,8 +14,7 @@ interface AIBoundingBoxesProps {
 function getWidthAutoRenderInfo(
   imgWidth: number,
   imgHeight: number,
-  containerWidth: number,
-  _containerHeight: number
+  containerWidth: number
 ) {
   // Models the actual DOM rendering: img { width: 100%; height: auto; }
   const renderedWidth = containerWidth;
@@ -37,7 +36,7 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
   const ch = containerSize.height;
   const iw = imageNaturalSize.width || lastPrediction.image_dimensions.width || cw;
   const ih = imageNaturalSize.height || lastPrediction.image_dimensions.height || ch;
-  const { renderedWidth, renderedHeight, offsetX, offsetY } = getWidthAutoRenderInfo(iw, ih, cw, ch);
+  const { renderedWidth, renderedHeight, offsetX, offsetY } = getWidthAutoRenderInfo(iw, ih, cw);
 
   return (
     <div style={{

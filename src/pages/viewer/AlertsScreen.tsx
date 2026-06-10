@@ -63,7 +63,7 @@ export const AlertsScreen: React.FC = () => {
         </div>
 
         {/* Correction tip card */}
-        <div className="card-decoration" style={{ padding: '20px', marginBottom: '24px', backgroundColor: '#F8FAFC' }}>
+        <div className="card-decoration" style={{ padding: '20px', marginBottom: '24px', backgroundColor: 'var(--color-surface-hover)' }}>
           <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>Action Plan & Tips</h4>
           <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '145%' }}>
             {selectedAlert.tip}

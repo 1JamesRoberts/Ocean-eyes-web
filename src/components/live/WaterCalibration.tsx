@@ -22,61 +22,37 @@ export const WaterCalibration: React.FC<WaterCalibrationProps> = ({
   };
 
   return (
-    <div className="card-decoration" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h4 style={{ fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', margin: 0, color: 'var(--color-text-primary)' }}>
-          <Ruler size={16} style={{ color: 'var(--color-primary)' }} />
+    <div className="bg-surface-card rounded-[20px] shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] p-[18px_20px] flex flex-col gap-3 mb-6">
+      <div className="flex justify-between items-center">
+        <h4 className="text-sm font-bold flex items-center gap-1.5 m-0 text-text-main">
+          <Ruler size={16} className="text-primary-dark" />
           <span>Water Calibration Level</span>
         </h4>
-        <span style={{
-          fontSize: '11px',
-          fontWeight: 600,
-          background: 'var(--color-primary-light)',
-          color: 'var(--color-primary-dark)',
-          padding: '2px 8px',
-          borderRadius: '12px'
-        }}>
+        <span className="text-[11px] font-semibold bg-primary-light-gradient text-primary-dark py-0.5 px-2 rounded-xl">
           {currentPercentage}% Calibrated
         </span>
       </div>
 
-      <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '140%', margin: 0 }}>
+      <p className="text-xs text-text-muted leading-[1.4] m-0">
         {isCalibrating
           ? "Calibration Mode Active: Click and drag the dashed line directly in the camera viewport above to adjust the reference water line level."
           : "Enable drag calibration to align the camera's reference water line overlay with the physical water level inside this camera's feed."
         }
       </p>
 
-      <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+      <div className="flex gap-2.5 mt-1">
         <button
-          className={isCalibrating ? "primary-button" : "secondary-button"}
-          style={{
-            padding: '8px 16px',
-            fontSize: '12px',
-            borderRadius: '8px',
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            backgroundColor: isCalibrating ? 'var(--color-critical)' : undefined,
-            color: isCalibrating ? '#FFF' : undefined,
-            borderColor: isCalibrating ? 'var(--color-critical)' : undefined
-          }}
+          className={`flex-1 py-2 px-4 text-xs rounded-lg flex items-center justify-center gap-1.5 font-semibold cursor-pointer transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] ${
+            isCalibrating 
+              ? "bg-critical text-white border border-critical" 
+              : "bg-primary-gradient text-text-inv shadow-[0_4px_12px_rgba(13,148,136,0.15)] hover:bg-primary-hover-gradient hover:shadow-[0_6px_16px_rgba(13,148,136,0.25)] active:scale-[0.98]"
+          }`}
           onClick={onToggleCalibrating}
         >
           {isCalibrating ? 'Done Calibrating' : 'Enable Drag Calibration'}
         </button>
         <button
-          className="secondary-button"
-          style={{
-            padding: '8px 16px',
-            fontSize: '12px',
-            borderRadius: '8px',
-            borderColor: 'var(--color-border)',
-            color: 'var(--color-text-secondary)',
-            cursor: 'pointer'
-          }}
+          className="py-2 px-4 text-xs rounded-lg flex items-center justify-center gap-1.5 font-semibold cursor-pointer transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] bg-surface-card text-text-muted border border-border-card hover:bg-surface-hover hover:border-text-muted"
           onClick={() => handleCalibrationChange(50)}
         >
           Reset to 50%

@@ -3408,7 +3408,14 @@ export const getSpeciesInitials = (speciesId: string): string => {
 export const getSpeciesDetail = (speciesId: string): SpeciesDetail | undefined => {
   const species = getSpeciesById(speciesId);
   if (!species) return undefined;
-  const { id, name, displayName, imageClass, imagePath, initials, color, ...detail } = species;
+  const detail: Partial<SpeciesInfo> = { ...species };
+  delete detail.id;
+  delete detail.name;
+  delete detail.displayName;
+  delete detail.imageClass;
+  delete detail.imagePath;
+  delete detail.initials;
+  delete detail.color;
   return Object.keys(detail).length > 0 ? (detail as SpeciesDetail) : undefined;
 };
 

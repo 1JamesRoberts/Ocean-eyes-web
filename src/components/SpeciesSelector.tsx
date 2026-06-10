@@ -152,16 +152,16 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
   return (
     <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
       <div style={{ position: 'relative' }}>
-        <Search 
-          size={16} 
-          style={{ 
-            position: 'absolute', 
-            left: '12px', 
-            top: '50%', 
+        <Search
+          size={16}
+          style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
             transform: 'translateY(-50%)',
             color: 'var(--color-text-secondary)',
             pointerEvents: 'none'
-          }} 
+          }}
         />
         <input
           ref={inputRef}
@@ -184,7 +184,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
       </div>
 
       {isOpen && createPortal(
-        <div 
+        <div
           ref={dropdownRef}
           style={{
             ...dropdownStyle,
@@ -288,7 +288,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             )}
           </div>
         </div>
-      , document.body)}
+        , document.body)}
     </div>
   );
 };

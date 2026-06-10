@@ -53,9 +53,9 @@ export const RootGateOnboarding: React.FC = () => {
       {!showCreate ? (
         <form onSubmit={handleLink} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ position: 'relative' }}>
-            <input 
-              type="text" 
-              placeholder="Enter Tank ID" 
+            <input
+              type="text"
+              placeholder="Enter Tank ID"
               value={qrInput}
               onChange={(e) => setQrInput(e.target.value)}
               style={{
@@ -67,7 +67,9 @@ export const RootGateOnboarding: React.FC = () => {
                 fontSize: '15px',
                 outline: 'none',
                 transition: 'var(--transition-smooth)',
-                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.01)'
+                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.01)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text-primary)'
               }}
               onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
@@ -82,8 +84,8 @@ export const RootGateOnboarding: React.FC = () => {
 
           <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>
             No hardware?{' '}
-            <button 
-              type="button" 
+            <button
+              type="button"
               style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
               onClick={() => setShowCreate(true)}
             >
@@ -93,9 +95,9 @@ export const RootGateOnboarding: React.FC = () => {
         </form>
       ) : (
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <input 
-            type="text" 
-            placeholder="Virtual Tank Name (e.g. My Bedroom Reef)" 
+          <input
+            type="text"
+            placeholder="Virtual Tank Name (e.g. My Bedroom Reef)"
             value={tankName}
             onChange={(e) => setTankName(e.target.value)}
             style={{
@@ -106,7 +108,9 @@ export const RootGateOnboarding: React.FC = () => {
               fontFamily: 'var(--font-main)',
               fontSize: '15px',
               outline: 'none',
-              transition: 'var(--transition-smooth)'
+              transition: 'var(--transition-smooth)',
+              backgroundColor: 'var(--color-surface)',
+              color: 'var(--color-text-primary)'
             }}
           />
 
@@ -114,9 +118,9 @@ export const RootGateOnboarding: React.FC = () => {
             Create Virtual Tank
           </button>
 
-          <button 
-            type="button" 
-            className="secondary-button" 
+          <button
+            type="button"
+            className="secondary-button"
             style={{ width: '100%', borderRadius: '24px' }}
             onClick={() => setShowCreate(false)}
           >

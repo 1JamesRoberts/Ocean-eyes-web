@@ -27,47 +27,24 @@ export const IoTMonitor: React.FC = () => {
   };
 
   return (
-    <div className="monitor-screen" style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '520px', // Fixed high fidelity panel height to simulate a hardware tablet unit
-      width: '100%',
-      background: '#090D11',
-      borderRadius: '12px',
-      overflow: 'hidden',
-      border: '1px solid #1E293B'
-    }}>
+    <div 
+      className="flex flex-col w-full bg-[#090d11] rounded-xl overflow-hidden border border-[#1e293b]" 
+      style={{ height: '520px' }}
+    >
       {/* Device Header Bar */}
-      <div style={{
-        height: '42px',
-        backgroundColor: '#090D11',
-        borderBottom: '1px solid #1E293B',
-        padding: '0 16px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        color: '#94A3B8',
-        fontSize: '11px',
-        fontWeight: 600,
-        letterSpacing: '0.05em'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Cpu size={12} className="anim-float-2" style={{ color: 'var(--color-primary)' }} />
+      <div className="h-[42px] bg-[#090d11] border-b border-[#1e293b] px-4 flex justify-between items-center text-[#94a3b8] text-[11px] font-semibold tracking-wider">
+        <div className="flex items-center gap-1.5">
+          <Cpu size={12} className="animate-float-2 text-primary-dark" />
           <span>OCEANEYES MONITOR v1.0.4</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: tankId ? 'var(--color-good)' : 'var(--color-warning)'
-          }} />
+        <div className="flex items-center gap-2.5">
+          <span className={`w-1.5 h-1.5 rounded-full ${tankId ? 'bg-good' : 'bg-warning'}`} />
           <span>{tankId ? 'LINKED' : 'UNPAIRED'}</span>
         </div>
       </div>
 
       {/* Screen Body */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div className="flex-1 relative overflow-hidden flex flex-col">
         {renderScreen()}
       </div>
     </div>

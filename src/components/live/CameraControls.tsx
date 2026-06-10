@@ -60,19 +60,16 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   const isChecking = backendStatus === 'checking';
   const isOnline = backendStatus === 'online';
 
-  const btnStyle = (active: boolean, disabled: boolean): React.CSSProperties => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: active
-      ? 'var(--color-primary)'
-      : disabled
-        ? 'rgba(100, 100, 100, 0.5)'
-        : 'rgba(15, 23, 42, 0.75)',
-    borderColor: active ? 'var(--color-primary-light)' : 'rgba(255, 255, 255, 0.2)',
-    color: active ? '#FFF' : disabled ? '#AAA' : '#FFF',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-  });
+  const getBtnClasses = (active: boolean, disabled: boolean, isPulseClass = ''): string => {
+    const base = "flex items-center justify-center rounded-full backdrop-blur-[8px] border text-white transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] w-10 h-10";
+    if (active) {
+      return `${base} bg-primary-gradient border-primary-light-gradient text-white cursor-pointer ${isPulseClass}`;
+    }
+    if (disabled) {
+      return `${base} bg-[rgba(100,100,100,0.5)] border-[rgba(255,255,255,0.2)] text-[#AAA] cursor-not-allowed`;
+    }
+    return `${base} bg-[rgba(15,23,42,0.75)] border-[rgba(255,255,255,0.15)] text-white cursor-pointer hover:bg-primary-gradient hover:border-primary-light-gradient hover:-translate-y-0.5 active:translate-y-0`;
+  };
 
   const getAIButtonTitle = (): string => {
     if (!isStreaming) return 'Start stream to enable AI Analysis';
@@ -88,73 +85,49 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
     if (!isOnline) return 'AI Backend Offline - Click to retry';
     return 'Measure Water Clarity';
   };
+
   return (
-    <div style={{
-      position: 'absolute',
-      bottom: '12px',
-      right: isFullscreen && showFsInventory ? '332px' : '12px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      zIndex: 20,
-      transition: 'right 0.3s ease'
-    }}>
+    <div 
+      className="absolute bottom-3 flex items-center gap-2 z-20 transition-[right] duration-300"
+      style={{
+        right: isFullscreen && showFsInventory ? '332px' : '12px',
+      }}
+    >
       {/* Zoom Controls */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        background: 'rgba(15, 23, 42, 0.75)',
-        backdropFilter: 'blur(8px)',
-        borderRadius: '20px',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        padding: '2px 8px',
-        gap: '6px',
-        color: '#FFF',
-        fontSize: '11px',
-        fontWeight: 600,
-        height: '40px'
-      }}>
+      <div className="flex items-center bg-[rgba(15,23,42,0.75)] backdrop-blur-[8px] rounded-[20px] border border-[rgba(255,255,255,0.15)] py-0.5 px-2 gap-1.5 text-white text-[11px] font-semibold h-10">
         <button
           onClick={onZoomOut}
           disabled={zoomLevel <= 1}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: zoomLevel <= 1 ? 'rgba(255,255,255,0.3)' : '#FFF',
-            cursor: zoomLevel <= 1 ? 'not-allowed' : 'pointer',
-            padding: '4px',
-            display: 'flex',
-            alignItems: 'center'
-          }}
+          className={`bg-none border-none p-1 flex items-center ${
+            zoomLevel <= 1 ? 'text-[rgba(255,255,255,0.3)] cursor-not-allowed' : 'text-white cursor-pointer'
+          }`}
           title="Zoom Out"
         >
           <ZoomOut size={14} />
         </button>
-        <span style={{ minWidth: '32px', textAlign: 'center' }}>{zoomLevel.toFixed(1)}x</span>
+        <span className="w-8 text-center">{zoomLevel.toFixed(1)}x</span>
         <button
           onClick={onZoomIn}
           disabled={zoomLevel >= 3}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: zoomLevel >= 3 ? 'rgba(255,255,255,0.3)' : '#FFF',
-            cursor: zoomLevel >= 3 ? 'not-allowed' : 'pointer',
-            padding: '4px',
-            display: 'flex',
-            alignItems: 'center'
-          }}
+          className={`bg-none border-none p-1 flex items-center ${
+            zoomLevel >= 3 ? 'text-[rgba(255,255,255,0.3)] cursor-not-allowed' : 'text-white cursor-pointer'
+          }`}
           title="Zoom In"
         >
           <ZoomIn size={14} />
         </button>
       </div>
 
-      <button className="camera-control-btn" onClick={onTakeSnapshot} title="Capture Snapshot">
+      <button 
+        className={getBtnClasses(false, false)} 
+        onClick={onTakeSnapshot} 
+        title="Capture Snapshot"
+      >
         <Camera size={16} />
       </button>
 
       <button
-        className={`camera-control-btn ${isRecording ? 'recording-active' : ''}`}
+        className={getBtnClasses(isRecording, false, 'bg-critical border-white/30 animate-pulse-recording')}
         onClick={onToggleRecording}
         title={isRecording ? "Stop Recording" : "Start Recording"}
       >
@@ -162,52 +135,37 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       </button>
 
       <button
-        className="camera-control-btn"
         onClick={onMeasureTurbidity}
         disabled={turbidityLoading || isChecking || !isStreaming || !hasImageSource}
         title={getTurbidityButtonTitle()}
-        style={btnStyle(false, turbidityLoading || isChecking || !isStreaming || !hasImageSource)}
+        className={getBtnClasses(false, turbidityLoading || isChecking || !isStreaming || !hasImageSource)}
       >
-        {turbidityLoading || isChecking ? <Loader2 size={16} className="anim-spin" /> : <Eye size={16} />}
+        {turbidityLoading || isChecking ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} />}
       </button>
 
       <button
-        className={`camera-control-btn ${isAIActive ? 'ai-active' : ''}`}
         onClick={onToggleAI}
         disabled={aiLoading || isChecking || !isStreaming}
         title={getAIButtonTitle()}
-        style={btnStyle(isAIActive, aiLoading || isChecking || !isStreaming)}
+        className={getBtnClasses(isAIActive, aiLoading || isChecking || !isStreaming, 'animate-pulse-ai')}
       >
-        {aiLoading || isChecking ? <Loader2 size={16} className="anim-spin" /> : <Brain size={16} />}
+        {aiLoading || isChecking ? <Loader2 size={16} className="animate-spin" /> : <Brain size={16} />}
       </button>
 
       {isFullscreen && (
         <button
-          className="camera-control-btn"
           onClick={onToggleFsInventory}
           title={showFsInventory ? "Hide Fish Inventory" : "Show Fish Inventory"}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: showFsInventory ? 'var(--color-primary)' : undefined,
-            borderColor: showFsInventory ? 'var(--color-primary-light)' : undefined,
-            color: showFsInventory ? '#FFF' : undefined
-          }}
+          className={getBtnClasses(showFsInventory, false)}
         >
           <Fish size={16} />
         </button>
       )}
 
       <button
-        className="camera-control-btn"
         onClick={onToggleFullscreen}
         title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
+        className={getBtnClasses(false, false)}
       >
         {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
       </button>

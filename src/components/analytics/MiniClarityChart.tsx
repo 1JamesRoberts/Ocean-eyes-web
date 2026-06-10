@@ -70,7 +70,7 @@ export const MiniClarityChart: React.FC<Props> = ({ readings }) => {
         {/* Data points */}
         {points.map((p, idx) => (
           <g key={idx}>
-            <circle cx={p.x} cy={p.y} r="4" fill="var(--color-info)" stroke="#FFFFFF" strokeWidth="2" />
+            <circle cx={p.x} cy={p.y} r="4" fill="var(--color-info)" stroke="var(--color-surface)" strokeWidth="2" />
             <text x={p.x} y={p.y - 8} fontSize="9" fontWeight="700" textAnchor="middle" fill="var(--color-text-primary)">
               {p.clarity}
             </text>

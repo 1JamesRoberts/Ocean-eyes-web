@@ -1,6 +1,5 @@
 // ChartEmptyState.tsx - Reusable empty-state placeholder for chart components
 import React from 'react';
-import styles from './ChartEmptyState.module.css';
 
 interface Props {
   message: string;
@@ -9,14 +8,16 @@ interface Props {
 }
 
 export const ChartEmptyState: React.FC<Props> = ({ message, hint, action }) => {
-  const layout = hint || action ? styles.emptyStateStacked : styles.emptyState;
+  const layout = hint || action 
+    ? "flex items-center justify-center h-[240px] text-text-muted text-sm flex-col gap-2 text-center px-6" 
+    : "flex items-center justify-center h-[240px] text-text-muted text-sm";
 
   return (
     <div className={layout}>
       <span>{message}</span>
-      {hint && <span className={styles.emptyStateHint}>{hint}</span>}
+      {hint && <span className="text-xs opacity-70">{hint}</span>}
       {action && (
-        <div className={hint ? styles.emptyStateActionWithHint : styles.emptyStateAction}>
+        <div className={hint ? "mt-3" : "mt-2"}>
           {action}
         </div>
       )}
