@@ -48,7 +48,7 @@ export const MiniClarityChart: React.FC<Props> = ({ readings }) => {
 
   return (
     <div ref={containerRef} style={{ width: '100%' }}>
-      <svg width="100%" height={160} viewBox={`0 0 ${width} ${HEIGHT}`} style={{ overflow: 'visible', display: 'block' }}>
+      <svg width="100%" height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} style={{ overflow: 'visible', display: 'block' }}>
         <defs>
           <linearGradient id="miniChartGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-info)" stopOpacity="0.3" />

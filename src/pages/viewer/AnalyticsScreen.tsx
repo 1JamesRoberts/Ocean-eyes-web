@@ -5,9 +5,7 @@ import { useNavigation } from '../../context/NavigationContext';
 import { useReadings } from '../../hooks/useReadings';
 import { useHistory } from '../../hooks/useHistory';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
-import { SpeciesDistributionChart } from '../../components/analytics/SpeciesDistributionChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
-import { SpeciesPresenceHeatmap } from '../../components/analytics/SpeciesPresenceHeatmap';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
 import { todayUTC } from '../../utils/analytics';
 import styles from './AnalyticsScreen.module.css';
@@ -154,28 +152,6 @@ export const AnalyticsScreen: React.FC = () => {
                 </button>
               }
             />
-          </div>
-
-          {/* Species Distribution */}
-          <div className={styles.chartCard}>
-            <div>
-              <h3 className={styles.chartTitle}>Species Distribution</h3>
-              <p className={styles.chartSubtitle}>
-                Aggregated across all detection frames
-              </p>
-            </div>
-            <SpeciesDistributionChart records={detectionRecords} />
-          </div>
-
-          {/* Species Presence Heatmap */}
-          <div className={styles.chartCard}>
-            <div>
-              <h3 className={styles.chartTitle}>Species Presence Heatmap</h3>
-              <p className={styles.chartSubtitle}>
-                Detections per 5-minute bucket
-              </p>
-            </div>
-            <SpeciesPresenceHeatmap records={detectionRecords} />
           </div>
 
           {/* AI Health Diagnostics Log */}
