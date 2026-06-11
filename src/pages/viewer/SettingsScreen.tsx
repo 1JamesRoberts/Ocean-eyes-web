@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useTank } from '../../hooks/useTank';
-import { MockFirestore } from '../../services/mock_service';
 import { ChevronRight } from 'lucide-react';
 
 export const SettingsScreen: React.FC = () => {
   const { setActiveTab } = useNavigation();
-  const { activeTank, unlinkTank, updateTankName } = useTank();
+  const { activeTank, unlinkTank, updateTankName, updateThresholds } = useTank();
   const [name, setName] = useState(activeTank?.name || 'Living Room Reef');
   const [editing, setEditing] = useState(false);
   const [showConfirmUnlink, setShowConfirmUnlink] = useState(false);
@@ -129,8 +128,7 @@ export const SettingsScreen: React.FC = () => {
             onChange={(e) => {
               const val = parseFloat(e.target.value);
               const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
-              MockFirestore.updateThresholds(activeTank!.id, val, fishPct);
-              window.dispatchEvent(new CustomEvent('oceaneyes_db_update'));
+              updateThresholds(val, fishPct);
             }}
             style={{ width: '100%', accentColor: 'var(--color-primary-dark)' }}
           />
@@ -150,8 +148,7 @@ export const SettingsScreen: React.FC = () => {
             onChange={(e) => {
               const val = parseInt(e.target.value);
               const clar = activeTank?.thresholds.clarity_min || 6.0;
-              MockFirestore.updateThresholds(activeTank!.id, clar, val);
-              window.dispatchEvent(new CustomEvent('oceaneyes_db_update'));
+              updateThresholds(clar, val);
             }}
             style={{ width: '100%', accentColor: 'var(--color-primary-dark)' }}
           />

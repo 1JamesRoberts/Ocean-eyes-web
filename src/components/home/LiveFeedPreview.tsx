@@ -1,11 +1,10 @@
 import React from 'react';
 import { Video } from 'lucide-react';
-import { MockFirestore } from '../../services/mock_service';
-import type { LiveState, TankBrief } from '../../types/aquarium';
+import { useLiveState } from '../../hooks/useLiveState';
+import type { TankBrief } from '../../types/aquarium';
 
 interface LiveFeedPreviewProps {
   activeTank: TankBrief | undefined;
-  liveState: LiveState | null;
   displayClarity: number;
   displayFishCount: number;
   onViewAdvanced: () => void;
@@ -13,11 +12,11 @@ interface LiveFeedPreviewProps {
 
 export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   activeTank,
-  liveState,
   displayClarity,
   displayFishCount,
   onViewAdvanced
 }) => {
+  const { liveState, saveLiveState } = useLiveState(activeTank?.id ?? null);
   const startStream = () => {
     if (activeTank && liveState) {
       const feed = liveState.feeds[0];
@@ -26,7 +25,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
         is_live: true,
         started_at: feed.started_at || new Date().toISOString()
       };
-      MockFirestore.saveLiveState(activeTank.id, {
+      saveLiveState({
         ...liveState,
         is_live: true,
         stream_url: updatedFeed.stream_url,
@@ -47,7 +46,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
         is_live: false,
         started_at: null
       };
-      MockFirestore.saveLiveState(activeTank.id, {
+      saveLiveState({
         ...liveState,
         is_live: false,
         stream_url: '',

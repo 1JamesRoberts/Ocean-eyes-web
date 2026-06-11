@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { AIDetectionResult } from '../../types/aquarium';
-import { formatTimeShort } from '../../utils/analytics';
+import { formatTimeShort } from '../../utils/formatters';
 import { ChartEmptyState } from './ChartEmptyState';
 
 interface Props {

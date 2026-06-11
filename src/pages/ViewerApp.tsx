@@ -15,17 +15,6 @@ export const ViewerApp: React.FC = () => {
   const tankId = useTank().tankId;
   const { activeTab } = useNavigation();
 
-  return (
-    <div className="flex-1 flex flex-col w-full">
-      {tankId === null && activeTab !== 'live' ? <RootGateOnboarding /> : <ViewerShell />}
-    </div>
-  );
-};
-
-// ─── Main Shell Component (ViewerShell equivalent) ───
-const ViewerShell: React.FC = () => {
-  const { activeTab } = useNavigation();
-
   const renderActiveScreen = () => {
     switch (activeTab) {
       case 'home':
@@ -48,8 +37,12 @@ const ViewerShell: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col">
-      {renderActiveScreen()}
+    <div className="flex-1 flex flex-col w-full">
+      {tankId === null && activeTab !== 'live' ? <RootGateOnboarding /> : (
+        <div className="flex-1 flex flex-col">
+          {renderActiveScreen()}
+        </div>
+      )}
     </div>
   );
 };

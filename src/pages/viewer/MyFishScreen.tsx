@@ -154,7 +154,7 @@ const DetailChip: React.FC<{ icon: React.ReactNode; label: string; value: string
 
 export const MyFishScreen: React.FC = () => {
   const { tankId } = useTank();
-  const { fishList, addFish, removeFish, updateFishCount } = useFish(tankId);
+  const { fishList, addFish, removeFish, updateFishCount } = useFish();
   const [name, setName] = useState('');
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -175,10 +175,10 @@ export const MyFishScreen: React.FC = () => {
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || !tankId) return;
     const species = selectedSpeciesId ? getSpeciesById(selectedSpeciesId) : null;
     const imageUrl = species ? species.imagePath : '/species-placeholder.png';
-    addFish(name.trim(), imageUrl, 1);
+    addFish(tankId, name.trim(), imageUrl, 1);
     setName('');
     setSelectedSpeciesId(null);
     setShowAddForm(false);

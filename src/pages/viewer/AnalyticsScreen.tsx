@@ -8,7 +8,7 @@ import { resolveCropUrl, clearDetectionHistory, clearTurbidityHistory } from '..
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
-import { todayUTC } from '../../utils/analytics';
+import { todayUTC } from '../../utils/formatters';
 
 export const AnalyticsScreen: React.FC = () => {
   const { setActiveTab } = useNavigation();
@@ -123,12 +123,6 @@ export const AnalyticsScreen: React.FC = () => {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* Spatial Detection Heatmap */}
           <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3 lg:col-span-2">
-            <div>
-              <h3 className="text-sm font-bold text-text-main m-0">Detection Density Heatmap</h3>
-              <p className="text-xs text-text-muted m-0">
-                Spatial distribution across camera frame
-              </p>
-            </div>
             <SpatialDetectionHeatmap records={detectionRecords} />
           </div>
 

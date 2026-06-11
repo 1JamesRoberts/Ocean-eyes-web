@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { MockFirestore } from '../services/mock_service';
+import { LocalStorageStore } from '../services/localStorageStore';
 import { generateAlerts } from '../services/alertEngine';
 import {
   fetchTodayReadings,
@@ -29,7 +29,7 @@ function migrateLocalStorage() {
 
 export const useDataSync = () => {
   const { tankId, activeTank } = useTank();
-  const { fishList } = useFish(tankId);
+  const { fishList } = useFish();
   const [syncActive, setSyncActive] = useState<boolean>(true);
   const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
   const syncingRef = useRef(false);
@@ -60,16 +60,16 @@ export const useDataSync = () => {
 
       const readings = await fetchTodayReadings(currentTankId);
       if (readings.length > 0) {
-        const existing = MockFirestore.getReadings();
+        const existing = LocalStorageStore.getReadings();
         const merged = [...readings, ...existing];
         const deduped = merged.filter(
           (r, i, arr) => arr.findIndex((x) => x.id === r.id) === i
         );
-        MockFirestore.saveReadings(deduped.slice(0, 50));
+        LocalStorageStore.saveReadings(deduped.slice(0, 50));
 
         const latest = readings[0];
-        const liveState = MockFirestore.getLiveState(currentTankId);
-        MockFirestore.saveLiveState(currentTankId, {
+        const liveState = LocalStorageStore.getLiveState(currentTankId);
+        LocalStorageStore.saveLiveState(currentTankId, {
           ...liveState,
           current_clarity: latest.clarity,
           current_fish_count: latest.fish_count,
@@ -78,7 +78,7 @@ export const useDataSync = () => {
       }
 
       const speciesCounts = await fetchSpeciesDetectedToday();
-      const allFish = MockFirestore.getFish();
+      const allFish = LocalStorageStore.getFish();
       let fishChanged = false;
 
       Object.entries(speciesCounts).forEach(([speciesKey, count]) => {
@@ -92,7 +92,7 @@ export const useDataSync = () => {
       });
 
       if (fishChanged) {
-        MockFirestore.saveFish(allFish);
+        LocalStorageStore.saveFish(allFish);
       }
 
       const currentActiveTank = activeTankRef.current;
@@ -111,7 +111,7 @@ export const useDataSync = () => {
         });
 
         if (newAlerts.length > 0) {
-          const activeAlerts = MockFirestore.getAlerts();
+          const activeAlerts = LocalStorageStore.getAlerts();
           const activeTitles = new Set(
             activeAlerts.filter((a) => !a.resolved).map((a) => a.title)
           );
@@ -119,7 +119,7 @@ export const useDataSync = () => {
             (a) => !activeTitles.has(a.title)
           );
           if (dedupedAlerts.length > 0) {
-            MockFirestore.saveAlerts([...dedupedAlerts, ...activeAlerts]);
+            LocalStorageStore.saveAlerts([...dedupedAlerts, ...activeAlerts]);
           }
         }
       }

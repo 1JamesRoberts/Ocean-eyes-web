@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
-import { MockFirestore, subscribeToDb } from '../services/mock_service';
+import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
 import type { FishEntry } from '../types/aquarium';
 
-export const useFish = (tankId: string | null) => {
-  const [fishList, setFishList] = useState<FishEntry[]>(() => MockFirestore.getFish());
+export const useFish = () => {
+  const [fishList, setFishList] = useState<FishEntry[]>(() => LocalStorageStore.getFish());
 
   const syncFish = () => {
-    setFishList(MockFirestore.getFish());
+    setFishList(LocalStorageStore.getFish());
   };
 
   useEffect(() => {
@@ -15,29 +15,27 @@ export const useFish = (tankId: string | null) => {
     return subscribeToDb(syncFish);
   }, []);
 
-  const addFish = (name: string, imageUrl: string, count: number) => {
-    if (tankId) {
-      MockFirestore.addFish(tankId, name, imageUrl, count);
-    }
+  const addFish = (tankId: string, name: string, imageUrl: string, count: number) => {
+    LocalStorageStore.addFish(tankId, name, imageUrl, count);
   };
 
   const updateFishCount = (docId: string, count: number) => {
-    MockFirestore.updateFishCount(docId, count);
+    LocalStorageStore.updateFishCount(docId, count);
   };
 
-  const updateFishSpecies = (docId: string, name: string, imageUrl: string) => {
-    MockFirestore.updateFishSpecies(docId, name, imageUrl);
+  const updateDetectedCount = (docId: string, detected: number) => {
+    LocalStorageStore.updateDetectedCount(docId, detected);
   };
 
   const removeFish = (docId: string) => {
-    MockFirestore.removeFish(docId);
+    LocalStorageStore.removeFish(docId);
   };
 
   return {
     fishList,
     addFish,
     updateFishCount,
-    updateFishSpecies,
+    updateDetectedCount,
     removeFish,
   };
 };

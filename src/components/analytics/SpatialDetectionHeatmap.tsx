@@ -4,7 +4,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { AIDetectionResult } from '../../types/aquarium';
-import { formatSpeciesName } from '../../utils/analytics';
+import { formatSpeciesName } from '../../utils/formatters';
 import { ChartEmptyState } from './ChartEmptyState';
 
 interface Props {
@@ -226,7 +226,11 @@ export const SpatialDetectionHeatmap: React.FC<Props> = ({ records }) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h3 className="text-sm font-bold text-text-main m-0">Detection Density Heatmap</h3>
+          <p className="text-xs text-text-muted m-0">Spatial distribution across camera frame</p>
+        </div>
         <select
           className="py-1.5 px-2.5 rounded-lg border border-border-card bg-surface-card text-text-main text-[13px] font-inherit cursor-pointer outline-none focus:border-info"
           value={selectedSpecies}

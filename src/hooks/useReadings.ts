@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
-import { MockFirestore, subscribeToDb } from '../services/mock_service';
+import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
 import type { ReadingItem } from '../types/aquarium';
 
 export const useReadings = () => {
-  const [readings, setReadings] = useState<ReadingItem[]>(() => MockFirestore.getReadings());
+  const [readings, setReadings] = useState<ReadingItem[]>(() => LocalStorageStore.getReadings());
 
   const syncReadings = () => {
-    setReadings(MockFirestore.getReadings());
+    setReadings(LocalStorageStore.getReadings());
   };
 
   useEffect(() => {
@@ -15,5 +15,17 @@ export const useReadings = () => {
     return subscribeToDb(syncReadings);
   }, []);
 
-  return { readings, setReadings };
+  const writeReading = (data: {
+    tankId: string;
+    clarity: number;
+    fishCount: number;
+    ph?: number;
+    temp?: number;
+    ammonia?: number;
+    nitrite?: number;
+  }) => {
+    LocalStorageStore.writeReading(data);
+  };
+
+  return { readings, writeReading };
 };

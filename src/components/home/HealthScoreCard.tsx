@@ -1,5 +1,5 @@
 import React from 'react';
-import { getHealthColor, getHealthMessage, type HealthReading } from '../../services/healthCalculator';
+import { calculateHealthScore, getHealthColor, getHealthMessage, type HealthReading } from '../../services/healthCalculator';
 
 interface HealthScoreCardProps {
   reading: HealthReading;
@@ -46,15 +46,3 @@ export const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ reading }) => 
   );
 };
 
-function calculateHealthScore(reading: HealthReading): number {
-  const score = Math.max(
-    1,
-    10 -
-      Math.abs(7.2 - reading.ph) * 4 -
-      Math.max(0, reading.clarity - 0.5) * 0.8 -
-      reading.ammonia * 20 -
-      reading.nitrite * 3
-  );
-  
-  return parseFloat(score.toFixed(1));
-}

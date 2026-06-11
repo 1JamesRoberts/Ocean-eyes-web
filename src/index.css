@@ -358,22 +358,6 @@
   }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.anim-spin {
-  animation: spin 1s linear infinite;
-}
-
-
-
 /* pairing items */
 .qr-container {
   display: flex;
@@ -438,18 +422,6 @@
     opacity: 1;
   }
 }
-
-
-
-
-
-
-
-.species-unknown {
-  background-color: #94A3B8;
-}
-
-
 
 /* ─── Delete Confirmation Modal ─── */
 .modal-overlay {

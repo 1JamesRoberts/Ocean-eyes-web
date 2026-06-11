@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTank } from '../../hooks/useTank';
 import { useLiveState } from '../../hooks/useLiveState';
 import { useFish } from '../../hooks/useFish';
-import { MockFirestore } from '../../services/mock_service';
+import { useAlerts } from '../../hooks/useAlerts';
+import { useReadings } from '../../hooks/useReadings';
 import type { CameraFilters, AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
 
 import { Video } from 'lucide-react';
@@ -19,8 +20,10 @@ import { VideoDecorations } from '../../components/live/VideoDecorations';
 
 export const LiveScreen: React.FC = () => {
   const { activeTank } = useTank();
-  const { liveState, updateCalibration } = useLiveState(activeTank?.id ?? null);
-  const { fishList } = useFish(activeTank?.id ?? null);
+  const { liveState, saveLiveState, updateCalibration } = useLiveState(activeTank?.id ?? null);
+  const { fishList, updateDetectedCount } = useFish();
+  const { addAlert } = useAlerts();
+  const { writeReading } = useReadings();
   const [isStreaming, setIsStreaming] = useState(liveState?.is_live || false);
 
   const feeds = liveState?.feeds || [];
@@ -235,22 +238,21 @@ export const LiveScreen: React.FC = () => {
 
   const startStream = () => {
     setIsStreaming(true);
-    if (activeTank) {
-      const currentLive = MockFirestore.getLiveState(activeTank.id);
-      const feed = currentLive.feeds[0];
+    if (activeTank && liveState) {
+      const feed = liveState.feeds[0];
       const updatedFeed = {
         ...feed,
         is_live: true,
         started_at: feed.started_at || new Date().toISOString()
       };
-      MockFirestore.saveLiveState(activeTank.id, {
+      saveLiveState({
         is_live: true,
         stream_url: updatedFeed.stream_url,
         started_at: updatedFeed.started_at,
         last_ping_at: new Date().toISOString(),
         current_clarity: updatedFeed.current_clarity,
         current_fish_count: updatedFeed.current_fish_count,
-        selected_feed_id: currentLive.selected_feed_id,
+        selected_feed_id: liveState.selected_feed_id,
         feeds: [updatedFeed]
       });
     }
@@ -260,22 +262,21 @@ export const LiveScreen: React.FC = () => {
     setIsStreaming(false);
     setIsRecording(false);
     setZoomLevel(1.0);
-    if (activeTank) {
-      const currentLive = MockFirestore.getLiveState(activeTank.id);
-      const feed = currentLive.feeds[0];
+    if (activeTank && liveState) {
+      const feed = liveState.feeds[0];
       const updatedFeed = {
         ...feed,
         is_live: false,
         started_at: null
       };
-      MockFirestore.saveLiveState(activeTank.id, {
+      saveLiveState({
         is_live: false,
         stream_url: '',
         started_at: null,
         last_ping_at: null,
         current_clarity: 0,
         current_fish_count: 0,
-        selected_feed_id: currentLive.selected_feed_id,
+        selected_feed_id: liveState.selected_feed_id,
         feeds: [updatedFeed]
       });
     }
@@ -341,8 +342,7 @@ export const LiveScreen: React.FC = () => {
           const diagnosedFish = result.detections.find(d => d.diagnosis);
           if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
             const diag = diagnosedFish.diagnosis;
-            const alerts = MockFirestore.getAlerts();
-            const newAlert = {
+            addAlert({
               id: `alert-disease-${Date.now()}`,
               title: `Disease Alert: ${diag.disease}`,
               message: `AI detected signs of ${diag.disease} on a ${diagnosedFish.species_display}: ${diag.description}`,
@@ -355,22 +355,20 @@ export const LiveScreen: React.FC = () => {
               fishAfter: '',
               resolved: false,
               timestamp: new Date().toISOString()
-            };
-            MockFirestore.saveAlerts([newAlert, ...alerts]);
+            });
           }
         }
 
-        if (activeTank) {
+        if (activeTank && liveState) {
           const totalFish = result.summary.total_detections;
 
-          MockFirestore.writeReading({
+          writeReading({
             tankId: activeTank.id,
             clarity: activeFeed.current_clarity ?? 0,
             fishCount: totalFish,
           });
 
-          const currentLive = MockFirestore.getLiveState(activeTank.id);
-          const updatedFeeds = currentLive.feeds.map(f => {
+          const updatedFeeds = liveState.feeds.map(f => {
             if (f.id === activeFeed.id) {
               return {
                 ...f,
@@ -379,19 +377,19 @@ export const LiveScreen: React.FC = () => {
             }
             return f;
           });
-          MockFirestore.saveLiveState(activeTank.id, {
-            ...currentLive,
+          saveLiveState({
+            ...liveState,
             current_fish_count: totalFish,
             feeds: updatedFeeds,
           });
 
           fishList.forEach(fish => {
-            MockFirestore.updateDetected(fish.id, 0);
+            updateDetectedCount(fish.id, 0);
           });
           Object.entries(result.summary.species_counts).forEach(([speciesId, count]) => {
             const fishEntry = fishList.find(f => f.speciesId === speciesId);
             if (fishEntry) {
-              MockFirestore.updateDetected(fishEntry.id, count);
+              updateDetectedCount(fishEntry.id, count);
             }
           });
         }
@@ -487,17 +485,16 @@ export const LiveScreen: React.FC = () => {
       const result = await sendFrameForTurbidity(blob, controller.signal);
       setLastTurbidityResult(result);
 
-      if (activeTank) {
+      if (activeTank && liveState) {
         const fnuValue = result.turbidity.fnu;
 
-        MockFirestore.writeReading({
+        writeReading({
           tankId: activeTank.id,
           clarity: parseFloat(fnuValue.toFixed(2)),
           fishCount: activeFeed.current_fish_count ?? 0,
         });
 
-        const currentLive = MockFirestore.getLiveState(activeTank.id);
-        const updatedFeeds = currentLive.feeds.map(f => {
+        const updatedFeeds = liveState.feeds.map(f => {
           if (f.id === activeFeed.id) {
             return {
               ...f,
@@ -506,8 +503,8 @@ export const LiveScreen: React.FC = () => {
           }
           return f;
         });
-        MockFirestore.saveLiveState(activeTank.id, {
-          ...currentLive,
+        saveLiveState({
+          ...liveState,
           current_clarity: parseFloat(fnuValue.toFixed(2)),
           feeds: updatedFeeds,
         });
@@ -519,12 +516,12 @@ export const LiveScreen: React.FC = () => {
       setTurbidityLoading(false);
       turbidityAbortControllerRef.current = null;
     }
-  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isWebcam, isStreaming, backendStatus, ensureBackendOnline]);
+  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isWebcam, isStreaming, backendStatus, ensureBackendOnline, liveState, saveLiveState, writeReading]);
 
-  const stateClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
-  const stateFish = isStreaming && liveState?.is_live ? activeFeed.current_fish_count : 0;
+  const currentClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
+  const currentFishCount = isStreaming && liveState?.is_live ? activeFeed.current_fish_count : 0;
 
-  const formatTime = (totalSeconds: number) => {
+  const formatDuration = (totalSeconds: number) => {
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -743,7 +740,7 @@ export const LiveScreen: React.FC = () => {
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 11px monospace';
         ctx.textAlign = 'left';
-        ctx.fillText(`REC ${formatTime(recordingSeconds)}`, 42, 25);
+        ctx.fillText(`REC ${formatDuration(recordingSeconds)}`, 42, 25);
       }
 
       ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
@@ -763,15 +760,15 @@ export const LiveScreen: React.FC = () => {
 
       ctx.textAlign = 'right';
       ctx.fillStyle = '#E2E8F0';
-      ctx.fillText(`FISH: ${stateFish} DETECTED  |  FNU: ${stateClarity.toFixed(2)}  |  ZOOM: ${zoomLevel.toFixed(1)}x`, 620, 335);
+      ctx.fillText(`FISH: ${currentFishCount} DETECTED  |  FNU: ${currentClarity.toFixed(2)}  |  ZOOM: ${zoomLevel.toFixed(1)}x`, 620, 335);
 
       const imgUrl = canvas.toDataURL('image/png');
       const newSnapshot = {
         id: `snap_${Date.now()}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         imageUrl: imgUrl,
-        fishCount: stateFish,
-        clarity: stateClarity
+        fishCount: currentFishCount,
+        clarity: currentClarity
       };
       setSnapshots(prev => [newSnapshot, ...prev]);
     };
@@ -811,8 +808,8 @@ export const LiveScreen: React.FC = () => {
         id: `rec_${Date.now()}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         duration: recordingSeconds,
-        fishCount: stateFish,
-        clarity: stateClarity
+        fishCount: currentFishCount,
+        clarity: currentClarity
       };
       setRecordings(prev => [newRecording, ...prev]);
     } else {
@@ -969,8 +966,8 @@ Diagnostics:
               isCalibrating={isCalibrating}
               isCalibDragging={isCalibDragging}
               waterLineY={displayLineY}
-              stateFish={stateFish}
-              stateClarity={stateClarity}
+              currentFishCount={currentFishCount}
+              currentClarity={currentClarity}
             />
 
             {isAIActive && lastPrediction && (
@@ -1055,7 +1052,7 @@ Diagnostics:
             {isRecording && (
               <div className="live-overlay-pill" style={{ left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgba(239, 68, 68, 0.85)' }}>
                 <div className="recording-dot" />
-                <span>REC {formatTime(recordingSeconds)}</span>
+                <span>REC {formatDuration(recordingSeconds)}</span>
               </div>
             )}
 

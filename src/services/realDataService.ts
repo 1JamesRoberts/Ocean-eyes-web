@@ -11,12 +11,6 @@ import { generateSimulatedChemistry } from './chemistrySimulator';
 
 const TODAY = () => new Date().toISOString().slice(0, 10);
 
-export interface SyncResult {
-  readings: ReadingItem[];
-  speciesCounts: Record<string, number>;
-  backendAvailable: boolean;
-}
-
 function average(values: number[]): number {
   if (values.length === 0) return 0.95;
   return values.reduce((a, b) => a + b, 0) / values.length;

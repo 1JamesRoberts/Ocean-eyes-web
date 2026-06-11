@@ -19,7 +19,7 @@ export const HomeScreen: React.FC = () => {
   const { setActiveTab, setSelectedAlertId } = useNavigation();
   const { activeTank, tanks, linkedTanks, tankId, selectTank, createAndLinkTank, linkTank } = useTank();
   const { readings } = useReadings();
-  const { fishList } = useFish(tankId);
+  const { fishList } = useFish();
   const { alerts } = useAlerts();
   const { liveState } = useLiveState(tankId);
 
@@ -89,7 +89,6 @@ export const HomeScreen: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <LiveFeedPreview
                 activeTank={activeTank}
-                liveState={liveState}
                 displayClarity={displayClarity}
                 displayFishCount={displayFishCount}
                 onViewAdvanced={() => setActiveTab('live')}

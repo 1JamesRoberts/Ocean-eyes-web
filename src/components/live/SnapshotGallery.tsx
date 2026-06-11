@@ -30,7 +30,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
   onDownloadRecording,
   onDeleteRecording
 }) => {
-  const formatTime = (totalSeconds: number) => {
+  const formatDuration = (totalSeconds: number) => {
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -100,7 +100,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                 <div>
                   <span className="text-xs font-semibold text-text-main">{rec.timestamp}</span>
                   <div className="text-[11px] text-text-muted mt-0.5">
-                    ⏱ {formatTime(rec.duration)} · {rec.fishCount} fish · {rec.clarity.toFixed(2)} FNU
+                    ⏱ {formatDuration(rec.duration)} · {rec.fishCount} fish · {rec.clarity.toFixed(2)} FNU
                   </div>
                 </div>
                 <div className="flex gap-1.5">

@@ -9,7 +9,7 @@ export interface AlertCheckInput {
   discrepancyPct: number;
 }
 
-export function checkClarityAlert(input: AlertCheckInput): AlertItem | null {
+export function createClarityAlert(input: AlertCheckInput): AlertItem | null {
   const { currentClarity, maxFnu, totalExpectedFish, totalDetected } = input;
   
   if (currentClarity <= maxFnu) return null;
@@ -30,7 +30,7 @@ export function checkClarityAlert(input: AlertCheckInput): AlertItem | null {
   };
 }
 
-export function checkFishDiscrepancyAlert(input: AlertCheckInput): AlertItem | null {
+export function createFishDiscrepancyAlert(input: AlertCheckInput): AlertItem | null {
   const { currentClarity, totalExpectedFish, totalDetected, discrepancyPct } = input;
   
   if (totalExpectedFish === 0) return null;
@@ -57,10 +57,10 @@ export function checkFishDiscrepancyAlert(input: AlertCheckInput): AlertItem | n
 export function generateAlerts(input: AlertCheckInput): AlertItem[] {
   const alerts: AlertItem[] = [];
   
-  const clarityAlert = checkClarityAlert(input);
+  const clarityAlert = createClarityAlert(input);
   if (clarityAlert) alerts.push(clarityAlert);
   
-  const fishAlert = checkFishDiscrepancyAlert(input);
+  const fishAlert = createFishDiscrepancyAlert(input);
   if (fishAlert) alerts.push(fishAlert);
   
   return alerts;

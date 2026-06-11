@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useTank } from '../../hooks/useTank';
 import { useReadings } from '../../hooks/useReadings';
 import { useFish } from '../../hooks/useFish';
-import { MockFirestore } from '../../services/mock_service';
-import type { AlertItem } from '../../types/aquarium';
+import { useAlerts } from '../../hooks/useAlerts';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
@@ -11,8 +10,9 @@ interface ScreenProps {
 
 export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
   const { activeTank: contextActiveTank, tanks } = useTank();
-  const { readings } = useReadings();
-  const { fishList } = useFish(contextActiveTank?.id ?? null);
+  const { readings, writeReading } = useReadings();
+  const { fishList } = useFish();
+  const { alerts, addAlert } = useAlerts();
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
   const [simClarityIssue, setSimClarityIssue] = useState(false);
 
@@ -33,7 +33,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
     if (!activeTank) return;
     
     // Simulate drop or restore
-    MockFirestore.writeReading({
+    writeReading({
       tankId: activeTank.id,
       clarity: displayClarity,
       fishCount: displayFish,
@@ -44,11 +44,9 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
     });
 
     if (simClarityIssue) {
-      const activeAlerts = MockFirestore.getAlerts();
-      const existing = activeAlerts.find((a: AlertItem) => !a.resolved && a.title.includes('clarity'));
+      const existing = alerts.find((a) => !a.resolved && a.title.includes('clarity'));
       if (!existing) {
-        const newAlerts = [...activeAlerts];
-        newAlerts.unshift({
+        addAlert({
           id: `alert-c-${Date.now()}`,
           title: 'Water clarity dropped',
           message: `Water turbidity rose to ${displayClarity} FNU (Threshold: ${activeTank.thresholds.clarity_min}). Check filter unit.`,
@@ -62,7 +60,6 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
           resolved: false,
           timestamp: new Date().toISOString()
         });
-        MockFirestore.saveAlerts(newAlerts);
       }
     }
 

@@ -1,4 +1,4 @@
-// mock_service.ts - Simulated Firestore Service for OceanEyes
+// localStorageStore.ts - Primary localStorage data layer for OceanEyes
 import type { 
   FishEntry, 
   AlertItem, 
@@ -30,7 +30,7 @@ const getOrDefault = <T>(key: string, defaultValue: T): T => {
   }
 };
 
-export class MockFirestore {
+export class LocalStorageStore {
   // Local storage lists
   static getTanks = (): TankBrief[] => {
     return getOrDefault<TankBrief[]>('tanks', []);
@@ -328,18 +328,7 @@ export class MockFirestore {
     }
   }
 
-  static updateFishSpecies(docId: string, name: string, imageUrl: string) {
-    const fish = this.getFish();
-    const index = fish.findIndex(f => f.id === docId);
-    if (index !== -1) {
-      fish[index].name = name;
-      fish[index].imageUrl = imageUrl;
-      fish[index].speciesId = name.toLowerCase().replace(/\s+/g, '_');
-      this.saveFish(fish);
-    }
-  }
-
-  static updateDetected(docId: string, detected: number) {
+  static updateDetectedCount(docId: string, detected: number) {
     const fish = this.getFish();
     const index = fish.findIndex(f => f.id === docId);
     if (index !== -1) {

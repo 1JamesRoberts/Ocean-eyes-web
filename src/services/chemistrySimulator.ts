@@ -2,10 +2,6 @@
 // pH, temp, ammonia, and nitrite are not yet available from the AI pipeline;
 // this module provides stable placeholder values until real sensor data is wired.
 
-export interface SimulatedChemistryParams {
-  seed?: number;
-}
-
 export interface SimulatedChemistry {
   ph: number;
   temp: number;
