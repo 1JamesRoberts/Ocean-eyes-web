@@ -35,21 +35,6 @@ const OceanEyesDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Linked Tank Brief Info Card */}
-        {activeTank && (
-          <div className="bg-background-app p-4 rounded-2xl border border-border-card">
-            <span className="text-[10px] text-text-muted block font-semibold uppercase tracking-wider">
-              Connected Unit
-            </span>
-            <strong className="text-base text-text-main block mt-0.5">
-              {activeTank.name}
-            </strong>
-            <code className="text-[10px] text-primary-dark block mt-1">
-              {activeTank.id}
-            </code>
-          </div>
-        )}
-
         {/* Navigation Sidebar Links */}
         <nav className="flex flex-col gap-2 flex-1 max-md:flex-row max-md:overflow-x-auto max-md:pb-1 max-md:gap-1.5 [&::-webkit-scrollbar]:hidden">
           <button
