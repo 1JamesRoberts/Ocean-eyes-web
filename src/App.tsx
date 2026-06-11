@@ -110,6 +110,7 @@ const OceanEyesDashboard: React.FC = () => {
                 })}
               </select>
             )}
+          </div>
         </div>
       </aside>
 
