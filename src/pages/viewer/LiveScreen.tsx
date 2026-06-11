@@ -142,8 +142,8 @@ export const LiveScreen: React.FC = () => {
     tint: 0
   });
 
-  const handleFilterChange = (key: keyof CameraFilters, val: number) => {
-    setFilters(prev => ({ ...prev, [key]: val }));
+  const handleFilterChange = (filters: Partial<CameraFilters>) => {
+    setFilters(prev => ({ ...prev, ...filters }));
   };
 
   const [containerSize, setContainerSize] = useState({ width: 640, height: 360 });

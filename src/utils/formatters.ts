@@ -1,4 +1,4 @@
-// analytics.ts - Shared formatting utilities for AI analytics components
+// formatters.ts - Shared formatting utilities for AI analytics components
 
 /**
  * Format an ISO timestamp into a short time string (HH:MM).

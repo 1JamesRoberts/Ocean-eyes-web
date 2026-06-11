@@ -4,7 +4,7 @@ import type { CameraFilters, FilterPreset } from '../../types/aquarium';
 
 interface StreamAdjustmentsProps {
   filters: CameraFilters;
-  onFilterChange: (key: keyof CameraFilters, val: number) => void;
+  onFilterChange: (filters: Partial<CameraFilters>) => void;
 }
 
 const DEFAULT_PRESETS: FilterPreset[] = [
@@ -49,11 +49,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
 
   const applyPreset = (preset: FilterPreset) => {
     setSelectedPresetId(preset.id);
-    onFilterChange('contrast', preset.filters.contrast);
-    onFilterChange('brightness', preset.filters.brightness);
-    onFilterChange('saturation', preset.filters.saturation);
-    onFilterChange('temperature', preset.filters.temperature);
-    onFilterChange('tint', preset.filters.tint);
+    onFilterChange(preset.filters);
   };
 
   const handleSavePreset = (e: React.FormEvent) => {
@@ -156,11 +152,11 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
                   <input
                     type="range" min={min} max={max} step="5"
                     value={filters[key]}
-                    onChange={(e) => onFilterChange(key, parseInt(e.target.value))}
+                    onChange={(e) => onFilterChange({ [key]: parseInt(e.target.value) })}
                     style={{ flex: 1, accentColor: 'var(--color-primary-dark)' }}
                   />
                   <button
-                    onClick={() => onFilterChange(key, key === 'temperature' || key === 'tint' ? 0 : 100)}
+                    onClick={() => onFilterChange({ [key]: key === 'temperature' || key === 'tint' ? 0 : 100 })}
                     style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: '10px' }}
                   >
                     Reset

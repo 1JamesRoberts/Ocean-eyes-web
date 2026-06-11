@@ -1,7 +1,7 @@
 // src/services/alertEngine.ts - Pure alert generation logic
 import type { AlertItem } from '../types/aquarium';
 
-export interface AlertCheckInput {
+interface AlertCheckInput {
   currentClarity: number;
   totalExpectedFish: number;
   totalDetected: number;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useTank } from '../../hooks/useTank';
 import { ChevronRight } from 'lucide-react';
@@ -9,6 +9,21 @@ export const SettingsScreen: React.FC = () => {
   const [name, setName] = useState(activeTank?.name || 'Living Room Reef');
   const [editing, setEditing] = useState(false);
   const [showConfirmUnlink, setShowConfirmUnlink] = useState(false);
+
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const debouncedUpdateThresholds = (clarityMin: number, fishPct: number) => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      updateThresholds(clarityMin, fishPct);
+    }, 300);
+  };
+
+  const flushThresholds = (clarityMin: number, fishPct: number) => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = null;
+    updateThresholds(clarityMin, fishPct);
+  };
 
   const handleNameChange = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,12 +127,12 @@ export const SettingsScreen: React.FC = () => {
 
       {/* Safety Threshold Settings Slider equivalent */}
       <div className="card-decoration" style={{ padding: '20px', marginBottom: '24px' }}>
-        <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>Safety Boundaries & Notification Thresholds</h4>
+        <h4 className="text-sm font-bold text-[var(--color-text-primary)] mb-4">Safety Boundaries & Notification Thresholds</h4>
 
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '6px' }}>
-            <span style={{ color: 'var(--color-text-secondary)' }}>Maximum FNU Threshold</span>
-            <strong style={{ color: 'var(--color-primary)' }}>{activeTank?.thresholds.clarity_min || 6.0} FNU</strong>
+        <div className="mb-4">
+          <div className="flex justify-between text-[13px] mb-1.5">
+            <span className="text-[var(--color-text-secondary)]">Maximum FNU Threshold</span>
+            <strong className="text-[var(--color-primary)]">{activeTank?.thresholds.clarity_min || 6.0} FNU</strong>
           </div>
           <input
             type="range"
@@ -128,16 +143,27 @@ export const SettingsScreen: React.FC = () => {
             onChange={(e) => {
               const val = parseFloat(e.target.value);
               const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
-              updateThresholds(val, fishPct);
+              debouncedUpdateThresholds(val, fishPct);
             }}
-            style={{ width: '100%', accentColor: 'var(--color-primary-dark)' }}
+            onMouseUp={(e) => {
+              const val = parseFloat((e.target as HTMLInputElement).value);
+              const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
+              flushThresholds(val, fishPct);
+            }}
+            onTouchEnd={(e) => {
+              const val = parseFloat((e.target as HTMLInputElement).value);
+              const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
+              flushThresholds(val, fishPct);
+            }}
+            className="w-full"
+            style={{ accentColor: 'var(--color-primary-dark)' }}
           />
         </div>
 
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '6px' }}>
-            <span style={{ color: 'var(--color-text-secondary)' }}>Discrepancy Alarm Trigger</span>
-            <strong style={{ color: 'var(--color-primary)' }}>{activeTank?.thresholds.fish_change_pct || 50.0}% visibility</strong>
+          <div className="flex justify-between text-[13px] mb-1.5">
+            <span className="text-[var(--color-text-secondary)]">Discrepancy Alarm Trigger</span>
+            <strong className="text-[var(--color-primary)]">{activeTank?.thresholds.fish_change_pct || 50.0}% visibility</strong>
           </div>
           <input
             type="range"
@@ -148,9 +174,20 @@ export const SettingsScreen: React.FC = () => {
             onChange={(e) => {
               const val = parseInt(e.target.value);
               const clar = activeTank?.thresholds.clarity_min || 6.0;
-              updateThresholds(clar, val);
+              debouncedUpdateThresholds(clar, val);
             }}
-            style={{ width: '100%', accentColor: 'var(--color-primary-dark)' }}
+            onMouseUp={(e) => {
+              const val = parseInt((e.target as HTMLInputElement).value);
+              const clar = activeTank?.thresholds.clarity_min || 6.0;
+              flushThresholds(clar, val);
+            }}
+            onTouchEnd={(e) => {
+              const val = parseInt((e.target as HTMLInputElement).value);
+              const clar = activeTank?.thresholds.clarity_min || 6.0;
+              flushThresholds(clar, val);
+            }}
+            className="w-full"
+            style={{ accentColor: 'var(--color-primary-dark)' }}
           />
         </div>
       </div>

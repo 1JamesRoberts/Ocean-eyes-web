@@ -116,9 +116,6 @@ export class LocalStorageStore {
     notifyUpdate();
   };
 
-  // Prototype constraint: strictly 1 camera per tank
-  // addCameraFeed and deleteCameraFeed removed - single camera only
-
   static switchActiveFeed = (tankId: string, feedId: string) => {
     const liveState = this.getLiveState(tankId);
     const activeFeed = liveState.feeds.find(f => f.id === feedId);

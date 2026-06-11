@@ -245,7 +245,6 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
             {simClarityIssue ? 'Restore Clarity' : 'Trigger Clog Filter'}
           </button>
 
-          {/* Fish hiding simulation removed — AI detection is the sole source of truth */}
         </div>
       </div>
 

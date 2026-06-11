@@ -25,8 +25,6 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
   const ih = imageNaturalSize.height || lastPrediction.image_dimensions.height || ch;
   const renderedWidth = cw;
   const renderedHeight = cw * (ih / iw);
-  const offsetX = 0;
-  const offsetY = 0;
 
   return (
     <div style={{
@@ -46,8 +44,8 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
         const speciesInfo = getSpeciesById(det.species);
         const boxColor = speciesInfo?.color || '#3B82F6';
 
-        const left = offsetX + nx1 * renderedWidth;
-        const top = offsetY + ny1 * renderedHeight;
+        const left = nx1 * renderedWidth;
+        const top = ny1 * renderedHeight;
         const width = (nx2 - nx1) * renderedWidth;
         const height = (ny2 - ny1) * renderedHeight;
 
