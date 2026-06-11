@@ -160,7 +160,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
             <h1 className="canvas-title" style={{ marginTop: '2px', display: 'inline-block' }}>{activeTank?.name || 'Living Room Reef'}</h1>
             <button 
               className="secondary-button" 
-              style={{ padding: '4px 8px', fontSize: '11px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: 'var(--color-primary)' }}
+              style={{ padding: '4px 8px', fontSize: '11px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
               onClick={onAddTank}
             >
               <Plus size={10} style={{ color: 'var(--color-primary)' }} />

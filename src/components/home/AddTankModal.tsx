@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 interface AddTankModalProps {
   show: boolean;

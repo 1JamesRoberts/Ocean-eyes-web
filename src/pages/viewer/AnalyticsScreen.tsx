@@ -9,9 +9,11 @@ import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
 import { todayUTC } from '../../utils/formatters';
+import { useTank } from '../../hooks/useTank';
 
 export const AnalyticsScreen: React.FC = () => {
   const { setActiveTab } = useNavigation();
+  const { tankId } = useTank();
   const { readings } = useReadings();
   const [selectedDate, setSelectedDate] = useState<string>(todayUTC);
   const { detectionData, turbidityData, loading, error, refetch } = useHistory(selectedDate);
@@ -121,13 +123,18 @@ export const AnalyticsScreen: React.FC = () => {
       {/* Charts grid */}
       {!loading && !error && hasAnyData && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {/* Spatial Detection Heatmap */}
-          <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3 lg:col-span-2">
-            <SpatialDetectionHeatmap records={detectionRecords} />
-          </div>
+          {/* Heatmap + Fish Count row (2:1 like dashboard-grid) */}
+          <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
+            {/* Spatial Detection Heatmap */}
+            <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3">
+              <SpatialDetectionHeatmap
+                records={detectionRecords}
+                tankId={tankId}
+              />
+            </div>
 
-          {/* Fish Count Timeline */}
-          <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3">
+            {/* Fish Count Timeline */}
+            <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3">
             <div>
               <h3 className="text-sm font-bold text-text-main m-0">Fish Count Over Time</h3>
               <p className="text-xs text-text-muted m-0">
@@ -136,10 +143,11 @@ export const AnalyticsScreen: React.FC = () => {
             </div>
             <FishCountChart records={detectionRecords} />
           </div>
+          </div>
 
           {/* Water Clarity Trend */}
           <div
-            className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3 cursor-pointer"
+            className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3 cursor-pointer lg:col-span-2"
             onClick={() => setActiveTab('history')}
             role="button"
             tabIndex={0}

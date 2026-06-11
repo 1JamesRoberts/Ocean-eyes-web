@@ -1,17 +1,18 @@
 // CCTV-style density heatmap overlaid on the aquarium camera frame.
 // Algorithm matches data_processing/test.py: density accumulation →
 // Gaussian blur → JET colourmap → alpha blend over camera background.
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
+import { CameraFeed } from '../live/CameraFeed';
 import { ChartEmptyState } from './ChartEmptyState';
 
 interface Props {
   records: AIDetectionResult[];
+  /** Tank ID to resolve the active camera feed. */
+  tankId?: string | null;
 }
 
-const BG_IMAGE_URL = '/mock_camera_main.png';
 const MAX_RENDER_WIDTH = 800;
 const HEATMAP_ALPHA = 0.55;
 const BLUR_SIGMA_PROP = 0.05; // σ as proportion of image width
@@ -95,156 +96,196 @@ function gaussianBlur(
   return dst;
 }
 
+// ─── Heatmap overlay builder ───────────────────────────────────────────────
+
+function buildHeatmapOverlay(
+  centers: { nx: number; ny: number; species: string }[],
+  renderW: number,
+  renderH: number,
+): HTMLCanvasElement | null {
+  if (centers.length === 0) return null;
+
+  const sigma = Math.max(1, Math.round(renderW * BLUR_SIGMA_PROP));
+
+  // 1. Float32 density accumulation
+  const density = new Float32Array(renderW * renderH);
+  for (const c of centers) {
+    const px = Math.round(c.nx * (renderW - 1));
+    const py = Math.round(c.ny * (renderH - 1));
+    if (px >= 0 && px < renderW && py >= 0 && py < renderH) {
+      density[py * renderW + px] += 1;
+    }
+  }
+
+  // 2. Gaussian blur
+  const blurred = gaussianBlur(density, renderW, renderH, sigma);
+
+  // 3. Find max, build colourised ImageData via JET LUT
+  let maxVal = 0;
+  for (let i = 0; i < blurred.length; i++) {
+    if (blurred[i] > maxVal) maxVal = blurred[i];
+  }
+
+  // 4. Build overlay canvas
+  const overlay = document.createElement('canvas');
+  overlay.width = renderW;
+  overlay.height = renderH;
+  const ctx = overlay.getContext('2d')!;
+  const imageData = ctx.createImageData(renderW, renderH);
+  const pixels = imageData.data;
+
+  if (maxVal > 0) {
+    const alpha255 = Math.round(HEATMAP_ALPHA * 255);
+    for (let i = 0; i < blurred.length; i++) {
+      const lutIdx = Math.round((blurred[i] / maxVal) * 255);
+      const [r, g, b] = JET_LUT[lutIdx];
+      const off = i * 4;
+      pixels[off] = r;
+      pixels[off + 1] = g;
+      pixels[off + 2] = b;
+      pixels[off + 3] = alpha255;
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  return overlay;
+}
+
 // ─── Component ─────────────────────────────────────────────────────────────
 
-export const SpatialDetectionHeatmap: React.FC<Props> = ({ records }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const offscreenRef = useRef<HTMLCanvasElement | null>(null);
-  const [selectedSpecies, setSelectedSpecies] = useState<string>('all');
-  const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
-  const [bgLoading, setBgLoading] = useState(true);
-  const [bgError, setBgError] = useState(false);
+export const SpatialDetectionHeatmap = React.memo<Props>(
+  ({ records, tankId }) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+    const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
+    const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
+    const [selectedSpecies, setSelectedSpecies] = React.useState<string>('all');
 
-  // Load camera background once
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => { setBgImage(img); setBgLoading(false); };
-    img.onerror = () => { setBgError(true); setBgLoading(false); };
-    img.src = BG_IMAGE_URL;
-  }, []);
-
-  // Flatten records into normalised center points
-  const allCenters = useMemo(() => {
-    const points: { nx: number; ny: number; species: string }[] = [];
-    for (const r of records) {
-      if (!r.detections) continue;
-      for (const d of r.detections) {
-        const [nx1, ny1, nx2, ny2] = d.bbox_normalized;
-        points.push({ nx: (nx1 + nx2) / 2, ny: (ny1 + ny2) / 2, species: d.species });
+    // Flatten records into normalised center points
+    const allCenters = useMemo(() => {
+      const points: { nx: number; ny: number; species: string }[] = [];
+      for (const r of records) {
+        if (!r.detections) continue;
+        for (const d of r.detections) {
+          const [nx1, ny1, nx2, ny2] = d.bbox_normalized;
+          points.push({ nx: (nx1 + nx2) / 2, ny: (ny1 + ny2) / 2, species: d.species });
+        }
       }
-    }
-    return points;
-  }, [records]);
+      return points;
+    }, [records]);
 
-  // Unique species for the filter dropdown
-  const speciesList = useMemo(
-    () => Array.from(new Set(allCenters.map((c) => c.species))).sort(),
-    [allCenters],
-  );
+    // Unique species for the filter dropdown
+    const speciesList = useMemo(
+      () => Array.from(new Set(allCenters.map((c) => c.species))).sort(),
+      [allCenters],
+    );
 
-  // Filter centers by selected species
-  const centers = useMemo(
-    () => (selectedSpecies === 'all' ? allCenters : allCenters.filter((c) => c.species === selectedSpecies)),
-    [allCenters, selectedSpecies],
-  );
+    // Filter centers by selected species
+    const centers = useMemo(
+      () => (selectedSpecies === 'all' ? allCenters : allCenters.filter((c) => c.species === selectedSpecies)),
+      [allCenters, selectedSpecies],
+    );
 
-  // Render the heatmap whenever inputs change
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !bgImage || centers.length === 0) return;
+    // ResizeObserver: keep overlay canvas sized to container pixels
+    useEffect(() => {
+      if (!containerRef.current) return;
 
-    const naturalW = bgImage.naturalWidth || 640;
-    const naturalH = bgImage.naturalHeight || 360;
-    const renderW = Math.min(MAX_RENDER_WIDTH, naturalW);
-    const renderH = Math.round(renderW * (naturalH / naturalW));
-    canvas.width = renderW;
-    canvas.height = renderH;
+      const ro = new ResizeObserver((entries) => {
+        const cr = entries[0].contentRect;
+        setContainerSize({ width: cr.width, height: cr.height });
 
-    const sigma = Math.max(1, Math.round(renderW * BLUR_SIGMA_PROP));
+        const canvas = overlayCanvasRef.current;
+        if (!canvas) return;
 
-    // 1. Float32 density accumulation
-    const density = new Float32Array(renderW * renderH);
-    for (const c of centers) {
-      const px = Math.round(c.nx * (renderW - 1));
-      const py = Math.round(c.ny * (renderH - 1));
-      if (px >= 0 && px < renderW && py >= 0 && py < renderH) {
-        density[py * renderW + px] += 1;
+        const dpr = window.devicePixelRatio || 1;
+        const newWidth = Math.round(cr.width * dpr);
+        const newHeight = Math.round(cr.height * dpr);
+
+        if (canvas.width !== newWidth || canvas.height !== newHeight) {
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+        }
+      });
+
+      ro.observe(containerRef.current);
+      return () => ro.disconnect();
+    }, []);
+
+    // Build heatmap texture whenever centers or container size change
+    useEffect(() => {
+      if (centers.length === 0) {
+        heatmapTextureRef.current = null;
+        drawOverlay();
+        return;
       }
-    }
 
-    // 2. Gaussian blur
-    const blurred = gaussianBlur(density, renderW, renderH, sigma);
+      const { width, height } = containerSize;
+      if (width === 0 || height === 0) return;
 
-    // 3. Find max, build colourised ImageData via JET LUT
-    const ctx = canvas.getContext('2d')!;
-    let maxVal = 0;
-    for (let i = 0; i < blurred.length; i++) {
-      if (blurred[i] > maxVal) maxVal = blurred[i];
-    }
+      const workW = Math.min(MAX_RENDER_WIDTH, Math.round(width));
+      const workH = Math.round(workW * (height / width));
 
-    const imageData = ctx.createImageData(renderW, renderH);
-    const pixels = imageData.data;
+      heatmapTextureRef.current = buildHeatmapOverlay(centers, workW, workH);
+      drawOverlay();
+    }, [centers, containerSize, drawOverlay]);
 
-    if (maxVal > 0) {
-      const alpha255 = Math.round(HEATMAP_ALPHA * 255);
-      for (let i = 0; i < blurred.length; i++) {
-        const lutIdx = Math.round((blurred[i] / maxVal) * 255);
-        const [r, g, b] = JET_LUT[lutIdx];
-        const off = i * 4;
-        pixels[off] = r;
-        pixels[off + 1] = g;
-        pixels[off + 2] = b;
-        pixels[off + 3] = alpha255;
+    const drawOverlay = useCallback(() => {
+      const canvas = overlayCanvasRef.current;
+      const texture = heatmapTextureRef.current;
+      if (!canvas || !texture) {
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        return;
       }
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(texture, 0, 0, canvas.width, canvas.height);
+    }, []);
+
+    // ── Render ──
+
+    if (allCenters.length === 0) {
+      return <ChartEmptyState message="No detection data available" />;
     }
 
-    // 4. Composite over background via offscreen canvas.
-    //    putImageData replaces pixels (no blend), so we draw it onto a temp
-    //    canvas, then drawImage blends it with alpha.
-    ctx.clearRect(0, 0, renderW, renderH);
-    ctx.drawImage(bgImage, 0, 0, renderW, renderH);
-    let offscreen = offscreenRef.current;
-    if (!offscreen || offscreen.width !== renderW || offscreen.height !== renderH) {
-      offscreen = document.createElement('canvas');
-      offscreen.width = renderW;
-      offscreen.height = renderH;
-      offscreenRef.current = offscreen;
-    }
-    const offCtx = offscreen.getContext('2d')!;
-    offCtx.putImageData(imageData, 0, 0);
-    ctx.drawImage(offscreen, 0, 0);
-  }, [bgImage, centers]);
-
-  // ── Render ──
-
-  if (allCenters.length === 0) {
-    return <ChartEmptyState message="No detection data available" />;
-  }
-
-  if (bgLoading) {
     return (
-      <div className="flex items-center justify-center gap-2.5 h-[200px] text-text-muted text-[13px]">
-        <Loader2 size={24} className="animate-float-1 text-info" />
-        <span className="text-[13px] text-text-muted">Loading camera frame...</span>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h3 className="text-sm font-bold text-text-main m-0">Detection Density Heatmap</h3>
+          </div>
+          <select
+            className="py-1.5 px-2.5 rounded-lg border border-border-card bg-surface-card text-text-main text-[13px] font-inherit cursor-pointer outline-none focus:border-info"
+            value={selectedSpecies}
+            onChange={(e) => setSelectedSpecies(e.target.value)}
+          >
+            <option value="all">All Species</option>
+            {speciesList.map((s) => (
+              <option key={s} value={s}>
+                {formatSpeciesName(s)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div ref={containerRef} className="relative w-full rounded-xl overflow-hidden bg-camera-bg">
+          <CameraFeed
+            tankId={tankId}
+            className="w-full"
+          />
+          <canvas
+            ref={overlayCanvasRef}
+            className="absolute inset-0 w-full h-full pointer-events-none"
+          />
+        </div>
       </div>
     );
-  }
-
-  if (bgError) {
-    return <ChartEmptyState message="Failed to load camera frame" hint="Check that mock_camera_main.png exists in public/" />;
-  }
-
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <h3 className="text-sm font-bold text-text-main m-0">Detection Density Heatmap</h3>
-          <p className="text-xs text-text-muted m-0">Spatial distribution across camera frame</p>
-        </div>
-        <select
-          className="py-1.5 px-2.5 rounded-lg border border-border-card bg-surface-card text-text-main text-[13px] font-inherit cursor-pointer outline-none focus:border-info"
-          value={selectedSpecies}
-          onChange={(e) => setSelectedSpecies(e.target.value)}
-        >
-          <option value="all">All Species</option>
-          {speciesList.map((s) => (
-            <option key={s} value={s}>
-              {formatSpeciesName(s)}
-            </option>
-          ))}
-        </select>
-      </div>
-      <canvas ref={canvasRef} className="w-full h-auto block rounded-xl bg-camera-bg" />
-    </div>
-  );
-};
+  },
+  (prevProps, nextProps) =>
+    prevProps.tankId === nextProps.tankId && prevProps.records === nextProps.records,
+);
