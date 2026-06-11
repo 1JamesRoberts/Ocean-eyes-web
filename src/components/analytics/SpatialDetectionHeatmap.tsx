@@ -211,24 +211,6 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       return () => ro.disconnect();
     }, []);
 
-    // Build heatmap texture whenever centers or container size change
-    useEffect(() => {
-      if (centers.length === 0) {
-        heatmapTextureRef.current = null;
-        drawOverlay();
-        return;
-      }
-
-      const { width, height } = containerSize;
-      if (width === 0 || height === 0) return;
-
-      const workW = Math.min(MAX_RENDER_WIDTH, Math.round(width));
-      const workH = Math.round(workW * (height / width));
-
-      heatmapTextureRef.current = buildHeatmapOverlay(centers, workW, workH);
-      drawOverlay();
-    }, [centers, containerSize, drawOverlay]);
-
     const drawOverlay = useCallback(() => {
       const canvas = overlayCanvasRef.current;
       const texture = heatmapTextureRef.current;
@@ -246,6 +228,24 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(texture, 0, 0, canvas.width, canvas.height);
     }, []);
+
+    // Build heatmap texture whenever centers or container size change
+    useEffect(() => {
+      if (centers.length === 0) {
+        heatmapTextureRef.current = null;
+        drawOverlay();
+        return;
+      }
+
+      const { width, height } = containerSize;
+      if (width === 0 || height === 0) return;
+
+      const workW = Math.min(MAX_RENDER_WIDTH, Math.round(width));
+      const workH = Math.round(workW * (height / width));
+
+      heatmapTextureRef.current = buildHeatmapOverlay(centers, workW, workH);
+      drawOverlay();
+    }, [centers, containerSize, drawOverlay]);
 
     // ── Render ──
 
