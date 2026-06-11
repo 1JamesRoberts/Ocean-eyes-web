@@ -59,12 +59,12 @@ export const AnalyticsScreen: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4 mb-2">
+      <div className="canvas-header">
         <div>
-          <h1 className="text-[28px] font-extrabold text-text-main">Analytics</h1>
-          <p className="text-[13px] text-text-muted m-1">
-            AI inference history &amp; trends
-          </p>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>
+            AI Insights
+          </span>
+          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Analytics</h1>
         </div>
         <div className="flex items-center gap-3">
           <Calendar size={16} className="text-text-muted" />

@@ -20,7 +20,7 @@ export const SettingsScreen: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div className="canvas-header" style={{ marginBottom: '24px' }}>
+      <div className="canvas-header">
         <div>
           <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Control Panel</span>
           <h1 className="canvas-title" style={{ marginTop: '2px' }}>Tank Settings</h1>

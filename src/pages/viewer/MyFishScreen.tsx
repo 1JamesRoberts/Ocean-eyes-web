@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigation } from '../../context/NavigationContext';
 import { useTank } from '../../hooks/useTank';
 import { useFish } from '../../hooks/useFish';
 import {
@@ -154,7 +153,6 @@ const DetailChip: React.FC<{ icon: React.ReactNode; label: string; value: string
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export const MyFishScreen: React.FC = () => {
-  const { setActiveTab } = useNavigation();
   const { tankId } = useTank();
   const { fishList, addFish, removeFish, updateFishCount } = useFish(tankId);
   const [name, setName] = useState('');
@@ -230,14 +228,16 @@ export const MyFishScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center pb-3 border-b border-border-card mb-6">
-        <button className="bg-none border-none text-primary-dark text-sm font-semibold cursor-pointer font-main" onClick={() => setActiveTab('home')}>
-          ← Back
-        </button>
-        <h1 className="text-2xl font-extrabold text-text-main">Fish Inventory</h1>
+      <div className="canvas-header">
+        <div>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>
+            My Fish
+          </span>
+          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Fish Inventory</h1>
+        </div>
         <button
           aria-label={showAddForm ? 'Close' : 'Add fish'}
-          className="bg-none border-none text-primary-dark p-1.5 cursor-pointer"
+          style={{ background: 'none', border: 'none', color: 'var(--color-primary-dark)', padding: '6px', cursor: 'pointer' }}
           onClick={() => setShowAddForm(!showAddForm)}
         >
           <Plus size={24} />

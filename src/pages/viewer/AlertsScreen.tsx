@@ -17,8 +17,8 @@ export const AlertsScreen: React.FC = () => {
   // If an alert is selected, render alert details (representing alert_detail_screen.dart)
   if (selectedAlert) {
     return (
-      <div style={{ padding: '0 20px 30px 20px' }}>
-        <div className="canvas-header" style={{ marginBottom: '24px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="canvas-header">
           <button 
             style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
             onClick={() => setSelectedAlertId(null)}
@@ -92,8 +92,8 @@ export const AlertsScreen: React.FC = () => {
 
   // Alerts Log List
   return (
-    <div style={{ padding: '0 20px 30px 20px' }}>
-      <div className="canvas-header" style={{ marginBottom: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div className="canvas-header">
         <button 
           style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
           onClick={handleBack}
