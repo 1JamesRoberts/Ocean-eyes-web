@@ -39,7 +39,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
   const currentTankName = activeTank?.name || 'Select Tank';
 
   return (
-    <div className="canvas-header" style={{ position: 'relative' }}>
+    <div className="canvas-header">
       <div>
         <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>My Aquarium</span>
         {linkedTanks.length > 1 ? (

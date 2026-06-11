@@ -17,16 +17,18 @@ export const AlertsScreen: React.FC = () => {
   // If an alert is selected, render alert details (representing alert_detail_screen.dart)
   if (selectedAlert) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div className="flex flex-col gap-6">
         <div className="canvas-header">
-          <button 
+          <div>
+            <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>Alert Details</span>
+            <h1 className="canvas-title" style={{ marginTop: '2px' }}>Alert Diagnostics</h1>
+          </div>
+          <button
             style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
             onClick={() => setSelectedAlertId(null)}
           >
             ← Back
           </button>
-          <h1 className="canvas-title" style={{ fontSize: '20px' }}>Alert Diagnostics</h1>
-          <div style={{ width: '40px' }} />
         </div>
 
         <div className="card-decoration" style={{ padding: '24px', marginBottom: '20px', borderLeft: `6px solid ${selectedAlert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)'}` }}>
@@ -92,16 +94,18 @@ export const AlertsScreen: React.FC = () => {
 
   // Alerts Log List
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="flex flex-col gap-6">
       <div className="canvas-header">
-        <button 
+        <div>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>Notifications</span>
+          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Safety Alerts</h1>
+        </div>
+        <button
           style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
           onClick={handleBack}
         >
           ← Back
         </button>
-        <h1 className="canvas-title" style={{ fontSize: '24px' }}>Safety Alerts</h1>
-        <div style={{ width: '40px' }} />
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

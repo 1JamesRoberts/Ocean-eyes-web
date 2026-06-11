@@ -52,7 +52,7 @@ export const HomeScreen: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="flex flex-col gap-6">
       <TankHeader
         activeTank={activeTank}
         linkedTanks={linkedTanks}

@@ -60,16 +60,18 @@ export const HistoryDetailScreen: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="flex flex-col gap-6">
       <div className="canvas-header">
-        <button 
+        <div>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>History</span>
+          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Clarity Analytics</h1>
+        </div>
+        <button
           style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
           onClick={() => setActiveTab('home')}
         >
           ← Back
         </button>
-        <h1 className="canvas-title" style={{ fontSize: '24px' }}>Clarity Analytics</h1>
-        <div style={{ width: '40px' }} />
       </div>
 
       {/* Main Clarity Area Chart */}
