@@ -3,14 +3,12 @@ import React from 'react';
 import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import { useTank } from './hooks/useTank';
 import { useAlerts } from './hooks/useAlerts';
-import { useDataSync } from './hooks/useDataSync';
 import { ViewerApp } from './pages/ViewerApp';
 import { IoTMonitor } from './pages/IoTMonitor';
 import {
   Home,
   Video,
   Settings,
-  RefreshCw,
   Fish,
   BarChart3
 } from 'lucide-react';
@@ -20,8 +18,6 @@ const OceanEyesDashboard: React.FC = () => {
   const { activeTab, setActiveTab } = useNavigation();
   const { tankId, activeTank, tanks, linkedTanks, selectTank } = useTank();
   const { alerts } = useAlerts();
-  const { syncActive, setSyncActive, triggerManualSync, backendAvailable } = useDataSync();
-
   const activeAlertCount = alerts.filter(a => !a.resolved).length;
 
   return (
@@ -114,35 +110,6 @@ const OceanEyesDashboard: React.FC = () => {
                 })}
               </select>
             )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              className={`flex-1 py-2.5 text-xs rounded-xl flex items-center justify-center gap-1.5 border font-semibold cursor-pointer transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] ${syncActive
-                ? 'bg-[rgba(16,185,129,0.08)] border-good text-good'
-                : 'bg-surface-card border-border-card text-text-muted hover:bg-surface-hover hover:border-text-muted'
-                }`}
-              onClick={() => setSyncActive(!syncActive)}
-            >
-              <RefreshCw size={12} className={syncActive ? 'animate-float-1' : ''} />
-              <span>{syncActive ? 'Sync Active' : 'Sync Paused'}</span>
-            </button>
-
-            <button
-              className={`p-2.5 text-xs rounded-xl flex items-center justify-center border font-semibold cursor-pointer transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] bg-surface-card border-border-card text-text-main hover:bg-surface-hover hover:border-text-muted ${backendAvailable === false ? 'opacity-50' : 'opacity-100'
-                }`}
-              title="Refresh data now"
-              onClick={triggerManualSync}
-            >
-              <RefreshCw size={12} />
-            </button>
-          </div>
-
-          {backendAvailable === false && (
-            <span className="text-[11px] text-warning">
-              AI backend unavailable. Waiting for connection…
-            </span>
-          )}
         </div>
       </aside>
 

@@ -17,7 +17,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   displayFishCount,
   onViewAdvanced
 }) => {
-  const { liveState, activeFeed, startStream, stopStream } = useCameraFeed(activeTank?.id ?? null);
+  const { liveState, activeFeed, startStream } = useCameraFeed(activeTank?.id ?? null);
   const isStreaming = liveState?.is_live ?? false;
 
   return (
@@ -108,13 +108,6 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 
       {isStreaming && (
         <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
-          <button
-            className="secondary-button"
-            style={{ flex: 1, padding: '8px', fontSize: '12px', borderRadius: '8px', color: 'var(--color-critical)' }}
-            onClick={stopStream}
-          >
-            Disconnect Stream
-          </button>
           <button
             className="primary-button"
             style={{ flex: 1, padding: '8px', fontSize: '12px', borderRadius: '8px' }}

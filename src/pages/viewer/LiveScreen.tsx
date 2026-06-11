@@ -16,7 +16,6 @@ import type { CameraFeedHandle } from '../../components/live/CameraFeed';
 import { FullscreenInventory } from '../../components/live/FullscreenInventory';
 import { SnapshotGallery } from '../../components/live/SnapshotGallery';
 import { StreamAdjustments } from '../../components/live/StreamAdjustments';
-import { WaterCalibration } from '../../components/live/WaterCalibration';
 import { AIAnalysisPanel } from '../../components/live/AIAnalysisPanel';
 import { VideoDecorations } from '../../components/live/VideoDecorations';
 
@@ -28,9 +27,7 @@ export const LiveScreen: React.FC = () => {
     activeFeed,
     isWebcam,
     isStreaming,
-    startStream,
-    stopStream,
-    updateCalibration
+    startStream
   } = useCameraFeed(activeTank?.id ?? null);
   const { fishList, updateDetectedCount } = useFish();
   const { addAlert } = useAlerts();
@@ -86,13 +83,7 @@ export const LiveScreen: React.FC = () => {
   const turbidityAbortControllerRef = useRef<AbortController | null>(null);
   const [lastTurbidityResult, setLastTurbidityResult] = useState<AITurbidityResult | null>(null);
 
-  const [isCalibrating, setIsCalibrating] = useState(false);
-  const [isCalibDragging, setIsCalibDragging] = useState(false);
-  const isCalibDraggingRef = useRef(false);
-  const dragLineYRef = useRef<number | null>(null);
-  const calibRectRef = useRef<DOMRect | null>(null);
-  const rafIdRef = useRef<number | null>(null);
-  const [dragLineY, setDragLineY] = useState<number | null>(null);
+
 
   const [filters, setFilters] = useState<CameraFilters>({
     contrast: 100,
@@ -185,14 +176,6 @@ export const LiveScreen: React.FC = () => {
       if (interval) clearInterval(interval);
     };
   }, [isRecording]);
-
-  const handleStopStream = () => {
-    stopStream();
-    setIsRecording(false);
-  };
-
-  const activeFeedCalibration = activeFeed?.calibration || activeTank?.calibration;
-  const displayLineY = dragLineY !== null ? dragLineY : (activeFeedCalibration?.water_line_y ?? 120);
 
   const handleDimensions = (width: number, height: number) => {
     setImageNaturalSize({ width, height });
@@ -431,82 +414,6 @@ export const LiveScreen: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const calculateWaterLineY = useCallback((rect: DOMRect, clientY: number) => {
-    const yPixel = Math.min(rect.height, Math.max(0, clientY - rect.top));
-    return Math.round((yPixel / rect.height) * 240);
-  }, []);
-
-  const scheduleDragLineUpdate = useCallback((newY: number) => {
-    dragLineYRef.current = newY;
-    if (rafIdRef.current !== null) return;
-    rafIdRef.current = requestAnimationFrame(() => {
-      rafIdRef.current = null;
-      setDragLineY(dragLineYRef.current);
-    });
-  }, []);
-
-  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (isCalibrating) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      calibRectRef.current = rect;
-      isCalibDraggingRef.current = true;
-      setIsCalibDragging(true);
-      const newY = calculateWaterLineY(rect, e.clientY);
-      setDragLineY(newY);
-    }
-  }, [isCalibrating, calculateWaterLineY]);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (isCalibrating) {
-      if (isCalibDraggingRef.current || e.buttons === 1) {
-        const rect = calibRectRef.current ?? e.currentTarget.getBoundingClientRect();
-        const newY = calculateWaterLineY(rect, e.clientY);
-        scheduleDragLineUpdate(newY);
-      }
-    }
-  }, [isCalibrating, calculateWaterLineY, scheduleDragLineUpdate]);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (isCalibrating) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      calibRectRef.current = rect;
-      isCalibDraggingRef.current = true;
-      setIsCalibDragging(true);
-      const clientY = e.touches[0].clientY;
-      const newY = calculateWaterLineY(rect, clientY);
-      setDragLineY(newY);
-    }
-  }, [isCalibrating, calculateWaterLineY]);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (isCalibrating) {
-      if (isCalibDraggingRef.current) {
-        const rect = calibRectRef.current ?? e.currentTarget.getBoundingClientRect();
-        const clientY = e.touches[0].clientY;
-        const newY = calculateWaterLineY(rect, clientY);
-        scheduleDragLineUpdate(newY);
-      }
-    }
-  }, [isCalibrating, calculateWaterLineY, scheduleDragLineUpdate]);
-
-  const handleMouseUpOrLeave = useCallback(() => {
-    if (isCalibDraggingRef.current) {
-      isCalibDraggingRef.current = false;
-      setIsCalibDragging(false);
-      calibRectRef.current = null;
-      if (rafIdRef.current !== null) {
-        cancelAnimationFrame(rafIdRef.current);
-        rafIdRef.current = null;
-      }
-      const finalY = dragLineYRef.current;
-      dragLineYRef.current = null;
-      if (finalY !== null) {
-        updateCalibration(finalY);
-        setDragLineY(null);
-      }
-    }
-  }, [updateCalibration]);
-
   const takeSnapshot = () => {
     if (!isStreaming) return;
     setFlashActive(true);
@@ -723,18 +630,8 @@ Diagnostics:
           marginBottom: '24px',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center',
-          cursor: isCalibrating ? 'ns-resize' : 'default',
-          userSelect: 'none',
-          touchAction: isCalibrating ? 'none' : 'auto'
+          alignItems: 'center'
         }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUpOrLeave}
-        onMouseLeave={handleMouseUpOrLeave}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleMouseUpOrLeave}
       >
         {isStreaming ? (
           <>
@@ -783,9 +680,6 @@ Diagnostics:
             </div>
 
             <VideoDecorations
-              isCalibrating={isCalibrating}
-              isCalibDragging={isCalibDragging}
-              waterLineY={displayLineY}
               currentFishCount={currentFishCount}
               currentClarity={currentClarity}
             />
@@ -928,14 +822,7 @@ Diagnostics:
             onFilterChange={handleFilterChange}
           />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <WaterCalibration
-              waterLineY={displayLineY}
-              isCalibrating={isCalibrating}
-              onToggleCalibrating={() => setIsCalibrating(prev => !prev)}
-              onUpdateCalibration={updateCalibration}
-            />
-          </div>
+
         </>
       )}
 
@@ -948,13 +835,6 @@ Diagnostics:
         onDeleteRecording={deleteRecording}
       />
       
-      {isStreaming && (
-        <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px' }}>
-          <button className="secondary-button" style={{ color: 'var(--color-critical)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={handleStopStream}>
-            Close Camera Connection
-          </button>
-        </div>
-      )}
     </div>
   );
 };

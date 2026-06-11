@@ -4,6 +4,7 @@ import { Calendar, RotateCcw, Loader2, ArrowRight, Trash2 } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useReadings } from '../../hooks/useReadings';
 import { useHistory } from '../../hooks/useHistory';
+import { useFish } from '../../hooks/useFish';
 import { resolveCropUrl, clearDetectionHistory, clearTurbidityHistory } from '../../services/ai_service';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
@@ -15,8 +16,13 @@ export const AnalyticsScreen: React.FC = () => {
   const { setActiveTab } = useNavigation();
   const { tankId } = useTank();
   const { readings } = useReadings();
+  const { fishList } = useFish();
   const [selectedDate, setSelectedDate] = useState<string>(todayUTC);
   const { detectionData, turbidityData, loading, error, refetch } = useHistory(selectedDate);
+  const inventorySpeciesIds = React.useMemo(
+    () => new Set(fishList.map((f) => f.speciesId)),
+    [fishList],
+  );
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDate(e.target.value);
@@ -130,6 +136,7 @@ export const AnalyticsScreen: React.FC = () => {
               <SpatialDetectionHeatmap
                 records={detectionRecords}
                 tankId={tankId}
+                inventorySpeciesIds={inventorySpeciesIds}
               />
             </div>
 

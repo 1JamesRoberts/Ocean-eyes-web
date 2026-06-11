@@ -11,6 +11,8 @@ interface Props {
   records: AIDetectionResult[];
   /** Tank ID to resolve the active camera feed. */
   tankId?: string | null;
+  /** Set of species IDs that exist in the tank inventory (filters the dropdown). */
+  inventorySpeciesIds?: Set<string>;
 }
 
 const MAX_RENDER_WIDTH = 800;
@@ -154,7 +156,7 @@ function buildHeatmapOverlay(
 // ─── Component ─────────────────────────────────────────────────────────────
 
 export const SpatialDetectionHeatmap = React.memo<Props>(
-  ({ records, tankId }) => {
+  ({ records, tankId, inventorySpeciesIds }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
@@ -174,10 +176,13 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       return points;
     }, [records]);
 
-    // Unique species for the filter dropdown
+    // Unique species for the filter dropdown — only those in the tank inventory
     const speciesList = useMemo(
-      () => Array.from(new Set(allCenters.map((c) => c.species))).sort(),
-      [allCenters],
+      () =>
+        Array.from(new Set(allCenters.map((c) => c.species)))
+          .filter((s) => !inventorySpeciesIds || inventorySpeciesIds.has(s))
+          .sort(),
+      [allCenters, inventorySpeciesIds],
     );
 
     // Filter centers by selected species
