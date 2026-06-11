@@ -386,8 +386,8 @@ class FishAIPipeline:
         try:
             w = x2 - x1
             h = y2 - y1
-pad_w = int(w * 0.10)
-                pad_h = int(h * 0.10)
+            pad_w = int(w * 0.10)
+            pad_h = int(h * 0.10)
 
             x1_pad = max(0, x1 - pad_w)
             y1_pad = max(0, y1 - pad_h)
