@@ -1,5 +1,5 @@
-import React from 'react';
-import { Video } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Video, Maximize2 } from 'lucide-react';
 import { useCameraFeed } from '../../hooks/useCameraFeed';
 import { CameraFeed } from '../live/CameraFeed';
 import type { TankBrief } from '../../types/aquarium';
@@ -19,9 +19,24 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 }) => {
   const { liveState, activeFeed, startStream } = useCameraFeed(activeTank?.id ?? null);
   const isStreaming = liveState?.is_live ?? false;
+  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const [isHoveringVideo, setIsHoveringVideo] = useState(false);
+
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoContainerRef.current) {
+      videoContainerRef.current.requestFullscreen().catch(err => {
+        console.error(`Error entering fullscreen: ${err.message}`);
+      });
+    }
+  };
 
   return (
-    <div className="card-decoration" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+    <div
+      className="card-decoration"
+      style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', cursor: 'pointer' }}
+      onClick={onViewAdvanced}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Video size={16} style={{ color: 'var(--color-primary)' }} />
@@ -30,6 +45,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
       </div>
 
       <div
+        ref={videoContainerRef}
         className="live-camera-feed"
         style={{
           position: 'relative',
@@ -40,8 +56,12 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: 'var(--color-background)',
-          border: '1px solid var(--color-border)'
+          border: '1px solid var(--color-border)',
+          cursor: 'pointer'
         }}
+        onClick={handleVideoClick}
+        onMouseEnter={() => setIsHoveringVideo(true)}
+        onMouseLeave={() => setIsHoveringVideo(false)}
       >
         {isStreaming ? (
           <>
@@ -66,11 +86,6 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             }}>
             </div>
 
-            <div className="live-overlay-pill" style={{ left: '8px', top: '8px', padding: '3px 6px', fontSize: '9px' }}>
-              <div className="live-badge" />
-              <span>{activeFeed.name}</span>
-            </div>
-
             <div style={{
               position: 'absolute',
               bottom: '8px',
@@ -86,6 +101,30 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                 <strong style={{ color: 'var(--color-info)' }}>{displayClarity.toFixed(2)} FNU</strong>
               </div>
             </div>
+
+            {isHoveringVideo && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  background: 'rgba(15, 23, 42, 0.55)',
+                  zIndex: 20,
+                  transition: 'opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  opacity: 1,
+                  pointerEvents: 'none'
+                }}
+              >
+                <Maximize2 size={24} color="#FFF" style={{ opacity: 0.9 }} />
+                <span style={{ color: '#FFF', fontSize: '11px', fontWeight: 600, opacity: 0.9 }}>
+                  Click for fullscreen
+                </span>
+              </div>
+            )}
           </>
         ) : (
           <div style={{ textAlign: 'center', padding: '12px' }}>
@@ -98,7 +137,10 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             <button
               className="primary-button"
               style={{ padding: '6px 12px', fontSize: '12px', margin: '0 auto' }}
-              onClick={startStream}
+              onClick={(e) => {
+                e.stopPropagation();
+                startStream();
+              }}
             >
               Connect Stream
             </button>
@@ -106,17 +148,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
         )}
       </div>
 
-      {isStreaming && (
-        <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
-          <button
-            className="primary-button"
-            style={{ flex: 1, padding: '8px', fontSize: '12px', borderRadius: '8px' }}
-            onClick={onViewAdvanced}
-          >
-            Advanced Controls
-          </button>
-        </div>
-      )}
+
     </div>
   );
 };

@@ -751,15 +751,6 @@ Diagnostics:
               </div>
             )}
 
-            <div className="live-overlay-pill" style={{ left: '12px' }}>
-              <div className="live-badge" />
-              <span>{activeFeed.name} (LIVE)</span>
-            </div>
-
-            <div className="live-overlay-pill" style={{ right: isFullscreen && showFsInventory ? '332px' : '12px', transition: 'right 0.3s ease' }}>
-              <span>FPS: 30</span>
-            </div>
-
             {isRecording && (
               <div className="live-overlay-pill" style={{ left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgba(239, 68, 68, 0.85)' }}>
                 <div className="recording-dot" />
