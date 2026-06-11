@@ -74,7 +74,6 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
           alignItems: 'center'
         }}
       >
-        <div className="camera-grid" />
         
         {/* Static Water Body Representation of Tank (Simulating Camera Feed) */}
         <div style={{

@@ -96,7 +96,6 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         background: 'radial-gradient(circle at center, #1E293B 0%, #0F172A 100%)',
         marginBottom: '16px'
       }}>
-        <div className="camera-grid" />
         <div className="camera-scanline" />
 
         {/* Visual Water Body Representation of Tank */}

@@ -45,7 +45,6 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
       >
         {isStreaming ? (
           <>
-            <div className="camera-grid" />
             <CameraFeed
               tankId={activeTank?.id ?? null}
               className="w-full"

@@ -6,18 +6,12 @@ interface AIBoundingBoxesProps {
   lastPrediction: AIDetectionResult;
   containerSize: { width: number; height: number };
   imageNaturalSize: { width: number; height: number };
-  panOffset: { x: number; y: number };
-  zoomLevel: number;
-  isDragging: boolean;
 }
 
 export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
   lastPrediction,
   containerSize,
   imageNaturalSize,
-  panOffset,
-  zoomLevel,
-  isDragging
 }) => {
   const cw = containerSize.width;
   const ch = containerSize.height;
@@ -35,9 +29,8 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
       height: '100%',
       zIndex: 15,
       pointerEvents: 'none',
-      transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`,
-      transformOrigin: 'center',
-      transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+      transform: 'scale(1)',
+      transformOrigin: 'center'
     }}>
       {lastPrediction.detections.map((det, idx) => {
         const [nx1, ny1, nx2, ny2] = det.bbox_normalized;

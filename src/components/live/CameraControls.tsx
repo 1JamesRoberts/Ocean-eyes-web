@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  ZoomIn,
-  ZoomOut,
   Camera,
   Square,
   Video,
@@ -17,7 +15,6 @@ import {
 type BackendStatus = 'unknown' | 'checking' | 'online' | 'offline';
 
 interface CameraControlsProps {
-  zoomLevel: number;
   isRecording: boolean;
   isStreaming: boolean;
   isAIActive: boolean;
@@ -27,8 +24,6 @@ interface CameraControlsProps {
   hasImageSource: boolean;
   isFullscreen: boolean;
   showFsInventory: boolean;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
   onTakeSnapshot: () => void;
   onToggleRecording: () => void;
   onMeasureTurbidity: () => void;
@@ -38,7 +33,6 @@ interface CameraControlsProps {
 }
 
 export const CameraControls: React.FC<CameraControlsProps> = ({
-  zoomLevel,
   isRecording,
   isStreaming,
   isAIActive,
@@ -48,8 +42,6 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   hasImageSource,
   isFullscreen,
   showFsInventory,
-  onZoomIn,
-  onZoomOut,
   onTakeSnapshot,
   onToggleRecording,
   onMeasureTurbidity,
@@ -93,31 +85,6 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         right: isFullscreen && showFsInventory ? '332px' : '12px',
       }}
     >
-      {/* Zoom Controls */}
-      <div className="flex items-center bg-[rgba(15,23,42,0.75)] backdrop-blur-[8px] rounded-[20px] border border-[rgba(255,255,255,0.15)] py-0.5 px-2 gap-1.5 text-white text-[11px] font-semibold h-10">
-        <button
-          onClick={onZoomOut}
-          disabled={zoomLevel <= 1}
-          className={`bg-none border-none p-1 flex items-center ${
-            zoomLevel <= 1 ? 'text-[rgba(255,255,255,0.3)] cursor-not-allowed' : 'text-white cursor-pointer'
-          }`}
-          title="Zoom Out"
-        >
-          <ZoomOut size={14} />
-        </button>
-        <span className="w-8 text-center">{zoomLevel.toFixed(1)}x</span>
-        <button
-          onClick={onZoomIn}
-          disabled={zoomLevel >= 3}
-          className={`bg-none border-none p-1 flex items-center ${
-            zoomLevel >= 3 ? 'text-[rgba(255,255,255,0.3)] cursor-not-allowed' : 'text-white cursor-pointer'
-          }`}
-          title="Zoom In"
-        >
-          <ZoomIn size={14} />
-        </button>
-      </div>
-
       <button 
         className={getBtnClasses(false, false)} 
         onClick={onTakeSnapshot} 

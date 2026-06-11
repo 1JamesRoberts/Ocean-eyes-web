@@ -68,7 +68,6 @@ export const LiveScreen: React.FC = () => {
     }
   };
 
-  const [zoomLevel, setZoomLevel] = useState(1.0);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [flashActive, setFlashActive] = useState(false);
@@ -122,16 +121,6 @@ export const LiveScreen: React.FC = () => {
   }, []);
 
   const [imageNaturalSize, setImageNaturalSize] = useState({ width: 0, height: 0 });
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    if (zoomLevel === 1.0) {
-      setPanOffset({ x: 0, y: 0 });
-    }
-  }, [zoomLevel]);
 
   const [snapshots, setSnapshots] = useState<{
     id: string;
@@ -200,7 +189,6 @@ export const LiveScreen: React.FC = () => {
   const handleStopStream = () => {
     stopStream();
     setIsRecording(false);
-    setZoomLevel(1.0);
   };
 
   const activeFeedCalibration = activeFeed?.calibration || activeTank?.calibration;
@@ -465,15 +453,8 @@ export const LiveScreen: React.FC = () => {
       setIsCalibDragging(true);
       const newY = calculateWaterLineY(rect, e.clientY);
       setDragLineY(newY);
-      return;
     }
-    if (zoomLevel <= 1.0) return;
-    setIsDragging(true);
-    setDragStart({
-      x: e.clientX - panOffset.x,
-      y: e.clientY - panOffset.y
-    });
-  }, [isCalibrating, zoomLevel, panOffset, calculateWaterLineY]);
+  }, [isCalibrating, calculateWaterLineY]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isCalibrating) {
@@ -482,22 +463,8 @@ export const LiveScreen: React.FC = () => {
         const newY = calculateWaterLineY(rect, e.clientY);
         scheduleDragLineUpdate(newY);
       }
-      return;
     }
-    if (!isDragging || zoomLevel <= 1.0) return;
-
-    let newX = e.clientX - dragStart.x;
-    let newY = e.clientY - dragStart.y;
-
-    const container = e.currentTarget.getBoundingClientRect();
-    const limitX = (container.width * (zoomLevel - 1)) / 2;
-    const limitY = (container.height * (zoomLevel - 1)) / 2;
-
-    newX = Math.max(-limitX, Math.min(limitX, newX));
-    newY = Math.max(-limitY, Math.min(limitY, newY));
-
-    setPanOffset({ x: newX, y: newY });
-  }, [isCalibrating, isDragging, zoomLevel, dragStart, calculateWaterLineY, scheduleDragLineUpdate]);
+  }, [isCalibrating, calculateWaterLineY, scheduleDragLineUpdate]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     if (isCalibrating) {
@@ -508,16 +475,8 @@ export const LiveScreen: React.FC = () => {
       const clientY = e.touches[0].clientY;
       const newY = calculateWaterLineY(rect, clientY);
       setDragLineY(newY);
-      return;
     }
-    if (zoomLevel <= 1.0 || e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    setIsDragging(true);
-    setDragStart({
-      x: touch.clientX - panOffset.x,
-      y: touch.clientY - panOffset.y
-    });
-  }, [isCalibrating, zoomLevel, panOffset, calculateWaterLineY]);
+  }, [isCalibrating, calculateWaterLineY]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     if (isCalibrating) {
@@ -527,26 +486,10 @@ export const LiveScreen: React.FC = () => {
         const newY = calculateWaterLineY(rect, clientY);
         scheduleDragLineUpdate(newY);
       }
-      return;
     }
-    if (!isDragging || zoomLevel <= 1.0 || e.touches.length !== 1) return;
-    const touch = e.touches[0];
-
-    let newX = touch.clientX - dragStart.x;
-    let newY = touch.clientY - dragStart.y;
-
-    const container = e.currentTarget.getBoundingClientRect();
-    const limitX = (container.width * (zoomLevel - 1)) / 2;
-    const limitY = (container.height * (zoomLevel - 1)) / 2;
-
-    newX = Math.max(-limitX, Math.min(limitX, newX));
-    newY = Math.max(-limitY, Math.min(limitY, newY));
-
-    setPanOffset({ x: newX, y: newY });
-  }, [isCalibrating, isDragging, zoomLevel, dragStart, calculateWaterLineY, scheduleDragLineUpdate]);
+  }, [isCalibrating, calculateWaterLineY, scheduleDragLineUpdate]);
 
   const handleMouseUpOrLeave = useCallback(() => {
-    setIsDragging(false);
     if (isCalibDraggingRef.current) {
       isCalibDraggingRef.current = false;
       setIsCalibDragging(false);
@@ -631,13 +574,6 @@ export const LiveScreen: React.FC = () => {
         ctx.stroke();
       }
 
-      ctx.save();
-      ctx.translate(panOffset.x, panOffset.y);
-      ctx.translate(320, 180);
-      ctx.scale(zoomLevel, zoomLevel);
-      ctx.translate(-320, -180);
-      ctx.restore();
-
       if (isRecording) {
         ctx.fillStyle = 'rgba(239, 68, 68, 0.85)';
         ctx.beginPath();
@@ -667,7 +603,7 @@ export const LiveScreen: React.FC = () => {
 
       ctx.textAlign = 'right';
       ctx.fillStyle = '#E2E8F0';
-      ctx.fillText(`FISH: ${currentFishCount} DETECTED  |  FNU: ${currentClarity.toFixed(2)}  |  ZOOM: ${zoomLevel.toFixed(1)}x`, 620, 335);
+      ctx.fillText(`FISH: ${currentFishCount} DETECTED  |  FNU: ${currentClarity.toFixed(2)}`, 620, 335);
 
       const imgUrl = canvas.toDataURL('image/png');
       const newSnapshot = {
@@ -788,9 +724,9 @@ Diagnostics:
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          cursor: isCalibrating ? 'ns-resize' : (zoomLevel > 1.0 ? (isDragging ? 'grabbing' : 'grab') : 'default'),
+          cursor: isCalibrating ? 'ns-resize' : 'default',
           userSelect: 'none',
-          touchAction: isCalibrating || zoomLevel > 1.0 ? 'none' : 'auto'
+          touchAction: isCalibrating ? 'none' : 'auto'
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -803,15 +739,11 @@ Diagnostics:
         {isStreaming ? (
           <>
             <div className={`camera-flash-overlay ${flashActive ? 'flash-active' : ''}`} />
-            <div className="camera-grid" />
 
             <div ref={imageContainerRef} style={{
               width: '100%',
               position: 'relative',
-              overflow: 'hidden',
-              transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`,
-              transformOrigin: 'center',
-              transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              overflow: 'hidden'
             }}>
               <CameraFeed
                 ref={cameraFeedRef}
@@ -863,9 +795,6 @@ Diagnostics:
                 lastPrediction={lastPrediction}
                 containerSize={containerSize}
                 imageNaturalSize={imageNaturalSize}
-                panOffset={panOffset}
-                zoomLevel={zoomLevel}
-                isDragging={isDragging}
               />
             )}
 
@@ -945,7 +874,6 @@ Diagnostics:
             )}
 
             <CameraControls
-              zoomLevel={zoomLevel}
               isRecording={isRecording}
               isStreaming={isStreaming}
               isAIActive={isAIActive}
@@ -955,8 +883,6 @@ Diagnostics:
               hasImageSource={isWebcam || !!activeFeed.mock_image}
               isFullscreen={isFullscreen}
               showFsInventory={showFsInventory}
-              onZoomIn={() => setZoomLevel(prev => Math.min(3, prev + 0.5))}
-              onZoomOut={() => setZoomLevel(prev => Math.max(1, prev - 0.5))}
               onTakeSnapshot={takeSnapshot}
               onToggleRecording={toggleRecording}
               onMeasureTurbidity={measureTurbidity}
