@@ -365,8 +365,8 @@ class FishAIPipeline:
         """Choose a random detection whose padded crop is large enough for diagnosis. Returns -1 if none viable."""
         viable = []
         for i, (x1, y1, x2, y2, _) in enumerate(detections_raw):
-            pad_w = int((x2 - x1) * 0.15)
-            pad_h = int((y2 - y1) * 0.15)
+            pad_w = int((x2 - x1) * 0.10)
+            pad_h = int((y2 - y1) * 0.10)
             pw = min(img_w, x2 + pad_w) - max(0, x1 - pad_w)
             ph = min(img_h, y2 + pad_h) - max(0, y1 - pad_h)
             if pw >= 32 and ph >= 32:
@@ -386,8 +386,8 @@ class FishAIPipeline:
         try:
             w = x2 - x1
             h = y2 - y1
-            pad_w = int(w * 0.15)
-            pad_h = int(h * 0.15)
+pad_w = int(w * 0.10)
+                pad_h = int(h * 0.10)
 
             x1_pad = max(0, x1 - pad_w)
             y1_pad = max(0, y1 - pad_h)
