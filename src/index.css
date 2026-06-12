@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
+@custom-variant max-xs (@media (max-width: 600px));
+
 :root {
   /* OceanEyes Color Tokens from AppTheme.dart */
   --color-background: #F0F7FA;

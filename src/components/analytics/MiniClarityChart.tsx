@@ -4,15 +4,17 @@ import type { ReadingItem } from '../../types/aquarium';
 
 interface Props {
   readings: ReadingItem[];
+  height?: number;
 }
 
-const HEIGHT = 140;
+const DEFAULT_HEIGHT = 140;
 const PADDING = 20;
 const MAX_VAL = 10;
 const MIN_VAL = 0;
 const DEFAULT_WIDTH = 600;
 
-export const MiniClarityChart: React.FC<Props> = ({ readings }) => {
+export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_HEIGHT }) => {
+  const HEIGHT = height;
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState<number>(DEFAULT_WIDTH);
 
@@ -38,7 +40,7 @@ export const MiniClarityChart: React.FC<Props> = ({ readings }) => {
       const y = HEIGHT - PADDING - ((r.clarity - MIN_VAL) * (HEIGHT - 2 * PADDING) / (MAX_VAL - MIN_VAL));
       return { x, y, clarity: r.clarity };
     });
-  }, [readings, width]);
+  }, [readings, width, HEIGHT]);
 
   if (points.length === 0) return null;
 

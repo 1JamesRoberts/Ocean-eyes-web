@@ -132,14 +132,14 @@ export const SettingsScreen: React.FC = () => {
         <div className="mb-4">
           <div className="flex justify-between text-[13px] mb-1.5">
             <span className="text-[var(--color-text-secondary)]">Maximum FNU Threshold</span>
-            <strong className="text-[var(--color-primary)]">{activeTank?.thresholds.clarity_min || 6.0} FNU</strong>
+            <strong className="text-[var(--color-primary)]">{activeTank?.thresholds.max_turbidity_fnu || 6.0} FNU</strong>
           </div>
           <input
             type="range"
             min="1.0"
             max="10.0"
             step="0.5"
-            value={activeTank?.thresholds.clarity_min || 6.0}
+            value={activeTank?.thresholds.max_turbidity_fnu || 6.0}
             onChange={(e) => {
               const val = parseFloat(e.target.value);
               const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
@@ -173,17 +173,17 @@ export const SettingsScreen: React.FC = () => {
             value={activeTank?.thresholds.fish_change_pct || 50.0}
             onChange={(e) => {
               const val = parseInt(e.target.value);
-              const clar = activeTank?.thresholds.clarity_min || 6.0;
+              const clar = activeTank?.thresholds.max_turbidity_fnu || 6.0;
               debouncedUpdateThresholds(clar, val);
             }}
             onMouseUp={(e) => {
               const val = parseInt((e.target as HTMLInputElement).value);
-              const clar = activeTank?.thresholds.clarity_min || 6.0;
+              const clar = activeTank?.thresholds.max_turbidity_fnu || 6.0;
               flushThresholds(clar, val);
             }}
             onTouchEnd={(e) => {
               const val = parseInt((e.target as HTMLInputElement).value);
-              const clar = activeTank?.thresholds.clarity_min || 6.0;
+              const clar = activeTank?.thresholds.max_turbidity_fnu || 6.0;
               flushThresholds(clar, val);
             }}
             className="w-full"

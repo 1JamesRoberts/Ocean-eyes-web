@@ -2,46 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, Check } from 'lucide-react';
 import { SPECIES_CATALOG, searchSpecies, getSpeciesByName, type SpeciesInfo } from '../data/speciesCatalog';
-
-const SpeciesThumbnail: React.FC<{ species: SpeciesInfo }> = ({ species }) => {
-  const [hasError, setHasError] = useState(false);
-  if (hasError) {
-    return (
-      <div
-        style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '6px',
-          backgroundColor: species.color,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '11px',
-          fontWeight: 700,
-          color: '#fff',
-          flexShrink: 0,
-          textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-        }}
-      >
-        {species.initials}
-      </div>
-    );
-  }
-  return (
-    <img
-      src={species.imagePath}
-      alt={species.initials}
-      style={{
-        width: '32px',
-        height: '32px',
-        borderRadius: '6px',
-        objectFit: 'contain',
-        flexShrink: 0
-      }}
-      onError={() => setHasError(true)}
-    />
-  );
-};
+import { SpeciesAvatar } from './fish/SpeciesAvatar';
 
 /** Small coloured badge showing the creature type (shrimp/snail/crab) */
 const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
@@ -227,7 +188,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                   }
                 }}
               >
-                <SpeciesThumbnail species={species} />
+                <SpeciesAvatar speciesId={species.id} />
                 <span style={{ flex: 1 }}>{species.displayName}</span>
                 {species.creatureType && species.creatureType !== 'fish' && (
                   <CreatureBadge type={species.creatureType} />

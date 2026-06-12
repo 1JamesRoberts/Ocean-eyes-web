@@ -22,6 +22,8 @@ interface SnapshotGalleryProps {
   onDeleteRecording: (id: string) => void;
 }
 
+import { formatDuration } from '../../utils/formatters';
+
 export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
   snapshots,
   recordings,
@@ -30,12 +32,6 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
   onDownloadRecording,
   onDeleteRecording
 }) => {
-  const formatDuration = (totalSeconds: number) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
       <div className="flex flex-col gap-3">

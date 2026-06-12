@@ -19,8 +19,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   onViewAdvanced,
   onGoFullscreen
 }) => {
-  const { liveState, activeFeed: _activeFeed, startStream } = useCameraFeed(activeTank?.id ?? null);
-  const isStreaming = liveState?.is_live ?? false;
+  const { activeFeed, isWebcam, isStreaming, videoRef, startStream } = useCameraFeed(activeTank?.id ?? null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [isHoveringVideo, setIsHoveringVideo] = useState(false);
 
@@ -66,7 +65,10 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
         {isStreaming ? (
           <>
             <CameraFeed
-              tankId={activeTank?.id ?? null}
+              feed={activeFeed}
+              isStreaming={isStreaming}
+              isWebcam={isWebcam}
+              videoRef={videoRef}
               className="w-full"
               idlePlaceholder={
                 <div className="flex flex-col items-center justify-center gap-2 py-8">

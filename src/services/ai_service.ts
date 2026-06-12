@@ -177,16 +177,6 @@ export async function sendFrameForTurbidity(blob: Blob, signal?: AbortSignal): P
 }
 
 /**
- * Get the list of supported species from the backend.
- */
-export async function getSpeciesList(): Promise<{ id: string; display: string }[]> {
-  const res = await fetch(`${AI_API_URL}/species`);
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.species || [];
-}
-
-/**
  * Fetch detection history for a given date from the backend.
  */
 export function fetchDetectionHistory(

@@ -78,12 +78,12 @@ export const AnalyticsScreen: React.FC = () => {
           <Calendar size={16} className="text-text-muted" />
           <input
             type="date"
-            className="py-2 px-3 rounded-xl border border-border-card bg-surface-card text-text-main text-sm font-inherit outline-none focus:border-info"
+            className="py-2 px-3 rounded-xl border border-border-card bg-surface-card text-text-main text-sm outline-none focus:border-info"
             value={selectedDate}
             onChange={handleDateChange}
           />
           <button
-            className="py-1.5 px-3 rounded-lg border border-border-card bg-transparent text-text-muted text-xs font-semibold cursor-pointer font-inherit hover:bg-black/5 dark:hover:bg-white/5"
+            className="py-1.5 px-3 rounded-lg border border-border-card bg-transparent text-text-muted text-xs font-semibold cursor-pointer hover:bg-black/5"
             onClick={refetch}
             disabled={loading}
             title="Refresh data"
@@ -97,7 +97,7 @@ export const AnalyticsScreen: React.FC = () => {
       {error && (
         <div className="py-3 px-4 rounded-xl bg-critical/10 border border-critical text-critical text-[13px] flex items-center justify-between gap-3">
           <span>{error}</span>
-          <button className="py-1.5 px-3 rounded-lg border border-critical bg-transparent text-critical text-xs font-semibold cursor-pointer font-inherit hover:bg-critical/12" onClick={refetch}>
+            <button className="py-1.5 px-3 rounded-lg border border-critical bg-transparent text-critical text-xs font-semibold cursor-pointer hover:bg-critical/12" onClick={refetch}>
             Retry
           </button>
         </div>
@@ -174,7 +174,7 @@ export const AnalyticsScreen: React.FC = () => {
               readings={readings}
               emptyAction={
                 <button
-                  className="py-1.5 px-3.5 rounded-lg border border-primary-dark bg-primary-light-gradient text-primary-dark text-xs font-semibold cursor-pointer font-inherit hover:bg-primary-dark hover:text-white"
+                  className="py-1.5 px-3.5 rounded-lg border border-primary-dark bg-primary-light-gradient text-primary-dark text-xs font-semibold cursor-pointer hover:bg-primary-dark hover:text-white"
                   onClick={(e) => { e.stopPropagation(); setActiveTab('history'); }}
                 >
                   View Clarity Analytics →
@@ -194,7 +194,7 @@ export const AnalyticsScreen: React.FC = () => {
               </div>
               {diagnoses.length > 0 && !confirmClear && (
                 <button
-                  className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg border border-critical bg-transparent text-critical text-xs font-semibold cursor-pointer font-inherit whitespace-nowrap shrink-0 hover:bg-critical/10"
+                    className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg border border-critical bg-transparent text-critical text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 hover:bg-critical/10"
                   onClick={() => setConfirmClear(true)}
                   title="Clear all diagnostics for this date"
                 >
@@ -206,14 +206,14 @@ export const AnalyticsScreen: React.FC = () => {
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs text-text-muted whitespace-nowrap">Delete all records for this date?</span>
                   <button
-                    className="py-1 px-2.5 rounded border border-critical bg-critical text-white text-[11px] font-bold cursor-pointer font-inherit whitespace-nowrap hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="py-1 px-2.5 rounded border border-critical bg-critical text-white text-[11px] font-bold cursor-pointer whitespace-nowrap hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleClearHistory}
                     disabled={clearing}
                   >
                     {clearing ? 'Deleting…' : 'Yes, clear'}
                   </button>
                   <button
-                    className="py-1 px-2.5 rounded border border-border-card bg-transparent text-text-muted text-[11px] font-semibold cursor-pointer font-inherit whitespace-nowrap hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="py-1 px-2.5 rounded border border-border-card bg-transparent text-text-muted text-[11px] font-semibold cursor-pointer whitespace-nowrap hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => setConfirmClear(false)}
                     disabled={clearing}
                   >

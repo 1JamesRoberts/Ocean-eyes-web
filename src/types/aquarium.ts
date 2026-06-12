@@ -1,14 +1,5 @@
 // src/types/aquarium.ts - Shared interface types for OceanEyes
 
-export interface SpeciesCount {
-  name: string;
-  emoji: string;
-  color: string;
-  count: number;
-  expectedCount: number;
-  weeklyHistory: number[];
-}
-
 export interface FishEntry {
   id: string;
   speciesId: string;
@@ -91,7 +82,7 @@ export interface ReadingItem {
   nitrite: number;
 }
 
-export interface CameraFeed {
+export interface CameraFeedConfig {
   id: string;
   name: string;
   stream_url: string;
@@ -113,7 +104,7 @@ export interface LiveState {
   current_clarity: number;
   current_fish_count: number;
   selected_feed_id: string;
-  feeds: CameraFeed[];
+  feeds: CameraFeedConfig[];
 }
 
 export interface TankBrief {
@@ -122,7 +113,7 @@ export interface TankBrief {
   owner_id: string;
   created_at: string;
   thresholds: {
-    clarity_min: number;
+    max_turbidity_fnu: number;
     fish_change_pct: number;
   };
   calibration?: {
@@ -227,9 +218,4 @@ export interface HistoryTurbidityResponse {
   date: string;
   count: number;
   records: AITurbidityResult[];
-}
-
-export interface HistoryDatesResponse {
-  detections: string[];
-  turbidity: string[];
 }

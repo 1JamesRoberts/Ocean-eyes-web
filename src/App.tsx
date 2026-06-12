@@ -117,12 +117,7 @@ const OceanEyesDashboard: React.FC = () => {
       {/* ─── Main Content Canvas ─── */}
       <main className="flex-1 flex justify-center overflow-y-auto">
         <div className="flex-1 flex flex-col gap-6 overflow-y-auto max-w-[1400px] w-full mx-auto p-10">
-          {/* Under onboarding check */}
-          {tankId === null && activeTab !== 'monitor' && activeTab !== 'live' ? (
-            <div className="bg-surface-card rounded-[20px] p-10 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] max-w-[480px] mx-auto mt-10">
-              <ViewerApp />
-            </div>
-          ) : activeTab === 'monitor' ? (
+          {activeTab === 'monitor' ? (
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center pb-3 border-b border-border-card max-xs:flex-col max-xs:items-start max-xs:gap-3">
                 <div>

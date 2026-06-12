@@ -23,12 +23,11 @@ OceanEyes is a React + TypeScript dashboard for real-time AI aquarium monitoring
 ```
 src/
 ├── context/          # React Context providers (NavigationContext)
-├── hooks/            # Custom hooks (useTank, useFish, useAlerts, useReadings, useLiveState, useDataSync, useHistory)
+├── hooks/            # Custom hooks (useTank, useFish, useAlerts, useReadings, useLiveState, useHistory)
 ├── services/         # Business logic & API
 │   ├── mock_service.ts      # localStorage-backed Firestore simulation
 │   ├── realDataService.ts   # Fetches real AI inference records from backend
 │   ├── ai_service.ts        # FastAPI backend communication
-│   ├── alertEngine.ts       # Pure alert generation logic
 │   ├── healthCalculator.ts  # Pure health score calculation
 │   └── chemistrySimulator.ts # Placeholder water chemistry values
 ├── components/       # UI components by feature (home/, live/, analytics/, fish/)
@@ -61,7 +60,6 @@ Tailwind CSS v4 is the default and preferred styling system for all UI work. Use
 
 - Functional components with hooks only (no class components).
 - Hooks in `src/hooks/` follow the pattern: state init from `MockFirestore`, `useEffect` with `subscribeToDb` for sync, return state + actions.
-- `useRef` for stable references in callbacks (see `useDataSync.ts` pattern).
 - `// eslint-disable-next-line react-hooks/set-state-in-effect` and `react-hooks/exhaustive-deps` are commonly used in hooks — accept these where justified.
 
 ### Styling
@@ -71,7 +69,7 @@ See the dedicated [Styling with Tailwind CSS v4](#styling-with-tailwind-css-v4) 
 ### Data Flow
 
 - **Mock mode** (default): `MockFirestore` class reads/writes localStorage. Hooks subscribe via `subscribeToDb()` for cross-component sync.
-- **Real mode**: `realDataService.ts` fetches from AI backend (`localhost:8000`). `useDataSync` orchestrates polling.
+- **Real mode**: `realDataService.ts` fetches from AI backend (`localhost:8000`).
 - AI backend endpoints: `/health`, `/predict/detection`, `/predict/turbidity`, `/history/detections`, `/history/turbidity`.
 - Backend proxy: Vite dev server proxies `/history` to `localhost:8000`.
 
@@ -99,5 +97,4 @@ See [ai/api_server.py](./ai/api_server.py) for API docs. Models:
 
 ## Common Pitfalls
 
-- **LocalStorage schema**: Version is tracked via `oceaneyes_data_version`. Bump `DATA_VERSION` in `useDataSync.ts` to force migration.
 - **Species catalog regeneration** requires network access to selectyourfish.com.

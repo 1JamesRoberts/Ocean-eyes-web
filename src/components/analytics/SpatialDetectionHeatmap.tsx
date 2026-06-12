@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
+import { useCameraFeed } from '../../hooks/useCameraFeed';
 import { CameraFeed } from '../live/CameraFeed';
 import { ChartEmptyState } from './ChartEmptyState';
 
@@ -157,6 +158,7 @@ function buildHeatmapOverlay(
 
 export const SpatialDetectionHeatmap = React.memo<Props>(
   ({ records, tankId, inventorySpeciesIds }) => {
+    const { activeFeed, isWebcam, isStreaming, videoRef } = useCameraFeed(tankId ?? null);
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
@@ -265,7 +267,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
             <h3 className="text-sm font-bold text-text-main m-0">Detection Density Heatmap</h3>
           </div>
           <select
-            className="py-1.5 px-2.5 rounded-lg border border-border-card bg-surface-card text-text-main text-[13px] font-inherit cursor-pointer outline-none focus:border-info"
+            className="py-1.5 px-2.5 rounded-lg border border-border-card bg-surface-card text-text-main text-[13px] cursor-pointer outline-none focus:border-info"
             value={selectedSpecies}
             onChange={(e) => setSelectedSpecies(e.target.value)}
           >
@@ -280,7 +282,10 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
 
         <div ref={containerRef} className="relative w-full rounded-xl overflow-hidden bg-camera-bg">
           <CameraFeed
-            tankId={tankId}
+            feed={activeFeed}
+            isStreaming={isStreaming}
+            isWebcam={isWebcam}
+            videoRef={videoRef}
             className="w-full"
           />
           <canvas

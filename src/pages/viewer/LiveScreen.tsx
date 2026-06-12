@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useTank } from '../../hooks/useTank';
@@ -9,6 +8,7 @@ import { useReadings } from '../../hooks/useReadings';
 import type { CameraFilters, AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
 
 import { Video } from 'lucide-react';
+import { formatDuration } from '../../utils/formatters';
 import { isBackendAvailable, captureFrame, captureFrameFromUrl, sendFrameForDetection, sendFrameForTurbidity } from '../../services/ai_service';
 import { AIBoundingBoxes } from '../../components/live/AIBoundingBoxes';
 import { CameraControls } from '../../components/live/CameraControls';
@@ -29,6 +29,7 @@ export const LiveScreen: React.FC = () => {
     activeFeed,
     isWebcam,
     isStreaming,
+    videoRef,
     startStream
   } = useCameraFeed(activeTank?.id ?? null);
   const { fishList, updateDetectedCount } = useFish();
@@ -426,12 +427,6 @@ export const LiveScreen: React.FC = () => {
   const currentClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
   const currentFishCount = isStreaming && liveState?.is_live ? activeFeed.current_fish_count : 0;
 
-  const formatDuration = (totalSeconds: number) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const takeSnapshot = () => {
     if (!isStreaming) return;
     setFlashActive(true);
@@ -449,16 +444,9 @@ export const LiveScreen: React.FC = () => {
         ctx.drawImage(bgImg, 0, 0, 640, 360);
       } else {
         const grad = ctx.createLinearGradient(0, 0, 0, 360);
-        const isDark = document.body.classList.contains('dark');
-        if (isDark) {
-          grad.addColorStop(0, '#050827');
-          grad.addColorStop(0.5, '#004f95');
-          grad.addColorStop(1, '#0074d9');
-        } else {
-          grad.addColorStop(0, '#0F766E');
-          grad.addColorStop(0.5, '#115E59');
-          grad.addColorStop(1, '#134E4A');
-        }
+        grad.addColorStop(0, '#0F766E');
+        grad.addColorStop(0.5, '#115E59');
+        grad.addColorStop(1, '#134E4A');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 640, 360);
       }
@@ -616,7 +604,10 @@ Diagnostics:
             }}>
               <CameraFeed
                 ref={cameraFeedRef}
-                tankId={activeTank?.id ?? null}
+                feed={activeFeed}
+                isStreaming={isStreaming}
+                isWebcam={isWebcam}
+                videoRef={videoRef}
                 filters={filters}
                 onDimensions={handleDimensions}
               >

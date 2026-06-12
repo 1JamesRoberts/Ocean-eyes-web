@@ -49,7 +49,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         addAlert({
           id: `alert-c-${Date.now()}`,
           title: 'Water clarity dropped',
-          message: `Water turbidity rose to ${displayClarity} FNU (Threshold: ${activeTank.thresholds.clarity_min}). Check filter unit.`,
+          message: `Water turbidity rose to ${displayClarity} FNU (Threshold: ${activeTank.thresholds.max_turbidity_fnu}). Check filter unit.`,
           tip: 'A sudden clarity drop indicates a clogged filter sponge or disturbed substrate. Wash the filter media or perform a 20% water change.',
           severity: 'warning',
           timeAgo: 'Just now',

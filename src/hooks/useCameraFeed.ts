@@ -1,21 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLiveState } from './useLiveState';
-import type { CameraFeed as CameraFeedType, LiveState } from '../types/aquarium';
+import type { CameraFeedConfig, LiveState } from '../types/aquarium';
 
 export interface UseCameraFeedResult {
   liveState: LiveState | null;
-  activeFeed: CameraFeedType;
+  activeFeed: CameraFeedConfig;
   isWebcam: boolean;
   isStreaming: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   webcamStream: MediaStream | null;
   saveLiveState: (state: LiveState) => void;
   startStream: () => void;
-  stopStream: () => void;
   updateCalibration: (waterLineY: number) => void;
 }
 
-const DEFAULT_FEED: CameraFeedType = {
+const DEFAULT_FEED: CameraFeedConfig = {
   id: 'feed-main',
   name: 'Main View',
   stream_url: 'rtsp://oceaneyes.iot/live-stream-09',
@@ -89,27 +88,6 @@ export const useCameraFeed = (tankId: string | null): UseCameraFeedResult => {
     });
   }, [liveState, saveLiveState]);
 
-  const stopStream = useCallback(() => {
-    if (!liveState) return;
-    const feed = liveState.feeds[0];
-    if (!feed) return;
-    const updatedFeed = {
-      ...feed,
-      is_live: false,
-      started_at: null
-    };
-    saveLiveState({
-      ...liveState,
-      is_live: false,
-      stream_url: '',
-      started_at: null,
-      last_ping_at: null,
-      current_clarity: 0,
-      current_fish_count: 0,
-      feeds: [updatedFeed]
-    });
-  }, [liveState, saveLiveState]);
-
   return {
     liveState,
     activeFeed,
@@ -119,7 +97,6 @@ export const useCameraFeed = (tankId: string | null): UseCameraFeedResult => {
     webcamStream,
     saveLiveState,
     startStream,
-    stopStream,
     updateCalibration
   };
 };

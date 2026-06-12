@@ -27,3 +27,12 @@ export function todayUTC(): string {
     .toISOString()
     .split('T')[0];
 }
+
+/**
+ * Format a duration in seconds as MM:SS.
+ */
+export function formatDuration(totalSeconds: number): string {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}

@@ -33,7 +33,29 @@ const getOrDefault = <T>(key: string, defaultValue: T): T => {
 export class LocalStorageStore {
   // Local storage lists
   static getTanks = (): TankBrief[] => {
-    return getOrDefault<TankBrief[]>('tanks', []);
+    const tanks = getOrDefault<TankBrief[]>('tanks', []);
+    // Schema migration: rename legacy clarity_min threshold to max_turbidity_fnu
+    let needsSave = false;
+    const migrated = tanks.map((tank) => {
+      const legacy = (tank.thresholds as Record<string, unknown>)?.clarity_min;
+      if (legacy !== undefined) {
+        needsSave = true;
+        const rest = { ...(tank.thresholds as Record<string, unknown>) };
+        delete rest.clarity_min;
+        return {
+          ...tank,
+          thresholds: {
+            ...rest,
+            max_turbidity_fnu: legacy,
+          },
+        } as TankBrief;
+      }
+      return tank;
+    });
+    if (needsSave) {
+      this.saveTanks(migrated);
+    }
+    return migrated;
   };
   static saveTanks = (tanks: TankBrief[]) => {
     localStorage.setItem('tanks', JSON.stringify(tanks));
@@ -139,7 +161,7 @@ export class LocalStorageStore {
       name,
       owner_id: 'anon-user-123',
       created_at: new Date().toISOString(),
-      thresholds: { clarity_min: 5.0, fish_change_pct: 50.0 },
+      thresholds: { max_turbidity_fnu: 5.0, fish_change_pct: 50.0 },
       calibration: { water_line_y: 120 }
     };
     tanks.push(newTank);
@@ -219,12 +241,12 @@ export class LocalStorageStore {
     }
   }
 
-  static updateThresholds(tankId: string, clarityMin: number, fishPct: number) {
+  static updateThresholds(tankId: string, maxTurbidityFnu: number, fishPct: number) {
     const tanks = this.getTanks();
     const index = tanks.findIndex(t => t.id === tankId);
     if (index !== -1) {
       tanks[index].thresholds = {
-        clarity_min: clarityMin,
+        max_turbidity_fnu: maxTurbidityFnu,
         fish_change_pct: fishPct
       };
       this.saveTanks(tanks);
@@ -290,7 +312,11 @@ export class LocalStorageStore {
 
   // ─── Fish Operations ─────────────────────────────────────────────────────────
 
-  static addFish(_tankId: string, name: string, imageUrl: string, count: number) {
+  /**
+   * Add fish to the global inventory.
+   * @param _unusedTankId Per-tank fish ownership is not implemented; this parameter is ignored.
+   */
+  static addFish(_unusedTankId: string, name: string, imageUrl: string, count: number) {
     const fish = this.getFish();
     const speciesId = name.toLowerCase().replace(/\s+/g, '_');
 

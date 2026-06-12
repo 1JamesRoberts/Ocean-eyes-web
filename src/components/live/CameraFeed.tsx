@@ -1,14 +1,16 @@
 import React, { useImperativeHandle, forwardRef } from 'react';
 import { Video } from 'lucide-react';
-import { useCameraFeed } from '../../hooks/useCameraFeed';
-import type { CameraFilters } from '../../types/aquarium';
+import type { CameraFilters, CameraFeedConfig } from '../../types/aquarium';
 
 export interface CameraFeedHandle {
   videoElement: HTMLVideoElement | null;
 }
 
 interface CameraFeedProps {
-  tankId?: string | null;
+  feed: CameraFeedConfig;
+  isStreaming: boolean;
+  isWebcam: boolean;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
   filters?: CameraFilters;
   onDimensions?: (width: number, height: number) => void;
   children?: React.ReactNode;
@@ -18,9 +20,7 @@ interface CameraFeedProps {
 }
 
 export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
-  ({ tankId, filters, onDimensions, children, className = '', style, idlePlaceholder }, forwardedRef) => {
-    const { activeFeed, isWebcam, isStreaming, videoRef } = useCameraFeed(tankId ?? null);
-
+  ({ feed, isStreaming, isWebcam, videoRef, filters, onDimensions, children, className = '', style, idlePlaceholder }, forwardedRef) => {
     useImperativeHandle(forwardedRef, () => ({
       videoElement: videoRef.current,
     }));
@@ -60,7 +60,7 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
             />
           ) : (
             <img
-              src={activeFeed.mock_image || ''}
+              src={feed.mock_image || ''}
               alt="Live feed"
               onLoad={handleImageLoaded}
               className="w-full h-auto block"
