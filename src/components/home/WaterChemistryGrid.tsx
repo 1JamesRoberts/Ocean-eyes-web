@@ -43,14 +43,14 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
   ];
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
       {parameters.map(param => (
-        <div key={param.label} className="flex items-center gap-3 bg-surface-card p-4 rounded-2xl border border-[rgba(13,148,136,0.02)] shadow-card">
+        <div key={param.label} className="flex items-center gap-2.5 bg-surface-card p-3 rounded-2xl border border-[rgba(13,148,136,0.02)] shadow-card">
           <div
-            className="w-10 h-10 rounded-xl flex justify-center items-center shrink-0"
+            className="w-9 h-9 rounded-xl flex justify-center items-center shrink-0"
             style={{ backgroundColor: param.bgColor, color: param.color }}
           >
-            <param.icon size={18} />
+            <param.icon size={16} />
           </div>
           <div>
             <span className="text-[11px] text-text-muted block font-semibold">{param.label}</span>
