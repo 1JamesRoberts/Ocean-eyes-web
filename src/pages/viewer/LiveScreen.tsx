@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigation } from '../../context/NavigationContext';
 import { useTank } from '../../hooks/useTank';
 import { useCameraFeed } from '../../hooks/useCameraFeed';
 import { useFish } from '../../hooks/useFish';
@@ -20,6 +21,7 @@ import { AIAnalysisPanel } from '../../components/live/AIAnalysisPanel';
 import { VideoDecorations } from '../../components/live/VideoDecorations';
 
 export const LiveScreen: React.FC = () => {
+  const { autoFullscreen, setAutoFullscreen, setActiveTab } = useNavigation();
   const { activeTank } = useTank();
   const {
     liveState,
@@ -39,6 +41,7 @@ export const LiveScreen: React.FC = () => {
   const [showFsInventory, setShowFsInventory] = useState(false);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement | null>(null);
+  const enteredViaAutoFullscreenRef = useRef(false);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -46,17 +49,32 @@ export const LiveScreen: React.FC = () => {
       setIsFullscreen(isFs);
       if (!isFs) {
         setShowFsInventory(false);
+        if (enteredViaAutoFullscreenRef.current) {
+          enteredViaAutoFullscreenRef.current = false;
+          setActiveTab('home');
+        }
       }
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
-  }, []);
+  }, [setActiveTab]);
+
+  useEffect(() => {
+    if (autoFullscreen && viewportRef.current) {
+      enteredViaAutoFullscreenRef.current = true;
+      viewportRef.current.requestFullscreen().catch(err => {
+        console.error(`Error entering fullscreen: ${err.message}`);
+      });
+      setAutoFullscreen(false);
+    }
+  }, [autoFullscreen, setAutoFullscreen]);
 
   const toggleFullscreen = () => {
     if (!viewportRef.current) return;
     if (!document.fullscreenElement) {
+      enteredViaAutoFullscreenRef.current = false;
       viewportRef.current.requestFullscreen().catch(err => {
         console.error(`Error entering fullscreen: ${err.message}`);
       });

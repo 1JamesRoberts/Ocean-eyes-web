@@ -11,6 +11,8 @@ interface NavigationContextType {
   setActiveTab: (tab: ViewerTab) => void;
   selectedAlertId: string | null;
   setSelectedAlertId: (id: string | null) => void;
+  autoFullscreen: boolean;
+  setAutoFullscreen: (value: boolean) => void;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
@@ -19,6 +21,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [activeMode, setActiveMode] = useState<AppMode>('both');
   const [activeTab, setActiveTab] = useState<ViewerTab>('home');
   const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
+  const [autoFullscreen, setAutoFullscreen] = useState<boolean>(false);
 
   return (
     <NavigationContext.Provider
@@ -29,6 +32,8 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setActiveTab,
         selectedAlertId,
         setSelectedAlertId,
+        autoFullscreen,
+        setAutoFullscreen,
       }}
     >
       {children}

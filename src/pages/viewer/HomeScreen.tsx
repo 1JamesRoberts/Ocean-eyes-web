@@ -16,7 +16,7 @@ import { ActiveAlertsList } from '../../components/home/ActiveAlertsList';
 import { AddTankModal } from '../../components/home/AddTankModal';
 
 export const HomeScreen: React.FC = () => {
-  const { setActiveTab, setSelectedAlertId } = useNavigation();
+  const { setActiveTab, setSelectedAlertId, setAutoFullscreen } = useNavigation();
   const { activeTank, tanks, linkedTanks, tankId, selectTank, createAndLinkTank, linkTank } = useTank();
   const { readings } = useReadings();
   const { fishList } = useFish();
@@ -41,6 +41,11 @@ export const HomeScreen: React.FC = () => {
   const handleSelectAlert = (alertId: string) => {
     setSelectedAlertId(alertId);
     setActiveTab('alerts');
+  };
+
+  const handleGoLiveFullscreen = () => {
+    setAutoFullscreen(true);
+    setActiveTab('live');
   };
 
   const handleCreateTank = async (name: string, cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }) => {
@@ -92,6 +97,7 @@ export const HomeScreen: React.FC = () => {
                 displayClarity={displayClarity}
                 displayFishCount={displayFishCount}
                 onViewAdvanced={() => setActiveTab('live')}
+                onGoFullscreen={handleGoLiveFullscreen}
               />
 
               <FishInventorySummary

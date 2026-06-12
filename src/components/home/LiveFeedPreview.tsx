@@ -9,13 +9,15 @@ interface LiveFeedPreviewProps {
   displayClarity: number;
   displayFishCount: number;
   onViewAdvanced: () => void;
+  onGoFullscreen?: () => void;
 }
 
 export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   activeTank,
   displayClarity,
   displayFishCount,
-  onViewAdvanced
+  onViewAdvanced,
+  onGoFullscreen
 }) => {
   const { liveState, activeFeed, startStream } = useCameraFeed(activeTank?.id ?? null);
   const isStreaming = liveState?.is_live ?? false;
@@ -24,10 +26,8 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (videoContainerRef.current) {
-      videoContainerRef.current.requestFullscreen().catch(err => {
-        console.error(`Error entering fullscreen: ${err.message}`);
-      });
+    if (onGoFullscreen) {
+      onGoFullscreen();
     }
   };
 
