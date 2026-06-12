@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "maintainability-reviewer": {
+      "source": "udecode/plate",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/maintainability-reviewer/SKILL.md",
+      "computedHash": "d47361ac47860976d0dced93ff17e959602cfd01dbb83f399f05d121031e4b38"
+    }
+  }
+}

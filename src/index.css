@@ -74,6 +74,7 @@
   --animate-recording-blink: recording-blink 1s infinite alternate;
   --animate-fade-in: fadeIn 0.2s ease-out;
   --animate-slide-up: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  --animate-slide-down: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
 }
 
 @layer base {
@@ -451,5 +452,17 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -6,16 +6,6 @@ OceanEyes is a React + TypeScript dashboard for real-time AI aquarium monitoring
 
 > 📄 See [README.md](./README.md) for full feature list and setup instructions.
 
-## Quick Start
-
-```bash
-npm install        # Install dependencies
-npm run dev        # Start Vite dev server (localhost:5173)
-npm run build      # TypeScript check + production build
-npm run lint       # ESLint check
-npm run build:species  # Re-generate species catalog from selectyourfish.com
-```
-
 ## Tech Stack
 
 | Layer      | Technology                                                   |
@@ -48,6 +38,17 @@ src/
 └── utils/            # Shared formatting utilities
 ```
 
+## Styling with Tailwind CSS v4
+
+Tailwind CSS v4 is the default and preferred styling system for all UI work. Use utility classes for layout, spacing, typography, colors, borders, gradients, and animations. Avoid writing custom CSS except for values that cannot be expressed with utilities.
+
+- Prefer theme tokens registered in `@theme` in `src/index.css` (e.g., `bg-surface-card`, `text-text-main`, `border-border-card`).
+- Use bracket syntax for legacy CSS custom properties: `bg-[var(--color-surface)]`, `text-[var(--color-text-primary)]`, `border-[var(--color-border)]`.
+- Custom shadow tokens must use inline `style={{ boxShadow: 'var(--shadow-card)' }}`.
+- Use `@theme` animation tokens: `animate-float-1`, `animate-float-2`, `animate-scan`, `animate-fade-in`, `animate-slide-up`.
+- CSS Modules are a last resort. If required, include `@reference "#tailwind";` at the top.
+- Run `npm run lint` after changing Tailwind classes.
+
 ## Coding Conventions
 
 ### TypeScript
@@ -63,13 +64,9 @@ src/
 - `useRef` for stable references in callbacks (see `useDataSync.ts` pattern).
 - `// eslint-disable-next-line react-hooks/set-state-in-effect` and `react-hooks/exhaustive-deps` are commonly used in hooks — accept these where justified.
 
-### Styling (Tailwind CSS v4)
+### Styling
 
-- Use Tailwind utility classes with bracket syntax for CSS custom properties: `bg-[var(--color-surface)]`, `text-[var(--color-text-primary)]`, `border-[var(--color-border)]`.
-- Custom shadow tokens must use inline `style={{ boxShadow: 'var(--shadow-card)' }}`.
-- Animations via `@theme` tokens: `animate-float-1`, `animate-float-2`, `animate-scan`, `animate-fade-in`, `animate-slide-up`.
-- Legacy CSS classes still in use: `card-decoration` (card wrapper), `dashboard-grid` (2fr/1fr), `canvas-header`, `primary-button`, `secondary-button`, `live-camera-feed`.
-- **Dark mode** is built-in via CSS custom properties — always use `var(--color-*)` tokens.
+See the dedicated [Styling with Tailwind CSS v4](#styling-with-tailwind-css-v4) section above. Only use legacy classes (`card-decoration`, `dashboard-grid`, `canvas-header`, `primary-button`, `secondary-button`, `live-camera-feed`) when modifying existing components that already depend on them; otherwise prefer Tailwind utilities.
 
 ### Data Flow
 
@@ -104,9 +101,3 @@ See [ai/api_server.py](./ai/api_server.py) for API docs. Models:
 
 - **LocalStorage schema**: Version is tracked via `oceaneyes_data_version`. Bump `DATA_VERSION` in `useDataSync.ts` to force migration.
 - **Species catalog regeneration** requires network access to selectyourfish.com.
-
-## Related Documentation
-
-- [Consumer advertisement](./docs/consumer-advertisement.md) — Product overview
-- [Git workflow](./.agents/skills/git-add-commit-push/SKILL.md) — Windows-safe git operations
-- [Fish species integration](./.agents/skills/README.md) — Species data pipeline docs

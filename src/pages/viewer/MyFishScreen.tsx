@@ -2,9 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTank } from '../../hooks/useTank';
 import { useFish } from '../../hooks/useFish';
 import {
-  Plus, Trash2, Fish, Eye, BarChart3,
+  Plus, Trash2, Fish, Eye, Hash, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
-  AlertTriangle, CheckCircle, HelpCircle, Hash
+  AlertTriangle, CheckCircle, HelpCircle
 } from 'lucide-react';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
 import {
@@ -392,57 +392,59 @@ export const MyFishScreen: React.FC = () => {
                 </div>
 
                 {/* ─── Expanded Detail Panel ─── */}
-                {isActive && species && (
-                  <div className="p-[0_12px_16px_12px] animate-slide-up">
-                    {/* Parameter chips — 2-column grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3.5">
-                      <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} colorClass="bg-[rgba(59,130,246,0.08)]" />
-                      <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass="bg-[rgba(16,185,129,0.08)]" />
-                      <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass="bg-[rgba(245,158,11,0.08)]" />
-                      <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} colorClass="bg-[rgba(147,112,219,0.08)]" />
-                      <DetailChip icon={<HelpCircle size={14} />} label="Difficulty" value={difficultyLabel[species.difficulty ?? 'medium']} colorClass="bg-[rgba(13,148,136,0.08)]" />
-                      <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} colorClass="bg-[rgba(16,185,129,0.08)]" />
-                      <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} colorClass="bg-[rgba(239,68,68,0.08)]" />
-                      <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} colorClass="bg-[rgba(59,130,246,0.08)]" />
-                      <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass="bg-[rgba(147,112,219,0.08)]" />
-                      <DetailChip icon={<HelpCircle size={14} />} label="Breeding" value={breedingLabel[species.breeding ?? 'no_record']} colorClass="bg-[rgba(148,163,184,0.12)]" />
-                    </div>
+                <div className={`grid transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)] ${isActive && species ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                  <div className="overflow-hidden">
+                    <div className={`p-[0_12px_16px_12px] transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)] ${isActive && species ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3'}`}>
+                      {species && (
+                        <>
+                          {/* Parameter chips — 2-column grid */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3.5">
+                            <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} colorClass="bg-[rgba(59,130,246,0.08)]" />
+                            <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass="bg-[rgba(16,185,129,0.08)]" />
+                            <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass="bg-[rgba(245,158,11,0.08)]" />
+                            <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} colorClass="bg-[rgba(147,112,219,0.08)]" />
+                            <DetailChip icon={<HelpCircle size={14} />} label="Difficulty" value={difficultyLabel[species.difficulty ?? 'medium']} colorClass="bg-[rgba(13,148,136,0.08)]" />
+                            <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} colorClass="bg-[rgba(16,185,129,0.08)]" />
+                            <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} colorClass="bg-[rgba(239,68,68,0.08)]" />
+                            <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} colorClass="bg-[rgba(59,130,246,0.08)]" />
+                            <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass="bg-[rgba(147,112,219,0.08)]" />
+                            <DetailChip icon={<HelpCircle size={14} />} label="Breeding" value={breedingLabel[species.breeding ?? 'no_record']} colorClass="bg-[rgba(148,163,184,0.12)]" />
+                          </div>
 
-                    {/* Origin */}
-                    {species.origin && (
-                      <span className="text-[11px] p-[4px_10px] rounded-[20px] bg-[rgba(13,148,136,0.08)] text-primary-dark font-semibold inline-block">{species.origin}</span>
-                    )}
+                          {/* Origin */}
+                          {species.origin && (
+                            <span className="text-[11px] p-[4px_10px] rounded-[20px] bg-[rgba(13,148,136,0.08)] text-primary-dark font-semibold inline-block">{species.origin}</span>
+                          )}
 
-                    {/* Compatibility section */}
-                    {compResults.length > 0 && (
-                      <div className="mt-4">
-                        <div className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                          Tank Compatibility
-                        </div>
-                        {compResults.map(cr => {
-                          const level = getCompatibilityLevel(cr.score);
-                          const color = getCompatibilityColor(level);
-                          return (
-                            <div key={cr.speciesId} className="flex items-center gap-2 py-1.5 border-b border-border-card last:border-b-0">
-                              <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                              <span className="text-xs font-semibold text-text-main flex-1">{cr.speciesName}</span>
-                              <span className="text-[11px] font-bold" style={{ color }}>{cr.score}%</span>
+                          {/* Compatibility section */}
+                          {compResults.length > 0 && (
+                            <div className="mt-4">
+                              <div className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">
+                                Tank Compatibility
+                              </div>
+                              {compResults.map(cr => {
+                                const level = getCompatibilityLevel(cr.score);
+                                const color = getCompatibilityColor(level);
+                                return (
+                                  <div key={cr.speciesId} className="flex items-center gap-2 py-1.5 border-b border-border-card last:border-b-0">
+                                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                                    <span className="text-xs font-semibold text-text-main flex-1">{cr.speciesName}</span>
+                                    <span className="text-[11px] font-bold" style={{ color }}>{cr.score}%</span>
+                                  </div>
+                                );
+                              })}
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                          )}
+                        </>
+                      )}
+                      {!species && (
+                        <p className="text-xs text-text-muted">
+                          No detailed species data available for this entry.
+                        </p>
+                      )}
+                    </div>
                   </div>
-                )}
-
-                {/* Empty detail when no species data */}
-                {isActive && !species && (
-                  <div className="p-[0_12px_16px_12px] animate-slide-up">
-                    <p className="text-xs text-text-muted">
-                      No detailed species data available for this entry.
-                    </p>
-                  </div>
-                )}
+                </div>
               </div>
             );
           })}
