@@ -9,7 +9,7 @@
   --color-primary: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
   --color-primary-hover: linear-gradient(135deg, #0F766E 0%, #115E59 100%);
   --color-primary-light: linear-gradient(90deg, rgba(204, 251, 241, 0.8) 0%, rgba(204, 251, 241, 0.2) 100%);
-  --color-primary-dark: #0F766E;
+  --color-primary-dark: #0D9488;
   --color-text-primary: #1A1D1F;
   --color-text-secondary: #6B7280;
   --color-text-inverse: #FFFFFF;
