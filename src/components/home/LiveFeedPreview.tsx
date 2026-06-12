@@ -19,7 +19,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   onViewAdvanced,
   onGoFullscreen
 }) => {
-  const { liveState, activeFeed, startStream } = useCameraFeed(activeTank?.id ?? null);
+  const { liveState, activeFeed: _activeFeed, startStream } = useCameraFeed(activeTank?.id ?? null);
   const isStreaming = liveState?.is_live ?? false;
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [isHoveringVideo, setIsHoveringVideo] = useState(false);

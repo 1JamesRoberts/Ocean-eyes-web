@@ -484,52 +484,6 @@ export const LiveScreen: React.FC = () => {
         ctx.restore();
       }
 
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < 640; x += 40) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, 360);
-        ctx.stroke();
-      }
-      for (let y = 0; y < 360; y += 40) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(640, y);
-        ctx.stroke();
-      }
-
-      if (isRecording) {
-        ctx.fillStyle = 'rgba(239, 68, 68, 0.85)';
-        ctx.beginPath();
-        ctx.arc(30, 25, 6, 0, 2 * Math.PI);
-        ctx.fill();
-
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 11px monospace';
-        ctx.textAlign = 'left';
-        ctx.fillText(`REC ${formatDuration(recordingSeconds)}`, 42, 25);
-      }
-
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
-      ctx.fillRect(520, 15, 100, 22);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 9px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(`LIVE CAM (FPS:30)`, 570, 26);
-
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-      ctx.fillRect(0, 310, 640, 50);
-
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = '10px Outfit, Inter, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText(`OCEANEYES AI DIAGNOSTICS`, 20, 335);
-
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#E2E8F0';
-      ctx.fillText(`FISH: ${currentFishCount} DETECTED  |  FNU: ${currentClarity.toFixed(2)}`, 620, 335);
-
       const imgUrl = canvas.toDataURL('image/png');
       const newSnapshot = {
         id: `snap_${Date.now()}`,

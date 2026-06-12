@@ -2,9 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTank } from '../../hooks/useTank';
 import { useFish } from '../../hooks/useFish';
 import {
-  Plus, Trash2, Fish, Eye, Hash, BarChart3,
+  Plus, Trash2, Fish, Eye, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
-  AlertTriangle, CheckCircle, HelpCircle
+  AlertTriangle, CheckCircle, HelpCircle, Hash
 } from 'lucide-react';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
 import {
