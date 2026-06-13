@@ -104,9 +104,8 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                 className="
                   pointer-events-none absolute inset-0 z-20 flex flex-col
                   items-center justify-center gap-1.5 bg-[rgba(15,23,42,0.55)]
-                  transition-opacity duration-250
+                  transition-opacity duration-250 ease-in-out
                 "
-                style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
               >
                 <Maximize2 size={24} color="#FFF" className="opacity-90" />
                 <span className="

@@ -22,12 +22,12 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
 
   return (
     <div
-      className="
+      className={`
         absolute inset-y-0 right-0 z-30 flex w-[320px] flex-col border-l
         border-[rgba(255,255,255,0.1)] bg-[rgba(15,23,42,0.7)] text-left
-        text-white transition-transform duration-300
-      "
-      style={{ transform: showFsInventory ? 'translateX(0)' : 'translateX(100%)', transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+        text-white transition-transform duration-300 ease-in-out
+        ${showFsInventory ? 'translate-x-0' : 'translate-x-full'}
+      `}
     >
       <div className="
         flex items-center justify-between border-b

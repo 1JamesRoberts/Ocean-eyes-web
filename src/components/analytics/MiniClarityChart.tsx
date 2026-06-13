@@ -49,8 +49,10 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
   const areaPoints = `${points[0].x},${baselineY} ${polylinePoints} ${points[points.length - 1].x},${baselineY}`;
 
   return (
-    <div ref={containerRef} style={{ width: '100%' }}>
-      <svg width="100%" height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} style={{ overflow: 'visible', display: 'block' }}>
+    <div ref={containerRef} className="w-full">
+      <svg width="100%" height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} className="
+        block overflow-visible
+      ">
         <defs>
           <linearGradient id="miniChartGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-info)" stopOpacity="0.3" />

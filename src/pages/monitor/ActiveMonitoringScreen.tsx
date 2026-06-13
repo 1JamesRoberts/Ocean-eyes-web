@@ -136,8 +136,8 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         {/* Live scanner target graphics */}
         <div className="
           absolute top-5 left-5 z-12 font-mono text-[9px] leading-[130%]
-          text-[#34D399]
-        " style={{ textShadow: '0 0 4px rgba(52, 211, 153, 0.4)' }}>
+          text-[#34D399] [text-shadow:0_0_4px_rgba(52,211,153,0.4)]
+        ">
           <span>CAM FEED: OK</span><br />
           <span>RESOLUTION: 1080P</span><br />
           <span>FPS: 30.00</span>
@@ -147,9 +147,8 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         <div
           className="
             absolute top-[30%] left-[25%] z-12 h-[60px] w-20 border-[1.5px]
-            border-[#34D399]
+            border-[#34D399] shadow-[0_0_6px_rgba(52,211,153,0.3)]
           "
-          style={{ boxShadow: '0 0 6px rgba(52, 211, 153, 0.3)' }}
         >
           <span className="
             absolute -top-3.5 left-0 bg-[#34D399] px-0.5 py-px text-[8px]
@@ -163,8 +162,8 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
           className="
             absolute right-[25%] bottom-[25%] z-12 h-[50px] w-[70px]
             border-[1.5px] border-[#34D399]
+            shadow-[0_0_6px_rgba(52,211,153,0.3)]
           "
-          style={{ boxShadow: '0 0 6px rgba(52, 211, 153, 0.3)' }}
         >
           <span className="
             absolute -top-3.5 left-0 bg-[#34D399] px-0.5 py-px text-[8px]

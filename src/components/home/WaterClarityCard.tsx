@@ -23,8 +23,9 @@ export const WaterClarityCard: React.FC<WaterClarityCardProps> = ({ displayClari
         onClick={onClick}
       >
         <div className="
-          flex size-9 shrink-0 items-center justify-center rounded-xl
-        " style={{ backgroundColor: 'rgba(59, 130, 246, 0.08)', color: 'var(--color-info)' }}>
+          flex size-9 shrink-0 items-center justify-center rounded-xl bg-info/8
+          text-info
+        ">
           <Droplet size={16} />
         </div>
         <div>

@@ -83,7 +83,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
                 strokeWidth="24"
                 strokeDasharray={`${dashLength} ${gapLength}`}
                 strokeDashoffset={-offset}
-                style={{ transition: 'all 0.3s ease' }}
+                className="transition-all duration-300 ease-in-out"
               />
             ))}
           </g>
@@ -433,11 +433,16 @@ export const MyFishScreen: React.FC = () => {
                       return (
                         <div className="flex items-center gap-2.5">
                           <div className="relative size-11">
-                            <svg width="44" height="44" viewBox="0 0 44 44" style={{ overflow: 'visible' }}>
+                            <svg width="44" height="44" viewBox="0 0 44 44" className="
+                              overflow-visible
+                            ">
                               <circle cx="22" cy="22" r={r} fill="none" stroke="var(--color-border)" strokeWidth="5" />
                               <circle cx="22" cy="22" r={r} fill="none" stroke={c} strokeWidth="5"
                                 strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
-                                transform="rotate(-90 22 22)" style={{ transition: 'stroke-dasharray 0.3s ease' }} />
+                                transform="rotate(-90 22 22)" className="
+                                  transition-[stroke-dasharray] duration-300
+                                  ease-in-out
+                                " />
                             </svg>
                             <div className="
                               absolute top-1/2 left-1/2 -translate-1/2
