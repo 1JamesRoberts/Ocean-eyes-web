@@ -27,7 +27,9 @@ dist-ssr
 ai/models/*.onnx
 
 # Python cache
-ai/__pycache__
+__pycache__/
+*.py[cod]
+*$py.class
 
 # AI detection output (generated at runtime)
 ai/output/
