@@ -2,10 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTank } from '../../hooks/useTank';
 import { useFish } from '../../hooks/useFish';
 import {
-  Plus, Trash2, Fish, Eye, Hash, BarChart3,
+  Plus, Trash2, Fish, Hash, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle, HelpCircle
 } from 'lucide-react';
+import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
 import {
   getSpeciesById, getSpeciesColor, getSpeciesInitials,
@@ -247,9 +248,7 @@ export const MyFishScreen: React.FC = () => {
 
   const { stats, speciesDistribution } = useMemo(() => {
     const totalFish = fishList.reduce((sum, f) => sum + f.count, 0);
-    const totalDetected = fishList.reduce((sum, f) => sum + f.detected, 0);
     const uniqueSpecies = new Set(fishList.map(f => f.speciesId)).size;
-    const detectionRate = totalFish > 0 ? Math.round((totalDetected / totalFish) * 100) : 0;
 
     // ── Ideal parameter computation ────────────────────────────────────────
     const speciesData = fishList
@@ -288,8 +287,11 @@ export const MyFishScreen: React.FC = () => {
       }
     });
 
+    const totalDetected = fishList.reduce((sum, f) => sum + f.detected, 0);
+    const totalExpected = totalFish;
+
     return {
-      stats: { totalFish, totalDetected, uniqueSpecies, detectionRate, idealTankSizeL, tempResult, phResult },
+      stats: { totalFish, uniqueSpecies, idealTankSizeL, tempResult, phResult, totalDetected, totalExpected },
       speciesDistribution: Object.values(dist).sort((a, b) => b.count - a.count)
     };
   }, [fishList]);
@@ -400,13 +402,17 @@ export const MyFishScreen: React.FC = () => {
             <div className="mb-4 flex items-center gap-2">
               <Fish size={18} className="text-primary-dark" />
               <h3 className="text-base font-bold text-text-main">Aquarium Overview</h3>
+              <div className="ml-auto">
+                <DetectionVisibilityRing
+                  detected={stats.totalDetected}
+                  expected={stats.totalExpected}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
                 { icon: <Hash size={14} />, color: 'var(--color-primary-dark)', bg: 'var(--color-primary-light)', label: 'Total Fish', value: stats.totalFish },
                 { icon: <Fish size={14} />, color: 'var(--color-info)', bg: 'rgba(59, 130, 246, 0.08)', label: 'Species', value: stats.uniqueSpecies },
-                { icon: <Eye size={14} />, color: 'var(--color-good)', bg: 'rgba(16, 185, 129, 0.08)', label: 'Detected', value: stats.totalDetected },
-                { icon: <BarChart3 size={14} />, color: 'var(--color-warning)', bg: 'rgba(245, 158, 11, 0.08)', label: 'Detection', value: `${stats.detectionRate}%` },
               ].map((item, i) => (
                 <div key={i} style={{ background: item.bg }} className="
                   flex flex-col gap-1 rounded-xl p-3.5
@@ -545,33 +551,10 @@ export const MyFishScreen: React.FC = () => {
 
                   <div className="flex items-center gap-3.5" onClick={e => e.stopPropagation()}>
                     {/* Visibility ring */}
-                    {(() => {
-                      const pct = fish.count > 0 ? Math.round((fish.detected / fish.count) * 100) : 0;
-                      const c = pct >= 80 ? '#16A34A' : pct >= 50 ? '#D97706' : '#DC2626';
-                      const r = 20, circ = 2 * Math.PI * r;
-                      const dash = (circ * pct) / 100;
-                      return (
-                        <div className="flex items-center gap-2.5">
-                          <div className="relative size-11">
-                            <svg width="44" height="44" viewBox="0 0 44 44" className="
-                              overflow-visible
-                            ">
-                              <circle cx="22" cy="22" r={r} fill="none" stroke="var(--color-border)" strokeWidth="5" />
-                              <circle cx="22" cy="22" r={r} fill="none" stroke={c} strokeWidth="5"
-                                strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
-                                transform="rotate(-90 22 22)" className="
-                                  transition-[stroke-dasharray] duration-300
-                                  ease-in-out
-                                " />
-                            </svg>
-                            <div className="
-                              absolute top-1/2 left-1/2 -translate-1/2
-                            "><Eye size={16} color={c} /></div>
-                          </div>
-                          <span className="min-w-[40px] text-[13px] font-bold" style={{ color: c }}>{pct}%</span>
-                        </div>
-                      );
-                    })()}
+                    <DetectionVisibilityRing
+                      detected={fish.detected}
+                      expected={fish.count}
+                    />
 
                     {isActive && (
                       <>
