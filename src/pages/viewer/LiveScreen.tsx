@@ -661,11 +661,9 @@ Diagnostics:
               <div
                 className="
                   absolute top-3 left-1/2 z-16 flex -translate-x-1/2
-                  items-center gap-1.5 rounded-[20px] border
-                  bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-[11px] font-semibold
-                  text-white
+                  items-center gap-1.5 rounded-[20px] bg-[rgba(15,23,42,0.85)]
+                  px-3 py-1.5 text-[11px] font-semibold text-white
                 "
-                style={{ borderColor: aiError ? 'var(--color-critical)' : 'var(--color-primary)' }}
               >
                 <div
                   className="size-2 rounded-full"

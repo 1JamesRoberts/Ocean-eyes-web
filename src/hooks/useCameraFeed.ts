@@ -35,17 +35,17 @@ export const useCameraFeed = (tankId: string | null): UseCameraFeedResult => {
 
   const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   // Webcam acquisition
   useEffect(() => {
-    let activeStream: MediaStream | null = null;
     if (isStreaming && isWebcam) {
       const deviceId = activeFeed.stream_url.split(':')[1];
       navigator.mediaDevices.getUserMedia({
         video: deviceId && deviceId !== 'default' ? { deviceId: { exact: deviceId } } : true
       })
       .then(stream => {
-        activeStream = stream;
+        streamRef.current = stream;
         setWebcamStream(stream);
       })
       .catch(err => {
@@ -53,8 +53,9 @@ export const useCameraFeed = (tankId: string | null): UseCameraFeedResult => {
       });
     }
     return () => {
-      if (activeStream) {
-        activeStream.getTracks().forEach(track => track.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
       setWebcamStream(null);
     };

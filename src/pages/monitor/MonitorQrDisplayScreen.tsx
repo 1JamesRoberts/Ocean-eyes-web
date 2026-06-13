@@ -7,14 +7,14 @@ interface ScreenProps {
 
 export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
   const { tankId, tanks } = useTank();
-  const [copied, setCopied] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const activeTankId = tankId || (tanks.length > 0 ? tanks[0].id : '');
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(activeTankId);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   return (
@@ -53,7 +53,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
                   font-semibold text-primary-dark underline
                 "
               >
-                {copied ? 'Copied!' : 'Copy'}
+                {isCopied ? 'Copied!' : 'Copy'}
               </button>
             </div>
           </div>

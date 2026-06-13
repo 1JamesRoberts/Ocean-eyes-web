@@ -4,13 +4,28 @@ import type { AIDetectionResult, AITurbidityResult, HistoryDetectionResponse, Hi
 export const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
 
 // ---------------------------------------------------------------------------
+// Custom error class
+// ---------------------------------------------------------------------------
+
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-    throw new Error(err.error || `AI backend error: ${res.status}`);
+    const body = await res.json().catch(() => null);
+    const message = body?.error || `AI backend error: ${res.status}`;
+    throw new ApiError(res.status, message);
   }
   return (await res.json()) as T;
 }

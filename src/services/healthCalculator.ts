@@ -1,4 +1,15 @@
 // src/services/healthCalculator.ts - Pure health score calculation
+import {
+  HEALTH_IDEAL_PH,
+  HEALTH_PH_PENALTY_FACTOR,
+  HEALTH_CLARITY_THRESHOLD,
+  HEALTH_CLARITY_PENALTY_FACTOR,
+  HEALTH_AMMONIA_PENALTY_FACTOR,
+  HEALTH_NITRITE_PENALTY_FACTOR,
+  HEALTH_MAX_SCORE,
+  HEALTH_MIN_SCORE,
+} from '../utils/constants';
+
 export interface HealthReading {
   ph?: number;
   clarity: number;
@@ -7,16 +18,16 @@ export interface HealthReading {
 }
 
 export function calculateHealthScore(reading: HealthReading): number {
-  const ph = reading.ph ?? 7.2;
+  const ph = reading.ph ?? HEALTH_IDEAL_PH;
   const ammonia = reading.ammonia ?? 0;
   const nitrite = reading.nitrite ?? 0;
   const score = Math.max(
-    1,
-    10 -
-      Math.abs(7.2 - ph) * 4 -
-      Math.max(0, reading.clarity - 0.5) * 0.8 -
-      ammonia * 20 -
-      nitrite * 3
+    HEALTH_MIN_SCORE,
+    HEALTH_MAX_SCORE -
+      Math.abs(HEALTH_IDEAL_PH - ph) * HEALTH_PH_PENALTY_FACTOR -
+      Math.max(0, reading.clarity - HEALTH_CLARITY_THRESHOLD) * HEALTH_CLARITY_PENALTY_FACTOR -
+      ammonia * HEALTH_AMMONIA_PENALTY_FACTOR -
+      nitrite * HEALTH_NITRITE_PENALTY_FACTOR
   );
 
   return parseFloat(score.toFixed(1));

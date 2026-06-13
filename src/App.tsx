@@ -14,6 +14,14 @@ import {
 } from 'lucide-react';
 
 
+const NAV_ITEMS = [
+  { tab: 'home' as const, icon: Home, label: 'Dashboard', isActive: (t: string) => t === 'home' },
+  { tab: 'live' as const, icon: Video, label: 'Live Video Feed', isActive: (t: string) => t === 'live' },
+  { tab: 'my_fish' as const, icon: Fish, label: 'My Fish', isActive: (t: string) => t === 'my_fish' },
+  { tab: 'analytics' as const, icon: BarChart3, label: 'Analytics', isActive: (t: string) => t === 'analytics' },
+  { tab: 'settings' as const, icon: Settings, label: 'Tank Settings', isActive: (t: string) => t === 'settings' || t === 'alerts' },
+];
+
 const OceanEyesDashboard: React.FC = () => {
   const { activeTab, setActiveTab } = useNavigation();
   const { tankId, activeTank, tanks, linkedTanks, selectTank } = useTank();
@@ -47,103 +55,38 @@ const OceanEyesDashboard: React.FC = () => {
           max-md:flex-row max-md:gap-1.5 max-md:overflow-x-auto max-md:pb-1
           [&::-webkit-scrollbar]:hidden
         ">
-          <button
-            className={`
-              flex w-full cursor-pointer items-center gap-3 rounded-xl
-              border-none bg-none px-4 py-3 text-left font-main text-sm
-              font-semibold transition-smooth
-              hover:bg-surface-hover hover:text-text-main
-              max-md:w-auto max-md:px-3.5 max-md:py-2 max-md:whitespace-nowrap
-              ${activeTab === 'home' ? `
-                bg-primary-light-gradient text-primary-dark
-              ` : `text-text-muted`
-              }
-            `}
-            onClick={() => setActiveTab('home')}
-          >
-            <Home size={18} />
-            <span>Dashboard</span>
-          </button>
-
-          <button
-            className={`
-              flex w-full cursor-pointer items-center gap-3 rounded-xl
-              border-none bg-none px-4 py-3 text-left font-main text-sm
-              font-semibold transition-smooth
-              hover:bg-surface-hover hover:text-text-main
-              max-md:w-auto max-md:px-3.5 max-md:py-2 max-md:whitespace-nowrap
-              ${activeTab === 'live' ? `
-                bg-primary-light-gradient text-primary-dark
-              ` : `text-text-muted`
-              }
-            `}
-            onClick={() => setActiveTab('live')}
-          >
-            <Video size={18} />
-            <span>Live Video Feed</span>
-          </button>
-
-          <button
-            className={`
-              flex w-full cursor-pointer items-center gap-3 rounded-xl
-              border-none bg-none px-4 py-3 text-left font-main text-sm
-              font-semibold transition-smooth
-              hover:bg-surface-hover hover:text-text-main
-              max-md:w-auto max-md:px-3.5 max-md:py-2 max-md:whitespace-nowrap
-              ${activeTab === 'my_fish' ? `
-                bg-primary-light-gradient text-primary-dark
-              ` : `text-text-muted`
-              }
-            `}
-            onClick={() => setActiveTab('my_fish')}
-          >
-            <Fish size={18} />
-            <span>My Fish</span>
-          </button>
-
-          <button
-            className={`
-              flex w-full cursor-pointer items-center gap-3 rounded-xl
-              border-none bg-none px-4 py-3 text-left font-main text-sm
-              font-semibold transition-smooth
-              hover:bg-surface-hover hover:text-text-main
-              max-md:w-auto max-md:px-3.5 max-md:py-2 max-md:whitespace-nowrap
-              ${activeTab === 'analytics' ? `
-                bg-primary-light-gradient text-primary-dark
-              ` : `text-text-muted`
-              }
-            `}
-            onClick={() => setActiveTab('analytics')}
-          >
-            <BarChart3 size={18} />
-            <span>Analytics</span>
-          </button>
-
-          <button
-            className={`
-              flex w-full cursor-pointer items-center gap-3 rounded-xl
-              border-none bg-none px-4 py-3 text-left font-main text-sm
-              font-semibold transition-smooth
-              hover:bg-surface-hover hover:text-text-main
-              max-md:w-auto max-md:px-3.5 max-md:py-2 max-md:whitespace-nowrap
-              ${activeTab === 'settings' || activeTab === 'alerts' ? `
-                bg-primary-light-gradient text-primary-dark
-              ` : `text-text-muted`
-              }
-            `}
-            onClick={() => setActiveTab('settings')}
-          >
-            <Settings size={18} />
-            <span>Tank Settings</span>
-            {activeAlertCount > 0 && (
-              <span className="
-                ml-auto rounded-full bg-critical px-1.5 py-0.5 text-[10px]
-                font-bold text-white
-              ">
-                {activeAlertCount}
-              </span>
-            )}
-          </button>
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.tab}
+                className={`
+                  flex w-full cursor-pointer items-center gap-3 rounded-xl
+                  border-none bg-none px-4 py-3 text-left font-main text-sm
+                  font-semibold transition-smooth
+                  hover:bg-surface-hover hover:text-text-main
+                  max-md:w-auto max-md:px-3.5 max-md:py-2
+                  max-md:whitespace-nowrap
+                  ${item.isActive(activeTab) ? `
+                    bg-primary-light-gradient text-primary-dark
+                  ` : `text-text-muted`
+                  }
+                `}
+                onClick={() => setActiveTab(item.tab)}
+              >
+                <Icon size={18} />
+                <span>{item.label}</span>
+                {item.tab === 'settings' && activeAlertCount > 0 && (
+                  <span className="
+                    ml-auto rounded-full bg-critical px-1.5 py-0.5 text-[10px]
+                    font-bold text-white
+                  ">
+                    {activeAlertCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </nav>
 
         {/* Data Sync & Tank Selector */}

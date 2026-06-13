@@ -17,7 +17,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
   const { liveState } = useLiveState(tankId);
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
   const activeFeedCalibration = liveState?.feeds.find(f => f.id === liveState?.selected_feed_id)?.calibration;
-  const [simClarityIssue, setSimClarityIssue] = useState(false);
+  const [hasClarityIssue, setHasClarityIssue] = useState(false);
 
   const latestReading = readings[0] || {
     clarity: 1.2,
@@ -27,37 +27,37 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
   };
 
   // Modulate local metrics scan trigger with simulations
-  const displayClarity = simClarityIssue ? 8.5 : latestReading.clarity;
+  const displayClarity = hasClarityIssue ? 8.5 : latestReading.clarity;
   const displayFish = latestReading.fish_count;
   const totalFish = fishList.reduce((sum, f) => sum + f.count, 0);
 
-  // Background mock state write
-  const triggerSimulationMetrics = () => {
+  // Background mock state write — accepts the sim state as a parameter
+  // to avoid the race condition of reading stale state after setState.
+  const triggerSimulationMetrics = (isIssueActive: boolean) => {
     if (!activeTank) return;
-    
-    // Simulate drop or restore
+
     writeReading({
       tankId: activeTank.id,
-      clarity: displayClarity,
+      clarity: isIssueActive ? 8.5 : latestReading.clarity,
       fishCount: displayFish,
       ph: 7.2,
       temp: 26.1,
-      ammonia: simClarityIssue ? 0.05 : 0.0,
-      nitrite: simClarityIssue ? 0.25 : 0.08
+      ammonia: isIssueActive ? 0.05 : 0.0,
+      nitrite: isIssueActive ? 0.25 : 0.08
     });
 
-    if (simClarityIssue) {
+    if (isIssueActive) {
       const existing = alerts.find((a) => !a.resolved && a.title.includes('clarity'));
       if (!existing) {
         addAlert({
           id: `alert-c-${Date.now()}`,
           title: 'Water clarity dropped',
-          message: `Water turbidity rose to ${displayClarity} FNU (Threshold: ${activeTank.thresholds.max_turbidity_fnu}). Check filter unit.`,
+          message: `Water turbidity rose to ${isIssueActive ? 8.5 : latestReading.clarity} FNU (Threshold: ${activeTank.thresholds.max_turbidity_fnu}). Check filter unit.`,
           tip: 'A sudden clarity drop indicates a clogged filter sponge or disturbed substrate. Wash the filter media or perform a 20% water change.',
           severity: 'warning',
           timeAgo: 'Just now',
           clarityBefore: '2.5',
-          clarityAfter: displayClarity.toString(),
+          clarityAfter: (isIssueActive ? 8.5 : latestReading.clarity).toString(),
           fishBefore: totalFish.toString(),
           fishAfter: displayFish.toString(),
           resolved: false,
@@ -65,8 +65,6 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         });
       }
     }
-
-
   };
 
   const waterHeightPct = activeFeedCalibration ? Math.min(100, Math.max(0, ((240 - activeFeedCalibration.water_line_y) / 240) * 100)) : 50;
@@ -214,10 +212,13 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
               cursor-pointer rounded-lg border-none px-2.5 py-2 text-[11px]
               font-semibold text-white transition-colors
             "
-            style={{ backgroundColor: simClarityIssue ? 'var(--color-critical)' : '#1E293B' }}
+            style={{ backgroundColor: hasClarityIssue ? 'var(--color-critical)' : '#1E293B' }}
             onClick={() => {
-              setSimClarityIssue(prev => !prev);
-              setTimeout(triggerSimulationMetrics, 50);
+              setHasClarityIssue(prev => {
+                const next = !prev;
+                setTimeout(() => triggerSimulationMetrics(next), 0);
+                return next;
+              });
             }}
           >
             {simClarityIssue ? 'Restore Clarity' : 'Trigger Clog Filter'}

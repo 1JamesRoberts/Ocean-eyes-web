@@ -12,7 +12,7 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
   const { liveState, updateCalibration } = useLiveState(activeTank?.id ?? null);
   const activeFeedCalibration = liveState?.feeds.find(f => f.id === liveState?.selected_feed_id)?.calibration;
   const [lineY, setLineY] = useState(activeFeedCalibration?.water_line_y || 120);
-  const [saved, setSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const staticWaterLineY = activeFeedCalibration?.water_line_y || 120; // Static camera feed reference
 
   const handleDrag = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
@@ -26,9 +26,9 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
   const handleSave = () => {
     if (activeTank) {
       updateCalibration(lineY);
-      setSaved(true);
+      setIsSaved(true);
       setTimeout(() => {
-        setSaved(false);
+        setIsSaved(false);
         onNavigate('welcome');
       }, 1500);
     }
@@ -130,7 +130,7 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
           onClick={handleSave}
           disabled={!activeTank}
         >
-          {saved ? '✓ Calibration Saved' : 'Confirm Level'}
+          {isSaved ? '✓ Calibration Saved' : 'Confirm Level'}
         </button>
         <button
           className="

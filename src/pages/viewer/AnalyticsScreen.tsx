@@ -46,10 +46,10 @@ export const AnalyticsScreen: React.FC = () => {
     .reverse();
 
   const [confirmClear, setConfirmClear] = useState(false);
-  const [clearing, setClearing] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const handleClearHistory = async () => {
-    setClearing(true);
+    setIsClearing(true);
     try {
       await Promise.all([
         clearDetectionHistory(selectedDate),
@@ -60,7 +60,7 @@ export const AnalyticsScreen: React.FC = () => {
     } catch (err) {
       console.error('Failed to clear history:', err);
     } finally {
-      setClearing(false);
+      setIsClearing(false);
     }
   };
 
@@ -276,9 +276,9 @@ export const AnalyticsScreen: React.FC = () => {
                       disabled:cursor-not-allowed disabled:opacity-50
                     "
                     onClick={handleClearHistory}
-                    disabled={clearing}
+                    disabled={isClearing}
                   >
-                    {clearing ? 'Deleting…' : 'Yes, clear'}
+                    {isClearing ? 'Deleting…' : 'Yes, clear'}
                   </button>
                   <button
                     className="
@@ -289,7 +289,7 @@ export const AnalyticsScreen: React.FC = () => {
                       disabled:cursor-not-allowed disabled:opacity-50
                     "
                     onClick={() => setConfirmClear(false)}
-                    disabled={clearing}
+                    disabled={isClearing}
                   >
                     Cancel
                   </button>

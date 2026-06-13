@@ -14,8 +14,14 @@ export function formatTimeShort(isoTimestamp: string): string {
  * Convert a snake_case species ID to Title Case display name.
  * Example: "harlequin_rasbora" → "Harlequin Rasbora"
  */
+const speciesNameCache = new Map<string, string>();
+
 export function formatSpeciesName(speciesId: string): string {
-  return speciesId.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const cached = speciesNameCache.get(speciesId);
+  if (cached !== undefined) return cached;
+  const formatted = speciesId.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  speciesNameCache.set(speciesId, formatted);
+  return formatted;
 }
 
 /**
