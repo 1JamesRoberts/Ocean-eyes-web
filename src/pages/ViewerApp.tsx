@@ -37,13 +37,17 @@ export const ViewerApp: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full">
+    <div className="flex w-full flex-1 flex-col">
       {tankId === null && activeTab !== 'live' ? (
-        <div className="bg-surface-card rounded-[20px] p-10 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] max-w-[480px] mx-auto mt-10">
+        <div className="
+          mx-auto mt-10 max-w-[480px] rounded-[20px] border
+          border-[rgba(13,148,136,0.02)] bg-surface-card p-10 shadow-card
+          transition-smooth
+        ">
           <RootGateOnboarding />
         </div>
       ) : (
-        <div className="flex-1 flex flex-col">
+        <div className="flex flex-1 flex-col">
           {renderActiveScreen()}
         </div>
       )}

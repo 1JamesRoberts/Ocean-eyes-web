@@ -18,46 +18,64 @@ export const AlertsScreen: React.FC = () => {
   if (selectedAlert) {
     return (
       <div className="flex flex-col gap-6">
-        <div className="canvas-header">
+        <div className="
+          flex min-h-[75px] items-center justify-between border-b
+          border-border-card pb-3
+          max-xs:flex-col max-xs:items-start max-xs:gap-3
+        ">
           <div>
-            <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>Alert Details</span>
-            <h1 className="canvas-title" style={{ marginTop: '2px' }}>Alert Diagnostics</h1>
+            <span className="
+              block text-xs font-semibold text-text-muted uppercase
+            ">Alert Details</span>
+            <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Alert Diagnostics</h1>
           </div>
           <button
-            style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
+            className="
+              cursor-pointer border-none bg-transparent font-main text-sm
+              font-semibold text-primary-dark
+            "
             onClick={() => setSelectedAlertId(null)}
           >
             ← Back
           </button>
         </div>
 
-        <div className="card-decoration" style={{ padding: '24px', marginBottom: '20px', borderLeft: `6px solid ${selectedAlert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)'}` }}>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <AlertTriangle size={20} color="var(--color-warning)" />
-            <h2 style={{ fontSize: '20px', fontWeight: 800 }}>{selectedAlert.title}</h2>
+        <div className="
+          mb-5 rounded-[20px] border border-[rgba(13,148,136,0.02)]
+          bg-surface-card p-6 shadow-card transition-smooth
+        " style={{ borderLeftWidth: '6px', borderLeftColor: selectedAlert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)' }}>
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={20} className="text-warning" />
+            <h2 className="text-xl font-extrabold">{selectedAlert.title}</h2>
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '6px' }}>{selectedAlert.timeAgo}</p>
-          
-          <p style={{ fontSize: '14px', color: 'var(--color-text-primary)', marginTop: '16px', lineHeight: '150%' }}>
+          <p className="mt-1.5 text-xs text-text-muted">{selectedAlert.timeAgo}</p>
+
+          <p className="mt-4 text-sm leading-[150%] text-text-main">
             {selectedAlert.message}
           </p>
         </div>
 
         {/* Diagnostic parameters before/after */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+        <div className="mb-5 grid grid-cols-2 gap-4">
           {selectedAlert.clarityBefore && (
-            <div className="card-decoration" style={{ padding: '16px', textAlign: 'center' }}>
-              <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', display: 'block' }}>Clarity Shift</span>
-              <strong style={{ fontSize: '20px', display: 'block', marginTop: '6px' }}>
+            <div className="
+              rounded-[20px] border border-[rgba(13,148,136,0.02)]
+              bg-surface-card p-4 text-center shadow-card transition-smooth
+            ">
+              <span className="block text-xs text-text-muted">Clarity Shift</span>
+              <strong className="mt-1.5 block text-xl">
                 {selectedAlert.clarityBefore} → {selectedAlert.clarityAfter}
               </strong>
             </div>
           )}
 
           {selectedAlert.fishBefore && (
-            <div className="card-decoration" style={{ padding: '16px', textAlign: 'center' }}>
-              <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', display: 'block' }}>Fish Discrepancy</span>
-              <strong style={{ fontSize: '20px', display: 'block', marginTop: '6px' }}>
+            <div className="
+              rounded-[20px] border border-[rgba(13,148,136,0.02)]
+              bg-surface-card p-4 text-center shadow-card transition-smooth
+            ">
+              <span className="block text-xs text-text-muted">Fish Discrepancy</span>
+              <strong className="mt-1.5 block text-xl">
                 {selectedAlert.fishBefore} → {selectedAlert.fishAfter}
               </strong>
             </div>
@@ -65,17 +83,26 @@ export const AlertsScreen: React.FC = () => {
         </div>
 
         {/* Correction tip card */}
-        <div className="card-decoration" style={{ padding: '20px', marginBottom: '24px', backgroundColor: 'var(--color-surface-hover)' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>Action Plan & Tips</h4>
-          <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '145%' }}>
+        <div className="
+          mb-6 rounded-[20px] border border-[rgba(13,148,136,0.02)]
+          bg-surface-card p-5 shadow-card transition-smooth
+        ">
+          <h4 className="mb-2 text-sm font-bold text-text-main">Action Plan & Tips</h4>
+          <p className="text-[13px] leading-[145%] text-text-muted">
             {selectedAlert.tip}
           </p>
         </div>
 
         {!selectedAlert.resolved ? (
-          <button 
-            className="primary-button" 
-            style={{ width: '100%', padding: '14px' }}
+          <button
+            className="
+              inline-flex w-full cursor-pointer items-center justify-center
+              gap-2 rounded-3xl border-none bg-primary-gradient px-6 py-3.5
+              font-main text-[15px] font-semibold text-text-inv
+              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              hover:bg-primary-hover-gradient
+              active:scale-[0.98]
+            "
             onClick={() => {
               resolveAlert(selectedAlert.id);
               setSelectedAlertId(null);
@@ -84,7 +111,9 @@ export const AlertsScreen: React.FC = () => {
             <Check size={18} /> Mark Alert as Resolved
           </button>
         ) : (
-          <div style={{ textAlign: 'center', padding: '12px', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-good)', borderRadius: '16px', fontWeight: 600 }}>
+          <div className="
+            rounded-2xl bg-good/10 p-3 text-center font-semibold text-good
+          ">
             ✓ Resolved Alert
           </div>
         )}
@@ -95,47 +124,52 @@ export const AlertsScreen: React.FC = () => {
   // Alerts Log List
   return (
     <div className="flex flex-col gap-6">
-      <div className="canvas-header">
+      <div className="
+        flex min-h-[75px] items-center justify-between border-b
+        border-border-card pb-3
+        max-xs:flex-col max-xs:items-start max-xs:gap-3
+      ">
         <div>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>Notifications</span>
-          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Safety Alerts</h1>
+          <span className="
+            block text-xs font-semibold text-text-muted uppercase
+          ">Notifications</span>
+          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Safety Alerts</h1>
         </div>
         <button
-          style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
+          className="
+            cursor-pointer border-none bg-transparent font-main text-sm
+            font-semibold text-primary-dark
+          "
           onClick={handleBack}
         >
           ← Back
         </button>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="flex flex-col gap-3">
         {alerts.map(alert => (
-          <div 
-            key={alert.id} 
-            className="card-decoration" 
-            style={{ 
-              padding: '16px', 
-              borderLeft: `5px solid ${
-                alert.resolved 
-                  ? 'var(--color-good)' 
-                  : alert.severity === 'critical' 
-                    ? 'var(--color-critical)' 
-                    : 'var(--color-warning)'
-              }`,
-              opacity: alert.resolved ? 0.6 : 1,
-              cursor: 'pointer'
-            }}
+          <div
+            key={alert.id}
+            className={`
+              cursor-pointer rounded-[20px] border
+              border-[rgba(13,148,136,0.02)] bg-surface-card p-4 shadow-card
+              transition-smooth
+              hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
+              hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+              ${alert.resolved ? `opacity-60` : ''}
+            `}
+            style={{ borderLeftWidth: '5px', borderLeftColor: alert.resolved ? 'var(--color-good)' : alert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)' }}
             onClick={() => setSelectedAlertId(alert.id)}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{alert.title}</h4>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{alert.timeAgo}</span>
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-text-main">{alert.title}</h4>
+              <span className="text-[11px] text-text-muted">{alert.timeAgo}</span>
             </div>
-            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <p className="mt-1 truncate text-xs text-text-muted">
               {alert.message}
             </p>
             {alert.resolved && (
-              <span style={{ fontSize: '10px', color: 'var(--color-good)', fontWeight: 600, marginTop: '8px', display: 'block' }}>
+              <span className="mt-2 block text-[10px] font-semibold text-good">
                 ✓ RESOLVED
               </span>
             )}

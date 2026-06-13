@@ -84,114 +84,99 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      backgroundColor: 'rgba(15, 23, 42, 0.6)',
-      backdropFilter: 'blur(4px)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1000
-    }}>
+    <div className="
+      fixed inset-0 z-1000 flex items-center justify-center
+      bg-[rgba(15,23,42,0.6)] backdrop-blur-xs
+    ">
       <form
         onSubmit={handleSubmit}
-        className="card-decoration"
-        style={{
-          padding: '24px',
-          width: '380px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)'
-        }}
+        className="
+          flex w-[380px] flex-col gap-4 rounded-[20px] border
+          border-[rgba(13,148,136,0.02)] bg-surface-card p-6
+          shadow-[0_20px_25px_-5px_rgba(0,0,0,0.15)]
+        "
       >
-        <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>Add Aquarium Tank</h3>
+        <h3 className="m-0 text-base font-bold text-text-main">Add Aquarium Tank</h3>
 
-        <div style={{ display: 'flex', background: 'var(--color-border)', padding: '2px', borderRadius: '10px', gap: '2px' }}>
+        <div className="flex gap-0.5 rounded-[10px] bg-border-card p-0.5">
           <button
             type="button"
             onClick={() => { setAddMode('create'); setAddError(''); }}
-            style={{
-              flex: 1,
-              padding: '6px',
-              fontSize: '12px',
-              border: 'none',
-              borderRadius: '8px',
-              background: addMode === 'create' ? 'var(--color-surface)' : 'transparent',
-              color: addMode === 'create' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
+            className={`
+              flex-1 cursor-pointer rounded-lg border-none p-1.5 text-xs
+              font-semibold transition-colors
+              ${addMode === 'create' ? `bg-surface-card text-text-main` : `
+                bg-transparent text-text-muted
+              `}
+            `}
           >
             Create New Tank
           </button>
           <button
             type="button"
             onClick={() => { setAddMode('link'); setAddError(''); }}
-            style={{
-              flex: 1,
-              padding: '6px',
-              fontSize: '12px',
-              border: 'none',
-              borderRadius: '8px',
-              background: addMode === 'link' ? 'var(--color-surface)' : 'transparent',
-              color: addMode === 'link' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
+            className={`
+              flex-1 cursor-pointer rounded-lg border-none p-1.5 text-xs
+              font-semibold transition-colors
+              ${addMode === 'link' ? `bg-surface-card text-text-main` : `
+                bg-transparent text-text-muted
+              `}
+            `}
           >
             Link Existing Tank
           </button>
         </div>
 
         {addError && (
-          <div style={{ color: 'var(--color-critical)', fontSize: '12px', fontWeight: 500 }}>
-            <AlertTriangle size={12} color="var(--color-critical)" /> {addError}
+          <div className="
+            flex items-center gap-1 text-xs font-medium text-critical
+          ">
+            <AlertTriangle size={12} className="text-critical" /> {addError}
           </div>
         )}
 
         {addMode === 'create' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="flex flex-col gap-3">
             <div>
-              <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px', fontWeight: 600 }}>AQUARIUM NAME</label>
+              <label className="
+                mb-1 block text-[11px] font-semibold text-text-muted
+              ">AQUARIUM NAME</label>
               <input
                 type="text"
                 placeholder="e.g. Bedroom Reef"
                 value={newTankName}
                 onChange={e => setNewTankName(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '10px',
-                  border: '1px solid var(--color-border)',
-                  outline: 'none',
-                  fontFamily: 'var(--font-main)',
-                  fontSize: '13px',
-                  backgroundColor: 'var(--color-surface)',
-                  color: 'var(--color-text-primary)'
-                }}
+                className="
+                  w-full rounded-[10px] border border-border-card
+                  bg-surface-card px-3 py-2 font-main text-[13px] text-text-main
+                  outline-none
+                "
                 required
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '6px', fontWeight: 600 }}>CAMERA SOURCE</label>
-              <div style={{ display: 'flex', gap: '16px', marginBottom: '8px' }}>
-                <label style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--color-text-primary)' }}>
+              <label className="
+                mb-1.5 block text-[11px] font-semibold text-text-muted
+              ">CAMERA SOURCE</label>
+              <div className="mb-2 flex gap-4">
+                <label className="
+                  flex cursor-pointer items-center gap-1.5 text-sm
+                  text-text-main
+                ">
                   <input
                     type="radio"
                     name="cameraType"
                     checked={cameraType === 'mock'}
                     onChange={() => setCameraType('mock')}
-                    style={{ accentColor: 'var(--color-primary)' }}
+                    className="accent-primary-dark"
                   />
                   Mock Feed
                 </label>
-                <label style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--color-text-primary)' }}>
+                <label className="
+                  flex cursor-pointer items-center gap-1.5 text-sm
+                  text-text-main
+                ">
                   <input
                     type="radio"
                     name="cameraType"
@@ -200,7 +185,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
                       setCameraType('webcam');
                       await requestCameraAccess();
                     }}
-                    style={{ accentColor: 'var(--color-primary)' }}
+                    className="accent-primary-dark"
                   />
                   Local Webcam
                 </label>
@@ -209,24 +194,18 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
               {cameraType === 'webcam' && (
                 <div>
                   {permissionError ? (
-                    <div style={{ color: 'var(--color-critical)', fontSize: '12px', marginTop: '4px' }}>
+                    <div className="mt-1 text-xs text-critical">
                       {permissionError}
                     </div>
                   ) : (
                     <select
                       value={selectedCamera}
                       onChange={e => setSelectedCamera(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        borderRadius: '10px',
-                        border: '1px solid var(--color-border)',
-                        outline: 'none',
-                        fontFamily: 'var(--font-main)',
-                        fontSize: '13px',
-                        backgroundColor: 'var(--color-surface)',
-                        color: 'var(--color-text-primary)'
-                      }}
+                      className="
+                        w-full rounded-[10px] border border-border-card
+                        bg-surface-card px-3 py-2 font-main text-[13px]
+                        text-text-main outline-none
+                      "
                     >
                       {cameras.length === 0 ? (
                         <option value="">Searching for cameras...</option>
@@ -245,41 +224,47 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
           </div>
         ) : (
           <div>
-            <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px', fontWeight: 600 }}>TANK REFERENCE ID / CODE</label>
+            <label className="
+              mb-1 block text-[11px] font-semibold text-text-muted
+            ">TANK REFERENCE ID / CODE</label>
             <input
               type="text"
               placeholder="e.g. tank-123456"
               value={linkTankCode}
               onChange={e => setLinkTankCode(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: '10px',
-                border: '1px solid var(--color-border)',
-                outline: 'none',
-                fontFamily: 'var(--font-main)',
-                fontSize: '13px',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text-primary)'
-              }}
+              className="
+                w-full rounded-[10px] border border-border-card bg-surface-card
+                px-3 py-2 font-main text-[13px] text-text-main outline-none
+              "
               required
             />
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+        <div className="mt-2 flex gap-2.5">
           <button
             type="button"
-            className="secondary-button"
-            style={{ flex: 1, padding: '10px', fontSize: '13px', borderRadius: '10px' }}
+            className="
+              inline-flex flex-1 cursor-pointer items-center justify-center
+              gap-2 rounded-[10px] border border-border-card bg-surface-card
+              px-5 py-2.5 font-main text-[13px] font-semibold text-text-main
+              transition-smooth
+              hover:border-text-muted hover:bg-surface-hover
+            "
             onClick={handleClose}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="primary-button"
-            style={{ flex: 1, padding: '10px', fontSize: '13px', borderRadius: '10px' }}
+            className="
+              inline-flex flex-1 cursor-pointer items-center justify-center
+              gap-2 rounded-[10px] border-none bg-primary-gradient px-5 py-2.5
+              font-main text-[13px] font-semibold text-text-inv
+              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              hover:bg-primary-hover-gradient
+              active:scale-[0.98]
+            "
           >
             {addMode === 'create' ? 'Create Tank' : 'Link Tank'}
           </button>

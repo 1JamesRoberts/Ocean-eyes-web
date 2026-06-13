@@ -9,11 +9,10 @@ const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
   const emoji = type === 'shrimp' ? '🦐' : type === 'snail' ? '🐌' : type === 'crab' ? '🦀' : '';
   const bgColor = type === 'shrimp' ? '#FF9800' : type === 'snail' ? '#8BC34A' : type === 'crab' ? '#E91E63' : 'var(--color-border)';
   return (
-    <span style={{
-      fontSize: '10px', padding: '2px 6px', borderRadius: '4px',
-      backgroundColor: bgColor, color: '#fff', fontWeight: 600,
-      textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: '1.2'
-    }}>
+    <span className="
+      rounded-sm px-1.5 py-0.5 text-[10px] leading-tight font-semibold
+      tracking-[0.5px] text-white uppercase
+    " style={{ backgroundColor: bgColor }}>
       {emoji} {type}
     </span>
   );
@@ -111,18 +110,14 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
   const showCustomOption = query.trim() && !getSpeciesByName(query.trim());
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
-      <div style={{ position: 'relative' }}>
+    <div ref={containerRef} className="relative w-full">
+      <div className="relative">
         <Search
           size={16}
-          style={{
-            position: 'absolute',
-            left: '12px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            color: 'var(--color-text-secondary)',
-            pointerEvents: 'none'
-          }}
+          className="
+            pointer-events-none absolute top-1/2 left-3 -translate-y-1/2
+            text-text-muted
+          "
         />
         <input
           ref={inputRef}
@@ -131,52 +126,33 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           placeholder={selectedSpecies ? selectedSpecies.displayName : placeholder}
-          style={{
-            width: '100%',
-            padding: '10px 12px 10px 36px',
-            borderRadius: '8px',
-            border: '1px solid var(--color-border)',
-            fontFamily: 'var(--font-main)',
-            fontSize: '14px',
-            outline: 'none',
-            backgroundColor: 'var(--color-surface)'
-          }}
+          className="
+            w-full rounded-lg border border-border-card bg-surface-card px-3
+            py-2.5 pl-9 font-main text-sm outline-none
+          "
         />
       </div>
 
       {isOpen && createPortal(
         <div
           ref={dropdownRef}
-          style={{
-            ...dropdownStyle,
-            maxHeight: '280px',
-            overflowY: 'auto',
-            backgroundColor: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-          }}
+          className="
+            max-h-[280px] overflow-y-auto rounded-lg border border-border-card
+            bg-surface-card shadow-[0_4px_12px_rgba(0,0,0,0.1)]
+          "
+          style={dropdownStyle}
         >
-          <div style={{ padding: '8px 0' }}>
+          <div className="py-2">
             {filteredSpecies.map((species) => (
               <button
                 key={species.id}
                 type="button"
                 onClick={() => handleSelect(species)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: 'none',
-                  background: selectedSpeciesId === species.id ? 'var(--color-primary-light)' : 'transparent',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontFamily: 'var(--font-main)',
-                  fontSize: '14px',
-                  color: 'var(--color-text-primary)'
-                }}
+                className="
+                  flex w-full cursor-pointer items-center gap-2.5 border-none
+                  px-3 py-2 text-left font-main text-sm text-text-main
+                "
+                style={{ background: selectedSpeciesId === species.id ? 'var(--color-primary-light)' : 'transparent' }}
                 onMouseEnter={e => {
                   if (selectedSpeciesId !== species.id) {
                     e.currentTarget.style.backgroundColor = 'var(--color-hover)';
@@ -189,12 +165,12 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 }}
               >
                 <SpeciesAvatar speciesId={species.id} />
-                <span style={{ flex: 1 }}>{species.displayName}</span>
+                <span className="flex-1">{species.displayName}</span>
                 {species.creatureType && species.creatureType !== 'fish' && (
                   <CreatureBadge type={species.creatureType} />
                 )}
                 {selectedSpeciesId === species.id && (
-                  <Check size={16} color="var(--color-primary)" />
+                  <Check size={16} className="text-primary-dark" />
                 )}
               </button>
             ))}
@@ -203,38 +179,19 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
               <button
                 type="button"
                 onClick={handleCustomSelect}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: 'none',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontFamily: 'var(--font-main)',
-                  fontSize: '14px',
-                  color: 'var(--color-primary)',
-                  fontStyle: 'italic'
-                }}
+                className="
+                  flex w-full cursor-pointer items-center gap-2.5 border-none
+                  bg-transparent px-3 py-2 text-left font-main text-sm
+                  text-primary-dark italic
+                "
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-hover)'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 <div
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '6px',
-                    backgroundColor: 'var(--color-border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: 'var(--color-text-secondary)',
-                    flexShrink: 0
-                  }}
+                  className="
+                    flex size-8 shrink-0 items-center justify-center rounded-md
+                    bg-border-card text-[11px] font-bold text-text-muted
+                  "
                 >
                   ??
                 </div>
@@ -243,7 +200,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             )}
 
             {filteredSpecies.length === 0 && !showCustomOption && (
-              <div style={{ padding: '12px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '13px' }}>
+              <div className="py-3 text-center text-[13px] text-text-muted">
                 No species found
               </div>
             )}

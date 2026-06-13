@@ -86,48 +86,45 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
   const activePresetName = [...DEFAULT_PRESETS, ...customPresets].find(p => p.id === selectedPresetId)?.name || 'Custom';
 
   return (
-    <div className="card-decoration" style={{
-      padding: isExpanded ? '24px' : '16px 24px',
-      marginBottom: '24px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: isExpanded ? '20px' : '0px'
-    }}>
+    <div
+      className={`
+        flex flex-col rounded-[20px] border border-[rgba(13,148,136,0.02)]
+        bg-surface-card shadow-card transition-smooth
+        ${isExpanded ? `gap-5 p-6` : `gap-0 px-6 py-4`}
+        mb-6
+      `}
+    >
       <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          cursor: 'pointer',
-          userSelect: 'none'
-        }}
+        className="flex cursor-pointer items-center justify-between select-none"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><SlidersHorizontal size={16} /> Stream Image Adjustments</span>
+        <h3 className="
+          m-0 flex items-center gap-2 text-[15px] font-bold text-text-main
+        ">
+          <span className="flex items-center gap-1.5"><SlidersHorizontal size={16} /> Stream Image Adjustments</span>
           {!isExpanded && selectedPresetId !== 'normal' && (
-            <span style={{
-              fontSize: '11px',
-              fontWeight: 500,
-              background: 'var(--color-primary-light)',
-              color: 'var(--color-primary-dark)',
-              padding: '2px 8px',
-              borderRadius: '12px',
-              marginLeft: '8px'
-            }}>
+            <span className="
+              ml-2 rounded-xl bg-primary-light-gradient px-2 py-0.5 text-[11px]
+              font-medium text-primary-dark
+            ">
               Active: {activePresetName}
             </span>
           )}
         </h3>
-        <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-secondary)' }}>
+        <div className="flex items-center text-text-muted">
           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </div>
       </div>
 
       {isExpanded && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', margin: 0, borderBottom: '1px solid var(--color-border)', paddingBottom: '6px' }}>
+        <div className="
+          grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6
+        ">
+          <div className="flex flex-col gap-4">
+            <h4 className="
+              m-0 border-b border-border-card pb-1.5 text-[13px] font-semibold
+              text-text-muted
+            ">
               TUNING SLIDERS
             </h4>
 
@@ -139,9 +136,9 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
               { key: 'tint' as const, label: 'Tint (Green / Magenta)', min: -80, max: 80 }
             ] as const).map(({ key, label, min, max }) => (
               <div key={key}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{label}</span>
-                  <span style={{ color: 'var(--color-primary)' }}>
+                <div className="mb-1 flex justify-between text-xs">
+                  <span className="font-semibold text-text-main">{label}</span>
+                  <span className="text-primary-dark">
                     {key === 'temperature'
                       ? filters.temperature > 0 ? `Warm (+${filters.temperature})` : filters.temperature < 0 ? `Cool (${filters.temperature})` : 'Neutral'
                       : key === 'tint'
@@ -149,16 +146,19 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
                         : `${filters[key]}%`}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="flex items-center gap-2.5">
                   <input
                     type="range" min={min} max={max} step="5"
                     value={filters[key]}
                     onChange={(e) => onFilterChange({ [key]: parseInt(e.target.value) })}
-                    style={{ flex: 1, accentColor: 'var(--color-primary-dark)' }}
+                    className="flex-1 accent-primary-dark"
                   />
                   <button
                     onClick={() => onFilterChange({ [key]: key === 'temperature' || key === 'tint' ? 0 : 100 })}
-                    style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: '10px' }}
+                    className="
+                      cursor-pointer border-none bg-transparent text-[10px]
+                      text-text-muted
+                    "
                   >
                     Reset
                   </button>
@@ -167,26 +167,30 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
             ))}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', margin: 0, borderBottom: '1px solid var(--color-border)', paddingBottom: '6px' }}>
+          <div className="flex flex-col gap-4">
+            <h4 className="
+              m-0 border-b border-border-card pb-1.5 text-[13px] font-semibold
+              text-text-muted
+            ">
               FILTER PRESETS
             </h4>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div className="flex flex-wrap gap-2">
               {DEFAULT_PRESETS.map(preset => (
                 <button
                   key={preset.id}
                   onClick={() => applyPreset(preset)}
-                  className="secondary-button"
+                  className="
+                    inline-flex cursor-pointer items-center justify-center gap-2
+                    rounded-lg border border-border-card bg-surface-card px-3
+                    py-2 font-main text-xs font-semibold text-text-main
+                    transition-smooth
+                    hover:border-text-muted hover:bg-surface-hover
+                  "
                   style={{
-                    padding: '8px 12px',
-                    fontSize: '12px',
-                    borderRadius: '8px',
-                    background: selectedPresetId === preset.id ? 'var(--color-primary-light)' : 'var(--color-surface)',
-                    color: selectedPresetId === preset.id ? 'var(--color-primary-dark)' : 'var(--color-text-primary)',
-                    borderColor: selectedPresetId === preset.id ? 'var(--color-primary)' : 'var(--color-border)',
-                    fontWeight: 600,
-                    cursor: 'pointer'
+                    background: selectedPresetId === preset.id ? 'var(--color-primary-light)' : undefined,
+                    color: selectedPresetId === preset.id ? 'var(--color-primary-dark)' : undefined,
+                    borderColor: selectedPresetId === preset.id ? 'var(--color-primary)' : undefined
                   }}
                 >
                   {preset.name}
@@ -196,43 +200,32 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
               {customPresets.map(preset => (
                 <div
                   key={preset.id}
-                  style={{ display: 'flex', alignItems: 'center', gap: '4px', position: 'relative' }}
+                  className="relative flex items-center gap-1"
                 >
                   <button
                     onClick={() => applyPreset(preset)}
-                    className="secondary-button"
+                    className="
+                      inline-flex cursor-pointer items-center justify-center
+                      gap-2 rounded-lg border border-border-card bg-surface-card
+                      py-2 pr-6 pl-3 font-main text-xs font-semibold
+                      text-text-main transition-smooth
+                      hover:border-text-muted hover:bg-surface-hover
+                    "
                     style={{
-                      padding: '8px 24px 8px 12px',
-                      fontSize: '12px',
-                      borderRadius: '8px',
-                      background: selectedPresetId === preset.id ? 'var(--color-primary-light)' : 'var(--color-surface)',
-                      color: selectedPresetId === preset.id ? 'var(--color-primary-dark)' : 'var(--color-text-primary)',
-                      borderColor: selectedPresetId === preset.id ? 'var(--color-primary)' : 'var(--color-border)',
-                      fontWeight: 600,
-                      cursor: 'pointer'
+                      background: selectedPresetId === preset.id ? 'var(--color-primary-light)' : undefined,
+                      color: selectedPresetId === preset.id ? 'var(--color-primary-dark)' : undefined,
+                      borderColor: selectedPresetId === preset.id ? 'var(--color-primary)' : undefined
                     }}
                   >
                     {preset.name}
                   </button>
                   <button
                     onClick={(e) => handleDeletePreset(preset.id, e)}
-                    style={{
-                      position: 'absolute',
-                      right: '6px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--color-critical)',
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '14px',
-                      height: '14px',
-                      padding: 0
-                    }}
+                    className="
+                      absolute top-1/2 right-1.5 flex size-3.5 -translate-y-1/2
+                      cursor-pointer items-center justify-center border-none
+                      bg-transparent p-0 text-xs text-critical
+                    "
                     title="Delete Preset"
                   >
                     ×
@@ -242,37 +235,41 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
             </div>
 
             {showSaveInput ? (
-              <form onSubmit={handleSavePreset} style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+              <form onSubmit={handleSavePreset} className="mt-2.5 flex gap-2">
                 <input
                   type="text"
                   placeholder="Preset Name..."
                   value={newPresetName}
                   onChange={e => setNewPresetName(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--color-border)',
-                    backgroundColor: 'var(--color-surface)',
-                    color: 'var(--color-text-primary)',
-                    fontFamily: 'var(--font-main)',
-                    fontSize: '12px',
-                    outline: 'none'
-                  }}
+                  className="
+                    flex-1 rounded-lg border border-border-card bg-surface-card
+                    px-3 py-2 font-main text-xs text-text-main outline-none
+                  "
                   maxLength={20}
                   required
                 />
                 <button
                   type="submit"
-                  className="primary-button"
-                  style={{ padding: '8px 12px', fontSize: '12px', borderRadius: '8px' }}
+                  className="
+                    inline-flex cursor-pointer items-center justify-center gap-2
+                    rounded-lg border-none bg-primary-gradient px-3 py-2
+                    font-main text-xs font-semibold text-text-inv
+                    shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+                    hover:bg-primary-hover-gradient
+                    active:scale-[0.98]
+                  "
                 >
                   Save
                 </button>
                 <button
                   type="button"
-                  className="secondary-button"
-                  style={{ padding: '8px 12px', fontSize: '12px', borderRadius: '8px' }}
+                  className="
+                    inline-flex cursor-pointer items-center justify-center gap-2
+                    rounded-lg border border-border-card bg-surface-card px-3
+                    py-2 font-main text-xs font-semibold text-text-main
+                    transition-smooth
+                    hover:border-text-muted hover:bg-surface-hover
+                  "
                   onClick={() => { setShowSaveInput(false); setNewPresetName(''); }}
                 >
                   Cancel
@@ -280,24 +277,17 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
               </form>
             ) : (
               <button
-                className="secondary-button"
-                style={{
-                  alignSelf: 'flex-start',
-                  padding: '8px 12px',
-                  fontSize: '12px',
-                  borderRadius: '8px',
-                  borderColor: 'var(--color-primary)',
-                  color: 'var(--color-primary-dark)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  marginTop: '8px',
-                  cursor: 'pointer'
-                }}
+                className="
+                  mt-2 inline-flex cursor-pointer items-center gap-1 self-start
+                  rounded-lg border border-primary-dark bg-surface-card px-3
+                  py-2 font-main text-xs font-semibold text-primary-dark
+                  transition-smooth
+                  hover:bg-surface-hover
+                "
                 onClick={() => setShowSaveInput(true)}
               >
-                <Plus size={12} style={{ color: 'var(--color-primary)' }} />
-                <span style={{ color: 'var(--color-primary-dark)' }}>Save Current as Preset</span>
+                <Plus size={12} className="text-primary-dark" />
+                <span className="text-primary-dark">Save Current as Preset</span>
               </button>
             )}
           </div>

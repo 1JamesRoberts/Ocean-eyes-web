@@ -34,47 +34,61 @@ export const SettingsScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="canvas-header">
+      <div className="
+        flex min-h-[75px] items-center justify-between border-b
+        border-border-card pb-3
+        max-xs:flex-col max-xs:items-start max-xs:gap-3
+      ">
         <div>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Control Panel</span>
-          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Tank Settings</h1>
+          <span className="text-xs font-semibold text-text-muted uppercase">Control Panel</span>
+          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Tank Settings</h1>
         </div>
       </div>
 
       {/* Tank Identity */}
-      <div className="card-decoration" style={{ padding: '20px', marginBottom: '20px' }}>
+      <div className="
+        mb-5 rounded-[20px] border border-[rgba(13,148,136,0.02)]
+        bg-surface-card p-5 shadow-card transition-smooth
+      ">
         {editing ? (
-          <form onSubmit={handleNameChange} style={{ display: 'flex', gap: '10px' }}>
+          <form onSubmit={handleNameChange} className="flex gap-2.5">
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              style={{
-                flex: 1,
-                padding: '8px 12px',
-                borderRadius: '10px',
-                border: '1px solid var(--color-border)',
-                outline: 'none',
-                fontFamily: 'var(--font-main)',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text-primary)'
-              }}
+              className="
+                flex-1 rounded-[10px] border border-border-card bg-surface-card
+                px-3 py-2 font-main text-text-main outline-none
+              "
             />
-            <button className="primary-button" style={{ padding: '8px 16px', fontSize: '13px', borderRadius: '10px' }} type="submit">
+            <button className="
+              inline-flex cursor-pointer items-center justify-center gap-2
+              rounded-[10px] border-none bg-primary-gradient px-4 py-2 font-main
+              text-[13px] font-semibold text-text-inv
+              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              hover:bg-primary-hover-gradient
+              active:scale-[0.98]
+            " type="submit">
               Save
             </button>
           </form>
         ) : (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="flex items-center justify-between">
             <div>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Tank Name</span>
-              <strong style={{ fontSize: '18px', display: 'block', color: 'var(--color-text-primary)', marginTop: '2px' }}>
+              <span className="
+                text-[11px] font-semibold text-text-muted uppercase
+              ">Tank Name</span>
+              <strong className="mt-0.5 block text-lg text-text-main">
                 {activeTank?.name}
               </strong>
             </div>
             <button
-              className="secondary-button"
-              style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '12px' }}
+              className="
+                inline-flex cursor-pointer items-center justify-center gap-2
+                rounded-xl border border-border-card bg-surface-card px-3 py-1.5
+                font-main text-xs font-semibold text-text-main transition-smooth
+                hover:border-text-muted hover:bg-surface-hover
+              "
               onClick={() => setEditing(true)}
             >
               Rename
@@ -82,57 +96,76 @@ export const SettingsScreen: React.FC = () => {
           </div>
         )}
 
-        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--color-border)', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+        <div className="
+          mt-4 border-t border-border-card pt-4 text-xs text-text-muted
+        ">
           <span>Tank Reference Code: </span>
-          <code style={{ fontSize: '11px', padding: '2px 6px', display: 'inline-block', verticalAlign: 'middle', marginLeft: '4px' }}>
+          <code className="
+            ml-1 inline-block px-1.5 py-0.5 align-middle text-[11px]
+          ">
             {activeTank?.id}
           </code>
         </div>
       </div>
 
       {/* Menu Options */}
-      <div className="card-decoration" style={{ padding: '4px 16px', marginBottom: '20px' }}>
+      <div className="
+        mb-5 rounded-[20px] border border-[rgba(13,148,136,0.02)]
+        bg-surface-card px-4 py-1 shadow-card transition-smooth
+      ">
         <div
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: '1px solid var(--color-border)', cursor: 'pointer' }}
+          className="
+            flex cursor-pointer items-center justify-between border-b
+            border-border-card py-4
+          "
           onClick={() => setActiveTab('my_fish')}
         >
-          <span style={{ fontSize: '15px', fontWeight: 600 }}>Manage Fish Inventory</span>
-          <ChevronRight size={18} style={{ color: 'var(--color-text-secondary)' }} />
+          <span className="text-[15px] font-semibold">Manage Fish Inventory</span>
+          <ChevronRight size={18} className="text-text-muted" />
         </div>
 
         <div
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: '1px solid var(--color-border)', cursor: 'pointer' }}
+          className="
+            flex cursor-pointer items-center justify-between border-b
+            border-border-card py-4
+          "
           onClick={() => setActiveTab('history')}
         >
-          <span style={{ fontSize: '15px', fontWeight: 600 }}>Water Clarity Reports</span>
-          <ChevronRight size={18} style={{ color: 'var(--color-text-secondary)' }} />
+          <span className="text-[15px] font-semibold">Water Clarity Reports</span>
+          <ChevronRight size={18} className="text-text-muted" />
         </div>
 
         <div
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: '1px solid var(--color-border)', cursor: 'pointer' }}
+          className="
+            flex cursor-pointer items-center justify-between border-b
+            border-border-card py-4
+          "
           onClick={() => setActiveTab('alerts')}
         >
-          <span style={{ fontSize: '15px', fontWeight: 600 }}>Safety Alert Logs</span>
-          <ChevronRight size={18} style={{ color: 'var(--color-text-secondary)' }} />
+          <span className="text-[15px] font-semibold">Safety Alert Logs</span>
+          <ChevronRight size={18} className="text-text-muted" />
         </div>
 
         <div
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', cursor: 'pointer' }}
+          className="flex cursor-pointer items-center justify-between py-4"
           onClick={() => setActiveTab('monitor')}
         >
-          <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-primary)' }}>IoT Scanner Console</span>
-          <ChevronRight size={18} style={{ color: 'var(--color-primary)' }} />
+          <span className="text-[15px] font-semibold text-primary-dark">IoT Scanner Console</span>
+          <ChevronRight size={18} className="text-primary-dark" />
         </div>
       </div>
 
       {/* Safety Threshold Settings Slider equivalent */}
-      <div className="card-decoration" style={{ padding: '20px', marginBottom: '24px' }}>
-        <h4 className="text-sm font-bold text-[var(--color-text-primary)] mb-4">Safety Boundaries & Notification Thresholds</h4>
+      <div className="
+        mb-6 rounded-[20px] border border-[rgba(13,148,136,0.02)]
+        bg-surface-card p-5 shadow-card transition-smooth
+      ">
+        <h4 className="mb-4 text-sm font-bold text-text-main">Safety Boundaries & Notification Thresholds</h4>
 
         <div className="mb-4">
-          <div className="flex justify-between text-[13px] mb-1.5">
-            <span className="text-[var(--color-text-secondary)]">Maximum FNU Threshold</span>
-            <strong className="text-[var(--color-primary)]">{activeTank?.thresholds.max_turbidity_fnu || 6.0} FNU</strong>
+          <div className="mb-1.5 flex justify-between text-[13px]">
+            <span className="text-text-muted">Maximum FNU Threshold</span>
+            <strong className="text-primary-dark">{activeTank?.thresholds.max_turbidity_fnu || 6.0} FNU</strong>
           </div>
           <input
             type="range"
@@ -155,15 +188,14 @@ export const SettingsScreen: React.FC = () => {
               const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
               flushThresholds(val, fishPct);
             }}
-            className="w-full"
-            style={{ accentColor: 'var(--color-primary-dark)' }}
+            className="w-full accent-primary-dark"
           />
         </div>
 
         <div>
-          <div className="flex justify-between text-[13px] mb-1.5">
-            <span className="text-[var(--color-text-secondary)]">Discrepancy Alarm Trigger</span>
-            <strong className="text-[var(--color-primary)]">{activeTank?.thresholds.fish_change_pct || 50.0}% visibility</strong>
+          <div className="mb-1.5 flex justify-between text-[13px]">
+            <span className="text-text-muted">Discrepancy Alarm Trigger</span>
+            <strong className="text-primary-dark">{activeTank?.thresholds.fish_change_pct || 50.0}% visibility</strong>
           </div>
           <input
             type="range"
@@ -186,30 +218,42 @@ export const SettingsScreen: React.FC = () => {
               const clar = activeTank?.thresholds.max_turbidity_fnu || 6.0;
               flushThresholds(clar, val);
             }}
-            className="w-full"
-            style={{ accentColor: 'var(--color-primary-dark)' }}
+            className="w-full accent-primary-dark"
           />
         </div>
       </div>
 
       {/* Disconnect button with confirmation */}
       {showConfirmUnlink ? (
-        <div className="card-decoration" style={{ padding: '20px', border: '1px solid var(--color-critical)', backgroundColor: 'rgba(239, 68, 68, 0.05)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <strong style={{ fontSize: '14px', color: 'var(--color-critical)' }}>Are you sure you want to disconnect?</strong>
-          <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: '140%' }}>
+        <div className="
+          flex flex-col gap-3 rounded-[20px] border border-critical
+          bg-critical/5 p-5 shadow-card transition-smooth
+        ">
+          <strong className="text-sm text-critical">Are you sure you want to disconnect?</strong>
+          <p className="m-0 text-xs leading-[140%] text-text-muted">
             This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
           </p>
-          <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+          <div className="mt-1 flex gap-2.5">
             <button
-              className="secondary-button"
-              style={{ flex: 1, padding: '8px', fontSize: '12px', borderRadius: '10px' }}
+              className="
+                inline-flex flex-1 cursor-pointer items-center justify-center
+                gap-2 rounded-[10px] border border-border-card bg-surface-card
+                p-2 font-main text-xs font-semibold text-text-main
+                transition-smooth
+                hover:border-text-muted hover:bg-surface-hover
+              "
               onClick={() => setShowConfirmUnlink(false)}
             >
               Cancel
             </button>
             <button
-              className="primary-button"
-              style={{ flex: 1, padding: '8px', fontSize: '12px', borderRadius: '10px', backgroundColor: 'var(--color-critical)', borderColor: 'var(--color-critical)' }}
+              className="
+                inline-flex flex-1 cursor-pointer items-center justify-center
+                gap-2 rounded-[10px] border-none bg-critical p-2 font-main
+                text-xs font-semibold text-text-inv transition-smooth
+                hover:opacity-90
+                active:scale-[0.98]
+              "
               onClick={() => { unlinkTank(); setActiveTab('home'); }}
             >
               Yes, Disconnect
@@ -218,8 +262,12 @@ export const SettingsScreen: React.FC = () => {
         </div>
       ) : (
         <button
-          className="secondary-button"
-          style={{ width: '100%', color: 'var(--color-critical)', borderColor: 'rgba(239, 68, 68, 0.2)', padding: '14px' }}
+          className="
+            inline-flex w-full cursor-pointer items-center justify-center gap-2
+            rounded-3xl border border-critical/20 bg-surface-card px-5 py-3.5
+            font-main text-[14px] font-semibold text-critical transition-smooth
+            hover:bg-critical/5
+          "
           onClick={() => setShowConfirmUnlink(true)}
         >
           Disconnect from Tank

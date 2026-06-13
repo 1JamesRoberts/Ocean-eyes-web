@@ -44,7 +44,9 @@ interface DonutChartProps {
 const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
   if (speciesDistribution.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[200px] text-text-muted">
+      <div className="
+        flex h-[200px] items-center justify-center text-text-muted
+      ">
         No fish data available
       </div>
     );
@@ -67,7 +69,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative w-[200px] h-[200px]">
+      <div className="relative size-[200px]">
         <svg width="200" height="200" viewBox="0 0 200 200">
           <g transform="rotate(-90 100 100)">
             {segmentsWithOffsets.map(({ species, dashLength, gapLength, offset, index }) => (
@@ -86,18 +88,20 @@ const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
             ))}
           </g>
         </svg>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+        <div className="absolute top-1/2 left-1/2 -translate-1/2 text-center">
           <div className="text-[28px] font-extrabold text-text-main">{total}</div>
-          <div className="text-[11px] text-text-muted font-semibold">TOTAL FISH</div>
+          <div className="text-[11px] font-semibold text-text-muted">TOTAL FISH</div>
         </div>
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-2 justify-center w-full">
+      <div className="flex w-full flex-wrap justify-center gap-2">
         {speciesDistribution.map((species, index) => (
-          <div key={index} className="flex items-center gap-1.5 text-xs font-semibold">
+          <div key={index} className="
+            flex items-center gap-1.5 text-xs font-semibold
+          ">
             <div 
-              className="w-2.5 h-2.5 rounded-[3px]"
+              className="size-2.5 rounded-[3px]"
               style={{ backgroundColor: species.color }} 
             />
             <span className="text-text-muted">
@@ -119,7 +123,10 @@ const FishThumbnail: React.FC<{ imagePath?: string; initials: string; color: str
     if (!imagePath || hasError) {
       return (
         <div 
-          className="rounded-lg flex items-center justify-center font-bold text-white shrink-0 shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
+          className="
+            flex shrink-0 items-center justify-center rounded-lg font-bold
+            text-white shadow-[0_1px_2px_rgba(0,0,0,0.3)]
+          "
           style={{
             width: s, height: s,
             backgroundColor: color, fontSize: Math.round(s * 0.3),
@@ -132,7 +139,7 @@ const FishThumbnail: React.FC<{ imagePath?: string; initials: string; color: str
     }
     return (
       <img src={imagePath} alt={initials}
-        className="rounded-lg object-contain shrink-0"
+        className="shrink-0 rounded-lg object-contain"
         style={{ width: s, height: s }}
         onError={() => setHasError(true)}
       />
@@ -143,9 +150,15 @@ const FishThumbnail: React.FC<{ imagePath?: string; initials: string; color: str
 
 const DetailChip: React.FC<{ icon: React.ReactNode; label: string; value: string; colorClass?: string }> =
   ({ icon, label, value, colorClass }) => (
-    <div className={`flex items-center gap-1.5 p-[8px_12px] rounded-xl text-xs font-semibold text-text-main ${colorClass || 'bg-[rgba(148,163,184,0.12)]'}`}>
+    <div className={`
+      flex items-center gap-1.5 rounded-xl p-[8px_12px] text-xs font-semibold
+      text-text-main
+      ${colorClass || `bg-[rgba(148,163,184,0.12)]`}
+    `}>
       {icon}
-      <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider mr-0.5">{label}</span>
+      <span className="
+        mr-0.5 text-[10px] font-medium tracking-wider text-text-muted uppercase
+      ">{label}</span>
       {value}
     </div>
   );
@@ -228,16 +241,24 @@ export const MyFishScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="canvas-header">
+      <div className="
+        flex min-h-[75px] items-center justify-between border-b
+        border-border-card pb-3
+        max-xs:flex-col max-xs:items-start max-xs:gap-3
+      ">
         <div>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>
+          <span className="
+            block text-xs font-semibold text-text-muted uppercase
+          ">
             My Fish
           </span>
-          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Fish Inventory</h1>
+          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Fish Inventory</h1>
         </div>
         <button
           aria-label={showAddForm ? 'Close' : 'Add fish'}
-          style={{ background: 'none', border: 'none', color: 'var(--color-primary-dark)', padding: '6px', cursor: 'pointer' }}
+          className="
+            cursor-pointer border-none bg-transparent p-1.5 text-primary-dark
+          "
           onClick={() => setShowAddForm(!showAddForm)}
         >
           <Plus size={24} />
@@ -245,13 +266,26 @@ export const MyFishScreen: React.FC = () => {
       </div>
 
       {/* ─── Add Form ─── */}
-      <div className={`overflow-hidden transition-[max-height_0.4s_cubic-bezier(0.4,0,0.2,1),opacity_0.3s_ease,transform_0.4s_cubic-bezier(0.4,0,0.2,1),margin_0.4s_ease] -translate-y-3 origin-top relative z-50 ${
-        showAddForm ? 'max-h-[500px] opacity-100 translate-y-0 mb-5' : 'max-h-0 opacity-0 pointer-events-none'
-      }`}>
-        <form onSubmit={handleAdd} className="bg-surface-card rounded-[20px] p-6 shadow-card border border-[rgba(13,148,136,0.02)] transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] flex flex-col gap-3.5">
+      <div className={`
+        relative z-50 origin-top -translate-y-3 overflow-hidden
+        transition-[max-height_0.4s_cubic-bezier(0.4,0,0.2,1),opacity_0.3s_ease,transform_0.4s_cubic-bezier(0.4,0,0.2,1),margin_0.4s_ease]
+        ${
+        showAddForm ? 'mb-5 max-h-[500px] translate-y-0 opacity-100' : `
+          pointer-events-none max-h-0 opacity-0
+        `
+      }
+      `}>
+        <form onSubmit={handleAdd} className="
+          flex flex-col gap-3.5 rounded-[20px] border
+          border-[rgba(13,148,136,0.02)] bg-surface-card p-6 shadow-card
+          transition-smooth
+        ">
           <h4 className="text-sm font-bold text-text-main">Add New Species Entry</h4>
           <div>
-            <label className="block text-[11px] text-text-muted mb-1 font-semibold uppercase tracking-wider">SPECIES</label>
+            <label className="
+              mb-1 block text-[11px] font-semibold tracking-wider
+              text-text-muted uppercase
+            ">SPECIES</label>
             <SpeciesSelector
               selectedSpeciesId={selectedSpeciesId}
               onSelect={handleSpeciesSelect}
@@ -259,11 +293,24 @@ export const MyFishScreen: React.FC = () => {
               excludeSpeciesIds={fishList.map(f => f.speciesId)}
             />
           </div>
-          <div className="flex gap-2.5 mt-1.5">
-            <button className="primary-button" style={{ flex: 1, padding: '10px', fontSize: '13px' }} type="submit">
+          <div className="mt-1.5 flex gap-2.5">
+            <button className="
+              inline-flex flex-1 cursor-pointer items-center justify-center
+              gap-2 rounded-3xl border-none bg-primary-gradient px-5 py-2.5
+              font-main text-[13px] font-semibold text-text-inv
+              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              hover:bg-primary-hover-gradient
+              active:scale-[0.98]
+            " type="submit">
               Add Species
             </button>
-            <button className="secondary-button" style={{ padding: '10px 14px', fontSize: '13px' }} type="button"
+            <button className="
+              inline-flex cursor-pointer items-center justify-center gap-2
+              rounded-3xl border border-border-card bg-surface-card px-3.5
+              py-2.5 font-main text-[13px] font-semibold text-text-main
+              transition-smooth
+              hover:border-text-muted hover:bg-surface-hover
+            " type="button"
               onClick={() => { setShowAddForm(false); setName(''); setSelectedSpeciesId(null); }}>
               Cancel
             </button>
@@ -272,19 +319,28 @@ export const MyFishScreen: React.FC = () => {
       </div>
 
       {/* ─── Layout ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-6">
+      <div className="
+        grid grid-cols-1 gap-6
+        md:grid-cols-[2fr_3fr]
+      ">
         {/* Left Column — Chart & Stats */}
         <div className="flex flex-col gap-4">
-          <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)]">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="
+            rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
+            p-5 shadow-card
+          ">
+            <div className="mb-4 flex items-center gap-2">
               <BarChart3 size={18} className="text-primary-dark" />
               <h3 className="text-base font-bold text-text-main">Species Distribution</h3>
             </div>
             <DonutChart speciesDistribution={speciesDistribution} />
           </div>
 
-          <div className="bg-surface-card rounded-[20px] p-5 shadow-card border border-[rgba(13,148,136,0.02)]">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="
+            rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
+            p-5 shadow-card
+          ">
+            <div className="mb-4 flex items-center gap-2">
               <Fish size={18} className="text-primary-dark" />
               <h3 className="text-base font-bold text-text-main">Aquarium Overview</h3>
             </div>
@@ -295,10 +351,14 @@ export const MyFishScreen: React.FC = () => {
                 { icon: <Eye size={14} />, color: 'var(--color-good)', bg: 'rgba(16, 185, 129, 0.08)', label: 'Detected', value: stats.totalDetected },
                 { icon: <BarChart3 size={14} />, color: 'var(--color-warning)', bg: 'rgba(245, 158, 11, 0.08)', label: 'Detection', value: `${stats.detectionRate}%` },
               ].map((item, i) => (
-                <div key={i} style={{ background: item.bg }} className="rounded-xl p-3.5 flex flex-col gap-1">
+                <div key={i} style={{ background: item.bg }} className="
+                  flex flex-col gap-1 rounded-xl p-3.5
+                ">
                   <div className="flex items-center gap-1.5">
                     <span style={{ color: item.color }}>{item.icon}</span>
-                    <span style={{ color: item.color }} className="text-[11px] font-bold uppercase tracking-wider">{item.label}</span>
+                    <span style={{ color: item.color }} className="
+                      text-[11px] font-bold tracking-wider uppercase
+                    ">{item.label}</span>
                   </div>
                   <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
                 </div>
@@ -310,7 +370,11 @@ export const MyFishScreen: React.FC = () => {
         {/* Right Column — Fish Cards */}
         <div className="flex flex-col gap-3">
           {fishList.length === 0 && (
-            <div className="bg-surface-card rounded-[20px] p-10 shadow-card border border-[rgba(13,148,136,0.02)] flex flex-col items-center justify-center gap-3 text-text-muted">
+            <div className="
+              flex flex-col items-center justify-center gap-3 rounded-[20px]
+              border border-[rgba(13,148,136,0.02)] bg-surface-card p-10
+              text-text-muted shadow-card
+            ">
               <span className="text-5xl">🐟</span>
               <p className="text-base font-bold text-text-main">No fish in your inventory</p>
               <p className="text-xs">Tap + to add your first species</p>
@@ -333,19 +397,27 @@ export const MyFishScreen: React.FC = () => {
 
             return (
               <div key={fish.id} data-fish-card
-                className="bg-surface-card rounded-[20px] shadow-card border border-[rgba(13,148,136,0.02)] cursor-pointer overflow-hidden transition-[box-shadow_0.25s_cubic-bezier(0.4,0,0.2,1)] hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)] flex flex-col"
+                className="
+                  flex cursor-pointer flex-col overflow-hidden rounded-[20px]
+                  border border-[rgba(13,148,136,0.02)] bg-surface-card
+                  shadow-card
+                  transition-[box-shadow_0.25s_cubic-bezier(0.4,0,0.2,1)]
+                  hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+                "
                 onClick={() => setActiveFishId(isActive ? null : fish.id)}
               >
                 {/* Main row — always visible */}
-                <div className="flex justify-between items-center p-3">
-                  <div className="flex items-center gap-3 flex-1">
+                <div className="flex items-center justify-between p-3">
+                  <div className="flex flex-1 items-center gap-3">
                     <FishThumbnail imagePath={display.imagePath} initials={display.initials} color={display.color} />
                     <div className="flex-1">
-                      <span className="text-base font-bold text-text-main block">{display.name}</span>
+                      <span className="block text-base font-bold text-text-main">{display.name}</span>
                       {species?.scientificName && (
-                        <span className="text-xs italic text-text-muted mb-1 block font-medium">{species.scientificName}</span>
+                        <span className="
+                          mb-1 block text-xs font-medium text-text-muted italic
+                        ">{species.scientificName}</span>
                       )}
-                      <span className="block text-xs text-text-muted mt-0.5">
+                      <span className="mt-0.5 block text-xs text-text-muted">
                         Visible: {fish.detected} / {fish.count}
                       </span>
                     </div>
@@ -360,30 +432,48 @@ export const MyFishScreen: React.FC = () => {
                       const dash = (circ * pct) / 100;
                       return (
                         <div className="flex items-center gap-2.5">
-                          <div className="relative w-11 h-11">
+                          <div className="relative size-11">
                             <svg width="44" height="44" viewBox="0 0 44 44" style={{ overflow: 'visible' }}>
                               <circle cx="22" cy="22" r={r} fill="none" stroke="var(--color-border)" strokeWidth="5" />
                               <circle cx="22" cy="22" r={r} fill="none" stroke={c} strokeWidth="5"
                                 strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
                                 transform="rotate(-90 22 22)" style={{ transition: 'stroke-dasharray 0.3s ease' }} />
                             </svg>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"><Eye size={16} color={c} /></div>
+                            <div className="
+                              absolute top-1/2 left-1/2 -translate-1/2
+                            "><Eye size={16} color={c} /></div>
                           </div>
-                          <span className="text-[13px] font-bold min-w-[40px]" style={{ color: c }}>{pct}%</span>
+                          <span className="min-w-[40px] text-[13px] font-bold" style={{ color: c }}>{pct}%</span>
                         </div>
                       );
                     })()}
 
                     {isActive && (
                       <>
-                        <div className="flex items-center bg-background-app rounded-xl p-0.5">
-                          <button className="w-6 h-6 border-none bg-transparent text-base font-extrabold cursor-pointer flex items-center justify-center text-text-main"
+                        <div className="
+                          flex items-center rounded-xl bg-background-app p-0.5
+                        ">
+                          <button className="
+                            flex size-6 cursor-pointer items-center
+                            justify-center border-none bg-transparent text-base
+                            font-extrabold text-text-main
+                          "
                             onClick={() => updateFishCount(fish.id, Math.max(1, fish.count - 1))}>−</button>
-                          <span className="w-6 text-center text-[13px] font-bold text-text-main">{fish.count}</span>
-                          <button className="w-6 h-6 border-none bg-transparent text-base font-extrabold cursor-pointer flex items-center justify-center text-text-main"
+                          <span className="
+                            w-6 text-center text-[13px] font-bold text-text-main
+                          ">{fish.count}</span>
+                          <button className="
+                            flex size-6 cursor-pointer items-center
+                            justify-center border-none bg-transparent text-base
+                            font-extrabold text-text-main
+                          "
                             onClick={() => updateFishCount(fish.id, fish.count + 1)}>+</button>
                         </div>
-                        <button className="bg-transparent border-none text-[#94A3B8] cursor-pointer flex p-1 transition-colors duration-200 hover:text-critical" onClick={() => setFishToDelete(fish.id)}>
+                        <button className="
+                          flex cursor-pointer border-none bg-transparent p-1
+                          text-[#94A3B8] transition-colors duration-200
+                          hover:text-critical
+                        " onClick={() => setFishToDelete(fish.id)}>
                           <Trash2 size={16} />
                         </button>
                       </>
@@ -392,13 +482,26 @@ export const MyFishScreen: React.FC = () => {
                 </div>
 
                 {/* ─── Expanded Detail Panel ─── */}
-                <div className={`grid transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)] ${isActive && species ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                <div className={`
+                  grid
+                  transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
+                  ${isActive && species ? `grid-rows-[1fr]` : `grid-rows-[0fr]`}
+                `}>
                   <div className="overflow-hidden">
-                    <div className={`p-[0_12px_16px_12px] transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)] ${isActive && species ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3'}`}>
+                    <div className={`
+                      p-[0_12px_16px_12px]
+                      transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)]
+                      ${isActive && species ? 'translate-y-0 opacity-100' : `
+                        -translate-y-3 opacity-0
+                      `}
+                    `}>
                       {species && (
                         <>
                           {/* Parameter chips — 2-column grid */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3.5">
+                          <div className="
+                            mb-3.5 grid grid-cols-1 gap-3
+                            sm:grid-cols-2
+                          ">
                             <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} colorClass="bg-[rgba(59,130,246,0.08)]" />
                             <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass="bg-[rgba(16,185,129,0.08)]" />
                             <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass="bg-[rgba(245,158,11,0.08)]" />
@@ -413,22 +516,38 @@ export const MyFishScreen: React.FC = () => {
 
                           {/* Origin */}
                           {species.origin && (
-                            <span className="text-[11px] p-[4px_10px] rounded-[20px] bg-[rgba(13,148,136,0.08)] text-primary-dark font-semibold inline-block">{species.origin}</span>
+                            <span className="
+                              inline-block rounded-[20px]
+                              bg-[rgba(13,148,136,0.08)] p-[4px_10px]
+                              text-[11px] font-semibold text-primary-dark
+                            ">{species.origin}</span>
                           )}
 
                           {/* Compatibility section */}
                           {compResults.length > 0 && (
                             <div className="mt-4">
-                              <div className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">
+                              <div className="
+                                mb-2 text-[11px] font-bold tracking-wider
+                                text-text-muted uppercase
+                              ">
                                 Tank Compatibility
                               </div>
                               {compResults.map(cr => {
                                 const level = getCompatibilityLevel(cr.score);
                                 const color = getCompatibilityColor(level);
                                 return (
-                                  <div key={cr.speciesId} className="flex items-center gap-2 py-1.5 border-b border-border-card last:border-b-0">
-                                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                                    <span className="text-xs font-semibold text-text-main flex-1">{cr.speciesName}</span>
+                                  <div key={cr.speciesId} className="
+                                    flex items-center gap-2 border-b
+                                    border-border-card py-1.5
+                                    last:border-b-0
+                                  ">
+                                    <div className="
+                                      size-2 shrink-0 rounded-full
+                                    " style={{ backgroundColor: color }} />
+                                    <span className="
+                                      flex-1 text-xs font-semibold
+                                      text-text-main
+                                    ">{cr.speciesName}</span>
                                     <span className="text-[11px] font-bold" style={{ color }}>{cr.score}%</span>
                                   </div>
                                 );
@@ -455,18 +574,28 @@ export const MyFishScreen: React.FC = () => {
       {fishToDelete && (
         <div className="modal-overlay" onClick={() => setFishToDelete(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-text-main mb-2">Delete Fish Entry</h3>
-            <p className="text-sm text-text-muted mb-6">
+            <h3 className="mb-2 text-lg font-bold text-text-main">Delete Fish Entry</h3>
+            <p className="mb-6 text-sm text-text-muted">
               Are you sure you want to delete this fish entry? This action cannot be undone.
             </p>
-            <div className="flex gap-3 justify-end">
-              <button className="secondary-button" style={{ padding: '10px 20px', fontSize: '14px' }}
+            <div className="flex justify-end gap-3">
+              <button className="
+                inline-flex cursor-pointer items-center justify-center gap-2
+                rounded-3xl border border-border-card bg-surface-card px-5
+                py-2.5 font-main text-sm font-semibold text-text-main
+                transition-smooth
+                hover:border-text-muted hover:bg-surface-hover
+              "
                 onClick={() => setFishToDelete(null)}>Cancel</button>
-              <button className="primary-button" style={{
-                padding: '10px 20px', fontSize: '14px',
-                backgroundColor: 'var(--color-critical)',
-                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.15)'
-              }} onClick={() => { if (fishToDelete) { removeFish(fishToDelete); setFishToDelete(null); } }}>
+              <button className="
+                inline-flex cursor-pointer items-center justify-center gap-2
+                rounded-3xl border-none bg-critical px-5 py-2.5 font-main
+                text-sm font-semibold text-text-inv
+                shadow-[0_4px_12px_rgba(239,68,68,0.15)] transition-smooth
+                hover:opacity-90
+                active:scale-[0.98]
+              "
+                onClick={() => { if (fishToDelete) { removeFish(fishToDelete); setFishToDelete(null); } }}>
                 Delete
               </button>
             </div>

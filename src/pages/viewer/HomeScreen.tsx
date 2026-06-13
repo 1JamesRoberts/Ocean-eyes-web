@@ -70,18 +70,26 @@ export const HomeScreen: React.FC = () => {
       />
 
       {!hasReadingData ? (
-        <div className="card-decoration" style={{ padding: '40px', textAlign: 'center' }}>
-          <span style={{ fontSize: '32px', display: 'block', marginBottom: '12px' }}>🐠</span>
-          <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
+        <div className="
+          rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
+          p-10 text-center shadow-card transition-smooth
+        ">
+          <span className="mb-3 block text-[32px]">🐠</span>
+          <h3 className="mb-2 text-lg font-bold text-text-main">
             Waiting for monitor data…
           </h3>
-          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', maxWidth: '420px', margin: '0 auto', lineHeight: '150%' }}>
+          <p className="
+            mx-auto max-w-[420px] text-sm leading-[150%] text-text-muted
+          ">
             The AI backend has not yet returned any readings for today. Make sure the OceanEyes inference service is running and has processed at least one frame.
           </p>
         </div>
       ) : (
-        <div className="dashboard-grid">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="
+          grid grid-cols-[2fr_1fr] gap-6
+          max-lg:grid-cols-1
+        ">
+          <div className="flex flex-col gap-6">
             <HealthScoreCard
               reading={{
                 ph: latestReading.ph,
@@ -91,7 +99,7 @@ export const HomeScreen: React.FC = () => {
               }}
             />
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div className="flex flex-col gap-6">
               <LiveFeedPreview
                 activeTank={activeTank}
                 displayClarity={displayClarity}
@@ -108,7 +116,7 @@ export const HomeScreen: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="flex flex-col gap-6">
             <WaterClarityCard
               displayClarity={displayClarity}
               readings={readings}
@@ -116,7 +124,7 @@ export const HomeScreen: React.FC = () => {
             />
 
             <div>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>
+              <h3 className="mb-3 text-base font-bold text-text-main">
                 Water Chemistry Parameters
               </h3>
               <WaterChemistryGrid reading={latestReading} />

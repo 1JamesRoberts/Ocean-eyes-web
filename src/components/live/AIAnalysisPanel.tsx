@@ -18,119 +18,61 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
   const diagnosisDetection = lastPrediction.detections.find(d => d.diagnosis);
   const diagnosis = diagnosisDetection?.diagnosis;
   return (
-    <div style={{
-      marginBottom: '24px',
-      padding: '20px',
-      background: 'var(--color-surface)',
-      borderRadius: '16px',
-      border: '1px solid var(--color-border)'
-    }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '16px'
-      }}>
-        <h3 style={{
-          margin: 0,
-          fontSize: '15px',
-          fontWeight: 700,
-          color: 'var(--color-text-primary)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <Brain size={18} color="var(--color-primary)" />
+    <div className="
+      mb-6 rounded-2xl border border-border-card bg-surface-card p-5
+    ">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="
+          m-0 flex items-center gap-2 text-[15px] font-bold text-text-main
+        ">
+          <Brain size={18} className="text-primary-dark" />
           AI Analysis Results
         </h3>
-        <span style={{
-          fontSize: '11px',
-          color: 'var(--color-text-secondary)',
-          fontWeight: 600
-        }}>
+        <span className="text-[11px] font-semibold text-text-muted">
           {new Date(lastPrediction.timestamp).toLocaleTimeString()}
         </span>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-        gap: '12px',
-        marginBottom: '16px'
-      }}>
-        <div style={{
-          background: 'var(--color-background)',
-          padding: '12px',
-          borderRadius: '12px',
-          border: '1px solid var(--color-border)'
-        }}>
-          <span style={{
-            fontSize: '10px',
-            color: 'var(--color-text-secondary)',
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            display: 'block'
-          }}>
+      <div className="
+        mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3
+      ">
+        <div className="
+          rounded-xl border border-border-card bg-background-app p-3
+        ">
+          <span className="
+            block text-[10px] font-semibold text-text-muted uppercase
+          ">
             Fish Detected
           </span>
-          <strong style={{
-            fontSize: '22px',
-            color: 'var(--color-primary)',
-            display: 'block',
-            marginTop: '4px'
-          }}>
+          <strong className="mt-1 block text-[22px] text-primary-dark">
             {lastPrediction.summary.total_detections}
           </strong>
         </div>
 
         {lastTurbidityResult && (
-          <div style={{
-            background: 'var(--color-background)',
-            padding: '12px',
-            borderRadius: '12px',
-            border: '1px solid var(--color-border)'
-          }}>
-            <span style={{
-              fontSize: '10px',
-              color: 'var(--color-text-secondary)',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              display: 'block'
-            }}>
+          <div className="
+            rounded-xl border border-border-card bg-background-app p-3
+          ">
+            <span className="
+              block text-[10px] font-semibold text-text-muted uppercase
+            ">
               FNU
             </span>
-            <strong style={{
-              fontSize: '22px',
-              color: 'var(--color-info)',
-              display: 'block',
-              marginTop: '4px'
-            }}>
+            <strong className="mt-1 block text-[22px] text-info">
               {lastTurbidityResult.turbidity.fnu.toFixed(2)}
             </strong>
           </div>
         )}
 
-        <div style={{
-          background: 'var(--color-background)',
-          padding: '12px',
-          borderRadius: '12px',
-          border: '1px solid var(--color-border)'
-        }}>
-          <span style={{
-            fontSize: '10px',
-            color: 'var(--color-text-secondary)',
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            display: 'block'
-          }}>
+        <div className="
+          rounded-xl border border-border-card bg-background-app p-3
+        ">
+          <span className="
+            block text-[10px] font-semibold text-text-muted uppercase
+          ">
             Species Found
           </span>
-          <strong style={{
-            fontSize: '22px',
-            color: 'var(--color-good)',
-            display: 'block',
-            marginTop: '4px'
-          }}>
+          <strong className="mt-1 block text-[22px] text-good">
             {Object.keys(lastPrediction.summary.species_counts).length}
           </strong>
         </div>
@@ -138,45 +80,24 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
       {Object.entries(lastPrediction.summary.species_counts).length > 0 && (
         <div>
-          <h4 style={{
-            fontSize: '12px',
-            fontWeight: 700,
-            color: 'var(--color-text-secondary)',
-            textTransform: 'uppercase',
-            marginBottom: '10px',
-            letterSpacing: '0.05em'
-          }}>
+          <h4 className="
+            mb-2.5 text-xs font-bold tracking-wider text-text-muted uppercase
+          ">
             Species Breakdown
           </h4>
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '8px'
-          }}>
+          <div className="flex flex-wrap gap-2">
             {Object.entries(lastPrediction.summary.species_counts).map(([speciesId, count]) => {
               const speciesInfo = getSpeciesById(speciesId);
               const color = speciesInfo?.color || '#3B82F6';
               const displayName = speciesInfo?.displayName || speciesId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
               return (
-                <div key={speciesId} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'var(--color-background)',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  border: `1px solid ${color}40`,
-                  fontSize: '12px',
-                  fontWeight: 600
-                }}>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: color
-                  }} />
-                  <span style={{ color: 'var(--color-text-primary)' }}>{displayName}</span>
-                  <span style={{ color: 'var(--color-text-secondary)' }}>{count}</span>
+                <div key={speciesId} className="
+                  flex items-center gap-1.5 rounded-[20px] border
+                  bg-background-app px-3 py-1.5 text-xs font-semibold
+                " style={{ borderColor: `${color}40` }}>
+                  <div className="size-2 rounded-full" style={{ backgroundColor: color }} />
+                  <span className="text-text-main">{displayName}</span>
+                  <span className="text-text-muted">{count}</span>
                 </div>
               );
             })}
@@ -186,72 +107,44 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
       {/* Disease Diagnosis Section */}
       {diagnosis && (
-        <div style={{
-          marginTop: '16px',
-          padding: '14px',
-          borderRadius: '12px',
-          background: diagnosis.error 
-            ? 'rgba(239, 68, 68, 0.08)' 
-            : diagnosis.healthy 
-              ? 'rgba(16, 185, 129, 0.08)' 
-              : 'rgba(245, 158, 11, 0.08)',
-          border: `1px solid ${
-            diagnosis.error 
-              ? 'var(--color-critical)' 
-              : diagnosis.healthy 
-                ? 'var(--color-good)' 
-                : 'var(--color-warning)'
-          }`,
-        }}>
-          <h4 style={{
-            margin: '0 0 8px 0',
-            fontSize: '12px',
-            fontWeight: 700,
-            color: diagnosis.error 
-              ? 'var(--color-critical)' 
-              : diagnosis.healthy 
-                ? 'var(--color-good)' 
-                : 'var(--color-warning)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-          }}>
+        <div
+          className={`
+            mt-4 rounded-xl border p-3.5
+            ${diagnosis.error ? `border-critical bg-critical/8` : diagnosis.healthy ? `
+              border-good bg-good/8
+            ` : `border-warning bg-warning/8`}
+          `}
+        >
+          <h4 className={`
+            m-0 mb-2 flex items-center gap-1.5 text-xs font-bold tracking-wider
+            uppercase
+            ${diagnosis.error ? `text-critical` : diagnosis.healthy ? `
+              text-good
+            ` : `text-warning`}
+          `}>
             🩺 Fish Health Diagnosis
           </h4>
           {diagnosis.error ? (
-            <p style={{
-              margin: 0,
-              fontSize: '12px',
-              color: 'var(--color-text-primary)',
-              lineHeight: '1.4',
-              fontWeight: 500
-            }}>
+            <p className="m-0 text-xs leading-[1.4] font-medium text-text-main">
               <strong>Error:</strong> {diagnosis.error}
             </p>
           ) : (
             <>
-              <div style={{ marginBottom: '8px', fontSize: '13px' }}>
-                <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>Status: </span>
-                <span style={{ 
-                  fontWeight: 800, 
-                  color: diagnosis.healthy ? 'var(--color-good)' : 'var(--color-warning)' 
-                }}>
+              <div className="mb-2 text-[13px]">
+                <span className="font-bold text-text-main">Status: </span>
+                <span className={`
+                  font-extrabold
+                  ${diagnosis.healthy ? `text-good` : `text-warning`}
+                `}>
                   {diagnosis.healthy ? 'HEALTHY' : `DISEASE DETECTED (${diagnosis.disease})`}
                 </span>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginLeft: '8px' }}>
+                <span className="ml-2 text-[11px] text-text-muted">
                   (Confidence: {Math.round(diagnosis.confidence * 100)}%)
                 </span>
               </div>
-              
+
               {diagnosisDetection && (
-                <div style={{ 
-                  fontSize: '11px', 
-                  color: 'var(--color-text-secondary)', 
-                  marginBottom: '8px',
-                  fontStyle: 'italic'
-                }}>
+                <div className="mb-2 text-[11px] text-text-muted italic">
                   Diagnosed Subject: {diagnosisDetection.species_display}
                 </div>
               )}
@@ -260,40 +153,25 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                 <img
                   src={resolveCropUrl(diagnosis.crop_url)}
                   alt="Fish crop sent to LLM"
-                  style={{
-                    maxWidth: '200px',
-                    maxHeight: '140px',
-                    borderRadius: '4px',
-                    objectFit: 'contain',
-                    marginBottom: '10px',
-                    display: 'block'
-                  }}
+                  className="
+                    mb-2.5 block max-h-[140px] max-w-[200px] rounded-sm
+                    object-contain
+                  "
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).style.display = 'none';
                   }}
                 />
               )}
 
-              <p style={{
-                margin: '0 0 8px 0',
-                fontSize: '12px',
-                color: 'var(--color-text-primary)',
-                lineHeight: '1.4'
-              }}>
+              <p className="m-0 mb-2 text-xs leading-[1.4] text-text-main">
                 <strong>Observation:</strong> {diagnosis.description}
               </p>
 
               {!diagnosis.healthy && diagnosis.treatment && (
-                <p style={{
-                  margin: 0,
-                  fontSize: '12px',
-                  color: 'var(--color-text-secondary)',
-                  lineHeight: '1.4',
-                  padding: '8px',
-                  background: 'var(--color-background)',
-                  borderRadius: '6px',
-                  borderLeft: '3px solid var(--color-warning)'
-                }}>
+                <p className="
+                  m-0 rounded-md border-l-3 border-warning bg-background-app p-2
+                  text-xs leading-[1.4] text-text-muted
+                ">
                   <strong>Recommended Treatment:</strong> {diagnosis.treatment}
                 </p>
               )}

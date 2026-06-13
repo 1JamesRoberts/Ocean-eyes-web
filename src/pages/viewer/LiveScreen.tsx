@@ -568,51 +568,46 @@ Diagnostics:
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="canvas-header">
+      <div className="
+        flex min-h-[75px] items-center justify-between border-b
+        border-border-card pb-3
+        max-xs:flex-col max-xs:items-start max-xs:gap-3
+      ">
         <div>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Camera Monitor</span>
-          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Live Video Stream</h1>
+          <span className="text-xs font-semibold text-text-muted uppercase">Camera Monitor</span>
+          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Live Video Stream</h1>
         </div>
       </div>
 
       {!activeTank && (
-        <div style={{
-          background: 'var(--color-warning-bg, rgba(217, 119, 6, 0.08))',
-          border: '1px solid var(--color-warning, #D97706)',
-          borderRadius: '12px',
-          padding: '12px 16px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          color: 'var(--color-warning-dark, #B45309)',
-          fontSize: '13px',
-          fontWeight: 600
-        }}>
-          <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-warning)' }}>!</span>
+        <div className="
+          mb-5 flex items-center gap-2.5 rounded-xl border border-warning
+          bg-warning/8 px-4 py-3 text-[13px] font-semibold text-[#B45309]
+        ">
+          <span className="text-base font-extrabold text-warning">!</span>
           <span>No aquarium linked. Link a tank from the Dashboard to save camera feeds and enable AI detection.</span>
         </div>
       )}
 
       <div
         ref={viewportRef}
-        className="live-camera-feed"
-        style={{
-          marginBottom: '24px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}
+        className="
+          live-camera-feed relative mb-6 flex items-center justify-center
+          overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.05)]
+          bg-camera-bg shadow-premium
+          max-sm:rounded-xl
+        "
       >
         {isStreaming ? (
           <>
-            <div className={`camera-flash-overlay ${flashActive ? 'flash-active' : ''}`} />
+            <div className={`
+              camera-flash-overlay
+              ${flashActive ? 'flash-active' : ''}
+            `} />
 
-            <div ref={imageContainerRef} style={{
-              width: '100%',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
+            <div ref={imageContainerRef} className="
+              relative w-full overflow-hidden
+            ">
               <CameraFeed
                 ref={cameraFeedRef}
                 feed={activeFeed}
@@ -623,32 +618,28 @@ Diagnostics:
                 onDimensions={handleDimensions}
               >
                 {filters.temperature !== 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: filters.temperature > 0 ? '#ffb000' : '#00a0ff',
-                    opacity: Math.abs(filters.temperature) / 300,
-                    mixBlendMode: 'color',
-                    pointerEvents: 'none',
-                    zIndex: 4
-                  }} />
+                  <div
+                    className="
+                      pointer-events-none absolute top-0 left-0 z-4 size-full
+                      mix-blend-color
+                    "
+                    style={{
+                      backgroundColor: filters.temperature > 0 ? '#ffb000' : '#00a0ff',
+                      opacity: Math.abs(filters.temperature) / 300
+                    }}
+                  />
                 )}
                 {filters.tint !== 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: filters.tint > 0 ? '#ff00bb' : '#00ff44',
-                    opacity: Math.abs(filters.tint) / 400,
-                    mixBlendMode: 'color',
-                    pointerEvents: 'none',
-                    zIndex: 5
-                  }} />
+                  <div
+                    className="
+                      pointer-events-none absolute top-0 left-0 z-5 size-full
+                      mix-blend-color
+                    "
+                    style={{
+                      backgroundColor: filters.tint > 0 ? '#ff00bb' : '#00ff44',
+                      opacity: Math.abs(filters.tint) / 400
+                    }}
+                  />
                 )}
               </CameraFeed>
             </div>
@@ -667,30 +658,22 @@ Diagnostics:
             )}
 
             {isAIActive && (
-              <div style={{
-                position: 'absolute',
-                top: '12px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 16,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(15, 23, 42, 0.85)',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                border: `1px solid ${aiError ? 'var(--color-critical)' : 'var(--color-primary)'}`,
-                color: '#FFF',
-                fontSize: '11px',
-                fontWeight: 600
-              }}>
-                <div style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: aiLoading ? 'var(--color-warning)' : aiError ? 'var(--color-critical)' : 'var(--color-good)',
-                  animation: aiLoading ? 'pulse 1.5s infinite' : 'none'
-                }} />
+              <div
+                className="
+                  absolute top-3 left-1/2 z-16 flex -translate-x-1/2
+                  items-center gap-1.5 rounded-[20px] border
+                  bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-[11px] font-semibold
+                  text-white
+                "
+                style={{ borderColor: aiError ? 'var(--color-critical)' : 'var(--color-primary)' }}
+              >
+                <div
+                  className="size-2 rounded-full"
+                  style={{
+                    backgroundColor: aiLoading ? 'var(--color-warning)' : aiError ? 'var(--color-critical)' : 'var(--color-good)',
+                    animation: aiLoading ? 'pulse 1.5s infinite' : 'none'
+                  }}
+                />
                 <span>
                   {aiLoading ? 'AI Analyzing...' : aiError ? `AI Error: ${aiError}` : `AI Active · ${lastPrediction?.summary.total_detections || 0} fish detected`}
                 </span>
@@ -698,36 +681,27 @@ Diagnostics:
             )}
 
             {turbidityError && (
-              <div style={{
-                position: 'absolute',
-                top: '44px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 16,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(15, 23, 42, 0.85)',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                border: '1px solid var(--color-critical)',
-                color: '#FFF',
-                fontSize: '11px',
-                fontWeight: 600
-              }}>
-                <div style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: 'var(--color-critical)'
-                }} />
+              <div className="
+                absolute top-11 left-1/2 z-16 flex -translate-x-1/2 items-center
+                gap-1.5 rounded-[20px] border border-critical
+                bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-[11px] font-semibold
+                text-white
+              ">
+                <div className="size-2 rounded-full bg-critical" />
                 <span>{`Turbidity Error: ${turbidityError}`}</span>
               </div>
             )}
 
             {isRecording && (
-              <div className="live-overlay-pill" style={{ left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgba(239, 68, 68, 0.85)' }}>
-                <div className="recording-dot" />
+              <div className="
+                absolute top-4 left-1/2 z-10 flex -translate-x-1/2 items-center
+                gap-1.5 rounded-[20px] border border-[rgba(255,255,255,0.08)]
+                bg-[rgba(239,68,68,0.85)] px-3 py-1.5 text-xs font-semibold
+                text-white backdrop-blur-md
+              ">
+                <div className="
+                  size-2 animate-recording-blink rounded-full bg-critical
+                " />
                 <span>REC {formatDuration(recordingSeconds)}</span>
               </div>
             )}
@@ -759,14 +733,21 @@ Diagnostics:
             )}
           </>
         ) : (
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>
-              <Video size={32} color="var(--color-text-secondary)" />
+          <div className="p-10 text-center">
+            <div className="mb-3 flex justify-center">
+              <Video size={32} className="text-text-muted" />
             </div>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', margin: '0 0 16px 0' }}>
+            <p className="mb-4 text-sm text-text-muted">
               Feed is idle. Connect stream to monitor.
             </p>
-            <button className="primary-button" onClick={startStream}>
+            <button className="
+              inline-flex cursor-pointer items-center justify-center gap-2
+              rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
+              text-[15px] font-semibold text-text-inv
+              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              hover:bg-primary-hover-gradient
+              active:scale-[0.98]
+            " onClick={startStream}>
               Connect Stream
             </button>
           </div>
@@ -776,8 +757,6 @@ Diagnostics:
       {isStreaming && (
         <>
           <AIAnalysisPanel
-            isAIActive={isAIActive}
-            aiLoading={aiLoading}
             lastPrediction={lastPrediction}
             lastTurbidityResult={lastTurbidityResult}
           />

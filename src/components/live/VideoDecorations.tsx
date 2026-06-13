@@ -12,14 +12,18 @@ export const VideoDecorations: React.FC<VideoDecorationsProps> = ({
   return (
     <>
       {/* Bottom-left Telemetry Badges */}
-      <div className="absolute bottom-3 left-3 flex gap-3 z-10">
-        <div className="bg-[rgba(15,23,42,0.75)] py-1.5 px-3 rounded-xl text-[11px] text-white">
-          <span className="text-text-muted block">FISH COUNT</span>
+      <div className="absolute bottom-3 left-3 z-10 flex gap-3">
+        <div className="
+          rounded-xl bg-[rgba(15,23,42,0.75)] px-3 py-1.5 text-[11px] text-white
+        ">
+          <span className="block text-text-muted">FISH COUNT</span>
           <strong className="text-sm font-bold">{currentFishCount} detected</strong>
         </div>
 
-        <div className="bg-[rgba(15,23,42,0.75)] py-1.5 px-3 rounded-xl text-[11px] text-white">
-          <span className="text-text-muted block">FNU</span>
+        <div className="
+          rounded-xl bg-[rgba(15,23,42,0.75)] px-3 py-1.5 text-[11px] text-white
+        ">
+          <span className="block text-text-muted">FNU</span>
           <strong className="text-sm font-bold text-info">{currentClarity.toFixed(2)}</strong>
         </div>
       </div>

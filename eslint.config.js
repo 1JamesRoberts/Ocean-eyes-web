@@ -3,6 +3,7 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
+import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
@@ -14,9 +15,26 @@ export default defineConfig([
       tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
+      betterTailwindcss.configs.recommended,
     ],
     languageOptions: {
       globals: globals.browser,
+    },
+    settings: {
+      'better-tailwindcss': {
+        entryPoint: 'src/index.css',
+        detectComponentClasses: true,
+        lineBreakStyle: 'windows',
+        ignore: [
+          '^live-camera-feed$',
+          '^camera-scanline$',
+          '^qr-code-canvas$',
+          '^camera-flash-overlay$',
+          '^flash-active$',
+          '^modal-overlay$',
+          '^modal-content$',
+        ],
+      },
     },
   },
 ])

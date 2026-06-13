@@ -67,6 +67,19 @@
   --background-image-camera-placeholder: var(--camera-placeholder);
   --background-image-calibration-bg: var(--calibration-bg);
 
+  --shadow-card: 0 4px 20px rgba(13, 148, 136, 0.05), 0 1px 3px rgba(13, 148, 136, 0.02);
+  --shadow-premium: 0 12px 30px rgba(15, 23, 42, 0.04);
+  --shadow-primary-hover: 0 6px 16px rgba(13, 148, 136, 0.25);
+
+  --z-index-1: 1;
+  --z-index-2: 2;
+  --z-index-4: 4;
+  --z-index-5: 5;
+  --z-index-12: 12;
+  --z-index-15: 15;
+  --z-index-16: 16;
+  --z-index-1000: 1000;
+
   --animate-float-1: float1 4s ease-in-out infinite;
   --animate-float-2: float2 5s ease-in-out infinite;
   --animate-scan: scan 4s linear infinite;
@@ -77,6 +90,10 @@
   --animate-fade-in: fadeIn 0.2s ease-out;
   --animate-slide-up: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
   --animate-slide-down: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+@utility transition-smooth {
+  transition: var(--transition-smooth);
 }
 
 @layer base {
@@ -123,157 +140,7 @@
 }
 
 
-/* ─── Dashboard Headers ─── */
-.canvas-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--color-border);
-  min-height: 75px;
-}
-
-@media (max-width: 600px) {
-  .canvas-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-}
-
-.canvas-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--color-text-primary);
-}
-
-/* ─── Reusable Flutter Cards ─── */
-.card-decoration {
-  background: var(--color-surface);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: var(--shadow-card);
-  border: 1px solid rgba(13, 148, 136, 0.02);
-  transition: var(--transition-smooth);
-}
-
-.card-decoration:hover {
-  border-color: rgba(13, 148, 136, 0.12);
-  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.08);
-  transform: translateY(-1px);
-}
-
-/* Custom Buttons */
-.primary-button {
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  border: none;
-  border-radius: 24px;
-  padding: 12px 24px;
-  font-family: var(--font-main);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  transition: var(--transition-smooth);
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15);
-}
-
-.primary-button:hover {
-  background: var(--color-primary-hover, var(--color-primary-dark));
-  box-shadow: var(--shadow-primary-hover, 0 6px 16px rgba(13, 148, 136, 0.25));
-}
-
-.primary-button:active {
-  transform: scale(0.98);
-}
-
-.secondary-button {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-  border-radius: 24px;
-  padding: 11px 20px;
-  font-family: var(--font-main);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  transition: var(--transition-smooth);
-}
-
-.secondary-button:hover {
-  background-color: var(--color-surface-hover);
-  border-color: var(--color-text-secondary);
-}
-
-/* ─── Grid Systems ─── */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-}
-
-@media (max-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-/* Floating Animations */
-@keyframes float1 {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(-6px) rotate(2deg);
-  }
-
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-}
-
-@keyframes float2 {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(6px) rotate(-2deg);
-  }
-
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-}
-
-.anim-float-1 {
-  animation: float1 4s ease-in-out infinite;
-}
-
-.anim-float-2 {
-  animation: float2 5s ease-in-out infinite;
-}
-
 /* ─── Live Camera & Visualizer ─── */
-.live-camera-feed {
-  position: relative;
-  overflow: hidden;
-  background-color: var(--color-camera-bg);
-  border-radius: 20px;
-  border: 1px solid var(--color-camera-border);
-  box-shadow: var(--shadow-premium);
-}
-
 .live-camera-feed:fullscreen {
   width: 100vw !important;
   height: 100vh !important;
@@ -283,12 +150,6 @@
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-}
-
-@media (max-width: 768px) {
-  .live-camera-feed {
-    border-radius: 12px;
-  }
 }
 
 .camera-scanline {
@@ -313,23 +174,6 @@
   }
 }
 
-.live-overlay-pill {
-  position: absolute;
-  top: 16px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(12px);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  z-index: 10;
-}
-
 @keyframes pulse {
   0% {
     opacity: 0.4;
@@ -342,17 +186,6 @@
   100% {
     opacity: 0.4;
   }
-}
-
-/* pairing items */
-.qr-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--color-surface);
-  padding: 24px;
-  border-radius: 20px;
-  border: 1px solid var(--color-border);
 }
 
 .qr-code-canvas {
@@ -388,15 +221,6 @@
   100% {
     opacity: 0;
   }
-}
-
-.recording-dot {
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-critical);
-  border-radius: 50%;
-  display: inline-block;
-  animation: recording-blink 1s infinite alternate;
 }
 
 @keyframes recording-blink {
@@ -466,5 +290,25 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes float1 {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+
+  50% {
+    transform: translateY(-12px) translateX(4px);
+  }
+}
+
+@keyframes float2 {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+
+  50% {
+    transform: translateY(-16px) translateX(-6px);
   }
 }

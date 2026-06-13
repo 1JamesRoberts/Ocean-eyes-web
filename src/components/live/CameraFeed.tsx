@@ -43,7 +43,10 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
 
   return (
     <div
-      className={`relative w-full overflow-hidden ${className}`}
+      className={`
+        relative w-full overflow-hidden
+        ${className}
+      `}
       style={style}
     >
       {isStreaming ? (
@@ -55,7 +58,7 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
               playsInline
               muted
               onLoadedMetadata={handleVideoLoaded}
-              className="w-full h-auto block"
+              className="block h-auto w-full"
               style={filterStyle ? { filter: filterStyle } : undefined}
             />
           ) : (
@@ -63,14 +66,16 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
               src={feed.mock_image || ''}
               alt="Live feed"
               onLoad={handleImageLoaded}
-              className="w-full h-auto block"
+              className="block h-auto w-full"
               style={filterStyle ? { filter: filterStyle } : undefined}
             />
           )}
 
           {/* Overlay layer for children (badges, decorations, etc.) */}
           {children && (
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="
+              pointer-events-none absolute inset-0 overflow-hidden
+            ">
               {children}
             </div>
           )}
@@ -78,8 +83,8 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
       ) : (
         idlePlaceholder ?? (
           <div className="flex flex-col items-center justify-center gap-2 py-8">
-            <Video size={24} className="text-text-secondary" />
-            <p className="text-text-secondary text-xs">Feed is idle. Connect stream to monitor.</p>
+            <Video size={24} className="text-text-muted" />
+            <p className="text-xs text-text-muted">Feed is idle. Connect stream to monitor.</p>
           </div>
         )
       )}

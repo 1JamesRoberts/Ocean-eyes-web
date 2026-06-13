@@ -28,65 +28,62 @@ export const RootGateOnboarding: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '60px 24px 24px 24px', display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }} className="anim-float-1">
-        <div style={{
-          width: '72px',
-          height: '72px',
-          borderRadius: '24px',
-          backgroundColor: 'var(--color-primary-light)',
-          color: 'var(--color-primary)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          margin: '0 auto 16px auto',
-          boxShadow: '0 8px 24px rgba(13, 148, 136, 0.15)'
-        }}>
+    <div className="flex h-full flex-col justify-center px-6 pt-15 pb-6">
+      <div className="mb-10 animate-float-1 text-center">
+        <div className="
+          mx-auto mb-4 flex size-[72px] items-center justify-center rounded-3xl
+          bg-primary-light-gradient text-primary-dark
+          shadow-[0_8px_24px_rgba(13,148,136,0.15)]
+        ">
           <QrCode size={36} />
         </div>
-        <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>Link Your Aquarium</h2>
-        <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', lineHeight: '145%' }}>
+        <h2 className="mb-2 text-[26px] font-extrabold text-text-main">Link Your Aquarium</h2>
+        <p className="text-sm leading-[145%] text-text-muted">
           Scan the QR code displayed on your OceanEyes smart monitoring hardware unit or enter the code manually.
         </p>
       </div>
 
       {!showCreate ? (
-        <form onSubmit={handleLink} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ position: 'relative' }}>
+        <form onSubmit={handleLink} className="flex flex-col gap-4">
+          <div className="relative">
             <input
               type="text"
               placeholder="Enter Tank ID"
               value={qrInput}
               onChange={(e) => setQrInput(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '16px 20px',
-                borderRadius: '16px',
-                border: '1px solid var(--color-border)',
-                fontFamily: 'var(--font-main)',
-                fontSize: '15px',
-                outline: 'none',
-                transition: 'var(--transition-smooth)',
-                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.01)',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text-primary)'
-              }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+              className="
+                w-full rounded-2xl border border-border-card bg-surface-card
+                px-5 py-4 font-main text-[15px] text-text-main
+                shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)] outline-none
+                transition-smooth
+                focus:border-primary-dark
+              "
             />
           </div>
 
-          {error && <p style={{ color: 'var(--color-critical)', fontSize: '13px', textAlign: 'center', fontWeight: 500 }}>{error}</p>}
+          {error && <p className="
+            text-center text-[13px] font-medium text-critical
+          ">{error}</p>}
 
-          <button type="submit" className="primary-button" style={{ width: '100%' }}>
+          <button type="submit" className="
+            inline-flex w-full cursor-pointer items-center justify-center gap-2
+            rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
+            text-[15px] font-semibold text-text-inv
+            shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+            hover:bg-primary-hover-gradient
+            active:scale-[0.98]
+          ">
             Link Tank
           </button>
 
-          <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>
+          <p className="mt-6 text-center text-sm text-text-muted">
             No hardware?{' '}
             <button
               type="button"
-              style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
+              className="
+                cursor-pointer border-none bg-transparent font-main
+                font-semibold text-primary-dark
+              "
               onClick={() => setShowCreate(true)}
             >
               Create virtual tank
@@ -94,34 +91,40 @@ export const RootGateOnboarding: React.FC = () => {
           </p>
         </form>
       ) : (
-        <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleCreate} className="flex flex-col gap-4">
           <input
             type="text"
             placeholder="Virtual Tank Name (e.g. My Bedroom Reef)"
             value={tankName}
             onChange={(e) => setTankName(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '16px 20px',
-              borderRadius: '16px',
-              border: '1px solid var(--color-border)',
-              fontFamily: 'var(--font-main)',
-              fontSize: '15px',
-              outline: 'none',
-              transition: 'var(--transition-smooth)',
-              backgroundColor: 'var(--color-surface)',
-              color: 'var(--color-text-primary)'
-            }}
+            className="
+              w-full rounded-2xl border border-border-card bg-surface-card px-5
+              py-4 font-main text-[15px] text-text-main outline-none
+              transition-smooth
+              focus:border-primary-dark
+            "
           />
 
-          <button type="submit" className="primary-button" style={{ width: '100%' }}>
+          <button type="submit" className="
+            inline-flex w-full cursor-pointer items-center justify-center gap-2
+            rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
+            text-[15px] font-semibold text-text-inv
+            shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+            hover:bg-primary-hover-gradient
+            active:scale-[0.98]
+          ">
             Create Virtual Tank
           </button>
 
           <button
             type="button"
-            className="secondary-button"
-            style={{ width: '100%', borderRadius: '24px' }}
+            className="
+              inline-flex w-full cursor-pointer items-center justify-center
+              gap-2 rounded-3xl border border-border-card bg-surface-card px-5
+              py-3 font-main text-[14px] font-semibold text-text-main
+              transition-smooth
+              hover:border-text-muted hover:bg-surface-hover
+            "
             onClick={() => setShowCreate(false)}
           >
             Back to Linking

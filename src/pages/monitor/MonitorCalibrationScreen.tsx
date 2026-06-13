@@ -35,133 +35,110 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
   };
 
   return (
-    <div style={{
-      padding: '24px',
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      color: '#FFFFFF',
-      background: '#090D11'
-    }}>
-      <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '2px', color: '#E2E8F0', textAlign: 'center' }}>
+    <div className="flex h-full flex-col bg-[#090D11] p-6 text-white">
+      <h3 className="mb-0.5 text-center text-base font-bold text-[#E2E8F0]">
         Water Line Calibration
       </h3>
       {activeTank && (
-        <span style={{ fontSize: '11px', color: 'var(--color-primary)', display: 'block', textAlign: 'center', marginBottom: '8px', fontWeight: 600 }}>
+        <span className="
+          mb-2 block text-center text-[11px] font-semibold text-primary-dark
+        ">
           Calibrating: {activeTank.name}
         </span>
       )}
-      <p style={{ fontSize: '11px', color: '#64748B', textAlign: 'center', marginBottom: '16px', lineHeight: '135%' }}>
+      <p className="mb-4 text-center text-[11px] leading-[135%] text-[#64748B]">
         Drag the dotted red line visually to match the physical water surface level in your tank.
       </p>
 
       {/* Interactive Calibration Canvas */}
-      <div 
+      <div
         onMouseMove={(e) => {
           if (e.buttons === 1) handleDrag(e);
         }}
         onMouseDown={handleDrag}
         onTouchMove={handleDrag}
-        style={{
-          height: '240px', // Matches exactly the 240px coordinate space to prevent stretching/floating gaps at the bottom
-          background: 'radial-gradient(circle at center, #1E293B 0%, #0F172A 100%)',
-          borderRadius: '12px',
-          border: '2px solid #1E293B',
-          position: 'relative',
-          cursor: 'ns-resize',
-          overflow: 'hidden',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}
+        className="
+          relative flex h-[240px] cursor-ns-resize items-center justify-center
+          overflow-hidden rounded-xl border-2 border-[#1E293B]
+          bg-[radial-gradient(circle_at_center,#1E293B_0%,#0F172A_100%)]
+        "
       >
-        
+
         {/* Static Water Body Representation of Tank (Simulating Camera Feed) */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          height: `${240 - staticWaterLineY}px`, // Static camera feed height
-          background: 'linear-gradient(180deg, rgba(20, 184, 166, 0.35) 0%, rgba(13, 148, 136, 0.55) 100%)',
-          borderTop: '2px solid rgba(255, 255, 255, 0.5)',
-          zIndex: 1,
-          pointerEvents: 'none'
-        }}>
+        <div
+          className="
+            pointer-events-none absolute bottom-0 left-0 z-1 w-full border-t-2
+            border-[rgba(255,255,255,0.5)]
+          "
+          style={{
+            height: `${240 - staticWaterLineY}px`,
+            background: 'linear-gradient(180deg, rgba(20, 184, 166, 0.35) 0%, rgba(13, 148, 136, 0.55) 100%)'
+          }}
+        >
           {/* Bubbles */}
         </div>
 
         {/* Sand/Substrate Bed */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          height: '24px',
-          background: 'linear-gradient(0deg, #0F172A 0%, #1E293B 100%)',
-          borderTop: '1px solid #334155',
-          zIndex: 2,
-          pointerEvents: 'none'
-        }} />
+        <div
+          className="
+            pointer-events-none absolute bottom-0 left-0 z-2 h-6 w-full border-t
+            border-[#334155] bg-[linear-gradient(0deg,#0F172A_0%,#1E293B_100%)]
+          "
+        />
 
         {/* Glass Tank Frame Reflection */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          boxShadow: 'inset 0 0 20px rgba(45, 212, 191, 0.15)',
-          border: '2px solid rgba(45, 212, 191, 0.25)',
-          borderRadius: '10px',
-          pointerEvents: 'none',
-          zIndex: 15
-        }} />
+        <div
+          className="
+            pointer-events-none absolute top-0 left-0 z-15 size-full
+            rounded-[10px] border-2 border-[rgba(45,212,191,0.25)]
+            shadow-[inset_0_0_20px_rgba(45,212,191,0.15)]
+          "
+        />
 
         {/* Dynamic Water Level Line Indicator */}
-        <div style={{
-          position: 'absolute',
-          top: `${lineY}px`,
-          left: 0,
-          width: '100%',
-          height: '2px',
-          borderTop: '2px dashed var(--color-critical)',
-          zIndex: 10,
-          display: 'flex',
-          justifyContent: 'center',
-          pointerEvents: 'none'
-        }} />
+        <div
+          className="
+            pointer-events-none absolute left-0 z-10 flex h-0.5 w-full
+            justify-center border-t-2 border-dashed border-critical
+          "
+          style={{ top: `${lineY}px` }}
+        />
 
         {/* Water Level Label */}
-        <div style={{
-          position: 'absolute',
-          top: `${lineY - 10}px`,
-          right: '10px',
-          fontSize: '9px',
-          background: 'var(--color-critical)',
-          color: '#FFF',
-          padding: '2px 6px',
-          borderRadius: '4px',
-          fontWeight: 600,
-          zIndex: 12,
-          pointerEvents: 'none'
-        }}>
+        <div
+          className="
+            pointer-events-none absolute right-2.5 z-12 rounded-sm bg-critical
+            px-1.5 py-0.5 text-[9px] font-semibold text-white
+          "
+          style={{ top: `${lineY - 10}px` }}
+        >
           DRAG TO WATER LINE ({Math.round(((240 - lineY) / 240) * 100)}%)
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
-        <button 
-          className="primary-button" 
-          style={{ flex: 1, padding: '12px', borderRadius: '12px' }}
+      <div className="mt-4 flex gap-2.5">
+        <button
+          className="
+            inline-flex flex-1 cursor-pointer items-center justify-center gap-2
+            rounded-xl border-none bg-primary-gradient px-6 py-3 font-main
+            text-[15px] font-semibold text-text-inv
+            shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+            hover:bg-primary-hover-gradient
+            active:scale-[0.98]
+            disabled:cursor-not-allowed disabled:opacity-50
+          "
           onClick={handleSave}
           disabled={!activeTank}
         >
           {saved ? '✓ Calibration Saved' : 'Confirm Level'}
         </button>
-        <button 
-          className="secondary-button" 
-          style={{ padding: '12px 16px', borderRadius: '12px', backgroundColor: 'transparent', borderColor: '#334155', color: '#94A3B8' }}
+        <button
+          className="
+            inline-flex cursor-pointer items-center justify-center gap-2
+            rounded-xl border border-[#334155] bg-transparent px-4 py-3
+            font-main text-[14px] font-semibold text-[#94A3B8] transition-smooth
+            hover:bg-[rgba(255,255,255,0.05)]
+          "
           onClick={() => onNavigate('welcome')}
         >
           Cancel

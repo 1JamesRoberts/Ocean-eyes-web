@@ -21,63 +21,65 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
   const detectionRate = totalFish > 0 ? Math.round((totalDetected / totalFish) * 100) : 0;
 
   return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      width: '320px',
-      backgroundColor: 'rgba(15, 23, 42, 0.7)',
-      borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
-      zIndex: 30,
-      display: 'flex',
-      flexDirection: 'column',
-      transform: showFsInventory ? 'translateX(0)' : 'translateX(100%)',
-      transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      color: '#FFFFFF',
-      textAlign: 'left'
-    }}>
-      <div style={{ padding: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#FFF', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Fish size={18} color="var(--color-primary)" />
+    <div
+      className="
+        absolute inset-y-0 right-0 z-30 flex w-[320px] flex-col border-l
+        border-[rgba(255,255,255,0.1)] bg-[rgba(15,23,42,0.7)] text-left
+        text-white transition-transform duration-300
+      "
+      style={{ transform: showFsInventory ? 'translateX(0)' : 'translateX(100%)', transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+    >
+      <div className="
+        flex items-center justify-between border-b
+        border-[rgba(255,255,255,0.1)] p-4
+      ">
+        <h3 className="
+          m-0 flex items-center gap-2 text-[15px] font-bold text-white
+        ">
+          <Fish size={18} className="text-primary-dark" />
           <span>Fish Inventory</span>
         </h3>
         <button
           onClick={onClose}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'rgba(255, 255, 255, 0.6)',
-            cursor: 'pointer',
-            fontSize: '20px',
-            padding: '4px',
-            lineHeight: 1
-          }}
+          className="
+            cursor-pointer border-none bg-transparent p-1 text-xl leading-none
+            text-[rgba(255,255,255,0.6)]
+          "
         >
           ×
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', padding: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-        <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: '8px', padding: '8px 12px' }}>
-          <span style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.5)', display: 'block', fontWeight: 600 }}>TOTAL FISH</span>
-          <strong style={{ fontSize: '15px', color: '#FFF' }}>{totalFish}</strong>
+      <div className="
+        grid grid-cols-2 gap-2 border-b border-[rgba(255,255,255,0.1)] p-4
+      ">
+        <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
+          <span className="
+            block text-[9px] font-semibold text-[rgba(255,255,255,0.5)]
+          ">TOTAL FISH</span>
+          <strong className="text-[15px] text-white">{totalFish}</strong>
         </div>
-        <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: '8px', padding: '8px 12px' }}>
-          <span style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.5)', display: 'block', fontWeight: 600 }}>SPECIES</span>
-          <strong style={{ fontSize: '15px', color: '#FFF' }}>{uniqueSpecies}</strong>
+        <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
+          <span className="
+            block text-[9px] font-semibold text-[rgba(255,255,255,0.5)]
+          ">SPECIES</span>
+          <strong className="text-[15px] text-white">{uniqueSpecies}</strong>
         </div>
-        <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: '8px', padding: '8px 12px' }}>
-          <span style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.5)', display: 'block', fontWeight: 600 }}>DETECTED</span>
-          <strong style={{ fontSize: '15px', color: 'var(--color-good)' }}>{totalDetected}</strong>
+        <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
+          <span className="
+            block text-[9px] font-semibold text-[rgba(255,255,255,0.5)]
+          ">DETECTED</span>
+          <strong className="text-[15px] text-good">{totalDetected}</strong>
         </div>
-        <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: '8px', padding: '8px 12px' }}>
-          <span style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.5)', display: 'block', fontWeight: 600 }}>DETECTION</span>
-          <strong style={{ fontSize: '15px', color: 'var(--color-warning)' }}>{detectionRate}%</strong>
+        <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
+          <span className="
+            block text-[9px] font-semibold text-[rgba(255,255,255,0.5)]
+          ">DETECTION</span>
+          <strong className="text-[15px] text-warning">{detectionRate}%</strong>
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-3">
         {fishList.map(fish => {
           const species = getSpeciesById(fish.speciesId);
           const display = species ? {
@@ -99,21 +101,17 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
           return (
             <div
               key={fish.id}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '10px',
-                borderRadius: '10px',
-                background: 'rgba(255, 255, 255, 0.03)'
-              }}
+              className="
+                flex items-center justify-between rounded-[10px]
+                bg-[rgba(255,255,255,0.03)] p-2.5
+              "
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className="flex items-center gap-2.5">
                 <SpeciesAvatar speciesId={fish.speciesId} radius={8} />
-                <span style={{ fontSize: '13px', fontWeight: 600 }}>{display.name}</span>
+                <span className="text-[13px] font-semibold">{display.name}</span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="flex items-center gap-2">
                 <svg width="28" height="28" viewBox="0 0 28 28">
                   <circle
                     cx="14"
@@ -135,7 +133,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
                     transform="rotate(-90 14 14)"
                   />
                 </svg>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: barColor }}>{visibilityPercent}%</span>
+                <span className="text-[11px] font-bold" style={{ color: barColor }}>{visibilityPercent}%</span>
               </div>
             </div>
           );

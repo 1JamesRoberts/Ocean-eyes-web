@@ -39,58 +39,42 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
   const currentTankName = activeTank?.name || 'Select Tank';
 
   return (
-    <div className="canvas-header">
+    <div className="
+      flex min-h-[75px] items-center justify-between border-b border-border-card
+      pb-3
+      max-xs:flex-col max-xs:items-start max-xs:gap-3
+    ">
       <div>
-        <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>My Aquarium</span>
+        <span className="block text-xs font-semibold text-text-muted uppercase">My Aquarium</span>
         {linkedTanks.length > 1 ? (
-          <div ref={dropdownRef} style={{ position: 'relative', marginTop: '2px', display: 'inline-block' }}>
+          <div ref={dropdownRef} className="relative mt-0.5 inline-block">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--color-text-primary)',
-                fontFamily: 'var(--font-main)',
-                fontSize: '28px',
-                fontWeight: 800,
-                outline: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                textAlign: 'left'
-              }}
+              className="
+                flex cursor-pointer items-center gap-2 border-none
+                bg-transparent p-0 text-left font-main text-[28px]
+                font-extrabold text-text-main outline-none
+              "
             >
               <span>{currentTankName}</span>
-              <ChevronDown 
-                size={22} 
-                style={{ 
-                  color: 'var(--color-text-secondary)', 
-                  marginTop: '4px', 
-                  transform: isOpen ? 'rotate(180deg)' : 'none', 
-                  transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)' 
-                }} 
+              <ChevronDown
+                size={22}
+                className="
+                  mt-1 text-text-muted transition-transform duration-200
+                "
+                style={{
+                  transform: isOpen ? 'rotate(180deg)' : 'none',
+                  transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
               />
             </button>
 
             {isOpen && (
-              <div style={{
-                position: 'absolute',
-                top: 'calc(100% + 8px)',
-                left: 0,
-                minWidth: '220px',
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '16px',
-                boxShadow: 'var(--shadow-card), 0 10px 25px -5px rgba(0, 0, 0, 0.1)',
-                padding: '6px',
-                zIndex: 1000,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px',
-                backdropFilter: 'blur(8px)',
-              }}>
+              <div className="
+                absolute top-[calc(100%+8px)] left-0 z-1000 flex min-w-[220px]
+                flex-col gap-1 rounded-2xl border border-border-card
+                bg-surface-card p-1.5 shadow-card backdrop-blur-sm
+              " style={{ boxShadow: 'var(--shadow-card), 0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}>
                 {tanks.filter(t => linkedTanks.includes(t.id)).map(t => (
                   <button
                     key={t.id}
@@ -98,20 +82,13 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
                       onSelectTank(t.id);
                       setIsOpen(false);
                     }}
-                    style={{
-                      background: t.id === tankId ? 'rgba(0, 116, 217, 0.08)' : 'transparent',
-                      border: 'none',
-                      borderRadius: '10px',
-                      color: t.id === tankId ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                      padding: '10px 12px',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      fontFamily: 'var(--font-main)',
-                      transition: 'background-color 0.15s ease',
-                      width: '100%'
-                    }}
+                    className={`
+                      w-full cursor-pointer rounded-[10px] border-none px-3
+                      py-2.5 text-left font-main text-sm font-semibold
+                      transition-colors
+                      ${t.id === tankId ? `text-primary-dark` : `text-text-main`}
+                    `}
+                    style={{ backgroundColor: t.id === tankId ? 'rgba(0, 116, 217, 0.08)' : 'transparent' }}
                     onMouseEnter={(e) => {
                       if (t.id !== tankId) e.currentTarget.style.backgroundColor = 'var(--color-background)';
                     }}
@@ -122,30 +99,19 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
                     {t.name}
                   </button>
                 ))}
-                
-                <div style={{ height: '1px', backgroundColor: 'var(--color-border)', margin: '4px 0' }} />
-                
+
+                <div className="my-1 h-px bg-border-card" />
+
                 <button
                   onClick={() => {
                     onAddTank();
                     setIsOpen(false);
                   }}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    borderRadius: '10px',
-                    color: 'var(--color-primary)',
-                    padding: '10px 12px',
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    fontFamily: 'var(--font-main)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    width: '100%'
-                  }}
+                  className="
+                    flex w-full cursor-pointer items-center gap-1.5
+                    rounded-[10px] border-none bg-transparent px-3 py-2.5
+                    text-left font-main text-sm font-bold text-primary-dark
+                  "
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-background)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -156,44 +122,39 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
             )}
           </div>
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 className="canvas-title" style={{ marginTop: '2px', display: 'inline-block' }}>{activeTank?.name || 'Living Room Reef'}</h1>
-            <button 
-              className="secondary-button" 
-              style={{ padding: '4px 8px', fontSize: '11px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          <div className="flex items-center gap-3">
+            <h1 className="
+              mt-0.5 inline-block text-[28px] font-extrabold text-text-main
+            ">{activeTank?.name || 'Living Room Reef'}</h1>
+            <button
+              className="
+                inline-flex cursor-pointer items-center gap-1 rounded-lg border
+                border-border-card bg-surface-card px-2 py-1 text-[11px]
+                font-semibold text-text-main transition-smooth
+                hover:border-text-muted hover:bg-surface-hover
+              "
               onClick={onAddTank}
             >
-              <Plus size={10} style={{ color: 'var(--color-primary)' }} />
-              <span style={{ color: 'var(--color-primary-dark)' }}>Add Tank</span>
+              <Plus size={10} className="text-primary-dark" />
+              <span className="text-primary-dark">Add Tank</span>
             </button>
           </div>
         )}
       </div>
-      
+
       {activeAlertCount > 0 && (
-        <button 
+        <button
           onClick={onViewAlerts}
-          style={{
-            background: 'none',
-            border: 'none',
-            position: 'relative',
-            cursor: 'pointer',
-            color: 'var(--color-warning)',
-            display: 'flex',
-            padding: '6px'
-          }}
+          className="
+            relative flex cursor-pointer border-none bg-transparent p-1.5
+            text-warning
+          "
         >
           <AlertTriangle size={24} />
-          <span style={{
-            position: 'absolute',
-            top: '2px',
-            right: '2px',
-            width: '10px',
-            height: '10px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--color-critical)',
-            border: '2px solid var(--color-surface)'
-          }} />
+          <span className="
+            absolute top-0.5 right-0.5 size-2.5 rounded-full border-2
+            border-surface-card bg-critical
+          " />
         </button>
       )}
     </div>

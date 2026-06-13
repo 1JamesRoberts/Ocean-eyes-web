@@ -262,12 +262,17 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
 
     return (
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-bold text-text-main m-0">Detection Density Heatmap</h3>
+            <h3 className="m-0 text-sm font-bold text-text-main">Detection Density Heatmap</h3>
           </div>
           <select
-            className="py-1.5 px-2.5 rounded-lg border border-border-card bg-surface-card text-text-main text-[13px] cursor-pointer outline-none focus:border-info"
+            className="
+              cursor-pointer rounded-lg border border-border-card
+              bg-surface-card px-2.5 py-1.5 text-[13px] text-text-main
+              outline-none
+              focus:border-info
+            "
             value={selectedSpecies}
             onChange={(e) => setSelectedSpecies(e.target.value)}
           >
@@ -280,7 +285,9 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
           </select>
         </div>
 
-        <div ref={containerRef} className="relative w-full rounded-xl overflow-hidden bg-camera-bg">
+        <div ref={containerRef} className="
+          relative w-full overflow-hidden rounded-xl bg-camera-bg
+        ">
           <CameraFeed
             feed={activeFeed}
             isStreaming={isStreaming}
@@ -290,7 +297,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
           />
           <canvas
             ref={overlayCanvasRef}
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="pointer-events-none absolute inset-0 size-full"
           />
         </div>
       </div>

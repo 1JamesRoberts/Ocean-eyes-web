@@ -32,32 +32,31 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 
   return (
     <div
-      className="card-decoration"
-      style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', cursor: 'pointer' }}
+      className="
+        flex cursor-pointer flex-col gap-3.5 rounded-[20px] border
+        border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
+        transition-smooth
+        hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
+        hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+      "
       onClick={onViewAdvanced}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Video size={16} style={{ color: 'var(--color-primary)' }} />
+      <div className="flex items-center justify-between">
+        <h3 className="
+          m-0 flex items-center gap-1.5 text-[15px] font-bold text-text-main
+        ">
+          <Video size={16} className="text-primary-dark" />
           <span>Live Feed Monitor</span>
         </h3>
       </div>
 
       <div
         ref={videoContainerRef}
-        className="live-camera-feed"
-        style={{
-          position: 'relative',
-          width: '100%',
-          borderRadius: '12px',
-          overflow: 'hidden',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'var(--color-background)',
-          border: '1px solid var(--color-border)',
-          cursor: 'pointer'
-        }}
+        className="
+          live-camera-feed relative flex w-full cursor-pointer items-center
+          justify-center overflow-hidden rounded-xl border border-border-card
+          bg-background-app
+        "
         onClick={handleVideoClick}
         onMouseEnter={() => setIsHoveringVideo(true)}
         onMouseLeave={() => setIsHoveringVideo(false)}
@@ -71,74 +70,70 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               videoRef={videoRef}
               className="w-full"
               idlePlaceholder={
-                <div className="flex flex-col items-center justify-center gap-2 py-8">
+                <div className="
+                  flex flex-col items-center justify-center gap-2 py-8
+                ">
                   <Video size={24} color="var(--color-text-secondary)" />
-                  <p className="text-text-secondary text-xs">Feed is idle. Connect stream to monitor.</p>
+                  <p className="text-xs text-text-muted">Feed is idle. Connect stream to monitor.</p>
                 </div>
               }
             />
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'none',
-              overflow: 'hidden'
-            }}>
+            <div className="
+              pointer-events-none absolute top-0 left-0 size-full
+              overflow-hidden
+            ">
             </div>
 
-            <div style={{
-              position: 'absolute',
-              bottom: '8px',
-              left: '8px',
-              display: 'flex',
-              gap: '6px',
-              zIndex: 10
-            }}>
-              <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '3px 6px', borderRadius: '6px', fontSize: '9px', color: '#FFF' }}>
+            <div className="absolute bottom-2 left-2 z-10 flex gap-1.5">
+              <div className="
+                rounded-md bg-[rgba(15,23,42,0.85)] px-1.5 py-0.5 text-[9px]
+                text-white
+              ">
                 <strong>{displayFishCount} fish</strong>
               </div>
-              <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '3px 6px', borderRadius: '6px', fontSize: '9px', color: '#FFF' }}>
-                <strong style={{ color: 'var(--color-info)' }}>{displayClarity.toFixed(2)} FNU</strong>
+              <div className="
+                rounded-md bg-[rgba(15,23,42,0.85)] px-1.5 py-0.5 text-[9px]
+                text-white
+              ">
+                <strong className="text-info">{displayClarity.toFixed(2)} FNU</strong>
               </div>
             </div>
 
             {isHoveringVideo && (
               <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  background: 'rgba(15, 23, 42, 0.55)',
-                  zIndex: 20,
-                  transition: 'opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  opacity: 1,
-                  pointerEvents: 'none'
-                }}
+                className="
+                  pointer-events-none absolute inset-0 z-20 flex flex-col
+                  items-center justify-center gap-1.5 bg-[rgba(15,23,42,0.55)]
+                  transition-opacity duration-250
+                "
+                style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
               >
-                <Maximize2 size={24} color="#FFF" style={{ opacity: 0.9 }} />
-                <span style={{ color: '#FFF', fontSize: '11px', fontWeight: 600, opacity: 0.9 }}>
+                <Maximize2 size={24} color="#FFF" className="opacity-90" />
+                <span className="
+                  text-[11px] font-semibold text-white opacity-90
+                ">
                   Click for fullscreen
                 </span>
               </div>
             )}
           </>
         ) : (
-          <div style={{ textAlign: 'center', padding: '12px' }}>
-            <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center' }}>
-              <Video size={24} color="var(--color-text-secondary)" />
+          <div className="p-3 text-center">
+            <div className="mb-2 flex justify-center">
+              <Video size={24} className="text-text-muted" />
             </div>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '12px', margin: '0 0 10px 0' }}>
+            <p className="mb-2.5 text-xs text-text-muted">
               Feed is idle. Connect stream to monitor.
             </p>
             <button
-              className="primary-button"
-              style={{ padding: '6px 12px', fontSize: '12px', margin: '0 auto' }}
+              className="
+                mx-auto inline-flex cursor-pointer items-center justify-center
+                gap-2 rounded-3xl border-none bg-primary-gradient px-3 py-1.5
+                font-main text-xs font-semibold text-text-inv
+                shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+                hover:bg-primary-hover-gradient
+                active:scale-[0.98]
+              "
               onClick={(e) => {
                 e.stopPropagation();
                 startStream();

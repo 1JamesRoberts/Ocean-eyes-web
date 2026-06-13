@@ -12,36 +12,40 @@ export const ActiveAlertsList: React.FC<ActiveAlertsListProps> = ({ alerts, onSe
 
   if (activeAlerts.length === 0) {
     return (
-      <div className="card-decoration" style={{ textAlign: 'center', padding: '32px 16px', border: '1px dashed var(--color-border)' }}>
-        <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>✓</span>
-        <strong style={{ fontSize: '14px', color: 'var(--color-good)' }}>System Operating Safely</strong>
-        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>No active safety alarms triggered.</p>
+      <div className="
+        rounded-[20px] border border-dashed border-border-card bg-surface-card
+        px-4 py-8 text-center shadow-card
+      ">
+        <span className="mb-2 block text-2xl">✓</span>
+        <strong className="text-sm text-good">System Operating Safely</strong>
+        <p className="mt-1 text-xs text-text-muted">No active safety alarms triggered.</p>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>
+    <div className="flex flex-col gap-3">
+      <h3 className="mb-3 text-base font-bold text-text-main">
         Active Safety Alerts
       </h3>
-      
+
       {activeAlerts.map(alert => (
-        <div 
-          key={alert.id} 
-          className="card-decoration" 
-          style={{ 
-            padding: '16px', 
-            borderLeft: `4px solid ${alert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)'}`,
-            cursor: 'pointer'
-          }}
+        <div
+          key={alert.id}
+          className="
+            cursor-pointer rounded-[20px] border border-[rgba(13,148,136,0.02)]
+            bg-surface-card p-4 shadow-card transition-smooth
+            hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
+            hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+          "
+          style={{ borderLeftWidth: '4px', borderLeftColor: alert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)' }}
           onClick={() => onSelectAlert(alert.id)}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{alert.title}</h4>
-            <ChevronRight size={16} style={{ color: 'var(--color-text-secondary)' }} />
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-bold text-text-main">{alert.title}</h4>
+            <ChevronRight size={16} className="text-text-muted" />
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px', lineHeight: '135%' }}>
+          <p className="mt-1 text-xs leading-[135%] text-text-muted">
             {alert.message}
           </p>
         </div>

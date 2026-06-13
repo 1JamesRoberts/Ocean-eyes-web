@@ -9,13 +9,22 @@ export const HistoryDetailScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="canvas-header">
+      <div className="
+        flex min-h-[75px] items-center justify-between border-b
+        border-border-card pb-3
+        max-xs:flex-col max-xs:items-start max-xs:gap-3
+      ">
         <div>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>History</span>
-          <h1 className="canvas-title" style={{ marginTop: '2px' }}>Clarity Analytics</h1>
+          <span className="
+            block text-xs font-semibold text-text-muted uppercase
+          ">History</span>
+          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Clarity Analytics</h1>
         </div>
         <button
-          style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
+          className="
+            cursor-pointer border-none bg-transparent font-main text-sm
+            font-semibold text-primary-dark
+          "
           onClick={() => setActiveTab('home')}
         >
           ← Back
@@ -23,19 +32,30 @@ export const HistoryDetailScreen: React.FC = () => {
       </div>
 
       {/* Main Clarity Area Chart */}
-      <div className="card-decoration" style={{ padding: '20px', marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="
+        mb-5 rounded-[20px] border border-[rgba(13,148,136,0.02)]
+        bg-surface-card p-5 shadow-card transition-smooth
+      ">
+        <h3 className="
+          mb-4 flex items-center justify-between text-[15px] font-bold
+        ">
           <span>Water Clarity Trend</span>
-          <span style={{ fontSize: '11px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary-dark)', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>
+          <span className="
+            rounded-[10px] bg-primary-light-gradient px-2 py-0.5 text-[11px]
+            font-semibold text-primary-dark
+          ">
             Live Sync
           </span>
         </h3>
-        
-        <div style={{ width: '100%', padding: '10px 0' }}>
+
+        <div className="w-full py-2.5">
           <MiniClarityChart readings={readings} height={180} />
         </div>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', fontSize: '9px', color: 'var(--color-text-secondary)', fontWeight: 600, marginTop: '8px' }}>
+
+        <div className="
+          mt-2 flex justify-between px-2.5 text-[9px] font-semibold
+          text-text-muted
+        ">
           <span>OLDER</span>
           <span>RECENT SCANS</span>
           <span>TODAY</span>
@@ -43,22 +63,26 @@ export const HistoryDetailScreen: React.FC = () => {
       </div>
 
       {/* Diagnostic Logs */}
-      <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>Database Reading Log Entries</h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <h3 className="mb-3 text-[15px] font-bold text-text-main">Database Reading Log Entries</h3>
+      <div className="flex flex-col gap-2.5">
         {readings.slice(0, 8).map(reading => {
           const date = new Date(reading.timestamp);
           const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           const day = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-          
+
           return (
-            <div key={reading.id} className="card-decoration" style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div key={reading.id} className="
+              flex items-center justify-between rounded-[20px] border
+              border-[rgba(13,148,136,0.02)] bg-surface-card px-4 py-3
+              shadow-card transition-smooth
+            ">
               <div>
-                <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>Clarity: {reading.clarity}/10</strong>
-                <span style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                <strong className="text-sm text-text-main">Clarity: {reading.clarity}/10</strong>
+                <span className="mt-0.5 block text-[11px] text-text-muted">
                   {day} · {time} · {reading.fish_count} fish visible
                 </span>
               </div>
-              <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              <div className="flex gap-3 text-xs text-text-muted">
                 <span>pH {reading.ph}</span>
                 <span>{reading.temp}°C</span>
               </div>

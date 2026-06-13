@@ -27,24 +27,33 @@ export const IoTMonitor: React.FC = () => {
   };
 
   return (
-    <div 
-      className="flex flex-col w-full bg-[#090d11] rounded-xl overflow-hidden border border-[#1e293b]" 
-      style={{ height: '520px' }}
+    <div
+      className="
+        flex h-[520px] w-full flex-col overflow-hidden rounded-xl border
+        border-[#1e293b] bg-[#090d11]
+      "
     >
       {/* Device Header Bar */}
-      <div className="h-[42px] bg-[#090d11] border-b border-[#1e293b] px-4 flex justify-between items-center text-[#94a3b8] text-[11px] font-semibold tracking-wider">
+      <div className="
+        flex h-[42px] items-center justify-between border-b border-[#1e293b]
+        bg-[#090d11] px-4 text-[11px] font-semibold tracking-wider
+        text-[#94a3b8]
+      ">
         <div className="flex items-center gap-1.5">
           <Cpu size={12} className="animate-float-2 text-primary-dark" />
           <span>OCEANEYES MONITOR v1.0.4</span>
         </div>
         <div className="flex items-center gap-2.5">
-          <span className={`w-1.5 h-1.5 rounded-full ${tankId ? 'bg-good' : 'bg-warning'}`} />
+          <span className={`
+            size-1.5 rounded-full
+            ${tankId ? 'bg-good' : `bg-warning`}
+          `} />
           <span>{tankId ? 'LINKED' : 'UNPAIRED'}</span>
         </div>
       </div>
 
       {/* Screen Body */}
-      <div className="flex-1 relative overflow-hidden flex flex-col">
+      <div className="relative flex flex-1 flex-col overflow-hidden">
         {renderScreen()}
       </div>
     </div>

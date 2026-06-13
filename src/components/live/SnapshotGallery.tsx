@@ -33,40 +33,80 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
   onDeleteRecording
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    <div className="
+      mt-6 grid grid-cols-1 gap-6
+      md:grid-cols-2
+    ">
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between pb-2 border-b border-border-card text-[15px] font-bold text-text-main">
+        <div className="
+          flex items-center justify-between border-b border-border-card pb-2
+          text-[15px] font-bold text-text-main
+        ">
           <span className="flex items-center gap-1.5"><Camera size={16} /> Snapshots</span>
-          <span className="text-xs text-text-muted font-medium">{snapshots.length} saved</span>
+          <span className="text-xs font-medium text-text-muted">{snapshots.length} saved</span>
         </div>
-        <div className="flex flex-col gap-3 max-h-[380px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-border-card [&::-webkit-scrollbar-thumb]:rounded-full">
+        <div className="
+          flex max-h-[380px] flex-col gap-3 overflow-y-auto pr-1
+          [&::-webkit-scrollbar]:w-1.5
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-thumb]:bg-border-card
+        ">
           {snapshots.length === 0 ? (
-            <div className="text-center p-5 text-text-muted text-[13px]">
+            <div className="p-5 text-center text-[13px] text-text-muted">
               No snapshots yet
             </div>
           ) : (
             snapshots.map(snap => (
-              <div key={snap.id} className="flex bg-surface-card rounded-xl border border-border-card overflow-hidden transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-0.5 hover:shadow-card">
-                <div className="w-[110px] relative bg-[#020617] flex items-center justify-center shrink-0">
-                  <img src={snap.imageUrl} alt="Snapshot" className="w-full h-full object-cover" />
+              <div key={snap.id} className="
+                flex overflow-hidden rounded-xl border border-border-card
+                bg-surface-card transition-smooth
+                hover:-translate-y-0.5 hover:shadow-card
+              ">
+                <div className="
+                  relative flex w-[110px] shrink-0 items-center justify-center
+                  bg-[#020617]
+                ">
+                  <img src={snap.imageUrl} alt="Snapshot" className="
+                    size-full object-cover
+                  " />
                 </div>
-                <div className="flex-1 p-3 flex flex-col justify-between">
+                <div className="flex flex-1 flex-col justify-between p-3">
                   <div>
                     <span className="text-xs font-semibold text-text-main">{snap.timestamp}</span>
-                    <div className="text-[11px] text-text-muted mt-0.5">
+                    <div className="mt-0.5 text-[11px] text-text-muted">
                       {snap.fishCount} fish · {snap.clarity.toFixed(2)} FNU
                     </div>
                   </div>
                   <div className="flex gap-1.5">
                     <button
-                      className="flex items-center justify-center rounded-full bg-[rgba(15,23,42,0.75)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.15)] text-white cursor-pointer transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] hover:not-disabled:bg-primary-gradient hover:not-disabled:border-primary-light-gradient hover:not-disabled:-translate-y-0.5 active:not-disabled:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed w-7 h-7"
+                      className="
+                        flex size-7 cursor-pointer items-center justify-center
+                        rounded-full border border-[rgba(255,255,255,0.15)]
+                        bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
+                        transition-smooth
+                        hover:not-disabled:-translate-y-0.5
+                        hover:not-disabled:border-primary-dark/50
+                        hover:not-disabled:bg-primary-gradient
+                        active:not-disabled:translate-y-0
+                        disabled:cursor-not-allowed disabled:opacity-40
+                      "
                       onClick={() => onDownloadSnapshot(snap)}
                       title="Download"
                     >
                       <Download size={12} />
                     </button>
                     <button
-                      className="flex items-center justify-center rounded-full bg-[rgba(15,23,42,0.75)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.15)] text-white cursor-pointer transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] hover:not-disabled:bg-primary-gradient hover:not-disabled:border-primary-light-gradient hover:not-disabled:-translate-y-0.5 active:not-disabled:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed w-7 h-7"
+                      className="
+                        flex size-7 cursor-pointer items-center justify-center
+                        rounded-full border border-[rgba(255,255,255,0.15)]
+                        bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
+                        transition-smooth
+                        hover:not-disabled:-translate-y-0.5
+                        hover:not-disabled:border-primary-dark/50
+                        hover:not-disabled:bg-primary-gradient
+                        active:not-disabled:translate-y-0
+                        disabled:cursor-not-allowed disabled:opacity-40
+                      "
                       onClick={() => onDeleteSnapshot(snap.id)}
                       title="Delete"
                     >
@@ -81,34 +121,67 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
       </div>
 
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between pb-2 border-b border-border-card text-[15px] font-bold text-text-main">
+        <div className="
+          flex items-center justify-between border-b border-border-card pb-2
+          text-[15px] font-bold text-text-main
+        ">
           <span className="flex items-center gap-1.5"><Video size={16} /> Recordings</span>
-          <span className="text-xs text-text-muted font-medium">{recordings.length} saved</span>
+          <span className="text-xs font-medium text-text-muted">{recordings.length} saved</span>
         </div>
-        <div className="flex flex-col gap-3 max-h-[380px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-border-card [&::-webkit-scrollbar-thumb]:rounded-full">
+        <div className="
+          flex max-h-[380px] flex-col gap-3 overflow-y-auto pr-1
+          [&::-webkit-scrollbar]:w-1.5
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-thumb]:bg-border-card
+        ">
           {recordings.length === 0 ? (
-            <div className="text-center p-5 text-text-muted text-[13px]">
+            <div className="p-5 text-center text-[13px] text-text-muted">
               No recordings yet
             </div>
           ) : (
             recordings.map(rec => (
-              <div key={rec.id} className="flex items-center justify-between p-[12px_16px] bg-surface-card rounded-xl border border-border-card transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-0.5 hover:shadow-card">
+              <div key={rec.id} className="
+                flex items-center justify-between rounded-xl border
+                border-border-card bg-surface-card p-[12px_16px]
+                transition-smooth
+                hover:-translate-y-0.5 hover:shadow-card
+              ">
                 <div>
                   <span className="text-xs font-semibold text-text-main">{rec.timestamp}</span>
-                  <div className="text-[11px] text-text-muted mt-0.5">
+                  <div className="mt-0.5 text-[11px] text-text-muted">
                     ⏱ {formatDuration(rec.duration)} · {rec.fishCount} fish · {rec.clarity.toFixed(2)} FNU
                   </div>
                 </div>
                 <div className="flex gap-1.5">
                   <button
-                    className="flex items-center justify-center rounded-full bg-[rgba(15,23,42,0.75)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.15)] text-white cursor-pointer transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] hover:not-disabled:bg-primary-gradient hover:not-disabled:border-primary-light-gradient hover:not-disabled:-translate-y-0.5 active:not-disabled:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed w-7 h-7"
+                    className="
+                      flex size-7 cursor-pointer items-center justify-center
+                      rounded-full border border-[rgba(255,255,255,0.15)]
+                      bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
+                      transition-smooth
+                      hover:not-disabled:-translate-y-0.5
+                      hover:not-disabled:border-primary-dark/50
+                      hover:not-disabled:bg-primary-gradient
+                      active:not-disabled:translate-y-0
+                      disabled:cursor-not-allowed disabled:opacity-40
+                    "
                     onClick={() => onDownloadRecording(rec)}
                     title="Download"
                   >
                     <Download size={12} />
                   </button>
                   <button
-                    className="flex items-center justify-center rounded-full bg-[rgba(15,23,42,0.75)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.15)] text-white cursor-pointer transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] hover:not-disabled:bg-primary-gradient hover:not-disabled:border-primary-light-gradient hover:not-disabled:-translate-y-0.5 active:not-disabled:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed w-7 h-7"
+                    className="
+                      flex size-7 cursor-pointer items-center justify-center
+                      rounded-full border border-[rgba(255,255,255,0.15)]
+                      bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
+                      transition-smooth
+                      hover:not-disabled:-translate-y-0.5
+                      hover:not-disabled:border-primary-dark/50
+                      hover:not-disabled:bg-primary-gradient
+                      active:not-disabled:translate-y-0
+                      disabled:cursor-not-allowed disabled:opacity-40
+                    "
                     onClick={() => onDeleteRecording(rec.id)}
                     title="Delete"
                   >

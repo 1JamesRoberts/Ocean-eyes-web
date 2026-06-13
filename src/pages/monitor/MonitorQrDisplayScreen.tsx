@@ -18,52 +18,40 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
   };
 
   return (
-    <div style={{
-      padding: '30px 24px',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100%',
-      color: '#FFFFFF',
-      background: '#090D11'
-    }}>
-      <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px', color: '#E2E8F0' }}>Pairing QR Code</h3>
+    <div className="
+      flex h-full flex-col items-center justify-center bg-[#090D11] px-6
+      py-[30px] text-white
+    ">
+      <h3 className="mb-5 text-lg font-bold text-[#E2E8F0]">Pairing QR Code</h3>
 
       {activeTankId ? (
         <>
           {/* Visual Scannable QR mock */}
-          <div className="qr-container" style={{ marginBottom: '20px' }}>
+          <div className="
+            mb-5 flex flex-col items-center rounded-[20px] border
+            border-border-card bg-surface-card p-6
+          ">
             <div className="qr-code-canvas" />
-            <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600, marginTop: '12px' }}>
+            <span className="mt-3 text-xs font-semibold text-[#64748B]">
               SCAN ME IN APP
             </span>
           </div>
 
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 600 }}>Manual Pairing ID</span>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              background: '#0F172A',
-              padding: '10px 16px',
-              borderRadius: '10px',
-              border: '1px solid #1E293B',
-              marginTop: '6px'
-            }}>
-              <code style={{ fontSize: '13px', color: '#38BDF8' }}>{activeTankId}</code>
-              <button 
+          <div className="mb-6 text-center">
+            <span className="
+              block text-[11px] font-semibold text-[#64748B] uppercase
+            ">Manual Pairing ID</span>
+            <div className="
+              mt-1.5 flex items-center gap-2.5 rounded-[10px] border
+              border-[#1E293B] bg-[#0F172A] px-4 py-2.5
+            ">
+              <code className="text-[13px] text-[#38BDF8]">{activeTankId}</code>
+              <button
                 onClick={copyToClipboard}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--color-primary)',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  textDecoration: 'underline'
-                }}
+                className="
+                  cursor-pointer border-none bg-transparent text-[11px]
+                  font-semibold text-primary-dark underline
+                "
               >
                 {copied ? 'Copied!' : 'Copy'}
               </button>
@@ -71,14 +59,20 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
           </div>
         </>
       ) : (
-        <p style={{ color: '#64748B', fontSize: '14px', marginBottom: '24px', textAlign: 'center' }}>
+        <p className="mb-6 text-center text-sm text-[#64748B]">
           No tank configured. Create a tank first to generate a pairing code.
         </p>
       )}
 
-      <button 
-        className="primary-button" 
-        style={{ width: '100%', maxWidth: '240px', padding: '12px', borderRadius: '12px' }}
+      <button
+        className="
+          inline-flex w-full max-w-[240px] cursor-pointer items-center
+          justify-center gap-2 rounded-xl border-none bg-primary-gradient px-6
+          py-3 font-main text-[15px] font-semibold text-text-inv
+          shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+          hover:bg-primary-hover-gradient
+          active:scale-[0.98]
+        "
         onClick={() => onNavigate('welcome')}
       >
         Done pairing

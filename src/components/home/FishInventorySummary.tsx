@@ -17,61 +17,78 @@ export const FishInventorySummary: React.FC<FishInventorySummaryProps> = ({
   const totalExpected = fishList.reduce((sum, f) => sum + f.count, 0);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px 24px', alignItems: 'start' }}>
-      <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>Camera Visualizer</h3>
-      <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="grid grid-cols-[1fr_2fr] items-start gap-x-6 gap-y-3">
+      <h3 className="m-0 text-base font-bold text-text-main">Camera Visualizer</h3>
+      <h3 className="
+        m-0 flex items-center justify-between text-base font-bold text-text-main
+      ">
         <span>Fish Inventory Summary</span>
-        <button 
+        <button
           onClick={onManageFish}
-          style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-main)' }}
+          className="
+            cursor-pointer border-none bg-transparent font-main text-xs
+            font-semibold text-primary-dark
+          "
         >
           Manage list
         </button>
       </h3>
-      
-      <div className="card-decoration" style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer', padding: '20px' }} onClick={onManageFish}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+
+      <div className="
+        flex cursor-pointer flex-col rounded-[20px] border
+        border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
+        transition-smooth
+        hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
+        hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+      " onClick={onManageFish}>
+        <div className="mb-3 flex items-start justify-between">
           <div>
-            <span style={{ fontSize: '28px', fontWeight: 800 }}>{displayFishCount}</span>
-            <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginLeft: '4px' }}>fish visible</span>
+            <span className="text-[28px] font-extrabold">{displayFishCount}</span>
+            <span className="ml-1 text-[13px] text-text-muted">fish visible</span>
           </div>
-          <Fish size={20} color="var(--color-primary)" />
+          <Fish size={20} className="text-primary-dark" />
         </div>
-        <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+        <span className="text-xs text-text-muted">
           Expected Target: {totalExpected} species count
         </span>
       </div>
 
-      <div className="card-decoration" style={{ padding: '4px 20px' }}>
+      <div className="
+        rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
+        px-5 py-1 shadow-card transition-smooth
+        hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
+        hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+      ">
         {fishList.slice(0, 3).map((fish, idx) => (
-          <div 
-            key={fish.id} 
-            style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              padding: '14px 0',
-              borderBottom: idx === Math.min(2, fishList.length - 1) ? 'none' : '1px solid var(--color-border)'
-            }}
+          <div
+            key={fish.id}
+            className={`
+              flex items-center justify-between py-3.5
+              ${idx === Math.min(2, fishList.length - 1) ? '' : `
+                border-b border-border-card
+              `}
+            `}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="flex items-center gap-3">
               <SpeciesAvatar speciesId={fish.speciesId} />
               <div>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{fish.name}</span>
-                <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', fontWeight: 500, marginTop: '2px' }}>
+                <span className="text-[15px] font-semibold text-text-main">{fish.name}</span>
+                <span className="
+                  mt-0.5 block text-[11px] font-medium text-text-muted
+                ">
                   Expected: {fish.count} species limit
                 </span>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{
-                fontSize: '11px',
-                backgroundColor: fish.detected === fish.count ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                color: fish.detected === fish.count ? 'var(--color-good)' : 'var(--color-critical)',
-                padding: '2px 8px',
-                borderRadius: '10px',
-                fontWeight: 600
-              }}>
+            <div className="flex items-center gap-2.5">
+              <span className="
+                rounded-[10px] px-2 py-0.5 text-[11px] font-semibold
+              "
+                style={{
+                  backgroundColor: fish.detected === fish.count ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                  color: fish.detected === fish.count ? 'var(--color-good)' : 'var(--color-critical)'
+                }}
+              >
                 {fish.detected === fish.count ? 'All Visible' : `${fish.detected} / ${fish.count} detected`}
               </span>
             </div>

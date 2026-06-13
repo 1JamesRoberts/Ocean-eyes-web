@@ -53,14 +53,14 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   const isOnline = backendStatus === 'online';
 
   const getBtnClasses = (active: boolean, disabled: boolean, isPulseClass = ''): string => {
-    const base = "flex items-center justify-center rounded-full backdrop-blur-[8px] border text-white transition-[all_0.25s_cubic-bezier(0.4,0,0.2,1)] w-10 h-10";
+    const base = "flex items-center justify-center rounded-full backdrop-blur-[8px] border text-white transition-smooth w-10 h-10";
     if (active) {
-      return `${base} bg-primary-gradient border-primary-light-gradient text-white cursor-pointer ${isPulseClass}`;
+      return `${base} bg-primary-gradient border-primary-dark/50 text-white cursor-pointer ${isPulseClass}`;
     }
     if (disabled) {
       return `${base} bg-[rgba(100,100,100,0.5)] border-[rgba(255,255,255,0.2)] text-[#AAA] cursor-not-allowed`;
     }
-    return `${base} bg-[rgba(15,23,42,0.75)] border-[rgba(255,255,255,0.15)] text-white cursor-pointer hover:bg-primary-gradient hover:border-primary-light-gradient hover:-translate-y-0.5 active:translate-y-0`;
+    return `${base} bg-[rgba(15,23,42,0.75)] border-[rgba(255,255,255,0.15)] text-white cursor-pointer hover:bg-primary-gradient hover:border-primary-dark/50 hover:-translate-y-0.5 active:translate-y-0`;
   };
 
   const getAIButtonTitle = (): string => {
@@ -80,7 +80,10 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
 
   return (
     <div 
-      className="absolute bottom-3 flex items-center gap-2 z-20 transition-[right] duration-300"
+      className="
+        absolute bottom-3 z-20 flex items-center gap-2 transition-[right]
+        duration-300
+      "
       style={{
         right: isFullscreen && showFsInventory ? '332px' : '12px',
       }}
@@ -107,7 +110,9 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         title={getTurbidityButtonTitle()}
         className={getBtnClasses(false, turbidityLoading || isChecking || !isStreaming || !hasImageSource)}
       >
-        {turbidityLoading || isChecking ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} />}
+        {turbidityLoading || isChecking ? <Loader2 size={16} className="
+          animate-spin
+        " /> : <Eye size={16} />}
       </button>
 
       <button

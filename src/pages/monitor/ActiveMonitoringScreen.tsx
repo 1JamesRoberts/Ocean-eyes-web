@@ -72,173 +72,150 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
   const waterHeightPct = activeFeedCalibration ? Math.min(100, Math.max(0, ((240 - activeFeedCalibration.water_line_y) / 240) * 100)) : 50;
 
   return (
-    <div style={{
-      padding: '16px',
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      color: '#FFFFFF',
-      background: '#090D11'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 600 }}>Active Stream Feed</span>
+    <div className="flex h-full flex-col bg-[#090D11] p-4 text-white">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-[11px] font-semibold text-[#94A3B8]">Active Stream Feed</span>
         {activeTank && (
-          <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}>
+          <span className="text-[11px] font-semibold text-primary-dark">
             {activeTank.name}
           </span>
         )}
       </div>
 
       {/* Live aquatic scanner simulation */}
-      <div style={{
-        flex: 1,
-        borderRadius: '8px',
-        border: '1px solid #1E293B',
-        position: 'relative',
-        overflow: 'hidden',
-        background: 'radial-gradient(circle at center, #1E293B 0%, #0F172A 100%)',
-        marginBottom: '16px'
-      }}>
+      <div
+        className="
+          relative mb-4 flex-1 overflow-hidden rounded-lg border
+          border-[#1E293B]
+          bg-[radial-gradient(circle_at_center,#1E293B_0%,#0F172A_100%)]
+        "
+      >
         <div className="camera-scanline" />
 
         {/* Visual Water Body Representation of Tank */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          height: `${waterHeightPct}%`,
-          background: 'linear-gradient(180deg, rgba(20, 184, 166, 0.3) 0%, rgba(13, 148, 136, 0.5) 100%)',
-          borderTop: '2px dashed rgba(255, 255, 255, 0.4)',
-          zIndex: 1,
-          pointerEvents: 'none'
-        }}>
+        <div
+          className="
+            pointer-events-none absolute bottom-0 left-0 z-1 w-full border-t-2
+            border-dashed border-[rgba(255,255,255,0.4)]
+          "
+          style={{
+            height: `${waterHeightPct}%`,
+            background: 'linear-gradient(180deg, rgba(20, 184, 166, 0.3) 0%, rgba(13, 148, 136, 0.5) 100%)'
+          }}
+        >
           {/* Bubbles */}
-          <div style={{ position: 'absolute', bottom: '15%', left: '20%', fontSize: '12px', opacity: 0.3 }} className="anim-float-1">🫧</div>
-          <div style={{ position: 'absolute', bottom: '45%', right: '15%', fontSize: '10px', opacity: 0.2 }} className="anim-float-2">🫧</div>
-          <div style={{ position: 'absolute', bottom: '70%', left: '50%', fontSize: '14px', opacity: 0.4 }} className="anim-float-1">🫧</div>
+          <div className="
+            absolute bottom-[15%] left-[20%] animate-float-1 text-xs opacity-30
+          ">🫧</div>
+          <div className="
+            absolute right-[15%] bottom-[45%] animate-float-2 text-[10px]
+            opacity-20
+          ">🫧</div>
+          <div className="
+            absolute bottom-[70%] left-1/2 animate-float-1 text-sm opacity-40
+          ">🫧</div>
         </div>
 
         {/* Sand/Substrate Bed */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          height: '20px',
-          background: 'linear-gradient(0deg, #0F172A 0%, #1E293B 100%)',
-          borderTop: '1px solid #334155',
-          zIndex: 2,
-          pointerEvents: 'none'
-        }} />
+        <div
+          className="
+            pointer-events-none absolute bottom-0 left-0 z-2 h-5 w-full border-t
+            border-[#334155] bg-[linear-gradient(0deg,#0F172A_0%,#1E293B_100%)]
+          "
+        />
 
         {/* Glass Tank Frame Reflection */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          boxShadow: 'inset 0 0 20px rgba(56, 189, 248, 0.15)',
-          border: '2px solid rgba(56, 189, 248, 0.25)',
-          borderRadius: '8px',
-          pointerEvents: 'none',
-          zIndex: 15
-        }} />
+        <div
+          className="
+            pointer-events-none absolute top-0 left-0 z-15 size-full rounded-lg
+            border-2 border-[rgba(56,189,248,0.25)]
+            shadow-[inset_0_0_20px_rgba(56,189,248,0.15)]
+          "
+        />
 
         {/* Live scanner target graphics */}
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          left: '20px',
-          fontFamily: 'monospace',
-          fontSize: '9px',
-          color: '#34D399',
-          lineHeight: '130%',
-          textShadow: '0 0 4px rgba(52, 211, 153, 0.4)',
-          zIndex: 12
-        }}>
+        <div className="
+          absolute top-5 left-5 z-12 font-mono text-[9px] leading-[130%]
+          text-[#34D399]
+        " style={{ textShadow: '0 0 4px rgba(52, 211, 153, 0.4)' }}>
           <span>CAM FEED: OK</span><br />
           <span>RESOLUTION: 1080P</span><br />
           <span>FPS: 30.00</span>
         </div>
 
         {/* Bounding box graphics simulating AI detection */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: '25%',
-          width: '80px',
-          height: '60px',
-          border: '1.5px solid #34D399',
-          boxShadow: '0 0 6px rgba(52, 211, 153, 0.3)',
-          zIndex: 12
-        }}>
-          <span style={{ position: 'absolute', top: '-14px', left: 0, fontSize: '8px', color: '#FFF', background: '#34D399', padding: '1px 3px', fontWeight: 700 }}>
+        <div
+          className="
+            absolute top-[30%] left-[25%] z-12 h-[60px] w-20 border-[1.5px]
+            border-[#34D399]
+          "
+          style={{ boxShadow: '0 0 6px rgba(52, 211, 153, 0.3)' }}
+        >
+          <span className="
+            absolute -top-3.5 left-0 bg-[#34D399] px-0.5 py-px text-[8px]
+            font-bold text-white
+          ">
             NEON TETRA 98%
           </span>
         </div>
 
-        <div style={{
-          position: 'absolute',
-          bottom: '25%',
-          right: '25%',
-          width: '70px',
-          height: '50px',
-          border: '1.5px solid #34D399',
-          boxShadow: '0 0 6px rgba(52, 211, 153, 0.3)',
-          zIndex: 12
-        }}>
-          <span style={{ position: 'absolute', top: '-14px', left: 0, fontSize: '8px', color: '#FFF', background: '#34D399', padding: '1px 3px', fontWeight: 700 }}>
+        <div
+          className="
+            absolute right-[25%] bottom-[25%] z-12 h-[50px] w-[70px]
+            border-[1.5px] border-[#34D399]
+          "
+          style={{ boxShadow: '0 0 6px rgba(52, 211, 153, 0.3)' }}
+        >
+          <span className="
+            absolute -top-3.5 left-0 bg-[#34D399] px-0.5 py-px text-[8px]
+            font-bold text-white
+          ">
             GUPPY 94%
           </span>
         </div>
 
         {/* Dynamic Water Line Calibration Overlay */}
         {activeFeedCalibration && (
-          <div style={{
-            position: 'absolute',
-            top: `${Math.min(100, Math.max(0, (activeFeedCalibration.water_line_y / 240) * 100))}%`,
-            left: 0,
-            width: '100%',
-            height: '2px',
-            borderTop: '2px dashed rgba(255,255,255,0.3)',
-            zIndex: 10,
-            pointerEvents: 'none'
-          }} />
+          <div
+            className="
+              pointer-events-none absolute left-0 z-10 h-0.5 w-full border-t-2
+              border-dashed border-[rgba(255,255,255,0.3)]
+            "
+            style={{ top: `${Math.min(100, Math.max(0, (activeFeedCalibration.water_line_y / 240) * 100))}%` }}
+          />
         )}
       </div>
 
       {/* Grid of monitored stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
-        <div style={{ background: '#0F172A', padding: '10px', borderRadius: '8px', border: '1px solid #1E293B' }}>
-          <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>VISIBILITY COUNT</span>
-          <strong style={{ fontSize: '16px', color: '#38BDF8' }}>{displayFish} fish detected</strong>
+      <div className="mb-4 grid grid-cols-2 gap-2.5">
+        <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-2.5">
+          <span className="block text-[10px] text-[#64748B]">VISIBILITY COUNT</span>
+          <strong className="text-base text-[#38BDF8]">{displayFish} fish detected</strong>
         </div>
 
-        <div style={{ background: '#0F172A', padding: '10px', borderRadius: '8px', border: '1px solid #1E293B' }}>
-          <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>WATER CLARITY</span>
-          <strong style={{ fontSize: '16px', color: '#38BDF8' }}>{displayClarity.toFixed(2)} FNU</strong>
+        <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-2.5">
+          <span className="block text-[10px] text-[#64748B]">WATER CLARITY</span>
+          <strong className="text-base text-[#38BDF8]">{displayClarity.toFixed(2)} FNU</strong>
         </div>
       </div>
 
       {/* Simulator triggers */}
-      <div className="card-decoration" style={{ padding: '12px', border: '1px dashed #1E293B', backgroundColor: 'transparent', marginBottom: '16px' }}>
-        <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600, display: 'block', textTransform: 'uppercase', marginBottom: '8px' }}>
+      <div className="
+        mb-4 rounded-[20px] border border-dashed border-[#1E293B] bg-transparent
+        p-3
+      ">
+        <span className="
+          mb-2 block text-[11px] font-semibold text-[#64748B] uppercase
+        ">
           Aquarium Simulator Controls
         </span>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <button 
-            style={{
-              padding: '8px 10px',
-              fontSize: '11px',
-              borderRadius: '8px',
-              border: 'none',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: simClarityIssue ? 'var(--color-critical)' : '#1E293B',
-              color: '#FFF'
-            }}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            className="
+              cursor-pointer rounded-lg border-none px-2.5 py-2 text-[11px]
+              font-semibold text-white transition-colors
+            "
+            style={{ backgroundColor: simClarityIssue ? 'var(--color-critical)' : '#1E293B' }}
             onClick={() => {
               setSimClarityIssue(prev => !prev);
               setTimeout(triggerSimulationMetrics, 50);
@@ -250,9 +227,13 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         </div>
       </div>
 
-      <button 
-        className="secondary-button" 
-        style={{ width: '100%', padding: '10px', fontSize: '13px', borderRadius: '10px', backgroundColor: 'transparent', borderColor: '#334155', color: '#94A3B8' }}
+      <button
+        className="
+          inline-flex w-full cursor-pointer items-center justify-center gap-2
+          rounded-xl border border-[#334155] bg-transparent px-5 py-2.5
+          font-main text-[13px] font-semibold text-[#94A3B8] transition-smooth
+          hover:bg-[rgba(255,255,255,0.05)]
+        "
         onClick={() => onNavigate('welcome')}
       >
         Exit Active Monitoring

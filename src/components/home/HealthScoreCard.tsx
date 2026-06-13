@@ -13,32 +13,42 @@ export const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ reading }) => 
   const dashOffset = circumference * (1 - healthScore / 10);
 
   return (
-    <div className="card-decoration" style={{ display: 'flex', gap: '24px', alignItems: 'center', padding: '24px' }}>
-      <div style={{ position: 'relative', width: '90px', height: '90px', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-        <svg style={{ position: 'absolute', transform: 'rotate(-90deg)', width: '90px', height: '90px' }}>
+    <div className="
+      flex items-center gap-6 rounded-[20px] border
+      border-[rgba(13,148,136,0.02)] bg-surface-card p-6 shadow-card
+      transition-smooth
+      hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
+      hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+    ">
+      <div className="
+        relative flex size-[90px] shrink-0 items-center justify-center
+      ">
+        <svg className="absolute size-[90px] -rotate-90">
           <circle cx="45" cy="45" r="38" stroke="var(--color-background)" strokeWidth="8" fill="none" />
-          <circle 
-            cx="45" 
-            cy="45" 
-            r="38" 
-            stroke={healthColor} 
-            strokeWidth="8" 
-            fill="none" 
+          <circle
+            cx="45"
+            cy="45"
+            r="38"
+            stroke={healthColor}
+            strokeWidth="8"
+            fill="none"
             strokeDasharray={circumference}
             strokeDashoffset={dashOffset}
             strokeLinecap="round"
-            style={{ transition: 'var(--transition-smooth)' }}
+            className="transition-smooth"
           />
         </svg>
-        <div style={{ textAlign: 'center', zIndex: 5 }}>
-          <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{healthScore}</span>
-          <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', fontWeight: 600, marginTop: '-4px' }}>Score</span>
+        <div className="z-5 text-center">
+          <span className="text-[28px] font-extrabold text-text-main">{healthScore}</span>
+          <span className="
+            -mt-1 block text-[11px] font-semibold text-text-muted
+          ">Score</span>
         </div>
       </div>
 
-      <div style={{ flex: 1 }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)' }}>Aquarium Health Index</h3>
-        <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginTop: '6px', lineHeight: '145%' }}>
+      <div className="flex-1">
+        <h3 className="text-lg font-bold text-text-main">Aquarium Health Index</h3>
+        <p className="mt-1.5 text-sm leading-[145%] text-text-muted">
           {healthMessage}
         </p>
       </div>
