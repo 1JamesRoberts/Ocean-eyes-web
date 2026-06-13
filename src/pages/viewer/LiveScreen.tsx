@@ -230,13 +230,24 @@ export const LiveScreen: React.FC = () => {
       if (!aiMountedRef.current) return;
       if (!cameraFeedRef.current?.videoElement || aiLoading) return;
 
+      const video = cameraFeedRef.current.videoElement;
+      const isVideoReady = (
+        video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
+        video.videoWidth > 0 &&
+        video.videoHeight > 0
+      );
+      if (!isVideoReady) {
+        // Video isn't ready yet; retry on the next scheduled tick instead of failing.
+        return;
+      }
+
       setAiLoading(true);
       setAiError(null);
       const controller = new AbortController();
       aiAbortControllerRef.current = controller;
 
       try {
-        const blob = await captureFrame(cameraFeedRef.current.videoElement);
+        const blob = await captureFrame(video);
 
         const ONE_HOUR = 3600000;
         const lastDiagStr = localStorage.getItem('oceaneyes_last_diagnosis_time');
@@ -377,6 +388,18 @@ export const LiveScreen: React.FC = () => {
 
   const measureTurbidity = useCallback(async () => {
     if (!cameraFeedRef.current?.videoElement || turbidityLoading || backendStatus === 'checking' || !isStreaming) return;
+
+    const video = cameraFeedRef.current.videoElement;
+    const isVideoReady = (
+      video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
+      video.videoWidth > 0 &&
+      video.videoHeight > 0
+    );
+    if (!isVideoReady) {
+      setTurbidityError('Camera feed is not ready yet');
+      return;
+    }
+
     if (!(await ensureBackendOnline())) {
       setTurbidityError('AI Backend is offline. Please start it first: cd ai && python api_server.py');
       return;
@@ -388,7 +411,7 @@ export const LiveScreen: React.FC = () => {
     turbidityAbortControllerRef.current = controller;
 
     try {
-      const blob = await captureFrame(cameraFeedRef.current.videoElement);
+      const blob = await captureFrame(video);
       const result = await sendFrameForTurbidity(blob, controller.signal);
       setLastTurbidityResult(result);
 

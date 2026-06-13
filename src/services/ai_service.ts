@@ -67,6 +67,14 @@ export async function isBackendAvailable(signal?: AbortSignal): Promise<boolean>
   }
 }
 
+function isVideoReady(video: HTMLVideoElement): boolean {
+  return (
+    video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
+    video.videoWidth > 0 &&
+    video.videoHeight > 0
+  );
+}
+
 /**
  * Capture a frame from a video or image element as a JPEG Blob.
  */
@@ -74,10 +82,27 @@ export async function captureFrame(
   source: HTMLVideoElement | HTMLImageElement,
   quality: number = 0.92
 ): Promise<Blob> {
-  const canvas = document.createElement('canvas');
   const isVideo = source instanceof HTMLVideoElement;
+
+  if (isVideo) {
+    const video = source as HTMLVideoElement;
+    if (!isVideoReady(video)) {
+      throw new Error('Video element is not ready for frame capture');
+    }
+  } else {
+    const img = source as HTMLImageElement;
+    if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
+      throw new Error('Image element is not loaded');
+    }
+  }
+
+  const canvas = document.createElement('canvas');
   canvas.width = isVideo ? source.videoWidth : (source as HTMLImageElement).naturalWidth || 640;
   canvas.height = isVideo ? source.videoHeight : (source as HTMLImageElement).naturalHeight || 360;
+
+  if (canvas.width === 0 || canvas.height === 0) {
+    throw new Error(`Invalid canvas dimensions: ${canvas.width}x${canvas.height}`);
+  }
 
   const ctx = canvas.getContext('2d');
   if (!ctx) {
@@ -131,6 +156,10 @@ export async function captureFrameFromUrl(
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
+      if (canvas.width === 0 || canvas.height === 0) {
+        reject(new Error(`Invalid canvas dimensions: ${canvas.width}x${canvas.height}`));
+        return;
+      }
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         reject(new Error('Failed to get canvas 2d context'));
