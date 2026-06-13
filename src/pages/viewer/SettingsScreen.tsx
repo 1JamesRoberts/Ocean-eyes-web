@@ -254,7 +254,7 @@ export const SettingsScreen: React.FC = () => {
                 hover:opacity-90
                 active:scale-[0.98]
               "
-              onClick={() => { unlinkTank(); setActiveTab('home'); }}
+              onClick={() => { unlinkTank(); setShowConfirmUnlink(false); }}
             >
               Yes, Disconnect
             </button>

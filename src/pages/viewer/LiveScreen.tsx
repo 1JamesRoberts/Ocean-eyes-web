@@ -9,7 +9,7 @@ import type { CameraFilters, AIDetectionResult, AITurbidityResult } from '../../
 
 import { Video } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
-import { isBackendAvailable, captureFrame, captureFrameFromUrl, sendFrameForDetection, sendFrameForTurbidity } from '../../services/ai_service';
+import { isBackendAvailable, captureFrame, sendFrameForDetection, sendFrameForTurbidity } from '../../services/ai_service';
 import { LocalStorageStore } from '../../services/localStorageStore';
 import { AIBoundingBoxes } from '../../components/live/AIBoundingBoxes';
 import { CameraControls } from '../../components/live/CameraControls';
@@ -228,7 +228,7 @@ export const LiveScreen: React.FC = () => {
 
     const processFrame = async () => {
       if (!aiMountedRef.current) return;
-      if (((!isWebcam && !activeFeed.mock_image) || aiLoading)) return;
+      if (!cameraFeedRef.current?.videoElement || aiLoading) return;
 
       setAiLoading(true);
       setAiError(null);
@@ -236,12 +236,7 @@ export const LiveScreen: React.FC = () => {
       aiAbortControllerRef.current = controller;
 
       try {
-        let blob: Blob;
-        if (isWebcam && cameraFeedRef.current?.videoElement) {
-          blob = await captureFrame(cameraFeedRef.current.videoElement);
-        } else {
-          blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360, controller.signal);
-        }
+        const blob = await captureFrame(cameraFeedRef.current.videoElement);
 
         const ONE_HOUR = 3600000;
         const lastDiagStr = localStorage.getItem('oceaneyes_last_diagnosis_time');
@@ -381,7 +376,7 @@ export const LiveScreen: React.FC = () => {
   }, [isAIActive, aiLoading, backendStatus, isStreaming, ensureBackendOnline]);
 
   const measureTurbidity = useCallback(async () => {
-    if (((!isWebcam && !activeFeed.mock_image) || turbidityLoading || backendStatus === 'checking' || !isStreaming)) return;
+    if (!cameraFeedRef.current?.videoElement || turbidityLoading || backendStatus === 'checking' || !isStreaming) return;
     if (!(await ensureBackendOnline())) {
       setTurbidityError('AI Backend is offline. Please start it first: cd ai && python api_server.py');
       return;
@@ -393,12 +388,7 @@ export const LiveScreen: React.FC = () => {
     turbidityAbortControllerRef.current = controller;
 
     try {
-      let blob: Blob;
-      if (isWebcam && cameraFeedRef.current?.videoElement) {
-        blob = await captureFrame(cameraFeedRef.current.videoElement);
-      } else {
-        blob = await captureFrameFromUrl(activeFeed.mock_image!, 640, 360, controller.signal);
-      }
+      const blob = await captureFrame(cameraFeedRef.current.videoElement);
       const result = await sendFrameForTurbidity(blob, controller.signal);
       setLastTurbidityResult(result);
 
@@ -433,7 +423,7 @@ export const LiveScreen: React.FC = () => {
       setTurbidityLoading(false);
       turbidityAbortControllerRef.current = null;
     }
-  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isWebcam, isStreaming, backendStatus, ensureBackendOnline, liveState, saveLiveState, writeReading, setLastTurbidityResult]);
+  }, [activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isStreaming, backendStatus, ensureBackendOnline, liveState, saveLiveState, writeReading, setLastTurbidityResult]);
 
   const currentClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
   const currentFishCount = isStreaming && liveState?.is_live ? activeFeed.current_fish_count : 0;
@@ -494,18 +484,8 @@ export const LiveScreen: React.FC = () => {
       setSnapshots(prev => [newSnapshot, ...prev]);
     };
 
-    if (isWebcam && cameraFeedRef.current?.videoElement) {
+    if (cameraFeedRef.current?.videoElement) {
       renderAllToCanvas(cameraFeedRef.current.videoElement);
-    } else if (activeFeed.mock_image) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        renderAllToCanvas(img);
-      };
-      img.onerror = () => {
-        renderAllToCanvas();
-      };
-      img.src = activeFeed.mock_image;
     } else {
       renderAllToCanvas();
     }
@@ -711,7 +691,7 @@ Diagnostics:
               aiLoading={aiLoading}
               backendStatus={backendStatus}
               turbidityLoading={turbidityLoading}
-              hasImageSource={isWebcam || !!activeFeed.mock_image}
+              hasImageSource={isWebcam}
               isFullscreen={isFullscreen}
               showFsInventory={showFsInventory}
               onTakeSnapshot={takeSnapshot}

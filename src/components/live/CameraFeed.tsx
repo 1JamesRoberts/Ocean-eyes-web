@@ -20,7 +20,7 @@ interface CameraFeedProps {
 }
 
 export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
-  ({ feed, isStreaming, isWebcam, videoRef, filters, onDimensions, children, className = '', style, idlePlaceholder }, forwardedRef) => {
+  ({ isStreaming, videoRef, filters, onDimensions, children, className = '', style, idlePlaceholder }, forwardedRef) => {
     useImperativeHandle(forwardedRef, () => ({
       videoElement: videoRef.current,
     }));
@@ -35,12 +35,6 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
     }
   };
 
-  const handleImageLoaded = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    if (onDimensions) {
-      onDimensions(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight);
-    }
-  };
-
   return (
     <div
       className={`
@@ -51,25 +45,15 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
     >
       {isStreaming ? (
         <>
-          {isWebcam ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              onLoadedMetadata={handleVideoLoaded}
-              className="block h-auto w-full"
-              style={filterStyle ? { filter: filterStyle } : undefined}
-            />
-          ) : (
-            <img
-              src={feed.mock_image || ''}
-              alt="Live feed"
-              onLoad={handleImageLoaded}
-              className="block h-auto w-full"
-              style={filterStyle ? { filter: filterStyle } : undefined}
-            />
-          )}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            onLoadedMetadata={handleVideoLoaded}
+            className="block h-auto w-full"
+            style={filterStyle ? { filter: filterStyle } : undefined}
+          />
 
           {/* Overlay layer for children (badges, decorations, etc.) */}
           {children && (

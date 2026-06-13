@@ -1,9 +1,5 @@
 // constants.ts - Shared constants for OceanEyes
 
-// ─── Default Stream URLs ────────────────────────────────────────────────────
-export const DEFAULT_RTSP_URL = 'rtsp://oceaneyes.iot/live-stream-09';
-export const DEFAULT_MOCK_IMAGE = '/mock_camera_main.png';
-
 // ─── Storage Keys ───────────────────────────────────────────────────────────
 export const SNAPSHOTS_STORAGE_KEY = 'oceaneyes_snapshots';
 export const RECORDINGS_STORAGE_KEY = 'oceaneyes_recordings';

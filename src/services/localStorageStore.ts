@@ -8,6 +8,22 @@ import type {
 } from '../types/aquarium';
 
 // ---------------------------------------------------------------------------
+// Single demo tank (multi-tank UI is kept as a non-functional mockup)
+// ---------------------------------------------------------------------------
+export const DEMO_TANK_ID = 'tank-demo';
+
+export const DEMO_TANK: TankBrief = {
+  id: DEMO_TANK_ID,
+  name: 'Living Room Reef',
+  owner_id: 'anon-user-123',
+  created_at: new Date().toISOString(),
+  thresholds: {
+    max_turbidity_fnu: 5.0,
+    fish_change_pct: 50.0,
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Storage keys
 // ---------------------------------------------------------------------------
 const STORAGE_KEYS = {
@@ -96,7 +112,7 @@ const getOrDefault = <T>(key: string, defaultValue: T): T => {
 // ---------------------------------------------------------------------------
 // Schema migrations (run once at app bootstrap)
 // ---------------------------------------------------------------------------
-const CURRENT_SCHEMA_VERSION = 2;
+const CURRENT_SCHEMA_VERSION = 3;
 
 const migrateTanks = (tanks: TankBrief[]): TankBrief[] => {
   return tanks.map((tank) => {
@@ -175,6 +191,73 @@ const migrateGlobalFishToPerTank = (
   localStorage.removeItem(STORAGE_KEYS.legacyFish);
 };
 
+const migrateToSingleDemoTank = (): void => {
+  const previousLinked = getOrDefault<string[]>(STORAGE_KEYS.linkedTanks, []);
+  const previousLastTankId = localStorage.getItem(STORAGE_KEYS.lastTankId);
+
+  // Merge fish from all previously linked tanks into the demo tank.
+  const mergedFish: FishEntry[] = [];
+  previousLinked.forEach((tankId) => {
+    const fish = getOrDefault<FishEntry[]>(STORAGE_KEYS.fish(tankId), []);
+    fish.forEach((entry) => mergedFish.push({ ...entry, tankId: DEMO_TANK_ID }));
+    localStorage.removeItem(STORAGE_KEYS.fish(tankId));
+  });
+  const globalFish = getOrDefault<FishEntry[]>(STORAGE_KEYS.legacyFish, []);
+  globalFish.forEach((entry) => mergedFish.push({ ...entry, tankId: DEMO_TANK_ID }));
+  localStorage.removeItem(STORAGE_KEYS.legacyFish);
+
+  // Deduplicate by species id and sum counts.
+  const fishBySpecies: Record<string, FishEntry> = {};
+  mergedFish.forEach((entry) => {
+    const existing = fishBySpecies[entry.speciesId];
+    if (existing) {
+      existing.count += entry.count;
+      existing.detected = Math.max(existing.detected, entry.detected);
+    } else {
+      fishBySpecies[entry.speciesId] = { ...entry };
+    }
+  });
+  safeSetItem(STORAGE_KEYS.fish(DEMO_TANK_ID), JSON.stringify(Object.values(fishBySpecies)));
+
+  // Re-tag readings to the demo tank and keep the most recent ones.
+  const readings = getOrDefault<ReadingItem[]>(STORAGE_KEYS.readings, []);
+  if (readings.length > 0) {
+    const retagged = readings.map((r) => ({ ...r, tank_id: DEMO_TANK_ID }));
+    safeSetItem(STORAGE_KEYS.readings, JSON.stringify(retagged.slice(0, 50)));
+  }
+
+  // Migrate the most recent live state, forcing a webcam-only feed.
+  const sourceTankId =
+    previousLastTankId && previousLinked.includes(previousLastTankId)
+      ? previousLastTankId
+      : previousLinked[0];
+  let liveState = getOrDefault<LiveState>(
+    STORAGE_KEYS.liveState(sourceTankId || DEMO_TANK_ID),
+    getDefaultLiveState()
+  );
+  liveState = migrateLiveState(liveState);
+  liveState.stream_url = 'webcam:default';
+  liveState.feeds = liveState.feeds.slice(0, 1).map((feed) => ({
+    ...feed,
+    name: 'Local Webcam',
+    stream_url: 'webcam:default',
+    mock_image: '',
+  }));
+  safeSetItem(STORAGE_KEYS.liveState(DEMO_TANK_ID), JSON.stringify(liveState));
+
+  // Delete any old per-tank live state keys.
+  previousLinked.forEach((tankId) => {
+    localStorage.removeItem(STORAGE_KEYS.liveState(tankId));
+  });
+
+  // Reset tanks and linked list to the single demo tank.
+  safeSetItem(STORAGE_KEYS.tanks, JSON.stringify([DEMO_TANK]));
+  safeSetItem(STORAGE_KEYS.linkedTanks, JSON.stringify([DEMO_TANK_ID]));
+  safeSetItem(STORAGE_KEYS.lastTankId, DEMO_TANK_ID);
+  notifyUpdate(STORAGE_KEYS.tanks);
+  notifyUpdate(STORAGE_KEYS.linkedTanks);
+};
+
 export const migrateLocalStorage = (): void => {
   const currentVersion = getOrDefault<number>(STORAGE_KEYS.schemaVersion, 0);
   if (currentVersion >= CURRENT_SCHEMA_VERSION) return;
@@ -208,6 +291,11 @@ export const migrateLocalStorage = (): void => {
     );
   }
 
+  // v3: collapse multi-tank data into a single demo tank and force webcam feed.
+  if (currentVersion < 3) {
+    migrateToSingleDemoTank();
+  }
+
   safeSetItem(STORAGE_KEYS.schemaVersion, JSON.stringify(CURRENT_SCHEMA_VERSION));
 };
 
@@ -216,7 +304,7 @@ export const migrateLocalStorage = (): void => {
 // ---------------------------------------------------------------------------
 const getDefaultLiveState = (): LiveState => ({
   is_live: false,
-  stream_url: 'rtsp://oceaneyes.iot/live-stream-09',
+  stream_url: 'webcam:default',
   started_at: null,
   last_ping_at: null,
   current_clarity: 1.2,
@@ -225,13 +313,13 @@ const getDefaultLiveState = (): LiveState => ({
   feeds: [
     {
       id: 'feed-main',
-      name: 'Main View',
-      stream_url: 'rtsp://oceaneyes.iot/live-stream-09',
+      name: 'Local Webcam',
+      stream_url: 'webcam:default',
       is_live: false,
       started_at: null,
       current_clarity: 1.2,
       current_fish_count: 0,
-      mock_image: '/mock_camera_main.png',
+      mock_image: '',
     },
   ],
 });
@@ -311,81 +399,24 @@ export class LocalStorageStore {
   // ─── Tank Operations ───────────────────────────────────────────────────────
 
   static async createTank(
-    name: string,
-    cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }
+    _name: string,
+    _cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }
   ): Promise<string> {
-    const id = `tank-${Math.floor(Math.random() * 900000) + 100000}`;
-    const tanks = this.getTanks();
-    const newTank: TankBrief = {
-      id,
-      name,
-      owner_id: 'anon-user-123',
-      created_at: new Date().toISOString(),
-      thresholds: { max_turbidity_fnu: 5.0, fish_change_pct: 50.0 },
-    };
-    tanks.push(newTank);
-    this.saveTanks(tanks);
-
-    const isWebcam = cameraSource?.type === 'webcam';
-    const liveState: LiveState = {
-      is_live: false,
-      stream_url: isWebcam
-        ? `webcam:${cameraSource?.deviceId || 'default'}`
-        : 'rtsp://oceaneyes.iot/live-stream-09',
-      started_at: null,
-      last_ping_at: null,
-      current_clarity: 1.2,
-      current_fish_count: 0,
-      selected_feed_id: 'feed-main',
-      feeds: [
-        {
-          id: 'feed-main',
-          name: isWebcam ? 'Local Webcam' : 'Main View',
-          stream_url: isWebcam
-            ? `webcam:${cameraSource?.deviceId || 'default'}`
-            : 'rtsp://oceaneyes.iot/live-stream-09',
-          is_live: false,
-          started_at: null,
-          current_clarity: 1.2,
-          current_fish_count: 0,
-          mock_image: isWebcam ? '' : '/mock_camera_main.png',
-        },
-      ],
-    };
-    this.saveLiveState(id, liveState);
-
-    await this.writeReading({
-      tankId: id,
-      clarity: 8.0,
-      fishCount: 0,
-    });
-
-    return id;
+    // Single demo tank mode: creation is a no-op that returns the demo id.
+    return DEMO_TANK_ID;
   }
 
-  static async joinTank(tankId: string): Promise<boolean> {
-    const tanks = this.getTanks();
-    const found = tanks.find((t) => t.id === tankId);
-    if (!found) return false;
-
-    const userTanks = getOrDefault<string[]>(STORAGE_KEYS.linkedTanks, []);
-    if (!userTanks.includes(tankId)) {
-      userTanks.push(tankId);
-      safeSetItem(STORAGE_KEYS.linkedTanks, JSON.stringify(userTanks));
-    }
-    notifyUpdate(STORAGE_KEYS.linkedTanks);
-    return true;
+  static async joinTank(_tankId: string): Promise<boolean> {
+    // Single demo tank mode: linking additional tanks is disabled.
+    return false;
   }
 
   static getLinkedTanks(): string[] {
-    return getOrDefault<string[]>(STORAGE_KEYS.linkedTanks, []);
+    return [DEMO_TANK_ID];
   }
 
-  static unlinkTank(tankId: string) {
-    const userTanks = this.getLinkedTanks();
-    const updated = userTanks.filter((id) => id !== tankId);
-    safeSetItem(STORAGE_KEYS.linkedTanks, JSON.stringify(updated));
-    notifyUpdate(STORAGE_KEYS.linkedTanks);
+  static unlinkTank(_tankId: string) {
+    // Single demo tank mode: unlinking is disabled.
   }
 
   static updateTankName(tankId: string, name: string) {
@@ -431,7 +462,7 @@ export class LocalStorageStore {
     const readings = this.getReadings();
     const newReading: ReadingItem = {
       id: `r-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      tank_id: data.tankId,
+      tank_id: DEMO_TANK_ID,
       timestamp: new Date().toISOString(),
       clarity: data.clarity,
       fish_count: data.fishCount,

@@ -47,21 +47,18 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
           {tankId ? 'Open Live Camera Monitor' : 'Open Live Camera Monitor (Demo Mode)'}
         </button>
 
-        {!tankId && (
-          <button
-            className="
-              inline-flex w-full cursor-pointer items-center justify-center
-              gap-2 rounded-xl border border-[#334155] bg-[#1E293B] px-6 py-3.5
-              font-main text-[15px] font-semibold text-[#E2E8F0]
-              transition-smooth
-              hover:bg-[#334155]
-              active:scale-[0.98]
-            "
-            onClick={() => onNavigate('qr')}
-          >
-            Pair with Mobile App
-          </button>
-        )}
+        <button
+          className="
+            inline-flex w-full cursor-pointer items-center justify-center gap-2
+            rounded-xl border border-[#334155] bg-[#1E293B] px-6 py-3.5
+            font-main text-[15px] font-semibold text-[#E2E8F0] transition-smooth
+            hover:bg-[#334155]
+            active:scale-[0.98]
+          "
+          onClick={() => onNavigate('qr')}
+        >
+          Pair with Mobile App
+        </button>
 
         <button
           className="

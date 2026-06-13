@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
 
 interface AddTankModalProps {
   show: boolean;
@@ -17,69 +16,31 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
   const [addMode, setAddMode] = useState<'create' | 'link'>('create');
   const [newTankName, setNewTankName] = useState('');
   const [linkTankCode, setLinkTankCode] = useState('');
-  const [addError, setAddError] = useState('');
-
-  const [cameraType, setCameraType] = useState<'mock' | 'webcam'>('mock');
-  const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState('');
-  const [permissionError, setPermissionError] = useState('');
-
-  const requestCameraAccess = async () => {
-    try {
-      setPermissionError('');
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop());
-
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(d => d.kind === 'videoinput');
-      setCameras(videoDevices);
-      if (videoDevices.length > 0) {
-        setSelectedCamera(videoDevices[0].deviceId);
-      }
-    } catch {
-      setPermissionError('Camera access denied or unavailable.');
-    }
-  };
 
   if (!show) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAddError('');
 
     if (addMode === 'create') {
       if (!newTankName.trim()) return;
-      try {
-        await onCreateTank(newTankName.trim(), {
-          type: cameraType,
-          deviceId: cameraType === 'webcam' ? selectedCamera : undefined
-        });
-        setNewTankName('');
-        onClose();
-      } catch {
-        setAddError('Failed to create tank.');
-      }
+      // Mockup: call handler but do not actually create a tank in single-demo-tank mode.
+      await onCreateTank(newTankName.trim(), { type: 'webcam' });
+      setNewTankName('');
+      onClose();
     } else {
       if (!linkTankCode.trim()) return;
-      const success = await onLinkTank(linkTankCode.trim());
-      if (success) {
-        setLinkTankCode('');
-        onClose();
-      } else {
-        setAddError('Invalid reference code or tank already linked.');
-      }
+      // Mockup: call handler but linking additional tanks is disabled.
+      await onLinkTank(linkTankCode.trim());
+      setLinkTankCode('');
+      onClose();
     }
   };
 
   const handleClose = () => {
     setNewTankName('');
     setLinkTankCode('');
-    setAddError('');
     setAddMode('create');
-    setCameraType('mock');
-    setCameras([]);
-    setSelectedCamera('');
-    setPermissionError('');
     onClose();
   };
 
@@ -101,7 +62,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
         <div className="flex gap-0.5 rounded-[10px] bg-border-card p-0.5">
           <button
             type="button"
-            onClick={() => { setAddMode('create'); setAddError(''); }}
+            onClick={() => { setAddMode('create'); }}
             className={`
               flex-1 cursor-pointer rounded-lg border-none p-1.5 text-xs
               font-semibold transition-colors
@@ -114,7 +75,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => { setAddMode('link'); setAddError(''); }}
+            onClick={() => { setAddMode('link'); }}
             className={`
               flex-1 cursor-pointer rounded-lg border-none p-1.5 text-xs
               font-semibold transition-colors
@@ -126,14 +87,6 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
             Link Existing Tank
           </button>
         </div>
-
-        {addError && (
-          <div className="
-            flex items-center gap-1 text-xs font-medium text-critical
-          ">
-            <AlertTriangle size={12} className="text-critical" /> {addError}
-          </div>
-        )}
 
         {addMode === 'create' ? (
           <div className="flex flex-col gap-3">
@@ -159,67 +112,12 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
               <label className="
                 mb-1.5 block text-[11px] font-semibold text-text-muted
               ">CAMERA SOURCE</label>
-              <div className="mb-2 flex gap-4">
-                <label className="
-                  flex cursor-pointer items-center gap-1.5 text-sm
-                  text-text-main
-                ">
-                  <input
-                    type="radio"
-                    name="cameraType"
-                    checked={cameraType === 'mock'}
-                    onChange={() => setCameraType('mock')}
-                    className="accent-primary-dark"
-                  />
-                  Mock Feed
-                </label>
-                <label className="
-                  flex cursor-pointer items-center gap-1.5 text-sm
-                  text-text-main
-                ">
-                  <input
-                    type="radio"
-                    name="cameraType"
-                    checked={cameraType === 'webcam'}
-                    onChange={async () => {
-                      setCameraType('webcam');
-                      await requestCameraAccess();
-                    }}
-                    className="accent-primary-dark"
-                  />
-                  Local Webcam
-                </label>
+              <div className="
+                rounded-[10px] border border-border-card bg-surface-card px-3
+                py-2
+              ">
+                <span className="text-[13px] text-text-main">Local Webcam</span>
               </div>
-
-              {cameraType === 'webcam' && (
-                <div>
-                  {permissionError ? (
-                    <div className="mt-1 text-xs text-critical">
-                      {permissionError}
-                    </div>
-                  ) : (
-                    <select
-                      value={selectedCamera}
-                      onChange={e => setSelectedCamera(e.target.value)}
-                      className="
-                        w-full rounded-[10px] border border-border-card
-                        bg-surface-card px-3 py-2 font-main text-[13px]
-                        text-text-main outline-none
-                      "
-                    >
-                      {cameras.length === 0 ? (
-                        <option value="">Searching for cameras...</option>
-                      ) : (
-                        cameras.map(cam => (
-                          <option key={cam.deviceId} value={cam.deviceId}>
-                            {cam.label || `Webcam ${cam.deviceId.slice(0, 5)}`}
-                          </option>
-                        ))
-                      )}
-                    </select>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         ) : (

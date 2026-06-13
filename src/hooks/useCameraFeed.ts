@@ -16,13 +16,13 @@ export interface UseCameraFeedResult {
 
 const DEFAULT_FEED: CameraFeedConfig = {
   id: 'feed-main',
-  name: 'Main View',
-  stream_url: 'rtsp://oceaneyes.iot/live-stream-09',
+  name: 'Local Webcam',
+  stream_url: 'webcam:default',
   is_live: false,
   started_at: null,
   current_clarity: 1.2,
   current_fish_count: 0,
-  mock_image: '/mock_camera_main.png'
+  mock_image: ''
 };
 
 export const useCameraFeed = (tankId: string | null): UseCameraFeedResult => {

@@ -1,31 +1,32 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
-import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
+import {
+  LocalStorageStore,
+  subscribeToDb,
+  DEMO_TANK_ID,
+  DEMO_TANK,
+} from '../services/localStorageStore';
 import type { TankBrief } from '../types/aquarium';
 
 const LAST_TANK_ID_KEY = 'oceaneyes_last_tank_id';
 
 export const useTank = () => {
+  // Single demo tank mode: the app always treats DEMO_TANK as the active tank.
   const [tankId, setTankId] = useState<string | null>(() => {
     const lastTankId = localStorage.getItem(LAST_TANK_ID_KEY);
-    if (lastTankId) {
-      const linked = LocalStorageStore.getLinkedTanks();
-      if (linked.includes(lastTankId)) {
-        return lastTankId;
-      }
-    }
-    const list = LocalStorageStore.getLinkedTanks();
-    return list.length > 0 ? list[0] : null;
+    return lastTankId === DEMO_TANK_ID ? DEMO_TANK_ID : DEMO_TANK_ID;
   });
 
-  const [linkedTanks, setLinkedTanks] = useState<string[]>(() => LocalStorageStore.getLinkedTanks());
-  const [tanks, setTanks] = useState<TankBrief[]>(() => LocalStorageStore.getTanks());
+  const [linkedTanks, setLinkedTanks] = useState<string[]>([DEMO_TANK_ID]);
+  const [tanks, setTanks] = useState<TankBrief[]>([DEMO_TANK]);
 
-  const activeTank = tanks.find(t => t.id === tankId);
+  const activeTank = DEMO_TANK;
 
   const syncTanks = () => {
-    setTanks(LocalStorageStore.getTanks());
-    setLinkedTanks(LocalStorageStore.getLinkedTanks());
+    // Keep the demo tank in sync with persisted renames/threshold updates.
+    const persisted = LocalStorageStore.getTanks().find((t) => t.id === DEMO_TANK_ID);
+    setTanks([persisted ?? DEMO_TANK]);
+    setLinkedTanks([DEMO_TANK_ID]);
   };
 
   useEffect(() => {
@@ -36,65 +37,57 @@ export const useTank = () => {
       unsubTanks();
       unsubLinked();
     };
-  }, [tankId]);
+  }, []);
 
   useEffect(() => {
     const handleTankSelect = (e: Event) => {
       const customEvent = e as CustomEvent<string | null>;
-      setTankId(customEvent.detail);
+      if (customEvent.detail === DEMO_TANK_ID) {
+        setTankId(DEMO_TANK_ID);
+      }
     };
     window.addEventListener('oceaneyes_tank_select_changed', handleTankSelect);
     return () => window.removeEventListener('oceaneyes_tank_select_changed', handleTankSelect);
   }, []);
 
   const selectTank = (id: string | null) => {
-    if (id) {
+    // Only the demo tank can be selected; ignore everything else.
+    if (id === DEMO_TANK_ID) {
       try {
-        localStorage.setItem(LAST_TANK_ID_KEY, id);
+        localStorage.setItem(LAST_TANK_ID_KEY, DEMO_TANK_ID);
       } catch {
         // Ignore quota errors for transient last-tank marker.
       }
-    } else {
-      localStorage.removeItem(LAST_TANK_ID_KEY);
+      setTankId(DEMO_TANK_ID);
+      window.dispatchEvent(
+        new CustomEvent('oceaneyes_tank_select_changed', { detail: DEMO_TANK_ID })
+      );
     }
-    setTankId(id);
-    window.dispatchEvent(new CustomEvent('oceaneyes_tank_select_changed', { detail: id }));
   };
 
-  const linkTank = async (targetId: string): Promise<boolean> => {
-    const success = await LocalStorageStore.joinTank(targetId);
-    if (success) {
-      selectTank(targetId);
-    }
-    return success;
+  const linkTank = async (_targetId: string): Promise<boolean> => {
+    // Single demo tank mode: linking additional tanks is disabled.
+    return false;
   };
 
   const unlinkTank = () => {
-    if (tankId) {
-      LocalStorageStore.unlinkTank(tankId);
-      const remaining = LocalStorageStore.getLinkedTanks();
-      const nextId = remaining.length > 0 ? remaining[0] : null;
-      selectTank(nextId);
-    }
+    // Single demo tank mode: unlinking is disabled.
   };
 
-  const createAndLinkTank = async (name: string, cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }): Promise<string> => {
-    const newId = await LocalStorageStore.createTank(name, cameraSource);
-    await LocalStorageStore.joinTank(newId);
-    selectTank(newId);
-    return newId;
+  const createAndLinkTank = async (
+    _name: string,
+    _cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }
+  ): Promise<string> => {
+    // Single demo tank mode: creation is a no-op that returns the demo id.
+    return DEMO_TANK_ID;
   };
 
   const updateTankName = (name: string) => {
-    if (tankId) {
-      LocalStorageStore.updateTankName(tankId, name);
-    }
+    LocalStorageStore.updateTankName(DEMO_TANK_ID, name);
   };
 
   const updateThresholds = (clarityMin: number, fishPct: number) => {
-    if (tankId) {
-      LocalStorageStore.updateThresholds(tankId, clarityMin, fishPct);
-    }
+    LocalStorageStore.updateThresholds(DEMO_TANK_ID, clarityMin, fishPct);
   };
 
   return {

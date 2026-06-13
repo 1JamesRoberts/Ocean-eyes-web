@@ -221,7 +221,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
               });
             }}
           >
-            {simClarityIssue ? 'Restore Clarity' : 'Trigger Clog Filter'}
+            {hasClarityIssue ? 'Restore Clarity' : 'Trigger Clog Filter'}
           </button>
 
         </div>
