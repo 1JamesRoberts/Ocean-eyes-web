@@ -89,9 +89,9 @@ export const LiveScreen: React.FC = () => {
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [flashActive, setFlashActive] = useState(false);
 
-  const [isAIActive, setIsAIActive] = useState(false);
+  const [isAIActive, setIsAIActive] = useState(() => liveState?.ai_active ?? false);
   const [backendStatus, setBackendStatus] = useState<'unknown' | 'checking' | 'online' | 'offline'>('unknown');
-  const [lastPrediction, setLastPrediction] = useState<AIDetectionResult | null>(null);
+  const [lastPrediction, setLastPrediction] = useState<AIDetectionResult | null>(() => liveState?.last_prediction ?? null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const aiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -101,9 +101,19 @@ export const LiveScreen: React.FC = () => {
   const [turbidityLoading, setTurbidityLoading] = useState(false);
   const [turbidityError, setTurbidityError] = useState<string | null>(null);
   const turbidityAbortControllerRef = useRef<AbortController | null>(null);
-  const [lastTurbidityResult, setLastTurbidityResult] = useState<AITurbidityResult | null>(null);
+  const [lastTurbidityResult, setLastTurbidityResult] = useState<AITurbidityResult | null>(() => liveState?.last_turbidity_result ?? null);
 
-
+  // Persist AI state into per-tank LiveState so it survives tab switches and page reloads.
+  useEffect(() => {
+    if (!activeTank || !liveState) return;
+    saveLiveState({
+      ...liveState,
+      ai_active: isAIActive,
+      last_prediction: lastPrediction,
+      last_turbidity_result: lastTurbidityResult,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAIActive, lastPrediction, lastTurbidityResult]);
 
   const [filters, setFilters] = useState<CameraFilters>({
     contrast: 100,
@@ -423,7 +433,7 @@ export const LiveScreen: React.FC = () => {
       setTurbidityLoading(false);
       turbidityAbortControllerRef.current = null;
     }
-  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isWebcam, isStreaming, backendStatus, ensureBackendOnline, liveState, saveLiveState, writeReading]);
+  }, [activeFeed.mock_image, activeFeed.id, activeFeed.current_fish_count, activeTank, turbidityLoading, isWebcam, isStreaming, backendStatus, ensureBackendOnline, liveState, saveLiveState, writeReading, setLastTurbidityResult]);
 
   const currentClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
   const currentFishCount = isStreaming && liveState?.is_live ? activeFeed.current_fish_count : 0;
@@ -765,12 +775,12 @@ Diagnostics:
 
       {isStreaming && (
         <>
-          {isAIActive && lastPrediction && (
-            <AIAnalysisPanel
-              lastPrediction={lastPrediction}
-              lastTurbidityResult={lastTurbidityResult}
-            />
-          )}
+          <AIAnalysisPanel
+            isAIActive={isAIActive}
+            aiLoading={aiLoading}
+            lastPrediction={lastPrediction}
+            lastTurbidityResult={lastTurbidityResult}
+          />
 
           <StreamAdjustments
             filters={filters}

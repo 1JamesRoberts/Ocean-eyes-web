@@ -110,6 +110,12 @@ export interface LiveState {
   current_fish_count: number;
   selected_feed_id: string;
   feeds: CameraFeedConfig[];
+  /** Whether AI analysis is currently enabled on the live feed. */
+  ai_active?: boolean;
+  /** Last successful AI detection result, persisted across tab switches. */
+  last_prediction?: AIDetectionResult | null;
+  /** Last successful AI turbidity result, persisted across tab switches. */
+  last_turbidity_result?: AITurbidityResult | null;
 }
 
 export interface TankBrief {
