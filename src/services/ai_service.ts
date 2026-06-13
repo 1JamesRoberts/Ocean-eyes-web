@@ -161,12 +161,13 @@ export async function sendFrameForDetection(
   blob: Blob,
   conf: number = 0.35,
   diagnose: boolean = false,
+  diagnosisMinConf: number = 0.6,
   signal?: AbortSignal
 ): Promise<AIDetectionResult> {
   const formData = new FormData();
   formData.append('file', blob, 'frame.jpg');
 
-  const res = await fetch(`${AI_API_URL}/predict/detection?conf=${conf}&diagnose=${diagnose}`, {
+  const res = await fetch(`${AI_API_URL}/predict/detection?conf=${conf}&diagnose=${diagnose}&diagnosis_min_conf=${diagnosisMinConf}`, {
     method: 'POST',
     body: formData,
     signal,

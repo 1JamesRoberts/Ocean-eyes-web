@@ -166,6 +166,7 @@ async def predict(
     file: UploadFile = File(...),
     conf: float = Query(0.35, ge=0.0, le=1.0, description="Detection confidence threshold"),
     diagnose: bool = Query(False, description="Run disease diagnosis on cropped fish"),
+    diagnosis_min_conf: float = Query(0.6, ge=0.0, le=1.0, description="Minimum detection confidence to send crop to LLM for diagnosis"),
 ):
     """
     Run full AI pipeline on uploaded image.
@@ -181,7 +182,7 @@ async def predict(
         if not contents:
             return JSONResponse(status_code=400, content={"error": "Empty file"})
 
-        result = pipeline.predict(contents, conf=conf, diagnose=diagnose)
+        result = pipeline.predict(contents, conf=conf, diagnose=diagnose, diagnosis_min_conf=diagnosis_min_conf)
         append_jsonl(DETECTION_OUTPUT_DIR, result, label="detection")
 
         # Save turbidity data separately (flattened)
@@ -250,6 +251,7 @@ async def predict_detection(
     file: UploadFile = File(...),
     conf: float = Query(0.35, ge=0.0, le=1.0, description="Detection confidence threshold"),
     diagnose: bool = Query(False, description="Run disease diagnosis on cropped fish"),
+    diagnosis_min_conf: float = Query(0.6, ge=0.0, le=1.0, description="Minimum detection confidence to send crop to LLM for diagnosis"),
 ):
     """
     Run fish detection + species classification only (no turbidity).
@@ -265,7 +267,7 @@ async def predict_detection(
         if not contents:
             return JSONResponse(status_code=400, content={"error": "Empty file"})
 
-        result = pipeline.predict_detection_only(contents, conf=conf, diagnose=diagnose)
+        result = pipeline.predict_detection_only(contents, conf=conf, diagnose=diagnose, diagnosis_min_conf=diagnosis_min_conf)
         append_jsonl(DETECTION_OUTPUT_DIR, result, label="detection")
         return result
 

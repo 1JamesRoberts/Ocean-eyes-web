@@ -243,7 +243,7 @@ export const LiveScreen: React.FC = () => {
         const lastDiag = lastDiagStr ? parseInt(lastDiagStr, 10) : 0;
         const shouldDiagnose = Date.now() - lastDiag > ONE_HOUR;
 
-        const result = await sendFrameForDetection(blob, 0.35, shouldDiagnose, controller.signal);
+        const result = await sendFrameForDetection(blob, 0.35, shouldDiagnose, 0.6, controller.signal);
 
         if (!aiMountedRef.current) return;
         setLastPrediction(result);

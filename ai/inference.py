@@ -7,6 +7,7 @@ Load models once and reuse across predictions.
 
 import io
 import json
+import random
 import sys
 import os
 import base64
@@ -363,23 +364,21 @@ class FishAIPipeline:
         return img_array, img_cv, pil_image.size[0], pil_image.size[1]
 
     @staticmethod
-    def _select_diagnosis_candidate(detections_raw: list, img_w: int, img_h: int) -> int:
-        """Choose the highest-confidence detection whose padded crop is large enough for diagnosis.
+    def _select_diagnosis_candidate(detections_raw: list, img_w: int, img_h: int, min_conf: float = 0.0) -> int:
+        """Pick a random detection eligible for diagnosis.
 
-        Returns -1 if no viable detection exists. Deterministic selection makes
-        repeated requests for the same image reproducible and easier to debug.
+        Only considers detections with confidence >= min_conf and a padded crop
+        large enough (>= 32×32 px). Returns -1 if no viable detection exists.
         """
-        best_index = -1
-        best_confidence = -1.0
+        eligible = []
         for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             pad_w = int((x2 - x1) * 0.10)
             pad_h = int((y2 - y1) * 0.10)
             pw = min(img_w, x2 + pad_w) - max(0, x1 - pad_w)
             ph = min(img_h, y2 + pad_h) - max(0, y1 - pad_h)
-            if pw >= 32 and ph >= 32 and det_confidence > best_confidence:
-                best_index = i
-                best_confidence = det_confidence
-        return best_index
+            if pw >= 32 and ph >= 32 and det_confidence >= min_conf:
+                eligible.append(i)
+        return random.choice(eligible) if eligible else -1
 
     def _run_diagnosis(
         self,
@@ -431,7 +430,7 @@ class FishAIPipeline:
         except Exception as e:
             return {"error": f"Failed to slice or encode crop: {str(e)}"}
 
-    def predict(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False) -> dict:
+    def predict(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False, diagnosis_min_conf: float = 0.7) -> dict:
         """Run full pipeline on image bytes and return structured JSON."""
         img_array, img_cv, img_w, img_h = self._load_image(image_bytes)
 
@@ -441,7 +440,7 @@ class FishAIPipeline:
         detections = []
         species_counts = {}
 
-        diagnose_index = self._select_diagnosis_candidate(detections_raw, img_w, img_h) if diagnose else -1
+        diagnose_index = self._select_diagnosis_candidate(detections_raw, img_w, img_h, diagnosis_min_conf) if diagnose else -1
 
         for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             x1 = max(0, x1)
@@ -506,7 +505,7 @@ class FishAIPipeline:
             "turbidity": turbidity_result,
         }
 
-    def predict_detection_only(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False) -> dict:
+    def predict_detection_only(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False, diagnosis_min_conf: float = 0.6) -> dict:
         """Run only fish detection + species classification (no turbidity)."""
         img_array, img_cv, img_w, img_h = self._load_image(image_bytes)
 
@@ -515,7 +514,7 @@ class FishAIPipeline:
         detections = []
         species_counts = {}
 
-        diagnose_index = self._select_diagnosis_candidate(detections_raw, img_w, img_h) if diagnose else -1
+        diagnose_index = self._select_diagnosis_candidate(detections_raw, img_w, img_h, diagnosis_min_conf) if diagnose else -1
 
         for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             x1 = max(0, x1)
