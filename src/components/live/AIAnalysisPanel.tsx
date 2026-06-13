@@ -23,8 +23,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
       padding: '20px',
       background: 'var(--color-surface)',
       borderRadius: '16px',
-      border: '1px solid var(--color-border)',
-      animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+      border: '1px solid var(--color-border)'
     }}>
       <div style={{
         display: 'flex',
