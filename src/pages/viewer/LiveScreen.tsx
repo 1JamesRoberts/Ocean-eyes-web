@@ -10,6 +10,7 @@ import type { CameraFilters, AIDetectionResult, AITurbidityResult } from '../../
 import { Video } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
 import { isBackendAvailable, captureFrame, captureFrameFromUrl, sendFrameForDetection, sendFrameForTurbidity } from '../../services/ai_service';
+import { LocalStorageStore } from '../../services/localStorageStore';
 import { AIBoundingBoxes } from '../../components/live/AIBoundingBoxes';
 import { CameraControls } from '../../components/live/CameraControls';
 import { CameraFeed } from '../../components/live/CameraFeed';
@@ -32,7 +33,7 @@ export const LiveScreen: React.FC = () => {
     videoRef,
     startStream
   } = useCameraFeed(activeTank?.id ?? null);
-  const { fishList, updateDetectedCount } = useFish();
+  const { fishList, updateDetectedCount } = useFish(activeTank?.id ?? null);
   const { addAlert } = useAlerts();
   const { writeReading } = useReadings();
 
@@ -155,11 +156,11 @@ export const LiveScreen: React.FC = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('oceaneyes_snapshots', JSON.stringify(snapshots));
+    LocalStorageStore.safeWriteRaw('oceaneyes_snapshots', JSON.stringify(snapshots));
   }, [snapshots]);
 
   useEffect(() => {
-    localStorage.setItem('oceaneyes_recordings', JSON.stringify(recordings));
+    LocalStorageStore.safeWriteRaw('oceaneyes_recordings', JSON.stringify(recordings));
   }, [recordings]);
 
   // Background health check every 30s when stream is active
@@ -243,7 +244,7 @@ export const LiveScreen: React.FC = () => {
         setLastPrediction(result);
 
         if (shouldDiagnose) {
-          localStorage.setItem('oceaneyes_last_diagnosis_time', Date.now().toString());
+          LocalStorageStore.safeWriteRaw('oceaneyes_last_diagnosis_time', Date.now().toString());
 
           const diagnosedFish = result.detections.find(d => d.diagnosis);
           if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {

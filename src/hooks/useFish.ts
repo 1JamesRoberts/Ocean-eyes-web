@@ -1,34 +1,41 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
 import type { FishEntry } from '../types/aquarium';
 
-export const useFish = () => {
-  const [fishList, setFishList] = useState<FishEntry[]>(() => LocalStorageStore.getFish());
+export const useFish = (tankId: string | null) => {
+  const [fishList, setFishList] = useState<FishEntry[]>(() =>
+    tankId ? LocalStorageStore.getFish(tankId) : []
+  );
 
-  const syncFish = () => {
-    setFishList(LocalStorageStore.getFish());
-  };
+  const syncFish = useCallback(() => {
+    setFishList(tankId ? LocalStorageStore.getFish(tankId) : []);
+  }, [tankId]);
 
   useEffect(() => {
     syncFish();
-    return subscribeToDb(syncFish);
-  }, []);
+    if (!tankId) return undefined;
+    return subscribeToDb(`tank_fish_${tankId}`, syncFish);
+  }, [tankId, syncFish]);
 
-  const addFish = (tankId: string, name: string, imageUrl: string, count: number) => {
+  const addFish = (name: string, imageUrl: string, count: number) => {
+    if (!tankId) return;
     LocalStorageStore.addFish(tankId, name, imageUrl, count);
   };
 
   const updateFishCount = (docId: string, count: number) => {
-    LocalStorageStore.updateFishCount(docId, count);
+    if (!tankId) return;
+    LocalStorageStore.updateFishCount(tankId, docId, count);
   };
 
   const updateDetectedCount = (docId: string, detected: number) => {
-    LocalStorageStore.updateDetectedCount(docId, detected);
+    if (!tankId) return;
+    LocalStorageStore.updateDetectedCount(tankId, docId, detected);
   };
 
   const removeFish = (docId: string) => {
-    LocalStorageStore.removeFish(docId);
+    if (!tankId) return;
+    LocalStorageStore.removeFish(tankId, docId);
   };
 
   return {

@@ -304,8 +304,8 @@ def run_full_pipeline(
     # -----------------------------------------------------------------------
     pil_image = Image.open(image_path).convert("RGB")
     img_array = np.array(pil_image)
-    img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
-    img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+    # All downstream preprocessors expect RGB; keep a separate mutable copy.
+    img_cv = img_array.copy()
 
     img_w, img_h = pil_image.size
 
@@ -390,11 +390,10 @@ def run_full_pipeline(
 
 def main():
     script_dir = Path(__file__).parent
-    repo_root = script_dir.parent.parent
 
-    default_detect = repo_root / "models" / "export" / "fish_detection.onnx"
-    default_species = repo_root / "models" / "export" / "species_classifier.onnx"
-    default_turbidity = repo_root / "models" / "export" / "turbidity.onnx"
+    default_detect = script_dir / "models" / "fish_detection.onnx"
+    default_species = script_dir / "models" / "species_classifier.onnx"
+    default_turbidity = script_dir / "models" / "turbidity.onnx"
 
     parser = argparse.ArgumentParser(
         description="FishAI pipeline inference (ONNX) — JSON output for application integration"

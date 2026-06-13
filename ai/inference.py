@@ -10,7 +10,6 @@ import json
 import sys
 import os
 import base64
-import random
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
@@ -210,6 +209,7 @@ def run_species(crop: np.ndarray, session: ort.InferenceSession, metadata: dict)
         "species_display": fmt_class_name(class_name),
         "confidence": round(top_prob, 4),
         "below_threshold": top_prob < threshold,
+        "threshold": threshold,
     }
 
 
@@ -353,25 +353,33 @@ class FishAIPipeline:
     # ------------------------------------------------------------------
     @staticmethod
     def _load_image(image_bytes: bytes) -> tuple[np.ndarray, np.ndarray, int, int]:
-        """Load image bytes into RGB array and BGR cv2 format. Returns (img_array, img_cv, width, height)."""
+        """Load image bytes into RGB arrays. Returns (img_array, img_cv, width, height)."""
         pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         img_array = np.array(pil_image)
-        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
-        img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+        # Both consumers (turbidity/detection/species preprocessing) expect RGB;
+        # keep a second reference so callers can mutate one if needed without
+        # affecting the other.
+        img_cv = img_array.copy()
         return img_array, img_cv, pil_image.size[0], pil_image.size[1]
 
     @staticmethod
     def _select_diagnosis_candidate(detections_raw: list, img_w: int, img_h: int) -> int:
-        """Choose a random detection whose padded crop is large enough for diagnosis. Returns -1 if none viable."""
-        viable = []
-        for i, (x1, y1, x2, y2, _) in enumerate(detections_raw):
+        """Choose the highest-confidence detection whose padded crop is large enough for diagnosis.
+
+        Returns -1 if no viable detection exists. Deterministic selection makes
+        repeated requests for the same image reproducible and easier to debug.
+        """
+        best_index = -1
+        best_confidence = -1.0
+        for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             pad_w = int((x2 - x1) * 0.10)
             pad_h = int((y2 - y1) * 0.10)
             pw = min(img_w, x2 + pad_w) - max(0, x1 - pad_w)
             ph = min(img_h, y2 + pad_h) - max(0, y1 - pad_h)
-            if pw >= 32 and ph >= 32:
-                viable.append(i)
-        return random.choice(viable) if viable else -1
+            if pw >= 32 and ph >= 32 and det_confidence > best_confidence:
+                best_index = i
+                best_confidence = det_confidence
+        return best_index
 
     def _run_diagnosis(
         self,
@@ -423,12 +431,12 @@ class FishAIPipeline:
         except Exception as e:
             return {"error": f"Failed to slice or encode crop: {str(e)}"}
 
-    def predict(self, image_bytes: bytes, diagnose: bool = False) -> dict:
+    def predict(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False) -> dict:
         """Run full pipeline on image bytes and return structured JSON."""
         img_array, img_cv, img_w, img_h = self._load_image(image_bytes)
 
         turbidity_result = run_turbidity(img_cv, self.turbidity_session, self.turbidity_metadata)
-        detections_raw = run_detection(img_cv, self.detect_session, self.conf)
+        detections_raw = run_detection(img_cv, self.detect_session, conf)
 
         detections = []
         species_counts = {}
@@ -469,6 +477,7 @@ class FishAIPipeline:
 
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "image_dimensions": {"width": img_w, "height": img_h},
             "models": {
                 "detection": {"provider": self.detect_provider},
                 "species": {"provider": self.species_provider},
@@ -490,6 +499,7 @@ class FishAIPipeline:
 
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "image_dimensions": {"width": img_w, "height": img_h},
             "models": {
                 "turbidity": {"provider": self.turbidity_provider},
             },
@@ -541,6 +551,7 @@ class FishAIPipeline:
 
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "image_dimensions": {"width": img_w, "height": img_h},
             "models": {
                 "detection": {"provider": self.detect_provider},
                 "species": {"provider": self.species_provider},

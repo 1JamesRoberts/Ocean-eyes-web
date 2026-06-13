@@ -9,10 +9,11 @@ interface ScreenProps {
 export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
   const { activeTank: contextActiveTank, tanks } = useTank();
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
-  const { updateCalibration } = useLiveState(activeTank?.id ?? null);
-  const [lineY, setLineY] = useState(activeTank?.calibration?.water_line_y || 120);
+  const { liveState, updateCalibration } = useLiveState(activeTank?.id ?? null);
+  const activeFeedCalibration = liveState?.feeds.find(f => f.id === liveState?.selected_feed_id)?.calibration;
+  const [lineY, setLineY] = useState(activeFeedCalibration?.water_line_y || 120);
   const [saved, setSaved] = useState(false);
-  const staticWaterLineY = activeTank?.calibration?.water_line_y || 120; // Static camera feed reference
+  const staticWaterLineY = activeFeedCalibration?.water_line_y || 120; // Static camera feed reference
 
   const handleDrag = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();

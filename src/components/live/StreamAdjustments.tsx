@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Plus, SlidersHorizontal } from 'lucide-react';
+import { LocalStorageStore } from '../../services/localStorageStore';
 import type { CameraFilters, FilterPreset } from '../../types/aquarium';
 
 interface StreamAdjustmentsProps {
@@ -66,7 +67,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
 
     const updated = [...customPresets, newPreset];
     setCustomPresets(updated);
-    localStorage.setItem('oceaneyes_camera_presets', JSON.stringify(updated));
+    LocalStorageStore.safeWriteRaw('oceaneyes_camera_presets', JSON.stringify(updated));
     setSelectedPresetId(presetId);
     setNewPresetName('');
     setShowSaveInput(false);
@@ -76,7 +77,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
     e.stopPropagation();
     const updated = customPresets.filter(p => p.id !== id);
     setCustomPresets(updated);
-    localStorage.setItem('oceaneyes_camera_presets', JSON.stringify(updated));
+    LocalStorageStore.safeWriteRaw('oceaneyes_camera_presets', JSON.stringify(updated));
     if (selectedPresetId === id) {
       applyPreset(DEFAULT_PRESETS[0]);
     }

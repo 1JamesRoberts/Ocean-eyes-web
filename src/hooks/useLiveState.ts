@@ -21,7 +21,8 @@ export const useLiveState = (tankId: string | null) => {
 
   useEffect(() => {
     syncLiveState();
-    return subscribeToDb(syncLiveState);
+    if (!tankId) return undefined;
+    return subscribeToDb(`live_state_${tankId}`, syncLiveState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tankId]);
 

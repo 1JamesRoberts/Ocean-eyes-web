@@ -10,11 +10,16 @@ Endpoints:
 
 import io
 import json
+import logging
 import sys
 import threading
+import traceback
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("fishai")
 
 import numpy as np
 from fastapi import FastAPI, File, UploadFile, Query
@@ -176,29 +181,28 @@ async def predict(
         if not contents:
             return JSONResponse(status_code=400, content={"error": "Empty file"})
 
-        # Temporarily update confidence if different from default
-        original_conf = pipeline.conf
-        pipeline.conf = conf
-
-        result = pipeline.predict(contents, diagnose=diagnose)
-        pipeline.conf = original_conf
-
+        result = pipeline.predict(contents, conf=conf, diagnose=diagnose)
         append_jsonl(DETECTION_OUTPUT_DIR, result, label="detection")
 
         # Save turbidity data separately (flattened)
         turbidity_entry = {
             "timestamp": result["timestamp"],
             "model_provider": result.get("models", {}).get("turbidity", {}).get("provider"),
+            "image_dimensions": result.get("image_dimensions"),
             **result.get("turbidity", {}),
         }
         append_jsonl(TURBIDITY_OUTPUT_DIR, turbidity_entry, label="turbidity")
 
         return result
 
-    except Exception as e:
+    except (ValueError, OSError) as e:
+        logger.warning("Bad request to /predict: %s", e)
+        return JSONResponse(status_code=400, content={"error": "Invalid image"})
+    except Exception:
+        logger.exception("Unexpected error in /predict")
         return JSONResponse(
             status_code=500,
-            content={"error": str(e), "type": type(e).__name__},
+            content={"error": "Prediction failed"},
         )
 
 
@@ -224,15 +228,20 @@ async def predict_turbidity(
         turbidity_entry = {
             "timestamp": result["timestamp"],
             "model_provider": result.get("models", {}).get("turbidity", {}).get("provider"),
+            "image_dimensions": result.get("image_dimensions"),
             **result.get("turbidity", {}),
         }
         append_jsonl(TURBIDITY_OUTPUT_DIR, turbidity_entry, label="turbidity")
         return result
 
-    except Exception as e:
+    except (ValueError, OSError) as e:
+        logger.warning("Bad request to /predict/turbidity: %s", e)
+        return JSONResponse(status_code=400, content={"error": "Invalid image"})
+    except Exception:
+        logger.exception("Unexpected error in /predict/turbidity")
         return JSONResponse(
             status_code=500,
-            content={"error": str(e), "type": type(e).__name__},
+            content={"error": "Prediction failed"},
         )
 
 
@@ -256,19 +265,18 @@ async def predict_detection(
         if not contents:
             return JSONResponse(status_code=400, content={"error": "Empty file"})
 
-        original_conf = pipeline.conf
-        pipeline.conf = conf
-
-        result = pipeline.predict_detection_only(contents, conf, diagnose=diagnose)
-        pipeline.conf = original_conf
-
+        result = pipeline.predict_detection_only(contents, conf=conf, diagnose=diagnose)
         append_jsonl(DETECTION_OUTPUT_DIR, result, label="detection")
         return result
 
-    except Exception as e:
+    except (ValueError, OSError) as e:
+        logger.warning("Bad request to /predict/detection: %s", e)
+        return JSONResponse(status_code=400, content={"error": "Invalid image"})
+    except Exception:
+        logger.exception("Unexpected error in /predict/detection")
         return JSONResponse(
             status_code=500,
-            content={"error": str(e), "type": type(e).__name__},
+            content={"error": "Prediction failed"},
         )
 
 
@@ -276,6 +284,7 @@ async def predict_detection(
 # History API — read persisted JSONL inference records
 # ---------------------------------------------------------------------------
 from typing import List, Any
+from statistics import median
 
 
 def _read_jsonl_date_file(output_dir: Path, date_str: str) -> List[Any]:
@@ -297,17 +306,103 @@ def _read_jsonl_date_file(output_dir: Path, date_str: str) -> List[Any]:
     return results
 
 
+def _derive_image_dimensions(record: dict) -> dict | None:
+    """Derive image dimensions from a detection record's bbox + bbox_normalized.
+
+    Returns {"width": int, "height": int} or None if no usable detections.
+    """
+    detections = record.get("detections", [])
+    if not detections:
+        return None
+
+    widths: list[float] = []
+    heights: list[float] = []
+    for det in detections:
+        bbox = det.get("bbox")
+        bbox_norm = det.get("bbox_normalized")
+        if not bbox or not bbox_norm or len(bbox) < 4 or len(bbox_norm) < 4:
+            continue
+        x2_norm = bbox_norm[2]
+        y2_norm = bbox_norm[3]
+        if x2_norm <= 0 or y2_norm <= 0:
+            continue
+        widths.append(bbox[2] / x2_norm)
+        heights.append(bbox[3] / y2_norm)
+
+    if not widths or not heights:
+        return None
+
+    return {
+        "width": int(round(median(widths))),
+        "height": int(round(median(heights))),
+    }
+
+
+def _enrich_detection_records(records: List[dict]) -> List[dict]:
+    """Add image_dimensions to detection records that lack it."""
+    for record in records:
+        if not record.get("image_dimensions"):
+            derived = _derive_image_dimensions(record)
+            if derived:
+                record["image_dimensions"] = derived
+    return records
+
+
+def _build_dimension_index(detection_records: List[dict]) -> dict[datetime, dict]:
+    """Build a timestamp -> image_dimensions index from detection records."""
+    index: dict[datetime, dict] = {}
+    for record in detection_records:
+        dims = record.get("image_dimensions") or _derive_image_dimensions(record)
+        if not dims:
+            continue
+        ts_str = record.get("timestamp")
+        if not ts_str:
+            continue
+        try:
+            ts = datetime.fromisoformat(ts_str)
+            index[ts] = dims
+        except ValueError:
+            continue
+    return index
+
+
+def _enrich_turbidity_records(
+    turbidity_records: List[dict], detection_records: List[dict]
+) -> List[dict]:
+    """Borrow image_dimensions from nearest detection record by timestamp."""
+    dimension_index = _build_dimension_index(detection_records)
+    if not dimension_index:
+        return turbidity_records
+
+    sorted_timestamps = sorted(dimension_index.keys())
+
+    for record in turbidity_records:
+        if record.get("image_dimensions"):
+            continue
+        ts_str = record.get("timestamp")
+        if not ts_str:
+            continue
+        try:
+            ts = datetime.fromisoformat(ts_str)
+        except ValueError:
+            continue
+
+        # Find nearest timestamp in the detection index
+        nearest_ts = min(sorted_timestamps, key=lambda t: abs((t - ts).total_seconds()))
+        record["image_dimensions"] = dimension_index[nearest_ts]
+
+    return turbidity_records
+
+
 @app.get("/history/detections")
 async def history_detections(
     date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
     limit: int = Query(default=1000, ge=1, le=10000, description="Max records to return"),
 ):
     """Return parsed detection records for a given date."""
-    if pipeline is None:
-        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
-
     date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+    records = _enrich_detection_records(records)
     return {"date": date_str, "count": len(records), "records": records[:limit]}
 
 
@@ -317,12 +412,11 @@ async def history_turbidity(
     limit: int = Query(default=1000, ge=1, le=10000, description="Max records to return"),
 ):
     """Return parsed turbidity records for a given date."""
-    if pipeline is None:
-        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
-
     date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
-    return {"date": date_str, "count": len(records), "records": records[:limit]}
+    turbidity_records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
+    detection_records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+    turbidity_records = _enrich_turbidity_records(turbidity_records, detection_records)
+    return {"date": date_str, "count": len(turbidity_records), "records": turbidity_records[:limit]}
 
 
 @app.delete("/history/detections")
@@ -330,9 +424,6 @@ async def clear_detection_history(
     date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
 ):
     """Delete detection history JSONL file for a given date."""
-    if pipeline is None:
-        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
-
     date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     file_path = DETECTION_OUTPUT_DIR / f"{date_str}.jsonl"
     try:
@@ -351,9 +442,6 @@ async def clear_turbidity_history(
     date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
 ):
     """Delete turbidity history JSONL file for a given date."""
-    if pipeline is None:
-        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
-
     date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     file_path = TURBIDITY_OUTPUT_DIR / f"{date_str}.jsonl"
     try:
@@ -370,9 +458,6 @@ async def clear_turbidity_history(
 @app.get("/history/dates")
 async def history_dates():
     """List available history dates for which JSONL files exist."""
-    if pipeline is None:
-        return JSONResponse(status_code=503, content={"error": "Models not loaded"})
-
     def _list_dates(output_dir: Path) -> List[str]:
         if not output_dir.exists():
             return []
@@ -388,4 +473,9 @@ async def history_dates():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument("--host", type=str, default="0.0.0.0")
+    args = parser.parse_args()
+    uvicorn.run(app, host=args.host, port=args.port)

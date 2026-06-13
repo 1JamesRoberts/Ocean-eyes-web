@@ -1,21 +1,24 @@
 // src/services/healthCalculator.ts - Pure health score calculation
 export interface HealthReading {
-  ph: number;
+  ph?: number;
   clarity: number;
-  ammonia: number;
-  nitrite: number;
+  ammonia?: number;
+  nitrite?: number;
 }
 
 export function calculateHealthScore(reading: HealthReading): number {
+  const ph = reading.ph ?? 7.2;
+  const ammonia = reading.ammonia ?? 0;
+  const nitrite = reading.nitrite ?? 0;
   const score = Math.max(
     1,
     10 -
-      Math.abs(7.2 - reading.ph) * 4 -
+      Math.abs(7.2 - ph) * 4 -
       Math.max(0, reading.clarity - 0.5) * 0.8 -
-      reading.ammonia * 20 -
-      reading.nitrite * 3
+      ammonia * 20 -
+      nitrite * 3
   );
-  
+
   return parseFloat(score.toFixed(1));
 }
 

@@ -12,7 +12,7 @@ export const useReadings = () => {
 
   useEffect(() => {
     syncReadings();
-    return subscribeToDb(syncReadings);
+    return subscribeToDb('readings', syncReadings);
   }, []);
 
   const writeReading = (data: {

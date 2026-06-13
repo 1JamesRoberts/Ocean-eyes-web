@@ -2,6 +2,7 @@
 
 export interface FishEntry {
   id: string;
+  tankId: string;
   speciesId: string;
   name: string;
   imageUrl: string;
@@ -76,10 +77,14 @@ export interface ReadingItem {
   fish_count: number;
   fish_count_confidence: number;
   frame_url: string;
-  ph: number;
-  temp: number;
-  ammonia: number;
-  nitrite: number;
+  /** Real sensor pH value, or undefined if no sensor data is available. */
+  ph?: number;
+  /** Real sensor temperature (°C), or undefined if no sensor data is available. */
+  temp?: number;
+  /** Real sensor ammonia (ppm), or undefined if no sensor data is available. */
+  ammonia?: number;
+  /** Real sensor nitrite (ppm), or undefined if no sensor data is available. */
+  nitrite?: number;
 }
 
 export interface CameraFeedConfig {
@@ -116,6 +121,7 @@ export interface TankBrief {
     max_turbidity_fnu: number;
     fish_change_pct: number;
   };
+  /** @deprecated Calibration now lives on CameraFeedConfig inside LiveState. */
   calibration?: {
     water_line_y: number;
   };
@@ -157,7 +163,8 @@ export interface AIDetection {
   species_display: string;
   confidence: number;
   below_threshold: boolean;
-  threshold: number;
+  /** Species confidence threshold used to compute below_threshold. May be absent in legacy records. */
+  threshold?: number;
   diagnosis?: FishDiagnosis | null;
 }
 
@@ -175,7 +182,8 @@ export interface AISummary {
 
 export interface AIPredictionResult {
   timestamp: string;
-  image_dimensions: { width: number; height: number };
+  /** Original image dimensions. Legacy records may omit this field. */
+  image_dimensions?: { width: number; height: number };
   models: {
     detection: { provider: string };
     species: { provider: string };
@@ -188,7 +196,8 @@ export interface AIPredictionResult {
 
 export interface AIDetectionResult {
   timestamp: string;
-  image_dimensions: { width: number; height: number };
+  /** Original image dimensions. Legacy records may omit this field. */
+  image_dimensions?: { width: number; height: number };
   models: {
     detection: { provider: string };
     species: { provider: string };
@@ -199,7 +208,8 @@ export interface AIDetectionResult {
 
 export interface AITurbidityResult {
   timestamp: string;
-  image_dimensions: { width: number; height: number };
+  /** Original image dimensions. Turbidity-only records may omit this field. */
+  image_dimensions?: { width: number; height: number };
   models: {
     turbidity: { provider: string };
   };

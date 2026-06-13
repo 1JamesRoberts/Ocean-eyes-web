@@ -7,7 +7,6 @@ import {
   fetchTurbidityHistory,
   isBackendAvailable,
 } from './ai_service';
-import { generateSimulatedChemistry } from './chemistrySimulator';
 
 const TODAY = () => new Date().toISOString().slice(0, 10);
 
@@ -42,7 +41,6 @@ export async function fetchTodayReadings(tankId: string): Promise<ReadingItem[]>
     return [];
   }
 
-  const chemistry = generateSimulatedChemistry();
   const timestamp = detection?.timestamp ?? turbidity?.timestamp ?? new Date().toISOString();
   const fishCount = detection?.summary?.total_detections ?? 0;
   const fishConfidence = detection?.detections?.length
@@ -57,10 +55,6 @@ export async function fetchTodayReadings(tankId: string): Promise<ReadingItem[]>
     fish_count: fishCount,
     fish_count_confidence: parseFloat(fishConfidence.toFixed(4)),
     frame_url: '',
-    ph: chemistry.ph,
-    temp: chemistry.temp,
-    ammonia: chemistry.ammonia,
-    nitrite: chemistry.nitrite,
   };
 
   return [reading];

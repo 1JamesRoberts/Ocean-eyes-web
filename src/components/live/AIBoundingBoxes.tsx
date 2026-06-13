@@ -15,8 +15,9 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
 }) => {
   const cw = containerSize.width;
   const ch = containerSize.height;
-  const iw = imageNaturalSize.width || lastPrediction.image_dimensions.width || cw;
-  const ih = imageNaturalSize.height || lastPrediction.image_dimensions.height || ch;
+  const dims = lastPrediction.image_dimensions;
+  const iw = imageNaturalSize.width || dims?.width || cw;
+  const ih = imageNaturalSize.height || dims?.height || ch;
   const renderedWidth = cw;
   const renderedHeight = cw * (ih / iw);
 

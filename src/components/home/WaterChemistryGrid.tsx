@@ -10,7 +10,7 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
   const parameters = [
     {
       label: 'pH Value',
-      value: `${reading.ph} pH`,
+      value: reading.ph === undefined ? '—' : `${reading.ph} pH`,
       color: 'var(--color-good)',
       bgColor: 'rgba(16, 185, 129, 0.08)',
       icon: Droplet,
@@ -18,7 +18,7 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
     },
     {
       label: 'Temperature',
-      value: `${reading.temp}°C`,
+      value: reading.temp === undefined ? '—' : `${reading.temp}°C`,
       color: 'var(--color-warning)',
       bgColor: 'rgba(245, 158, 11, 0.08)',
       icon: Thermometer,
@@ -26,19 +26,19 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
     },
     {
       label: 'Ammonia (NH₃)',
-      value: `${reading.ammonia} ppm`,
+      value: reading.ammonia === undefined ? '—' : `${reading.ammonia} ppm`,
       color: 'var(--color-good)',
       bgColor: 'rgba(16, 185, 129, 0.08)',
       icon: Shield,
-      isCritical: reading.ammonia > 0
+      isCritical: (reading.ammonia ?? 0) > 0
     },
     {
       label: 'Nitrite (NO₂⁻)',
-      value: `${reading.nitrite} ppm`,
+      value: reading.nitrite === undefined ? '—' : `${reading.nitrite} ppm`,
       color: '#8B5CF6',
       bgColor: 'rgba(139, 92, 246, 0.08)',
       icon: Activity,
-      isCritical: reading.nitrite > 0.2
+      isCritical: (reading.nitrite ?? 0) > 0.2
     }
   ];
 

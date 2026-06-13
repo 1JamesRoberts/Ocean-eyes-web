@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
 import type { TankBrief } from '../types/aquarium';
 
+const LAST_TANK_ID_KEY = 'oceaneyes_last_tank_id';
+
 export const useTank = () => {
   const [tankId, setTankId] = useState<string | null>(() => {
-    const lastTankId = localStorage.getItem('oceaneyes_last_tank_id');
+    const lastTankId = localStorage.getItem(LAST_TANK_ID_KEY);
     if (lastTankId) {
       const linked = LocalStorageStore.getLinkedTanks();
       if (linked.includes(lastTankId)) {
@@ -28,7 +30,12 @@ export const useTank = () => {
 
   useEffect(() => {
     syncTanks();
-    return subscribeToDb(syncTanks);
+    const unsubTanks = subscribeToDb('tanks', syncTanks);
+    const unsubLinked = subscribeToDb('user_tanks', syncTanks);
+    return () => {
+      unsubTanks();
+      unsubLinked();
+    };
   }, [tankId]);
 
   useEffect(() => {
@@ -42,9 +49,13 @@ export const useTank = () => {
 
   const selectTank = (id: string | null) => {
     if (id) {
-      localStorage.setItem('oceaneyes_last_tank_id', id);
+      try {
+        localStorage.setItem(LAST_TANK_ID_KEY, id);
+      } catch {
+        // Ignore quota errors for transient last-tank marker.
+      }
     } else {
-      localStorage.removeItem('oceaneyes_last_tank_id');
+      localStorage.removeItem(LAST_TANK_ID_KEY);
     }
     setTankId(id);
     window.dispatchEvent(new CustomEvent('oceaneyes_tank_select_changed', { detail: id }));

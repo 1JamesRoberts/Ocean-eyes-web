@@ -19,7 +19,7 @@ export const HomeScreen: React.FC = () => {
   const { setActiveTab, setSelectedAlertId, setAutoFullscreen } = useNavigation();
   const { activeTank, tanks, linkedTanks, tankId, selectTank, createAndLinkTank, linkTank } = useTank();
   const { readings } = useReadings();
-  const { fishList } = useFish();
+  const { fishList } = useFish(tankId);
   const { alerts } = useAlerts();
   const { liveState } = useLiveState(tankId);
 

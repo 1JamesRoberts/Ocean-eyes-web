@@ -3,17 +3,20 @@ import { useTank } from '../../hooks/useTank';
 import { useReadings } from '../../hooks/useReadings';
 import { useFish } from '../../hooks/useFish';
 import { useAlerts } from '../../hooks/useAlerts';
+import { useLiveState } from '../../hooks/useLiveState';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
 }
 
 export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
-  const { activeTank: contextActiveTank, tanks } = useTank();
+  const { activeTank: contextActiveTank, tanks, tankId } = useTank();
   const { readings, writeReading } = useReadings();
-  const { fishList } = useFish();
+  const { fishList } = useFish(tankId);
   const { alerts, addAlert } = useAlerts();
+  const { liveState } = useLiveState(tankId);
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
+  const activeFeedCalibration = liveState?.feeds.find(f => f.id === liveState?.selected_feed_id)?.calibration;
   const [simClarityIssue, setSimClarityIssue] = useState(false);
 
   const latestReading = readings[0] || {
@@ -66,7 +69,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
 
   };
 
-  const waterHeightPct = activeTank?.calibration ? Math.min(100, Math.max(0, ((240 - activeTank.calibration.water_line_y) / 240) * 100)) : 50;
+  const waterHeightPct = activeFeedCalibration ? Math.min(100, Math.max(0, ((240 - activeFeedCalibration.water_line_y) / 240) * 100)) : 50;
 
   return (
     <div style={{
@@ -192,10 +195,10 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         </div>
 
         {/* Dynamic Water Line Calibration Overlay */}
-        {activeTank?.calibration && (
+        {activeFeedCalibration && (
           <div style={{
             position: 'absolute',
-            top: `${Math.min(100, Math.max(0, (activeTank.calibration.water_line_y / 240) * 100))}%`,
+            top: `${Math.min(100, Math.max(0, (activeFeedCalibration.water_line_y / 240) * 100))}%`,
             left: 0,
             width: '100%',
             height: '2px',

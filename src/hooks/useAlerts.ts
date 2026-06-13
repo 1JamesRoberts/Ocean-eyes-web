@@ -12,7 +12,7 @@ export const useAlerts = () => {
 
   useEffect(() => {
     syncAlerts();
-    return subscribeToDb(syncAlerts);
+    return subscribeToDb('alerts', syncAlerts);
   }, []);
 
   const addAlert = (alert: AlertItem) => {

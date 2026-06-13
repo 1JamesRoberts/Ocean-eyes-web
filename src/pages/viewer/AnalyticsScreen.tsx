@@ -16,7 +16,7 @@ export const AnalyticsScreen: React.FC = () => {
   const { setActiveTab } = useNavigation();
   const { tankId } = useTank();
   const { readings } = useReadings();
-  const { fishList } = useFish();
+  const { fishList } = useFish(tankId);
   const [selectedDate, setSelectedDate] = useState<string>(todayUTC);
   const { detectionData, turbidityData, loading, error, refetch } = useHistory(selectedDate);
   const inventorySpeciesIds = React.useMemo(
