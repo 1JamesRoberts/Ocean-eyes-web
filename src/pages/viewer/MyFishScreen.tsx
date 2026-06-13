@@ -35,6 +35,39 @@ const breedingLabel: Record<BreedingDifficulty, string> = {
   easy: 'Easy', medium: 'Medium', hard: 'Hard', no_record: 'No Record'
 };
 
+// ─── Range Helpers ────────────────────────────────────────────────────────────
+
+function intersectRanges(
+  ranges: Array<{ min: number; max: number }>
+): { range: [number, number] | null; conflict: boolean } {
+  if (ranges.length === 0) return { range: null, conflict: false };
+
+  let low = -Infinity;
+  let high = Infinity;
+
+  for (const r of ranges) {
+    low = Math.max(low, r.min);
+    high = Math.min(high, r.max);
+  }
+
+  if (low <= high) {
+    // Normal intersection
+    return { range: [low, high], conflict: false };
+  }
+
+  // No overlap — return the full span (union) and flag conflict
+  const allMins = ranges.map(r => r.min);
+  const allMaxs = ranges.map(r => r.max);
+  return { range: [Math.min(...allMins), Math.max(...allMaxs)], conflict: true };
+}
+
+function formatRange(min: number, max: number, unit: string, decimals?: number): string {
+  const d = decimals ?? (Number.isInteger(min) && Number.isInteger(max) ? 0 : 1);
+  const fmt = (v: number) => (d === 0 ? v.toString() : v.toFixed(d));
+  if (min === max) return `${fmt(min)}${unit ? ` ${unit}` : ''}`;
+  return `${fmt(min)}\u2013${fmt(max)} ${unit}`;
+}
+
 // ─── DonutChart ──────────────────────────────────────────────────────────────
 
 interface DonutChartProps {
@@ -218,6 +251,30 @@ export const MyFishScreen: React.FC = () => {
     const uniqueSpecies = new Set(fishList.map(f => f.speciesId)).size;
     const detectionRate = totalFish > 0 ? Math.round((totalDetected / totalFish) * 100) : 0;
 
+    // ── Ideal parameter computation ────────────────────────────────────────
+    const speciesData = fishList
+      .map(f => getSpeciesById(f.speciesId))
+      .filter((s): s is SpeciesInfo => !!s);
+
+    // Tank size: max of all species' minimum requirements
+    let idealTankSizeL: number | null = null;
+    if (speciesData.length > 0) {
+      idealTankSizeL = Math.max(...speciesData.map(s => s.minTankSizeL));
+    }
+
+    // Temperature: intersection of all species' ranges
+    const tempRanges = speciesData
+      .filter(s => s.tempMin !== undefined && s.tempMax !== undefined)
+      .map(s => ({ min: s.tempMin!, max: s.tempMax! }));
+    const tempResult = intersectRanges(tempRanges);
+
+    // pH: intersection of all species' ranges
+    const phRanges = speciesData
+      .filter(s => s.phMin !== undefined && s.phMax !== undefined)
+      .map(s => ({ min: s.phMin!, max: s.phMax! }));
+    const phResult = intersectRanges(phRanges);
+
+    // ── Species distribution ────────────────────────────────────────────────
     const dist: Record<string, { name: string; count: number; color: string; initials: string }> = {};
     fishList.forEach(fish => {
       const species = getSpeciesById(fish.speciesId);
@@ -232,7 +289,7 @@ export const MyFishScreen: React.FC = () => {
     });
 
     return {
-      stats: { totalFish, totalDetected, uniqueSpecies, detectionRate },
+      stats: { totalFish, totalDetected, uniqueSpecies, detectionRate, idealTankSizeL, tempResult, phResult },
       speciesDistribution: Object.values(dist).sort((a, b) => b.count - a.count)
     };
   }, [fishList]);
@@ -363,6 +420,69 @@ export const MyFishScreen: React.FC = () => {
                   <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
                 </div>
               ))}
+            </div>
+
+            {/* ── Ideal Parameters ── */}
+            <div className="mt-4 border-t border-border-card pt-4">
+              <span className="
+                mb-3 block text-[11px] font-bold tracking-wider
+                text-text-muted uppercase
+              ">
+                Ideal Parameters
+              </span>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {[
+                  {
+                    icon: <Maximize2 size={14} />,
+                    color: 'var(--color-primary-dark)',
+                    bg: 'var(--color-primary-light)',
+                    label: 'Tank Size',
+                    value: stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '\u2014',
+                  },
+                  {
+                    icon: <Thermometer size={14} />,
+                    color: 'var(--color-warning)',
+                    bg: 'rgba(245, 158, 11, 0.08)',
+                    label: 'Temperature',
+                    value: stats.tempResult.range != null
+                      ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '\u00b0C')
+                      : '\u2014',
+                    conflict: stats.tempResult.conflict,
+                  },
+                  {
+                    icon: <Droplets size={14} />,
+                    color: 'rgba(147, 112, 219, 1)',
+                    bg: 'rgba(147, 112, 219, 0.08)',
+                    label: 'pH',
+                    value: stats.phResult.range != null
+                      ? formatRange(stats.phResult.range[0], stats.phResult.range[1], '', 1)
+                      : '\u2014',
+                    conflict: stats.phResult.conflict,
+                  },
+                ].map((item, i) => (
+                  <div key={i} style={{ background: item.bg }} className="
+                    flex flex-col gap-1 rounded-xl p-3.5
+                  ">
+                    <div className="flex items-center gap-1.5">
+                      <span style={{ color: item.color }}>{item.icon}</span>
+                      <span style={{ color: item.color }} className="
+                        text-[11px] font-bold tracking-wider uppercase
+                      ">{item.label}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
+                      {(item as any).conflict && (
+                        <span
+                          className="mt-0.5 shrink-0"
+                          title="Species have conflicting requirements \u2014 showing the full range"
+                        >
+                          <AlertTriangle size={14} className="text-critical" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
