@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAlerts } from '../useAlerts';
 import { useReadings } from '../useReadings';
-import { isBackendAvailable, captureFrame, sendFrameForDetection, sendFrameForTurbidity } from '../../services/ai_service';
+import { isBackendAvailable, isVideoReady, captureFrame, sendFrameForDetection, sendFrameForTurbidity } from '../../services/ai_service';
 import { LocalStorageStore } from '../../services/localStorageStore';
 import type {
   AIDetectionResult,
@@ -203,12 +203,7 @@ export const useAIAnalytics = ({
       if (!cameraFeedRef.current?.videoElement || aiLoading) return;
 
       const video = cameraFeedRef.current.videoElement;
-      const isVideoReady = (
-        video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
-        video.videoWidth > 0 &&
-        video.videoHeight > 0
-      );
-      if (!isVideoReady) {
+      if (!isVideoReady(video)) {
         // Video isn't ready yet; retry on the next scheduled tick instead of failing.
         return;
       }
@@ -327,12 +322,7 @@ export const useAIAnalytics = ({
     if (!cameraFeedRef.current?.videoElement || turbidityLoading || backendStatus === 'checking' || !isStreaming) return;
 
     const video = cameraFeedRef.current.videoElement;
-    const isVideoReady = (
-      video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
-      video.videoWidth > 0 &&
-      video.videoHeight > 0
-    );
-    if (!isVideoReady) {
+    if (!isVideoReady(video)) {
       setTurbidityError('Camera feed is not ready yet');
       return;
     }

@@ -67,7 +67,7 @@ export async function isBackendAvailable(signal?: AbortSignal): Promise<boolean>
   }
 }
 
-function isVideoReady(video: HTMLVideoElement): boolean {
+export function isVideoReady(video: HTMLVideoElement): boolean {
   return (
     video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
     video.videoWidth > 0 &&
