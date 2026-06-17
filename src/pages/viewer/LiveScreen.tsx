@@ -75,6 +75,7 @@ export const LiveScreen: React.FC = () => {
     turbidityLoading,
     turbidityError,
     manualDiagnosisLoading,
+    lastManualDiagnosis,
     toggleAI,
     measureTurbidity,
     manualDiagnose,
@@ -285,6 +286,7 @@ export const LiveScreen: React.FC = () => {
           <AIAnalysisPanel
             lastPrediction={lastPrediction}
             lastTurbidityResult={lastTurbidityResult}
+            lastManualDiagnosis={lastManualDiagnosis}
           />
 
           <StreamAdjustments

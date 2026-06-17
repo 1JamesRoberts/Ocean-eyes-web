@@ -337,6 +337,11 @@ export const AnalyticsScreen: React.FC = () => {
                           >
                             {isErr ? 'Error' : isHealthy ? 'Healthy' : `Disease: ${diag.diagnosis.disease}`}
                           </span>
+                          {!isErr && (
+                            <span className="text-[11px] font-semibold text-text-muted">
+                              {Math.round(diag.diagnosis.confidence * 100)}% confidence
+                            </span>
+                          )}
                         </div>
                         <span className="
                           text-[11px] font-semibold text-text-muted

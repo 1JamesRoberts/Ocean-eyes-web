@@ -7,15 +7,18 @@ import type { AIDetectionResult, AITurbidityResult } from '../../types/aquarium'
 interface AIAnalysisPanelProps {
   lastPrediction: AIDetectionResult | null;
   lastTurbidityResult: AITurbidityResult | null;
+  lastManualDiagnosis?: AIDetectionResult | null;
 }
 
 export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
   lastPrediction,
-  lastTurbidityResult
+  lastTurbidityResult,
+  lastManualDiagnosis
 }) => {
   if (!lastPrediction) return null;
 
-  const diagnosisDetection = lastPrediction.detections.find(d => d.diagnosis);
+  const diagnosisSource = lastManualDiagnosis ?? lastPrediction;
+  const diagnosisDetection = diagnosisSource.detections.find(d => d.diagnosis);
   const diagnosis = diagnosisDetection?.diagnosis;
   return (
     <div className="

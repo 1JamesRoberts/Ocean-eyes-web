@@ -42,6 +42,7 @@ interface UseAIAnalyticsResult {
   turbidityError: string | null;
   manualDiagnosisLoading: boolean;
   manualDiagnosisError: string | null;
+  lastManualDiagnosis: AIDetectionResult | null;
   toggleAI: () => Promise<void>;
   measureTurbidity: () => Promise<void>;
   manualDiagnose: () => Promise<void>;
@@ -103,6 +104,7 @@ export const useAIAnalytics = ({
 
   const [manualDiagnosisLoading, setManualDiagnosisLoading] = useState(false);
   const [manualDiagnosisError, setManualDiagnosisError] = useState<string | null>(null);
+  const [lastManualDiagnosis, setLastManualDiagnosis] = useState<AIDetectionResult | null>(null);
   const manualDiagnosisAbortControllerRef = useRef<AbortController | null>(null);
 
   // ── Derived values ────────────────────────────────────────────────────
@@ -231,6 +233,7 @@ export const useAIAnalytics = ({
       );
 
       setLastPrediction(result);
+      setLastManualDiagnosis(result);
       LocalStorageStore.safeWriteRaw('oceaneyes_last_diagnosis_time', Date.now().toString());
 
       const diagnosedFish = result.detections.find(d => d.diagnosis);
@@ -474,6 +477,7 @@ export const useAIAnalytics = ({
     turbidityError,
     manualDiagnosisLoading,
     manualDiagnosisError,
+    lastManualDiagnosis,
     toggleAI,
     measureTurbidity,
     manualDiagnose,
