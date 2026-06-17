@@ -74,8 +74,10 @@ export const LiveScreen: React.FC = () => {
     lastTurbidityResult,
     turbidityLoading,
     turbidityError,
+    manualDiagnosisLoading,
     toggleAI,
     measureTurbidity,
+    manualDiagnose,
     currentClarity,
     currentFishCount,
   } = useAIAnalytics({
@@ -235,6 +237,7 @@ export const LiveScreen: React.FC = () => {
               aiLoading={aiLoading}
               backendStatus={backendStatus}
               turbidityLoading={turbidityLoading}
+              manualDiagnoseLoading={manualDiagnosisLoading}
               hasImageSource={isWebcam}
               isFullscreen={isFullscreen}
               showFsInventory={showFsInventory}
@@ -242,6 +245,7 @@ export const LiveScreen: React.FC = () => {
               onToggleRecording={() => toggleRecording(currentFishCount, currentClarity)}
               onMeasureTurbidity={measureTurbidity}
               onToggleAI={toggleAI}
+              onManualDiagnose={manualDiagnose}
               onToggleFullscreen={toggleFullscreen}
               onToggleFsInventory={() => setShowFsInventory(!showFsInventory)}
             />

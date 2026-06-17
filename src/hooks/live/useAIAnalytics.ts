@@ -40,8 +40,11 @@ interface UseAIAnalyticsResult {
   lastTurbidityResult: AITurbidityResult | null;
   turbidityLoading: boolean;
   turbidityError: string | null;
+  manualDiagnosisLoading: boolean;
+  manualDiagnosisError: string | null;
   toggleAI: () => Promise<void>;
   measureTurbidity: () => Promise<void>;
+  manualDiagnose: () => Promise<void>;
   currentClarity: number;
   currentFishCount: number;
 }
@@ -96,6 +99,12 @@ export const useAIAnalytics = ({
     () => liveState?.last_turbidity_result ?? null,
   );
 
+  // ── Manual diagnosis state ────────────────────────────────────────────
+
+  const [manualDiagnosisLoading, setManualDiagnosisLoading] = useState(false);
+  const [manualDiagnosisError, setManualDiagnosisError] = useState<string | null>(null);
+  const manualDiagnosisAbortControllerRef = useRef<AbortController | null>(null);
+
   // ── Derived values ────────────────────────────────────────────────────
 
   const currentClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
@@ -134,6 +143,10 @@ export const useAIAnalytics = ({
       if (turbidityAbortControllerRef.current) {
         turbidityAbortControllerRef.current.abort();
         turbidityAbortControllerRef.current = null;
+      }
+      if (manualDiagnosisAbortControllerRef.current) {
+        manualDiagnosisAbortControllerRef.current.abort();
+        manualDiagnosisAbortControllerRef.current = null;
       }
     };
   }, []);
@@ -180,6 +193,72 @@ export const useAIAnalytics = ({
     setIsAIActive(true);
     setAiError(null);
   }, [isAIActive, aiLoading, backendStatus, isStreaming, ensureBackendOnline]);
+
+  // ── Manual LLM fish diagnosis ────────────────────────────────────────
+
+  const manualDiagnose = useCallback(async () => {
+    if (manualDiagnosisLoading || aiLoading || backendStatus === 'checking' || !isStreaming) return;
+
+    if (!(await ensureBackendOnline())) {
+      setManualDiagnosisError('AI Backend is offline. Please start it first: cd ai && python api_server.py');
+      return;
+    }
+
+    if (!cameraFeedRef.current?.videoElement) {
+      setManualDiagnosisError('Camera feed is not ready yet');
+      return;
+    }
+
+    const video = cameraFeedRef.current.videoElement;
+    if (!isVideoReady(video)) {
+      setManualDiagnosisError('Camera feed is not ready yet');
+      return;
+    }
+
+    setManualDiagnosisLoading(true);
+    setManualDiagnosisError(null);
+    const controller = new AbortController();
+    manualDiagnosisAbortControllerRef.current = controller;
+
+    try {
+      const blob = await captureFrame(video);
+      const result = await sendFrameForDetection(
+        blob,
+        DETECTION_CONFIDENCE,
+        true,
+        DIAGNOSIS_MIN_CONF,
+        controller.signal,
+      );
+
+      setLastPrediction(result);
+      LocalStorageStore.safeWriteRaw('oceaneyes_last_diagnosis_time', Date.now().toString());
+
+      const diagnosedFish = result.detections.find(d => d.diagnosis);
+      if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
+        const diag = diagnosedFish.diagnosis;
+        addAlert({
+          id: `alert-disease-${Date.now()}`,
+          title: `Disease Alert: ${diag.disease}`,
+          message: `AI detected signs of ${diag.disease} on a ${diagnosedFish.species_display}: ${diag.description}`,
+          tip: `Recommended Action: ${diag.treatment}`,
+          severity: 'critical' as const,
+          timeAgo: 'Just now',
+          clarityBefore: '',
+          clarityAfter: '',
+          fishBefore: '',
+          fishAfter: '',
+          resolved: false,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+      setManualDiagnosisError(err instanceof Error ? err.message : 'LLM diagnosis failed');
+    } finally {
+      setManualDiagnosisLoading(false);
+      manualDiagnosisAbortControllerRef.current = null;
+    }
+  }, [manualDiagnosisLoading, aiLoading, backendStatus, isStreaming, ensureBackendOnline, cameraFeedRef, addAlert]);
 
   // ── AI detection polling loop ─────────────────────────────────────────
 
@@ -393,8 +472,11 @@ export const useAIAnalytics = ({
     lastTurbidityResult,
     turbidityLoading,
     turbidityError,
+    manualDiagnosisLoading,
+    manualDiagnosisError,
     toggleAI,
     measureTurbidity,
+    manualDiagnose,
     currentClarity,
     currentFishCount,
   };

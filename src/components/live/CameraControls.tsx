@@ -8,7 +8,8 @@ import {
   Loader2,
   Maximize,
   Minimize,
-  Fish
+  Fish,
+  Stethoscope
 } from 'lucide-react';
 
 
@@ -21,6 +22,7 @@ interface CameraControlsProps {
   aiLoading: boolean;
   backendStatus: BackendStatus;
   turbidityLoading: boolean;
+  manualDiagnoseLoading: boolean;
   hasImageSource: boolean;
   isFullscreen: boolean;
   showFsInventory: boolean;
@@ -28,6 +30,7 @@ interface CameraControlsProps {
   onToggleRecording: () => void;
   onMeasureTurbidity: () => void;
   onToggleAI: () => void;
+  onManualDiagnose: () => void;
   onToggleFullscreen: () => void;
   onToggleFsInventory: () => void;
 }
@@ -39,6 +42,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   aiLoading,
   backendStatus,
   turbidityLoading,
+  manualDiagnoseLoading,
   hasImageSource,
   isFullscreen,
   showFsInventory,
@@ -46,6 +50,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   onToggleRecording,
   onMeasureTurbidity,
   onToggleAI,
+  onManualDiagnose,
   onToggleFullscreen,
   onToggleFsInventory
 }) => {
@@ -68,6 +73,13 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
     if (isChecking) return 'Checking AI Backend…';
     if (!isOnline) return 'AI Backend Offline - Click to retry';
     return isAIActive ? 'Stop AI Analysis' : 'Start AI Analysis';
+  };
+
+  const getDiagnoseButtonTitle = (): string => {
+    if (!isStreaming) return 'Start stream to enable LLM diagnosis';
+    if (isChecking) return 'Checking AI Backend…';
+    if (!isOnline) return 'AI Backend Offline';
+    return 'Run LLM Fish Health Diagnosis';
   };
 
   const getTurbidityButtonTitle = (): string => {
@@ -122,6 +134,15 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         className={getBtnClasses(isAIActive, aiLoading || isChecking || !isStreaming, 'animate-pulse-ai')}
       >
         {aiLoading || isChecking ? <Loader2 size={16} className="animate-spin" /> : <Brain size={16} />}
+      </button>
+
+      <button
+        onClick={onManualDiagnose}
+        disabled={manualDiagnoseLoading || aiLoading || isChecking || !isStreaming}
+        title={getDiagnoseButtonTitle()}
+        className={getBtnClasses(false, manualDiagnoseLoading || aiLoading || isChecking || !isStreaming)}
+      >
+        {manualDiagnoseLoading ? <Loader2 size={16} className="animate-spin" /> : <Stethoscope size={16} />}
       </button>
 
       {isFullscreen && (
