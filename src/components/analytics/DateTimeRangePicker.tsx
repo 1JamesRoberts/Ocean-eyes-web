@@ -1,6 +1,7 @@
 // DateTimeRangePicker.tsx - Apple-style Starts/Ends date-time range selector
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { ChevronDown, ChevronUp, CalendarDays } from 'lucide-react';
 import { parseISO } from 'date-fns';
 import type { DateRange } from '../../types/aquarium';
 import {
@@ -29,10 +30,23 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   onChange,
 }) => {
   const [open, setOpen] = useState<OpenState | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const activeField = open?.field ?? null;
+
+  const summaryText = useMemo(() => {
+    const startDate = formatDateForDisplay(value.startDate);
+    const endDate = formatDateForDisplay(value.endDate);
+    const startTime = formatTimeForDisplay(value.startTime);
+    const endTime = formatTimeForDisplay(value.endTime);
+
+    if (value.startDate === value.endDate) {
+      return `${startDate} · ${startTime} – ${endTime}`;
+    }
+    return `${startDate}, ${startTime} – ${endDate}, ${endTime}`;
+  }, [value]);
 
   const selectedDateForCalendar = useMemo(() => {
     const dateStr =
@@ -142,37 +156,89 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   const isCalendar = activeField === 'startDate' || activeField === 'endDate';
   const isTimeWheel = activeField === 'startTime' || activeField === 'endTime';
 
+  const toggleExpanded = useCallback(
+    () => setIsExpanded((prev) => !prev),
+    [],
+  );
+
   return (
     <div ref={containerRef} className="flex flex-col gap-2">
-      {/* Starts row */}
-      <div className="flex items-center gap-3">
-        <span className="w-14 text-lg font-medium text-text-main">Starts</span>
-        <DateTimePill
-          label={formatDateForDisplay(value.startDate)}
-          isActive={activeField === 'startDate'}
-          onClick={handlePillClick('startDate')}
-        />
-        <DateTimePill
-          label={formatTimeForDisplay(value.startTime)}
-          isActive={activeField === 'startTime'}
-          onClick={handlePillClick('startTime')}
-        />
-      </div>
+      {!isExpanded && (
+        <button
+          type="button"
+          onClick={() => setIsExpanded(true)}
+          aria-expanded={false}
+          aria-controls="date-range-editor"
+          className="
+            flex cursor-pointer items-center gap-2 rounded-full border-none
+            bg-surface-hover px-4 py-2.5 text-[15px] font-medium
+            whitespace-nowrap text-text-main transition-colors
+            hover:bg-border-card
+          "
+        >
+          <CalendarDays size={16} className="text-text-muted" />
+          <span>{summaryText}</span>
+          <ChevronDown size={16} className="text-text-muted" />
+        </button>
+      )}
 
-      {/* Ends row */}
-      <div className="flex items-center gap-3">
-        <span className="w-14 text-lg font-medium text-text-main">Ends</span>
-        <DateTimePill
-          label={formatDateForDisplay(value.endDate)}
-          isActive={activeField === 'endDate'}
-          onClick={handlePillClick('endDate')}
-        />
-        <DateTimePill
-          label={formatTimeForDisplay(value.endTime)}
-          isActive={activeField === 'endTime'}
-          onClick={handlePillClick('endTime')}
-        />
-      </div>
+      {isExpanded && (
+        <div
+          id="date-range-editor"
+          className="flex flex-col gap-2"
+          aria-label="Date range editor"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[15px] font-medium text-text-main">
+              {summaryText}
+            </span>
+            <button
+              type="button"
+              onClick={toggleExpanded}
+              aria-expanded={true}
+              aria-controls="date-range-editor"
+              aria-label="Collapse date range editor"
+              className="
+                flex cursor-pointer items-center justify-center rounded-full
+                border-none p-1.5 text-text-muted transition-colors
+                hover:bg-surface-hover hover:text-text-main
+              "
+            >
+              <ChevronUp size={18} />
+            </button>
+          </div>
+
+          {/* Starts row */}
+          <div className="flex items-center gap-3">
+            <span className="w-14 text-lg font-medium text-text-main">Starts</span>
+            <DateTimePill
+              label={formatDateForDisplay(value.startDate)}
+              isActive={activeField === 'startDate'}
+              onClick={handlePillClick('startDate')}
+            />
+            <DateTimePill
+              label={formatTimeForDisplay(value.startTime)}
+              isActive={activeField === 'startTime'}
+              onClick={handlePillClick('startTime')}
+            />
+          </div>
+
+          {/* Ends row */}
+          <div className="flex items-center gap-3">
+            <span className="w-14 text-lg font-medium text-text-main">Ends</span>
+            <DateTimePill
+              label={formatDateForDisplay(value.endDate)}
+              isActive={activeField === 'endDate'}
+              onClick={handlePillClick('endDate')}
+            />
+            <DateTimePill
+              label={formatTimeForDisplay(value.endTime)}
+              isActive={activeField === 'endTime'}
+              onClick={handlePillClick('endTime')}
+            />
+          </div>
+        </div>
+      )}
 
       {open &&
         createPortal(
