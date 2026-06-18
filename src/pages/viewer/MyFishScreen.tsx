@@ -4,7 +4,7 @@ import { useFish } from '../../hooks/useFish';
 import {
   Plus, Trash2, Fish, Hash, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
-  AlertTriangle, CheckCircle, HelpCircle
+  AlertTriangle, CheckCircle, HelpCircle, Heart
 } from 'lucide-react';
 import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
@@ -12,7 +12,7 @@ import {
   getSpeciesById, getSpeciesColor, getSpeciesInitials,
   type SpeciesInfo
 } from '../../data/speciesCatalog';
-import { checkTankCompatibility, getCompatibilityLevel, getCompatibilityColor } from '../../data/speciesCatalog';
+import { checkTankCompatibility, getCompatibilityLevel, getCompatibilityColor, getOverallCompatibilityScore } from '../../data/speciesCatalog';
 import type { Difficulty, Aggression, BehaviorType, SwimLocation, Availability, BreedingDifficulty } from '../../types/aquarium';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -257,8 +257,11 @@ export const MyFishScreen: React.FC = () => {
 
     // Tank size: max of all species' minimum requirements
     let idealTankSizeL: number | null = null;
-    if (speciesData.length > 0) {
-      idealTankSizeL = Math.max(...speciesData.map(s => s.minTankSizeL));
+    const tankSizes = speciesData
+      .map(s => s.minTankSizeL)
+      .filter((v): v is number => v !== undefined);
+    if (tankSizes.length > 0) {
+      idealTankSizeL = Math.max(...tankSizes);
     }
 
     // Temperature: intersection of all species' ranges
@@ -290,8 +293,13 @@ export const MyFishScreen: React.FC = () => {
     const totalDetected = fishList.reduce((sum, f) => sum + f.detected, 0);
     const totalExpected = totalFish;
 
+    const overallCompatibility = getOverallCompatibilityScore(speciesData);
+
     return {
-      stats: { totalFish, uniqueSpecies, idealTankSizeL, tempResult, phResult, totalDetected, totalExpected },
+      stats: {
+        totalFish, uniqueSpecies, idealTankSizeL, tempResult, phResult,
+        totalDetected, totalExpected, overallCompatibility
+      },
       speciesDistribution: Object.values(dist).sort((a, b) => b.count - a.count)
     };
   }, [fishList]);
@@ -409,23 +417,27 @@ export const MyFishScreen: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { icon: <Hash size={14} />, color: 'var(--color-primary-dark)', bg: 'var(--color-primary-light)', label: 'Total Fish', value: stats.totalFish },
-                { icon: <Fish size={14} />, color: 'var(--color-info)', bg: 'rgba(59, 130, 246, 0.08)', label: 'Species', value: stats.uniqueSpecies },
-              ].map((item, i) => (
-                <div key={i} style={{ background: item.bg }} className="
-                  flex flex-col gap-1 rounded-xl p-3.5
-                ">
-                  <div className="flex items-center gap-1.5">
-                    <span style={{ color: item.color }}>{item.icon}</span>
-                    <span style={{ color: item.color }} className="
-                      text-[11px] font-bold tracking-wider uppercase
-                    ">{item.label}</span>
+            <div className="grid grid-cols-3 gap-3">
+              {(() => {
+                const compatibilityColor = getCompatibilityColor(getCompatibilityLevel(stats.overallCompatibility));
+                return [
+                  { icon: <Hash size={14} />, color: 'var(--color-primary-dark)', bg: 'var(--color-primary-light)', label: 'Total Fish', value: stats.totalFish },
+                  { icon: <Fish size={14} />, color: 'var(--color-info)', bg: 'rgba(59, 130, 246, 0.08)', label: 'Species', value: stats.uniqueSpecies },
+                  { icon: <Heart size={14} />, color: compatibilityColor, bg: `${compatibilityColor}14`, label: 'Compatibility', value: stats.overallCompatibility },
+                ].map((item, i) => (
+                  <div key={i} style={{ background: item.bg }} className="
+                    flex flex-col gap-1 rounded-xl p-3.5
+                  ">
+                    <div className="flex items-center gap-1.5">
+                      <span style={{ color: item.color }}>{item.icon}</span>
+                      <span style={{ color: item.color }} className="
+                        text-[11px] font-bold tracking-wider uppercase
+                      ">{item.label}</span>
+                    </div>
+                    <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
                   </div>
-                  <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
 
             {/* ── Ideal Parameters ── */}

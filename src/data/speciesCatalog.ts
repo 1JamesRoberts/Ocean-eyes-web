@@ -3469,3 +3469,23 @@ export function checkTankCompatibility(
     })
     .sort((a, b) => a.score - b.score);
 }
+
+/**
+ * Compute the overall compatibility score for a list of species.
+ * Returns the rounded average of all unique species pairs.
+ * If fewer than 2 species are provided, returns 100 (trivially compatible).
+ */
+export function getOverallCompatibilityScore(speciesList: SpeciesInfo[]): number {
+  const unique = speciesList.filter((s, i, arr) => arr.findIndex(t => t.id === s.id) === i);
+  if (unique.length < 2) return 100;
+
+  let total = 0;
+  let pairs = 0;
+  for (let i = 0; i < unique.length; i++) {
+    for (let j = i + 1; j < unique.length; j++) {
+      total += getCompatibilityScore(unique[i], unique[j]);
+      pairs++;
+    }
+  }
+  return pairs === 0 ? 100 : Math.round(total / pairs);
+}
