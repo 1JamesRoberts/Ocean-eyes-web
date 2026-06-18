@@ -8,7 +8,7 @@ interface WaterClarityCardProps {
   onClick: () => void;
 }
 
-export const WaterClarityCard: React.FC<WaterClarityCardProps> = ({ displayClarity, onClick }) => {
+export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClarity, onClick }) => {
   return (
     <div>
       <h3 className="mb-2 text-base font-bold text-text-main">Water Clarity</h3>
@@ -38,4 +38,6 @@ export const WaterClarityCard: React.FC<WaterClarityCardProps> = ({ displayClari
       </button>
     </div>
   );
-};
+});
+
+WaterClarityCard.displayName = 'WaterClarityCard';

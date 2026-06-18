@@ -7,7 +7,7 @@ interface Props {
   action?: React.ReactNode;
 }
 
-export const ChartEmptyState: React.FC<Props> = ({ message, hint, action }) => {
+export const ChartEmptyState = React.memo<Props>(({ message, hint, action }) => {
   const layout = hint || action 
     ? "flex items-center justify-center h-[240px] text-text-muted text-sm flex-col gap-2 text-center px-6" 
     : "flex items-center justify-center h-[240px] text-text-muted text-sm";
@@ -23,4 +23,6 @@ export const ChartEmptyState: React.FC<Props> = ({ message, hint, action }) => {
       )}
     </div>
   );
-};
+});
+
+ChartEmptyState.displayName = 'ChartEmptyState';

@@ -9,7 +9,7 @@ interface FishInventorySummaryProps {
   onManageFish: () => void;
 }
 
-export const FishInventorySummary: React.FC<FishInventorySummaryProps> = ({
+export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
   fishList,
   displayFishCount,
   onManageFish
@@ -97,4 +97,6 @@ export const FishInventorySummary: React.FC<FishInventorySummaryProps> = ({
       </div>
     </div>
   );
-};
+});
+
+FishInventorySummary.displayName = 'FishInventorySummary';

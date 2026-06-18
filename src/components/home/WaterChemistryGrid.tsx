@@ -6,7 +6,7 @@ interface WaterChemistryGridProps {
   reading: ReadingItem;
 }
 
-export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading }) => {
+export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading }) => {
   const parameters = [
     {
       label: 'pH Value',
@@ -66,4 +66,6 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
       ))}
     </div>
   );
-};
+});
+
+WaterChemistryGrid.displayName = 'WaterChemistryGrid';

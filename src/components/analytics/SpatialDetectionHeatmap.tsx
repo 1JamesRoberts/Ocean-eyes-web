@@ -156,6 +156,17 @@ function buildHeatmapOverlay(
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
+function debounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number) {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeoutId !== null) clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+      fn(...args);
+    }, ms);
+  };
+}
+
 export const SpatialDetectionHeatmap = React.memo<Props>(
   ({ records, tankId, inventorySpeciesIds }) => {
     const { activeFeed, isWebcam, isStreaming, videoRef } = useCameraFeed(tankId ?? null);
@@ -197,25 +208,37 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     useEffect(() => {
       if (!containerRef.current) return;
 
-      const ro = new ResizeObserver((entries) => {
-        const cr = entries[0].contentRect;
-        setContainerSize({ width: cr.width, height: cr.height });
+      const updateCanvasSize = (width: number, height: number) => {
+        setContainerSize({ width, height });
 
         const canvas = overlayCanvasRef.current;
         if (!canvas) return;
 
         const dpr = window.devicePixelRatio || 1;
-        const newWidth = Math.round(cr.width * dpr);
-        const newHeight = Math.round(cr.height * dpr);
+        const newWidth = Math.round(width * dpr);
+        const newHeight = Math.round(height * dpr);
 
         if (canvas.width !== newWidth || canvas.height !== newHeight) {
           canvas.width = newWidth;
           canvas.height = newHeight;
         }
-      });
+      };
+
+      // Initial synchronous measurement
+      const initialRect = containerRef.current.getBoundingClientRect();
+      updateCanvasSize(initialRect.width, initialRect.height);
+
+      const debouncedUpdate = debounce((entries: ResizeObserverEntry[]) => {
+        const cr = entries[0].contentRect;
+        updateCanvasSize(cr.width, cr.height);
+      }, 200);
+
+      const ro = new ResizeObserver(debouncedUpdate);
 
       ro.observe(containerRef.current);
-      return () => ro.disconnect();
+      return () => {
+        ro.disconnect();
+      };
     }, []);
 
     const drawOverlay = useCallback(() => {

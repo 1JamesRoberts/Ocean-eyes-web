@@ -33,7 +33,7 @@ export const useHistory = (range: DateRange): UseHistoryResult => {
   const [error, setError] = useState<string | null>(null);
   const [refetchKey, setRefetchKey] = useState(0);
 
-  const { startDate, endDate, startTime, endTime } = range;
+  const { startDate, endDate } = range;
 
   useEffect(() => {
     let cancelled = false;
@@ -72,7 +72,7 @@ export const useHistory = (range: DateRange): UseHistoryResult => {
       cancelled = true;
       controller.abort();
     };
-  }, [startDate, endDate, startTime, endTime, refetchKey]);
+  }, [startDate, endDate, refetchKey]);
 
   const detectionData: HistoryDetectionResponse | null = useMemo(() => {
     if (!rawDetectionData) return null;

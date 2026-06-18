@@ -7,7 +7,7 @@ interface ActiveAlertsListProps {
   onSelectAlert: (alertId: string) => void;
 }
 
-export const ActiveAlertsList: React.FC<ActiveAlertsListProps> = ({ alerts, onSelectAlert }) => {
+export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onSelectAlert }) => {
   const activeAlerts = alerts.filter(a => !a.resolved);
 
   if (activeAlerts.length === 0) {
@@ -63,4 +63,6 @@ export const ActiveAlertsList: React.FC<ActiveAlertsListProps> = ({ alerts, onSe
       ))}
     </div>
   );
-};
+});
+
+ActiveAlertsList.displayName = 'ActiveAlertsList';

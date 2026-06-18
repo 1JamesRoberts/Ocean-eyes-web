@@ -5,7 +5,7 @@ interface HealthScoreCardProps {
   reading: HealthReading;
 }
 
-export const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ reading }) => {
+export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) => {
   const healthScore = calculateHealthScore(reading);
   const healthColor = getHealthColor(healthScore);
   const healthMessage = getHealthMessage(healthScore);
@@ -54,5 +54,7 @@ export const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ reading }) => 
       </div>
     </div>
   );
-};
+});
+
+HealthScoreCard.displayName = 'HealthScoreCard';
 
