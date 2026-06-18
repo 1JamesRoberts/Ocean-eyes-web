@@ -1,19 +1,17 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect } from 'react';
-import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
+import { useSyncExternalStore } from 'react';
+import { LocalStorageStore, subscribe } from '../services/localStorageStore';
 import type { ReadingItem } from '../types/aquarium';
 
+const EMPTY_READINGS: ReadingItem[] = [];
+
+const subscribeReadings = (callback: () => void) => subscribe('readings', callback);
+
 export const useReadings = () => {
-  const [readings, setReadings] = useState<ReadingItem[]>(() => LocalStorageStore.getReadings());
-
-  const syncReadings = () => {
-    setReadings(LocalStorageStore.getReadings());
-  };
-
-  useEffect(() => {
-    syncReadings();
-    return subscribeToDb('readings', syncReadings);
-  }, []);
+  const readings = useSyncExternalStore<ReadingItem[]>(
+    subscribeReadings,
+    () => LocalStorageStore.getSnapshot('readings', EMPTY_READINGS),
+    () => EMPTY_READINGS
+  );
 
   const writeReading = (data: {
     tankId: string;

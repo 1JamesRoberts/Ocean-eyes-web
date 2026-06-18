@@ -1,30 +1,21 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect } from 'react';
-import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
+import { useSyncExternalStore, useCallback } from 'react';
+import { LocalStorageStore, subscribe } from '../services/localStorageStore';
 import type { LiveState } from '../types/aquarium';
 
 export const useLiveState = (tankId: string | null) => {
-  const [liveState, setLiveState] = useState<LiveState | null>(() => {
-    if (tankId) {
-      return LocalStorageStore.getLiveState(tankId);
-    }
-    return null;
-  });
+  const subscribeLiveState = useCallback(
+    (callback: () => void) => {
+      if (!tankId) return () => {};
+      return subscribe(`live_state_${tankId}`, callback);
+    },
+    [tankId]
+  );
 
-  const syncLiveState = () => {
-    if (tankId) {
-      setLiveState(LocalStorageStore.getLiveState(tankId));
-    } else {
-      setLiveState(null);
-    }
-  };
-
-  useEffect(() => {
-    syncLiveState();
-    if (!tankId) return undefined;
-    return subscribeToDb(`live_state_${tankId}`, syncLiveState);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tankId]);
+  const liveState = useSyncExternalStore<LiveState | null>(
+    subscribeLiveState,
+    () => (tankId ? LocalStorageStore.getSnapshot(`live_state_${tankId}`, LocalStorageStore.getLiveState(tankId)) : null),
+    () => null
+  );
 
   const saveLiveState = (state: LiveState) => {
     if (tankId) {
@@ -34,9 +25,9 @@ export const useLiveState = (tankId: string | null) => {
 
   const updateCalibration = (waterLineY: number) => {
     if (tankId) {
-      const activeFeedId = liveState?.selected_feed_id || '';
+      const current = LocalStorageStore.getLiveState(tankId);
+      const activeFeedId = current.selected_feed_id || '';
       LocalStorageStore.updateCalibration(tankId, activeFeedId, waterLineY);
-      setLiveState(LocalStorageStore.getLiveState(tankId));
     }
   };
 

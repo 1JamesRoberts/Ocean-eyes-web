@@ -4,7 +4,6 @@ import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import { useTank } from './hooks/useTank';
 import { useAlerts } from './hooks/useAlerts';
 import { ViewerApp } from './pages/ViewerApp';
-import { IoTMonitor } from './pages/IoTMonitor';
 import {
   Home,
   Video,
@@ -133,32 +132,7 @@ const OceanEyesDashboard: React.FC = () => {
           mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-6
           overflow-y-auto p-10
         ">
-          {activeTab === 'monitor' ? (
-            <div className="flex flex-col gap-4">
-              <div className="
-                flex items-center justify-between border-b border-border-card
-                pb-3
-                max-xs:flex-col max-xs:items-start max-xs:gap-3
-              ">
-                <div>
-                  <span className="
-                    text-xs font-semibold text-text-muted uppercase
-                  ">Hardware Unit</span>
-                  <h1 className="text-[28px] font-extrabold text-text-main">Aquarium Smart Scanner Console</h1>
-                </div>
-              </div>
-
-              <div className="
-                mx-auto w-full max-w-[800px] rounded-[20px] border
-                border-[rgba(13,148,136,0.02)] bg-surface-card p-2 shadow-card
-                transition-smooth
-              ">
-                <IoTMonitor />
-              </div>
-            </div>
-          ) : (
-            <ViewerApp />
-          )}
+          <ViewerApp />
         </div>
       </main>
     </div>

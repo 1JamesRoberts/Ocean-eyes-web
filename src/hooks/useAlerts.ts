@@ -1,19 +1,17 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect } from 'react';
-import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
+import { useSyncExternalStore } from 'react';
+import { LocalStorageStore, subscribe } from '../services/localStorageStore';
 import type { AlertItem } from '../types/aquarium';
 
+const EMPTY_ALERTS: AlertItem[] = [];
+
+const subscribeAlerts = (callback: () => void) => subscribe('alerts', callback);
+
 export const useAlerts = () => {
-  const [alerts, setAlerts] = useState<AlertItem[]>(() => LocalStorageStore.getAlerts());
-
-  const syncAlerts = () => {
-    setAlerts(LocalStorageStore.getAlerts());
-  };
-
-  useEffect(() => {
-    syncAlerts();
-    return subscribeToDb('alerts', syncAlerts);
-  }, []);
+  const alerts = useSyncExternalStore<AlertItem[]>(
+    subscribeAlerts,
+    () => LocalStorageStore.getSnapshot('alerts', EMPTY_ALERTS),
+    () => EMPTY_ALERTS
+  );
 
   const addAlert = (alert: AlertItem) => {
     LocalStorageStore.saveAlerts([alert, ...LocalStorageStore.getAlerts()]);

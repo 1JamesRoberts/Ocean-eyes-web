@@ -43,7 +43,10 @@ const STORAGE_KEYS = {
 // ---------------------------------------------------------------------------
 const DB_UPDATE_EVENT = 'oceaneyes_db_update';
 
+const snapshotCache = new Map<string, unknown>();
+
 const notifyUpdate = (key: string) => {
+  snapshotCache.delete(key);
   window.dispatchEvent(new CustomEvent(DB_UPDATE_EVENT, { detail: { key } }));
 };
 
@@ -56,6 +59,18 @@ export const subscribeToDb = (key: string, callback: () => void) => {
   };
   window.addEventListener(DB_UPDATE_EVENT, handler);
   return () => window.removeEventListener(DB_UPDATE_EVENT, handler);
+};
+
+export const subscribe = (key: string, callback: () => void) => subscribeToDb(key, callback);
+
+export const getSnapshot = <T>(key: string, fallback: T): T => {
+  const cached = snapshotCache.get(key);
+  if (cached !== undefined) {
+    return cached as T;
+  }
+  const value = getOrDefault<T>(key, fallback);
+  snapshotCache.set(key, value);
+  return value;
 };
 
 // ---------------------------------------------------------------------------

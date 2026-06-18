@@ -1,22 +1,23 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect, useCallback } from 'react';
-import { LocalStorageStore, subscribeToDb } from '../services/localStorageStore';
+import { useSyncExternalStore, useCallback } from 'react';
+import { LocalStorageStore, subscribe } from '../services/localStorageStore';
 import type { FishEntry } from '../types/aquarium';
 
+const EMPTY_FISH: FishEntry[] = [];
+
 export const useFish = (tankId: string | null) => {
-  const [fishList, setFishList] = useState<FishEntry[]>(() =>
-    tankId ? LocalStorageStore.getFish(tankId) : []
+  const subscribeFish = useCallback(
+    (callback: () => void) => {
+      if (!tankId) return () => {};
+      return subscribe(`tank_fish_${tankId}`, callback);
+    },
+    [tankId]
   );
 
-  const syncFish = useCallback(() => {
-    setFishList(tankId ? LocalStorageStore.getFish(tankId) : []);
-  }, [tankId]);
-
-  useEffect(() => {
-    syncFish();
-    if (!tankId) return undefined;
-    return subscribeToDb(`tank_fish_${tankId}`, syncFish);
-  }, [tankId, syncFish]);
+  const fishList = useSyncExternalStore<FishEntry[]>(
+    subscribeFish,
+    () => (tankId ? LocalStorageStore.getSnapshot(`tank_fish_${tankId}`, EMPTY_FISH) : EMPTY_FISH),
+    () => EMPTY_FISH
+  );
 
   const addFish = (name: string, imageUrl: string, count: number) => {
     if (!tankId) return;
