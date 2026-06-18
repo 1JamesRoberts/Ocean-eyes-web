@@ -157,7 +157,7 @@ export const AnalyticsScreen: React.FC = () => {
         ">
           {/* Heatmap + Fish Count row (2:1 like dashboard-grid) */}
           <div className="
-            grid grid-cols-1 gap-4
+            grid grid-cols-1 items-start gap-4
             lg:col-span-2 lg:grid-cols-[2fr_1fr]
           ">
             {/* Spatial Detection Heatmap */}

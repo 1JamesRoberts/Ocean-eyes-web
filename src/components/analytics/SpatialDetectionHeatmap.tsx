@@ -178,6 +178,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
     const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
+    const [videoSize, setVideoSize] = React.useState<{ width: number; height: number } | null>(null);
 
     // Flatten records into normalised center points
     const allCenters = useMemo(() => {
@@ -311,15 +312,26 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
           </select>
         </div>
 
-        <div ref={containerRef} className="
-          relative w-full overflow-hidden rounded-xl bg-camera-bg
-        ">
+        <div
+          ref={containerRef}
+          className="relative w-full overflow-hidden rounded-xl bg-camera-bg"
+          style={
+            videoSize
+              ? { aspectRatio: `${videoSize.width} / ${videoSize.height}` }
+              : undefined
+          }
+        >
           <CameraFeed
             feed={activeFeed}
             isStreaming={isStreaming}
             isWebcam={isWebcam}
             videoRef={videoRef}
             className="w-full"
+            onDimensions={(width, height) => {
+              if (width > 0 && height > 0) {
+                setVideoSize({ width, height });
+              }
+            }}
           />
           <canvas
             ref={overlayCanvasRef}
