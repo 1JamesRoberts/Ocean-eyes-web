@@ -14,6 +14,10 @@ interface Props {
   tankId?: string | null;
   /** Set of species IDs that exist in the tank inventory (filters the dropdown). */
   inventorySpeciesIds?: Set<string>;
+  /** Currently selected species filter. Controls the heatmap and external charts. */
+  selectedSpecies: string;
+  /** Called when the user changes the species filter. */
+  onSelectedSpeciesChange: (species: string) => void;
 }
 
 const MAX_RENDER_WIDTH = 800;
@@ -168,13 +172,12 @@ function debounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number)
 }
 
 export const SpatialDetectionHeatmap = React.memo<Props>(
-  ({ records, tankId, inventorySpeciesIds }) => {
+  ({ records, tankId, inventorySpeciesIds, selectedSpecies, onSelectedSpeciesChange }) => {
     const { activeFeed, isWebcam, isStreaming, videoRef } = useCameraFeed(tankId ?? null);
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
     const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
-    const [selectedSpecies, setSelectedSpecies] = React.useState<string>('all');
 
     // Flatten records into normalised center points
     const allCenters = useMemo(() => {
@@ -297,7 +300,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
               focus:border-info
             "
             value={selectedSpecies}
-            onChange={(e) => setSelectedSpecies(e.target.value)}
+            onChange={(e) => onSelectedSpeciesChange(e.target.value)}
           >
             <option value="all">All Species</option>
             {speciesList.map((s) => (
@@ -327,5 +330,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     );
   },
   (prevProps, nextProps) =>
-    prevProps.tankId === nextProps.tankId && prevProps.records === nextProps.records,
+    prevProps.tankId === nextProps.tankId &&
+    prevProps.records === nextProps.records &&
+    prevProps.selectedSpecies === nextProps.selectedSpecies,
 );

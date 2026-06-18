@@ -12,6 +12,7 @@ import {
 } from '../../services/ai_service';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
+import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
 import { formatDateForDisplay } from '../../utils/formatters';
@@ -46,6 +47,8 @@ export const AnalyticsScreen: React.FC = () => {
         }))
     )
     .reverse();
+
+  const [selectedSpecies, setSelectedSpecies] = useState<string>('all');
 
   const [confirmClear, setConfirmClear] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
@@ -167,6 +170,8 @@ export const AnalyticsScreen: React.FC = () => {
                 records={detectionRecords}
                 tankId={tankId}
                 inventorySpeciesIds={inventorySpeciesIds}
+                selectedSpecies={selectedSpecies}
+                onSelectedSpeciesChange={setSelectedSpecies}
               />
             </div>
 
@@ -182,7 +187,14 @@ export const AnalyticsScreen: React.FC = () => {
                 {detectionRecords.length} detection frames
               </p>
             </div>
-            <FishCountChart records={detectionRecords} />
+            <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
+            <div className="mt-2">
+              <h3 className="m-0 text-sm font-bold text-text-main">Mean Nearest-Neighbor Distance</h3>
+              <p className="m-0 text-xs text-text-muted">
+                Average distance between fish per frame
+              </p>
+            </div>
+            <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
           </div>
           </div>
 

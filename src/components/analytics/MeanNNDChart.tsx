@@ -1,4 +1,4 @@
-// FishCountChart.tsx - Area chart of total fish detections over time
+// src/components/analytics/MeanNNDChart.tsx - Mean nearest-neighbor distance over time
 import React, { useMemo } from 'react';
 import {
   AreaChart,
@@ -9,8 +9,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import type { AIDetectionResult } from '../../types/aquarium';
+import type { AIDetection, AIDetectionResult } from '../../types/aquarium';
 import { formatTimeShort } from '../../utils/formatters';
+import { calculateMeanNND } from '../../utils/geometry';
 import { ChartEmptyState } from './ChartEmptyState';
 
 interface Props {
@@ -18,20 +19,22 @@ interface Props {
   selectedSpecies?: string;
 }
 
-function countBySpecies(record: AIDetectionResult, selectedSpecies?: string): number {
+function filterDetectionsBySpecies(record: AIDetectionResult, selectedSpecies?: string): AIDetection[] {
   if (!selectedSpecies || selectedSpecies === 'all') {
-    return record.summary?.total_detections ?? 0;
+    return record.detections;
   }
-  return record.detections.filter((d) => d.species === selectedSpecies).length;
+  return record.detections.filter((d) => d.species === selectedSpecies);
 }
 
-export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) => {
+export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
   const data = useMemo(() => {
-    return records
-      .map((r) => ({
-        time: formatTimeShort(r.timestamp),
-        count: countBySpecies(r, selectedSpecies),
-      }));
+    return records.map((r) => ({
+      time: formatTimeShort(r.timestamp),
+      nnd: calculateMeanNND(
+        filterDetectionsBySpecies(r, selectedSpecies),
+        r.image_dimensions,
+      ),
+    }));
   }, [records, selectedSpecies]);
 
   if (data.length === 0) {
@@ -42,9 +45,9 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
     <ResponsiveContainer width="100%" height={260}>
       <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <defs>
-          <linearGradient id="fishCountGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-info)" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="var(--color-info)" stopOpacity={0} />
+          <linearGradient id="meanNNDGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--color-warning)" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="var(--color-warning)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -55,7 +58,6 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
           tickLine={{ stroke: 'var(--color-border)' }}
         />
         <YAxis
-          allowDecimals={false}
           tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
           axisLine={{ stroke: 'var(--color-border)' }}
           tickLine={{ stroke: 'var(--color-border)' }}
@@ -68,17 +70,17 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
             color: 'var(--color-text-primary)',
             fontSize: 13,
           }}
-          formatter={(value) => [`${value as number} fish`, 'Count']}
+          formatter={(value) => [Number(value).toFixed(3), 'Mean NND']}
         />
         <Area
           type="monotone"
-          dataKey="count"
-          stroke="var(--color-info)"
+          dataKey="nnd"
+          stroke="var(--color-warning)"
           strokeWidth={2}
-          fill="url(#fishCountGrad)"
+          fill="url(#meanNNDGrad)"
           animationDuration={500}
-          dot={{ r: 3, fill: 'var(--color-info)', strokeWidth: 0 }}
-          activeDot={{ r: 5, fill: 'var(--color-info)', stroke: 'var(--color-surface)', strokeWidth: 2 }}
+          dot={{ r: 3, fill: 'var(--color-warning)', strokeWidth: 0 }}
+          activeDot={{ r: 5, fill: 'var(--color-warning)', stroke: 'var(--color-surface)', strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>
