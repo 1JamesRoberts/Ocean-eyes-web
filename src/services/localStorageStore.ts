@@ -343,6 +343,10 @@ const getDefaultLiveState = (): LiveState => ({
 // Store
 // ---------------------------------------------------------------------------
 export class LocalStorageStore {
+  static getSnapshot = <T,>(key: string, fallback: T): T => {
+    return getSnapshot<T>(key, fallback);
+  };
+
   // ─── Tanks ─────────────────────────────────────────────────────────────────
   static getTanks = (): TankBrief[] => {
     return getOrDefault<TankBrief[]>(STORAGE_KEYS.tanks, []);
