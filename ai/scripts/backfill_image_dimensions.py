@@ -57,20 +57,21 @@ def derive_image_dimensions(record: dict) -> dict[str, int] | None:
 
 def process_file(file_path: Path, dry_run: bool) -> tuple[int, int, int]:
     """Process one JSONL file. Returns (total, enriched, skipped)."""
-    records: list[dict[str, Any]] = []
+    records: list[dict[str, Any] | str] = []
     enriched = 0
     skipped = 0
     total = 0
 
     with open(file_path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if not line:
+                records.append(raw_line if raw_line.endswith("\n") else raw_line + "\n")
                 continue
             try:
                 record = json.loads(line)
             except json.JSONDecodeError:
-                records.append(line)  # preserve corrupted lines as-is
+                records.append(raw_line)
                 continue
 
             total += 1
@@ -94,8 +95,11 @@ def process_file(file_path: Path, dry_run: bool) -> tuple[int, int, int]:
 
     tmp_path = file_path.with_suffix(file_path.suffix + ".tmp")
     with open(tmp_path, "w", encoding="utf-8") as f:
-        for record in records:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        for item in records:
+            if isinstance(item, dict):
+                f.write(json.dumps(item, ensure_ascii=False) + "\n")
+            else:
+                f.write(item)
 
     tmp_path.replace(file_path)
     return total, enriched, skipped

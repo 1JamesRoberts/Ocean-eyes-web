@@ -8,15 +8,15 @@ Endpoints:
   GET  /species    - List supported species
 """
 
-import io
 import json
 import logging
+import re
 import sys
 import threading
-import traceback
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any, Callable, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("fishai")
@@ -57,6 +57,53 @@ DETECTION_OUTPUT_DIR = SCRIPT_DIR / "output" / "detections"
 TURBIDITY_OUTPUT_DIR = SCRIPT_DIR / "output" / "turbidity"
 CROP_OUTPUT_DIR = SCRIPT_DIR / "output" / "crops"
 _io_lock = threading.Lock()
+
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+MAX_UPLOAD_BYTES_DEFAULT = 20 * 1024 * 1024
+
+
+def _validate_date(date_str: str) -> None:
+    """Validate strict YYYY-MM-DD format. Raises ValueError if invalid."""
+    if not isinstance(date_str, str) or not DATE_RE.match(date_str):
+        raise ValueError(f"Invalid date format: {date_str!r}; expected YYYY-MM-DD")
+    datetime.strptime(date_str, "%Y-%m-%d")
+
+
+def _safe_history_path(output_dir: Path, date_str: str) -> Path:
+    """Return resolved path for a history date file, ensuring it stays inside output_dir."""
+    _validate_date(date_str)
+    file_path = (output_dir / f"{date_str}.jsonl").resolve()
+    base = output_dir.resolve()
+    if base not in file_path.parents and file_path != base:
+        raise ValueError(f"Path escapes allowed directory: {date_str!r}")
+    return file_path
+
+
+async def _read_upload_file(file: UploadFile) -> bytes | JSONResponse:
+    """Read uploaded file, enforcing size limit and non-empty content."""
+    try:
+        contents = await file.read()
+    except (ValueError, OSError) as e:
+        logger.warning("Failed to read upload: %s", e)
+        return JSONResponse(status_code=400, content={"error": "Invalid upload"})
+    if not contents:
+        return JSONResponse(status_code=400, content={"error": "Empty file"})
+    max_bytes = int(os.getenv("MAX_UPLOAD_BYTES", str(MAX_UPLOAD_BYTES_DEFAULT)))
+    if len(contents) > max_bytes:
+        return JSONResponse(status_code=400, content={"error": "File too large"})
+    return contents
+
+
+async def _handle_prediction_error(operation: str, predict_fn: Callable[[], Any]) -> Any:
+    """Run a synchronous prediction callable with standardised error handling."""
+    try:
+        return predict_fn()
+    except (ValueError, OSError) as e:
+        logger.warning("Bad request to %s: %s", operation, e)
+        return JSONResponse(status_code=400, content={"error": "Invalid image"})
+    except Exception:
+        logger.exception("Unexpected error in %s", operation)
+        return JSONResponse(status_code=500, content={"error": "Prediction failed"})
 
 
 def append_jsonl(output_dir: Path, result: dict, label: str = "entry") -> None:
@@ -177,11 +224,11 @@ async def predict(
     if pipeline is None:
         return JSONResponse(status_code=503, content={"error": "Models not loaded"})
 
-    try:
-        contents = await file.read()
-        if not contents:
-            return JSONResponse(status_code=400, content={"error": "Empty file"})
+    contents = await _read_upload_file(file)
+    if isinstance(contents, JSONResponse):
+        return contents
 
+    def _run():
         result = pipeline.predict(contents, conf=conf, diagnose=diagnose, diagnosis_min_conf=diagnosis_min_conf)
         append_jsonl(DETECTION_OUTPUT_DIR, result, label="detection")
 
@@ -196,15 +243,7 @@ async def predict(
 
         return result
 
-    except (ValueError, OSError) as e:
-        logger.warning("Bad request to /predict: %s", e)
-        return JSONResponse(status_code=400, content={"error": "Invalid image"})
-    except Exception:
-        logger.exception("Unexpected error in /predict")
-        return JSONResponse(
-            status_code=500,
-            content={"error": "Prediction failed"},
-        )
+    return await _handle_prediction_error("/predict", _run)
 
 
 @app.post("/predict/turbidity")
@@ -220,11 +259,11 @@ async def predict_turbidity(
     if pipeline is None:
         return JSONResponse(status_code=503, content={"error": "Models not loaded"})
 
-    try:
-        contents = await file.read()
-        if not contents:
-            return JSONResponse(status_code=400, content={"error": "Empty file"})
+    contents = await _read_upload_file(file)
+    if isinstance(contents, JSONResponse):
+        return contents
 
+    def _run():
         result = pipeline.predict_turbidity_only(contents)
         turbidity_entry = {
             "timestamp": result["timestamp"],
@@ -235,15 +274,7 @@ async def predict_turbidity(
         append_jsonl(TURBIDITY_OUTPUT_DIR, turbidity_entry, label="turbidity")
         return result
 
-    except (ValueError, OSError) as e:
-        logger.warning("Bad request to /predict/turbidity: %s", e)
-        return JSONResponse(status_code=400, content={"error": "Invalid image"})
-    except Exception:
-        logger.exception("Unexpected error in /predict/turbidity")
-        return JSONResponse(
-            status_code=500,
-            content={"error": "Prediction failed"},
-        )
+    return await _handle_prediction_error("/predict/turbidity", _run)
 
 
 @app.post("/predict/detection")
@@ -262,36 +293,27 @@ async def predict_detection(
     if pipeline is None:
         return JSONResponse(status_code=503, content={"error": "Models not loaded"})
 
-    try:
-        contents = await file.read()
-        if not contents:
-            return JSONResponse(status_code=400, content={"error": "Empty file"})
+    contents = await _read_upload_file(file)
+    if isinstance(contents, JSONResponse):
+        return contents
 
+    def _run():
         result = pipeline.predict_detection_only(contents, conf=conf, diagnose=diagnose, diagnosis_min_conf=diagnosis_min_conf)
         append_jsonl(DETECTION_OUTPUT_DIR, result, label="detection")
         return result
 
-    except (ValueError, OSError) as e:
-        logger.warning("Bad request to /predict/detection: %s", e)
-        return JSONResponse(status_code=400, content={"error": "Invalid image"})
-    except Exception:
-        logger.exception("Unexpected error in /predict/detection")
-        return JSONResponse(
-            status_code=500,
-            content={"error": "Prediction failed"},
-        )
+    return await _handle_prediction_error("/predict/detection", _run)
 
 
 # ---------------------------------------------------------------------------
 # History API — read persisted JSONL inference records
 # ---------------------------------------------------------------------------
-from typing import List, Any
 from statistics import median
 
 
 def _read_jsonl_date_file(output_dir: Path, date_str: str) -> List[Any]:
     """Read a single day's JSONL file and return a list of parsed objects."""
-    file_path = output_dir / f"{date_str}.jsonl"
+    file_path = _safe_history_path(output_dir, date_str)
     if not file_path.exists():
         return []
     results: List[Any] = []
@@ -310,6 +332,8 @@ def _read_jsonl_date_file(output_dir: Path, date_str: str) -> List[Any]:
 
 def _iterate_date_range(start_date_str: str, end_date_str: str) -> List[str]:
     """Return inclusive list of YYYY-MM-DD strings between two dates."""
+    _validate_date(start_date_str)
+    _validate_date(end_date_str)
     start = datetime.strptime(start_date_str, "%Y-%m-%d").date()
     end = datetime.strptime(end_date_str, "%Y-%m-%d").date()
     if end < start:
@@ -418,19 +442,22 @@ async def history_detections(
     limit: int = Query(default=1000, ge=1, le=10000, description="Max records to return"),
 ):
     """Return parsed detection records for a given date or inclusive date range."""
-    if date:
-        date_str = date
-        records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
-    elif start_date and end_date:
-        date_str = f"{start_date}:{end_date}"
-        records: List[Any] = []
-        for d in _iterate_date_range(start_date, end_date):
-            records.extend(_read_jsonl_date_file(DETECTION_OUTPUT_DIR, d))
-    else:
-        date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
-    records = _enrich_detection_records(records)
-    return {"date": date_str, "count": len(records), "records": records[:limit]}
+    try:
+        if date:
+            date_str = date
+            records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+        elif start_date and end_date:
+            date_str = f"{start_date}:{end_date}"
+            records: List[Any] = []
+            for d in _iterate_date_range(start_date, end_date):
+                records.extend(_read_jsonl_date_file(DETECTION_OUTPUT_DIR, d))
+        else:
+            date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+        records = _enrich_detection_records(records)
+        return {"date": date_str, "count": len(records), "records": records[:limit]}
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
 
 
 @app.get("/history/turbidity")
@@ -441,23 +468,26 @@ async def history_turbidity(
     limit: int = Query(default=1000, ge=1, le=10000, description="Max records to return"),
 ):
     """Return parsed turbidity records for a given date or inclusive date range."""
-    if date:
-        date_str = date
-        turbidity_records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
-        detection_records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
-    elif start_date and end_date:
-        date_str = f"{start_date}:{end_date}"
-        turbidity_records: List[Any] = []
-        detection_records: List[Any] = []
-        for d in _iterate_date_range(start_date, end_date):
-            turbidity_records.extend(_read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, d))
-            detection_records.extend(_read_jsonl_date_file(DETECTION_OUTPUT_DIR, d))
-    else:
-        date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        turbidity_records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
-        detection_records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
-    turbidity_records = _enrich_turbidity_records(turbidity_records, detection_records)
-    return {"date": date_str, "count": len(turbidity_records), "records": turbidity_records[:limit]}
+    try:
+        if date:
+            date_str = date
+            turbidity_records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
+            detection_records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+        elif start_date and end_date:
+            date_str = f"{start_date}:{end_date}"
+            turbidity_records: List[Any] = []
+            detection_records: List[Any] = []
+            for d in _iterate_date_range(start_date, end_date):
+                turbidity_records.extend(_read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, d))
+                detection_records.extend(_read_jsonl_date_file(DETECTION_OUTPUT_DIR, d))
+        else:
+            date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            turbidity_records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
+            detection_records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+        turbidity_records = _enrich_turbidity_records(turbidity_records, detection_records)
+        return {"date": date_str, "count": len(turbidity_records), "records": turbidity_records[:limit]}
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
 
 
 @app.delete("/history/detections")
@@ -471,24 +501,29 @@ async def clear_detection_history(
     try:
         if date:
             date_str = date
-            file_path = DETECTION_OUTPUT_DIR / f"{date_str}.jsonl"
-            if file_path.exists():
-                file_path.unlink()
+            file_path = _safe_history_path(DETECTION_OUTPUT_DIR, date_str)
+            with _io_lock:
+                if file_path.exists():
+                    file_path.unlink()
             deleted.append(date_str)
         elif start_date and end_date:
             date_str = f"{start_date}:{end_date}"
             for d in _iterate_date_range(start_date, end_date):
-                file_path = DETECTION_OUTPUT_DIR / f"{d}.jsonl"
-                if file_path.exists():
-                    file_path.unlink()
-                    deleted.append(d)
+                file_path = _safe_history_path(DETECTION_OUTPUT_DIR, d)
+                with _io_lock:
+                    if file_path.exists():
+                        file_path.unlink()
+                        deleted.append(d)
         else:
             date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            file_path = DETECTION_OUTPUT_DIR / f"{date_str}.jsonl"
-            if file_path.exists():
-                file_path.unlink()
+            file_path = _safe_history_path(DETECTION_OUTPUT_DIR, date_str)
+            with _io_lock:
+                if file_path.exists():
+                    file_path.unlink()
             deleted.append(date_str)
         return {"status": "ok", "deleted": date_str, "files": deleted}
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
     except OSError as e:
         return JSONResponse(
             status_code=500, content={"error": f"Failed to delete history: {e}"}
@@ -506,24 +541,29 @@ async def clear_turbidity_history(
     try:
         if date:
             date_str = date
-            file_path = TURBIDITY_OUTPUT_DIR / f"{date_str}.jsonl"
-            if file_path.exists():
-                file_path.unlink()
+            file_path = _safe_history_path(TURBIDITY_OUTPUT_DIR, date_str)
+            with _io_lock:
+                if file_path.exists():
+                    file_path.unlink()
             deleted.append(date_str)
         elif start_date and end_date:
             date_str = f"{start_date}:{end_date}"
             for d in _iterate_date_range(start_date, end_date):
-                file_path = TURBIDITY_OUTPUT_DIR / f"{d}.jsonl"
-                if file_path.exists():
-                    file_path.unlink()
-                    deleted.append(d)
+                file_path = _safe_history_path(TURBIDITY_OUTPUT_DIR, d)
+                with _io_lock:
+                    if file_path.exists():
+                        file_path.unlink()
+                        deleted.append(d)
         else:
             date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            file_path = TURBIDITY_OUTPUT_DIR / f"{date_str}.jsonl"
-            if file_path.exists():
-                file_path.unlink()
+            file_path = _safe_history_path(TURBIDITY_OUTPUT_DIR, date_str)
+            with _io_lock:
+                if file_path.exists():
+                    file_path.unlink()
             deleted.append(date_str)
         return {"status": "ok", "deleted": date_str, "files": deleted}
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
     except OSError as e:
         return JSONResponse(
             status_code=500, content={"error": f"Failed to delete history: {e}"}

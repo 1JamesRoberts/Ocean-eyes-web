@@ -38,6 +38,11 @@ PREFERRED_PROVIDERS = [
     "CPUExecutionProvider",
 ]
 
+# Model / preprocessing constants
+DETECTOR_INPUT_SIZE = 576
+CROP_MIN_SIZE = 32
+CROP_PADDING_RATIO = 0.10
+
 
 def _test_provider(model_path: Path, provider: str) -> bool:
     """Try to create a session with a single provider to verify it works."""
@@ -75,8 +80,8 @@ def load_session(model_path: Path):
 
 
 def preprocess_detection(image: np.ndarray) -> np.ndarray:
-    """Resize to 576x576 and apply ImageNet normalization."""
-    img = cv2.resize(image, (576, 576))
+    """Resize to the detector input size and apply ImageNet normalization."""
+    img = cv2.resize(image, (DETECTOR_INPUT_SIZE, DETECTOR_INPUT_SIZE))
     img = img.astype(np.float32) / 255.0
     img = (img - NORM_MEAN) / NORM_STD
     img = np.transpose(img, (2, 0, 1))
@@ -163,22 +168,23 @@ def run_detection(image: np.ndarray, session: ort.InferenceSession, conf: float)
     keep = confidences >= conf
 
     results = []
+    size = DETECTOR_INPUT_SIZE
     for i in np.where(keep)[0]:
         cx, cy, w, h = dets[i]
-        cx *= 576
-        cy *= 576
-        w *= 576
-        h *= 576
+        cx *= size
+        cy *= size
+        w *= size
+        h *= size
 
         x1 = cx - w / 2
         y1 = cy - h / 2
         x2 = cx + w / 2
         y2 = cy + h / 2
 
-        x1 = x1 * w_orig / 576
-        y1 = y1 * h_orig / 576
-        x2 = x2 * w_orig / 576
-        y2 = y2 * h_orig / 576
+        x1 = x1 * w_orig / size
+        y1 = y1 * h_orig / size
+        x2 = x2 * w_orig / size
+        y2 = y2 * h_orig / size
 
         x1 = max(0, min(x1, w_orig))
         y1 = max(0, min(y1, h_orig))
@@ -368,15 +374,16 @@ class FishAIPipeline:
         """Pick a random detection eligible for diagnosis.
 
         Only considers detections with confidence >= min_conf and a padded crop
-        large enough (>= 32×32 px). Returns -1 if no viable detection exists.
+        large enough (>= CROP_MIN_SIZE px per side). Returns -1 if no viable
+        detection exists.
         """
         eligible = []
         for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
-            pad_w = int((x2 - x1) * 0.10)
-            pad_h = int((y2 - y1) * 0.10)
+            pad_w = int((x2 - x1) * CROP_PADDING_RATIO)
+            pad_h = int((y2 - y1) * CROP_PADDING_RATIO)
             pw = min(img_w, x2 + pad_w) - max(0, x1 - pad_w)
             ph = min(img_h, y2 + pad_h) - max(0, y1 - pad_h)
-            if pw >= 32 and ph >= 32 and det_confidence >= min_conf:
+            if pw >= CROP_MIN_SIZE and ph >= CROP_MIN_SIZE and det_confidence >= min_conf:
                 eligible.append(i)
         return random.choice(eligible) if eligible else -1
 
@@ -393,8 +400,8 @@ class FishAIPipeline:
         try:
             w = x2 - x1
             h = y2 - y1
-            pad_w = int(w * 0.10)
-            pad_h = int(h * 0.10)
+            pad_w = int(w * CROP_PADDING_RATIO)
+            pad_h = int(h * CROP_PADDING_RATIO)
 
             x1_pad = max(0, x1 - pad_w)
             y1_pad = max(0, y1 - pad_h)
@@ -430,17 +437,32 @@ class FishAIPipeline:
         except Exception as e:
             return {"error": f"Failed to slice or encode crop: {str(e)}"}
 
-    def predict(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False, diagnosis_min_conf: float = 0.7) -> dict:
-        """Run full pipeline on image bytes and return structured JSON."""
-        img_array, img_cv, img_w, img_h = self._load_image(image_bytes)
+    def _build_detections(
+        self,
+        img_array: np.ndarray,
+        img_cv: np.ndarray,
+        img_w: int,
+        img_h: int,
+        detections_raw: list,
+        conf: float,
+        diagnose: bool,
+        diagnosis_min_conf: float,
+    ) -> tuple[list[dict], dict]:
+        """Clip detections to image bounds, classify species, and optionally diagnose one candidate.
 
-        turbidity_result = run_turbidity(img_cv, self.turbidity_session, self.turbidity_metadata)
-        detections_raw = run_detection(img_cv, self.detect_session, conf)
+        The ``img_cv`` and ``conf`` parameters mirror the public pipelines for
+        symmetry; ``conf`` is not needed here because ``detections_raw`` is
+        already filtered.
+        """
+        _ = img_cv, conf  # accepted for symmetry, not required for building entries
+        detections: list[dict] = []
+        species_counts: dict = {}
 
-        detections = []
-        species_counts = {}
-
-        diagnose_index = self._select_diagnosis_candidate(detections_raw, img_w, img_h, diagnosis_min_conf) if diagnose else -1
+        diagnose_index = (
+            self._select_diagnosis_candidate(detections_raw, img_w, img_h, diagnosis_min_conf)
+            if diagnose
+            else -1
+        )
 
         for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
             x1 = max(0, x1)
@@ -451,7 +473,13 @@ class FishAIPipeline:
             crop = img_array[y1:y2, x1:x2]
             species_result = run_species(crop, self.species_session, self.species_metadata)
 
-            diagnosis_result = self._run_diagnosis(img_array, img_w, img_h, x1, y1, x2, y2, species_result, i) if i == diagnose_index else None
+            diagnosis_result = (
+                self._run_diagnosis(
+                    img_array, img_w, img_h, x1, y1, x2, y2, species_result, i
+                )
+                if i == diagnose_index
+                else None
+            )
 
             detection_entry = {
                 "bbox": [x1, y1, x2, y2],
@@ -473,6 +501,18 @@ class FishAIPipeline:
                 else "unknown"
             )
             species_counts[count_key] = species_counts.get(count_key, 0) + 1
+
+        return detections, species_counts
+
+    def predict(self, image_bytes: bytes, conf: float = 0.35, diagnose: bool = False, diagnosis_min_conf: float = 0.7) -> dict:
+        """Run full pipeline on image bytes and return structured JSON."""
+        img_array, img_cv, img_w, img_h = self._load_image(image_bytes)
+
+        turbidity_result = run_turbidity(img_cv, self.turbidity_session, self.turbidity_metadata)
+        detections_raw = run_detection(img_cv, self.detect_session, conf)
+        detections, species_counts = self._build_detections(
+            img_array, img_cv, img_w, img_h, detections_raw, conf, diagnose, diagnosis_min_conf
+        )
 
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -510,43 +550,9 @@ class FishAIPipeline:
         img_array, img_cv, img_w, img_h = self._load_image(image_bytes)
 
         detections_raw = run_detection(img_cv, self.detect_session, conf)
-
-        detections = []
-        species_counts = {}
-
-        diagnose_index = self._select_diagnosis_candidate(detections_raw, img_w, img_h, diagnosis_min_conf) if diagnose else -1
-
-        for i, (x1, y1, x2, y2, det_confidence) in enumerate(detections_raw):
-            x1 = max(0, x1)
-            y1 = max(0, y1)
-            x2 = min(img_w, x2)
-            y2 = min(img_h, y2)
-
-            crop = img_array[y1:y2, x1:x2]
-            species_result = run_species(crop, self.species_session, self.species_metadata)
-
-            diagnosis_result = self._run_diagnosis(img_array, img_w, img_h, x1, y1, x2, y2, species_result, i) if i == diagnose_index else None
-
-            detection_entry = {
-                "bbox": [x1, y1, x2, y2],
-                "bbox_normalized": [
-                    round(x1 / img_w, 4),
-                    round(y1 / img_h, 4),
-                    round(x2 / img_w, 4),
-                    round(y2 / img_h, 4),
-                ],
-                "detection_confidence": round(det_confidence, 4),
-                "diagnosis": diagnosis_result,
-                **species_result,
-            }
-            detections.append(detection_entry)
-
-            count_key = (
-                species_result["species"]
-                if not species_result["below_threshold"]
-                else "unknown"
-            )
-            species_counts[count_key] = species_counts.get(count_key, 0) + 1
+        detections, species_counts = self._build_detections(
+            img_array, img_cv, img_w, img_h, detections_raw, conf, diagnose, diagnosis_min_conf
+        )
 
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
