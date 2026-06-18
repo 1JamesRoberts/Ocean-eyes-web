@@ -38,7 +38,7 @@ export const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ reading }) => 
             className="transition-smooth"
           />
         </svg>
-        <div className="z-5 text-center">
+        <div className="z-50 text-center">
           <span className="text-[28px] font-extrabold text-text-main">{healthScore}</span>
           <span className="
             -mt-1 block text-[11px] font-semibold text-text-muted

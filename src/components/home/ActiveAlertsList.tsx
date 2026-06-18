@@ -30,15 +30,26 @@ export const ActiveAlertsList: React.FC<ActiveAlertsListProps> = ({ alerts, onSe
       </h3>
 
       {activeAlerts.map(alert => (
-        <div
+        <button
           key={alert.id}
-          className="
-            cursor-pointer rounded-[20px] border border-[rgba(13,148,136,0.02)]
-            bg-surface-card p-4 shadow-card transition-smooth
+          type="button"
+          className={`
+            w-full cursor-pointer rounded-[20px] border border-l-4
+            border-[rgba(13,148,136,0.02)] bg-surface-card p-4 text-left
+            shadow-card transition-smooth
             hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
             hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
-          "
-          style={{ borderLeftWidth: '4px', borderLeftColor: alert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)' }}
+            ${alert.severity === 'critical'
+              ? `
+                border-l-critical
+                hover:border-l-critical
+              `
+              : `
+                border-l-warning
+                hover:border-l-warning
+              `
+            }
+          `}
           onClick={() => onSelectAlert(alert.id)}
         >
           <div className="flex items-center justify-between">
@@ -48,7 +59,7 @@ export const ActiveAlertsList: React.FC<ActiveAlertsListProps> = ({ alerts, onSe
           <p className="mt-1 text-xs leading-[135%] text-text-muted">
             {alert.message}
           </p>
-        </div>
+        </button>
       ))}
     </div>
   );

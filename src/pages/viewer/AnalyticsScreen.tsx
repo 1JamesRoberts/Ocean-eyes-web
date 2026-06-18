@@ -93,6 +93,7 @@ export const AnalyticsScreen: React.FC = () => {
             onClick={refetch}
             disabled={loading}
             title="Refresh data"
+            aria-label="Refresh analytics"
           >
             <RotateCcw size={14} />
           </button>

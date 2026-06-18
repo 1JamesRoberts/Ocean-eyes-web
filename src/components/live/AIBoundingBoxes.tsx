@@ -22,17 +22,7 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
   const renderedHeight = cw * (ih / iw);
 
   return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      zIndex: 15,
-      pointerEvents: 'none',
-      transform: 'scale(1)',
-      transformOrigin: 'center'
-    }}>
+    <div className="pointer-events-none absolute inset-0 z-15">
       {lastPrediction.detections.map((det, idx) => {
         const [nx1, ny1, nx2, ny2] = det.bbox_normalized;
         const speciesInfo = getSpeciesById(det.species);
@@ -45,8 +35,7 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
 
         const fontSize = Math.max(10, Math.min(22, width * 0.12));
         return (
-          <div key={idx} style={{
-            position: 'absolute',
+          <div key={idx} className="absolute" style={{
             left: `${left}px`,
             top: `${top}px`,
             width: `${width}px`,
@@ -54,17 +43,14 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
             border: `2px solid ${boxColor}`,
             boxShadow: `0 0 8px ${boxColor}40`
           }}>
-            <span style={{
-              position: 'absolute',
+            <span className="
+              pointer-events-none absolute left-[2px] whitespace-nowrap
+              opacity-85
+            " style={{
               top: `-${fontSize + 4}px`,
-              left: '2px',
               fontSize: `${fontSize}px`,
-              fontWeight: 400,
               color: boxColor,
-              textShadow: '0 1px 2px rgba(0,0,0,0.6)',
-              whiteSpace: 'nowrap',
-              opacity: 0.85,
-              pointerEvents: 'none'
+              textShadow: '0 1px 2px rgba(0,0,0,0.6)'
             }}>
               {det.species_display} {(det.confidence * 100).toFixed(0)}%
             </span>

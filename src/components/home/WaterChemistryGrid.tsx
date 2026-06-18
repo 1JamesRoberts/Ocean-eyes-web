@@ -11,32 +11,28 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
     {
       label: 'pH Value',
       value: reading.ph === undefined ? '—' : `${reading.ph} pH`,
-      color: 'var(--color-good)',
-      bgColor: 'rgba(16, 185, 129, 0.08)',
+      colorClass: 'text-good bg-good/8',
       icon: Droplet,
       isCritical: false
     },
     {
       label: 'Temperature',
       value: reading.temp === undefined ? '—' : `${reading.temp}°C`,
-      color: 'var(--color-warning)',
-      bgColor: 'rgba(245, 158, 11, 0.08)',
+      colorClass: 'text-warning bg-warning/8',
       icon: Thermometer,
       isCritical: false
     },
     {
       label: 'Ammonia (NH₃)',
       value: reading.ammonia === undefined ? '—' : `${reading.ammonia} ppm`,
-      color: 'var(--color-good)',
-      bgColor: 'rgba(16, 185, 129, 0.08)',
+      colorClass: 'text-good bg-good/8',
       icon: Shield,
       isCritical: (reading.ammonia ?? 0) > 0
     },
     {
       label: 'Nitrite (NO₂⁻)',
       value: reading.nitrite === undefined ? '—' : `${reading.nitrite} ppm`,
-      color: '#8B5CF6',
-      bgColor: 'rgba(139, 92, 246, 0.08)',
+      colorClass: 'text-[#8B5CF6] bg-[rgba(139,92,246,0.08)]',
       icon: Activity,
       isCritical: (reading.nitrite ?? 0) > 0.2
     }
@@ -50,10 +46,10 @@ export const WaterChemistryGrid: React.FC<WaterChemistryGridProps> = ({ reading 
           border-[rgba(13,148,136,0.02)] bg-surface-card p-3 shadow-card
         ">
           <div
-            className="
+            className={`
               flex size-9 shrink-0 items-center justify-center rounded-xl
-            "
-            style={{ backgroundColor: param.bgColor, color: param.color }}
+              ${param.colorClass}
+            `}
           >
             <param.icon size={16} />
           </div>
