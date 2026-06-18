@@ -235,3 +235,16 @@ export interface HistoryTurbidityResponse {
   count: number;
   records: AITurbidityResult[];
 }
+
+// ─── Analytics Date Range Type ─────────────────────────────────────────────
+
+export interface DateRange {
+  /** Start date as YYYY-MM-DD */
+  startDate: string;
+  /** End date as YYYY-MM-DD */
+  endDate: string;
+  /** Start time as HH:mm (24-hour) */
+  startTime: string;
+  /** End time as HH:mm (24-hour) */
+  endTime: string;
+}

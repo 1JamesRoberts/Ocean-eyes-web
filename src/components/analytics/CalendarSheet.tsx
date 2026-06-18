@@ -1,0 +1,119 @@
+// CalendarSheet.tsx - Apple-style month calendar for the analytics date picker
+import React, { useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameDay,
+  isSameMonth,
+  isToday,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from 'date-fns';
+
+interface CalendarSheetProps {
+  selectedDate: Date;
+  onSelect: (date: Date) => void;
+}
+
+const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+export const CalendarSheet: React.FC<CalendarSheetProps> = ({
+  selectedDate,
+  onSelect,
+}) => {
+  const [viewMonth, setViewMonth] = useState(startOfMonth(selectedDate));
+
+  const days = useMemo(() => {
+    const start = startOfWeek(startOfMonth(viewMonth));
+    const end = endOfWeek(endOfMonth(viewMonth));
+    return eachDayOfInterval({ start, end });
+  }, [viewMonth]);
+
+  return (
+    <div className="w-[320px] p-4">
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-1">
+          <span className="text-lg font-bold text-text-main">
+            {format(viewMonth, 'MMMM yyyy')}
+          </span>
+          <ChevronDown size={16} className="text-critical" />
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setViewMonth((m) => subMonths(m, 1))}
+            className="
+              cursor-pointer rounded-full border-none bg-transparent p-2
+              text-critical
+              hover:bg-surface-hover
+            "
+            aria-label="Previous month"
+          >
+            <ChevronLeft size={22} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMonth((m) => addMonths(m, 1))}
+            className="
+              cursor-pointer rounded-full border-none bg-transparent p-2
+              text-critical
+              hover:bg-surface-hover
+            "
+            aria-label="Next month"
+          >
+            <ChevronRight size={22} />
+          </button>
+        </div>
+      </div>
+
+      {/* Weekday labels */}
+      <div className="mb-2 grid grid-cols-7 text-center">
+        {WEEKDAYS.map((day) => (
+          <span key={day} className="text-[11px] font-medium text-text-muted">
+            {day}
+          </span>
+        ))}
+      </div>
+
+      {/* Day grid */}
+      <div className="grid grid-cols-7 gap-y-1 text-center">
+        {days.map((day) => {
+          const selected = isSameDay(day, selectedDate);
+          const today = isToday(day);
+          const inMonth = isSameMonth(day, viewMonth);
+          return (
+            <button
+              key={day.toISOString()}
+              type="button"
+              onClick={() => onSelect(day)}
+              className={`
+                mx-auto flex size-9 cursor-pointer items-center justify-center
+                rounded-full border-none text-[15px] font-medium
+                transition-colors
+                ${selected
+                  ? 'bg-critical text-white'
+                  : today
+                    ? 'bg-transparent text-critical'
+                    : inMonth
+                      ? `
+                        bg-transparent text-text-main
+                        hover:bg-surface-hover
+                      `
+                      : 'bg-transparent text-text-muted/40'
+                }
+              `}
+            >
+              {format(day, 'd')}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};

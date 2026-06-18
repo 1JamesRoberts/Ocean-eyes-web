@@ -15,7 +15,7 @@ import sys
 import threading
 import traceback
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
@@ -308,6 +308,20 @@ def _read_jsonl_date_file(output_dir: Path, date_str: str) -> List[Any]:
     return results
 
 
+def _iterate_date_range(start_date_str: str, end_date_str: str) -> List[str]:
+    """Return inclusive list of YYYY-MM-DD strings between two dates."""
+    start = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+    end = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+    if end < start:
+        start, end = end, start
+    dates: List[str] = []
+    current = start
+    while current <= end:
+        dates.append(current.strftime("%Y-%m-%d"))
+        current += timedelta(days=1)
+    return dates
+
+
 def _derive_image_dimensions(record: dict) -> dict | None:
     """Derive image dimensions from a detection record's bbox + bbox_normalized.
 
@@ -398,41 +412,83 @@ def _enrich_turbidity_records(
 
 @app.get("/history/detections")
 async def history_detections(
-    date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
+    date: str = Query(default=None, description="YYYY-MM-DD (single day shortcut; overrides start_date/end_date)"),
+    start_date: str = Query(default=None, description="YYYY-MM-DD start of range"),
+    end_date: str = Query(default=None, description="YYYY-MM-DD end of range"),
     limit: int = Query(default=1000, ge=1, le=10000, description="Max records to return"),
 ):
-    """Return parsed detection records for a given date."""
-    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+    """Return parsed detection records for a given date or inclusive date range."""
+    if date:
+        date_str = date
+        records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+    elif start_date and end_date:
+        date_str = f"{start_date}:{end_date}"
+        records: List[Any] = []
+        for d in _iterate_date_range(start_date, end_date):
+            records.extend(_read_jsonl_date_file(DETECTION_OUTPUT_DIR, d))
+    else:
+        date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
     records = _enrich_detection_records(records)
     return {"date": date_str, "count": len(records), "records": records[:limit]}
 
 
 @app.get("/history/turbidity")
 async def history_turbidity(
-    date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
+    date: str = Query(default=None, description="YYYY-MM-DD (single day shortcut; overrides start_date/end_date)"),
+    start_date: str = Query(default=None, description="YYYY-MM-DD start of range"),
+    end_date: str = Query(default=None, description="YYYY-MM-DD end of range"),
     limit: int = Query(default=1000, ge=1, le=10000, description="Max records to return"),
 ):
-    """Return parsed turbidity records for a given date."""
-    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    turbidity_records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
-    detection_records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+    """Return parsed turbidity records for a given date or inclusive date range."""
+    if date:
+        date_str = date
+        turbidity_records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
+        detection_records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
+    elif start_date and end_date:
+        date_str = f"{start_date}:{end_date}"
+        turbidity_records: List[Any] = []
+        detection_records: List[Any] = []
+        for d in _iterate_date_range(start_date, end_date):
+            turbidity_records.extend(_read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, d))
+            detection_records.extend(_read_jsonl_date_file(DETECTION_OUTPUT_DIR, d))
+    else:
+        date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        turbidity_records = _read_jsonl_date_file(TURBIDITY_OUTPUT_DIR, date_str)
+        detection_records = _read_jsonl_date_file(DETECTION_OUTPUT_DIR, date_str)
     turbidity_records = _enrich_turbidity_records(turbidity_records, detection_records)
     return {"date": date_str, "count": len(turbidity_records), "records": turbidity_records[:limit]}
 
 
 @app.delete("/history/detections")
 async def clear_detection_history(
-    date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
+    date: str = Query(default=None, description="YYYY-MM-DD (single day shortcut; overrides start_date/end_date)"),
+    start_date: str = Query(default=None, description="YYYY-MM-DD start of range"),
+    end_date: str = Query(default=None, description="YYYY-MM-DD end of range"),
 ):
-    """Delete detection history JSONL file for a given date."""
-    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    file_path = DETECTION_OUTPUT_DIR / f"{date_str}.jsonl"
+    """Delete detection history JSONL file(s) for a given date or inclusive range."""
+    deleted: List[str] = []
     try:
-        if file_path.exists():
-            file_path.unlink()
-            return {"status": "ok", "deleted": date_str}
-        return {"status": "ok", "deleted": date_str, "message": "No file found"}
+        if date:
+            date_str = date
+            file_path = DETECTION_OUTPUT_DIR / f"{date_str}.jsonl"
+            if file_path.exists():
+                file_path.unlink()
+            deleted.append(date_str)
+        elif start_date and end_date:
+            date_str = f"{start_date}:{end_date}"
+            for d in _iterate_date_range(start_date, end_date):
+                file_path = DETECTION_OUTPUT_DIR / f"{d}.jsonl"
+                if file_path.exists():
+                    file_path.unlink()
+                    deleted.append(d)
+        else:
+            date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            file_path = DETECTION_OUTPUT_DIR / f"{date_str}.jsonl"
+            if file_path.exists():
+                file_path.unlink()
+            deleted.append(date_str)
+        return {"status": "ok", "deleted": date_str, "files": deleted}
     except OSError as e:
         return JSONResponse(
             status_code=500, content={"error": f"Failed to delete history: {e}"}
@@ -441,16 +497,33 @@ async def clear_detection_history(
 
 @app.delete("/history/turbidity")
 async def clear_turbidity_history(
-    date: str = Query(default=None, description="YYYY-MM-DD (defaults to today UTC)"),
+    date: str = Query(default=None, description="YYYY-MM-DD (single day shortcut; overrides start_date/end_date)"),
+    start_date: str = Query(default=None, description="YYYY-MM-DD start of range"),
+    end_date: str = Query(default=None, description="YYYY-MM-DD end of range"),
 ):
-    """Delete turbidity history JSONL file for a given date."""
-    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    file_path = TURBIDITY_OUTPUT_DIR / f"{date_str}.jsonl"
+    """Delete turbidity history JSONL file(s) for a given date or inclusive range."""
+    deleted: List[str] = []
     try:
-        if file_path.exists():
-            file_path.unlink()
-            return {"status": "ok", "deleted": date_str}
-        return {"status": "ok", "deleted": date_str, "message": "No file found"}
+        if date:
+            date_str = date
+            file_path = TURBIDITY_OUTPUT_DIR / f"{date_str}.jsonl"
+            if file_path.exists():
+                file_path.unlink()
+            deleted.append(date_str)
+        elif start_date and end_date:
+            date_str = f"{start_date}:{end_date}"
+            for d in _iterate_date_range(start_date, end_date):
+                file_path = TURBIDITY_OUTPUT_DIR / f"{d}.jsonl"
+                if file_path.exists():
+                    file_path.unlink()
+                    deleted.append(d)
+        else:
+            date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            file_path = TURBIDITY_OUTPUT_DIR / f"{date_str}.jsonl"
+            if file_path.exists():
+                file_path.unlink()
+            deleted.append(date_str)
+        return {"status": "ok", "deleted": date_str, "files": deleted}
     except OSError as e:
         return JSONResponse(
             status_code=500, content={"error": f"Failed to delete history: {e}"}

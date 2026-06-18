@@ -1,5 +1,7 @@
 // formatters.ts - Shared formatting utilities for AI analytics components
 
+import { format, isValid, parse, parseISO } from 'date-fns';
+
 /**
  * Format an ISO timestamp into a short time string (HH:MM).
  */
@@ -8,6 +10,47 @@ export function formatTimeShort(isoTimestamp: string): string {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+/**
+ * Format a YYYY-MM-DD date string into the Apple-style display form.
+ * Example: "2026-06-18" → "18 Jun 2026"
+ */
+export function formatDateForDisplay(dateString: string): string {
+  const parsed = parseISO(dateString);
+  if (!isValid(parsed)) return dateString;
+  return format(parsed, 'dd MMM yyyy');
+}
+
+/**
+ * Format a 24-hour time string (HH:mm) into the Apple-style display form.
+ * Example: "11:00" → "11:00 AM", "14:30" → "2:30 PM"
+ */
+export function formatTimeForDisplay(timeString: string): string {
+  const parsed = parse(timeString, 'HH:mm', new Date());
+  if (!isValid(parsed)) return timeString;
+  return format(parsed, 'h:mm aa');
+}
+
+/**
+ * Combine a YYYY-MM-DD date string and an HH:mm time string into a Date object.
+ */
+export function combineDateTime(dateString: string, timeString: string): Date {
+  return parse(`${dateString} ${timeString}`, 'yyyy-MM-dd HH:mm', new Date());
+}
+
+/**
+ * Convert a Date object to YYYY-MM-DD.
+ */
+export function toISODate(date: Date): string {
+  return format(date, 'yyyy-MM-dd');
+}
+
+/**
+ * Convert a Date object to HH:mm (24-hour).
+ */
+export function toISOTime(date: Date): string {
+  return format(date, 'HH:mm');
 }
 
 /**

@@ -243,6 +243,50 @@ export function fetchTurbidityHistory(
   return fetchHistory<HistoryTurbidityResponse>('/history/turbidity', date, limit, signal);
 }
 
+async function fetchHistoryRange<T>(
+  endpoint: string,
+  startDate: string,
+  endDate: string,
+  limit: number = 1000,
+  signal?: AbortSignal
+): Promise<T> {
+  const params = new URLSearchParams();
+  params.append('start_date', startDate);
+  params.append('end_date', endDate);
+  params.append('limit', String(limit));
+
+  const res = await fetch(`${AI_API_URL}${endpoint}?${params.toString()}`, {
+    method: 'GET',
+    signal,
+  });
+
+  return handleResponse<T>(res);
+}
+
+/**
+ * Fetch detection history across an inclusive date range.
+ */
+export function fetchDetectionHistoryRange(
+  startDate: string,
+  endDate: string,
+  limit?: number,
+  signal?: AbortSignal
+): Promise<HistoryDetectionResponse> {
+  return fetchHistoryRange<HistoryDetectionResponse>('/history/detections', startDate, endDate, limit, signal);
+}
+
+/**
+ * Fetch turbidity history across an inclusive date range.
+ */
+export function fetchTurbidityHistoryRange(
+  startDate: string,
+  endDate: string,
+  limit?: number,
+  signal?: AbortSignal
+): Promise<HistoryTurbidityResponse> {
+  return fetchHistoryRange<HistoryTurbidityResponse>('/history/turbidity', startDate, endDate, limit, signal);
+}
+
 /**
  * Resolve a relative crop_url to an absolute URL using the backend base URL.
  */
@@ -286,4 +330,44 @@ export async function clearTurbidityHistory(
   });
 
   return handleResponse<{ status: string; deleted: string }>(res);
+}
+
+async function clearHistoryRange(
+  endpoint: string,
+  startDate: string,
+  endDate: string,
+  signal?: AbortSignal
+): Promise<{ status: string; deleted: string; files: string[] }> {
+  const params = new URLSearchParams();
+  params.append('start_date', startDate);
+  params.append('end_date', endDate);
+
+  const res = await fetch(`${AI_API_URL}${endpoint}?${params.toString()}`, {
+    method: 'DELETE',
+    signal,
+  });
+
+  return handleResponse<{ status: string; deleted: string; files: string[] }>(res);
+}
+
+/**
+ * Clear detection history across an inclusive date range.
+ */
+export function clearDetectionHistoryRange(
+  startDate: string,
+  endDate: string,
+  signal?: AbortSignal
+): Promise<{ status: string; deleted: string; files: string[] }> {
+  return clearHistoryRange('/history/detections', startDate, endDate, signal);
+}
+
+/**
+ * Clear turbidity history across an inclusive date range.
+ */
+export function clearTurbidityHistoryRange(
+  startDate: string,
+  endDate: string,
+  signal?: AbortSignal
+): Promise<{ status: string; deleted: string; files: string[] }> {
+  return clearHistoryRange('/history/turbidity', startDate, endDate, signal);
 }

@@ -1,9 +1,15 @@
 // useHistory.ts - Fetch AI inference history from the backend
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 
 const DEFAULT_LIMIT = 1000;
-import type { HistoryDetectionResponse, HistoryTurbidityResponse } from '../types/aquarium';
-import { fetchDetectionHistory, fetchTurbidityHistory } from '../services/ai_service';
+import type { DateRange, HistoryDetectionResponse, HistoryTurbidityResponse } from '../types/aquarium';
+import {
+  fetchDetectionHistory,
+  fetchDetectionHistoryRange,
+  fetchTurbidityHistory,
+  fetchTurbidityHistoryRange,
+} from '../services/ai_service';
+import { combineDateTime } from '../utils/formatters';
 
 export interface UseHistoryResult {
   detectionData: HistoryDetectionResponse | null;
@@ -13,12 +19,21 @@ export interface UseHistoryResult {
   refetch: () => void;
 }
 
-export const useHistory = (date: string): UseHistoryResult => {
-  const [detectionData, setDetectionData] = useState<HistoryDetectionResponse | null>(null);
-  const [turbidityData, setTurbidityData] = useState<HistoryTurbidityResponse | null>(null);
+function recordInRange(record: { timestamp: string }, range: DateRange): boolean {
+  const ts = new Date(record.timestamp);
+  const start = combineDateTime(range.startDate, range.startTime);
+  const end = combineDateTime(range.endDate, range.endTime);
+  return ts >= start && ts <= end;
+}
+
+export const useHistory = (range: DateRange): UseHistoryResult => {
+  const [rawDetectionData, setRawDetectionData] = useState<HistoryDetectionResponse | null>(null);
+  const [rawTurbidityData, setRawTurbidityData] = useState<HistoryTurbidityResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refetchKey, setRefetchKey] = useState(0);
+
+  const { startDate, endDate, startTime, endTime } = range;
 
   useEffect(() => {
     let cancelled = false;
@@ -28,13 +43,19 @@ export const useHistory = (date: string): UseHistoryResult => {
       setLoading(true);
       setError(null);
       try {
-        const [det, turb] = await Promise.all([
-          fetchDetectionHistory(date, DEFAULT_LIMIT, controller.signal),
-          fetchTurbidityHistory(date, DEFAULT_LIMIT, controller.signal),
-        ]);
+        const [det, turb] =
+          startDate === endDate
+            ? await Promise.all([
+                fetchDetectionHistory(startDate, DEFAULT_LIMIT, controller.signal),
+                fetchTurbidityHistory(startDate, DEFAULT_LIMIT, controller.signal),
+              ])
+            : await Promise.all([
+                fetchDetectionHistoryRange(startDate, endDate, DEFAULT_LIMIT, controller.signal),
+                fetchTurbidityHistoryRange(startDate, endDate, DEFAULT_LIMIT, controller.signal),
+              ]);
         if (!cancelled) {
-          setDetectionData(det);
-          setTurbidityData(turb);
+          setRawDetectionData(det);
+          setRawTurbidityData(turb);
         }
       } catch (err) {
         if (cancelled) return;
@@ -51,7 +72,19 @@ export const useHistory = (date: string): UseHistoryResult => {
       cancelled = true;
       controller.abort();
     };
-  }, [date, refetchKey]);
+  }, [startDate, endDate, startTime, endTime, refetchKey]);
+
+  const detectionData: HistoryDetectionResponse | null = useMemo(() => {
+    if (!rawDetectionData) return null;
+    const records = rawDetectionData.records.filter((r) => recordInRange(r, range));
+    return { ...rawDetectionData, count: records.length, records };
+  }, [rawDetectionData, range]);
+
+  const turbidityData: HistoryTurbidityResponse | null = useMemo(() => {
+    if (!rawTurbidityData) return null;
+    const records = rawTurbidityData.records.filter((r) => recordInRange(r, range));
+    return { ...rawTurbidityData, count: records.length, records };
+  }, [rawTurbidityData, range]);
 
   const refetch = useCallback(() => {
     setRefetchKey((k) => k + 1);

@@ -5,11 +5,17 @@ import { useNavigation } from '../../context/NavigationContext';
 import { useReadings } from '../../hooks/useReadings';
 import { useHistory } from '../../hooks/useHistory';
 import { useFish } from '../../hooks/useFish';
-import { resolveCropUrl, clearDetectionHistory, clearTurbidityHistory } from '../../services/ai_service';
+import {
+  resolveCropUrl,
+  clearDetectionHistoryRange,
+  clearTurbidityHistoryRange,
+} from '../../services/ai_service';
+import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
-import { todayUTC } from '../../utils/formatters';
+import { formatDateForDisplay } from '../../utils/formatters';
+import { useDateRangeFromUrl } from '../../hooks/useDateRangeFromUrl';
 import { useTank } from '../../hooks/useTank';
 
 export const AnalyticsScreen: React.FC = () => {
@@ -17,16 +23,12 @@ export const AnalyticsScreen: React.FC = () => {
   const { tankId } = useTank();
   const { readings } = useReadings();
   const { fishList } = useFish(tankId);
-  const [selectedDate, setSelectedDate] = useState<string>(todayUTC);
-  const { detectionData, turbidityData, loading, error, refetch } = useHistory(selectedDate);
+  const { range, setRange } = useDateRangeFromUrl();
+  const { detectionData, turbidityData, loading, error, refetch } = useHistory(range);
   const inventorySpeciesIds = React.useMemo(
     () => new Set(fishList.map((f) => f.speciesId)),
     [fishList],
   );
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDate(e.target.value);
-  };
 
   const detectionRecords = detectionData?.records ?? [];
   const turbidityRecords = turbidityData?.records ?? [];
@@ -52,8 +54,8 @@ export const AnalyticsScreen: React.FC = () => {
     setIsClearing(true);
     try {
       await Promise.all([
-        clearDetectionHistory(selectedDate),
-        clearTurbidityHistory(selectedDate),
+        clearDetectionHistoryRange(range.startDate, range.endDate),
+        clearTurbidityHistoryRange(range.startDate, range.endDate),
       ]);
       setConfirmClear(false);
       refetch();
@@ -81,17 +83,7 @@ export const AnalyticsScreen: React.FC = () => {
           <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Analytics</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Calendar size={16} className="text-text-muted" />
-          <input
-            type="date"
-            className="
-              rounded-xl border border-border-card bg-surface-card px-3 py-2
-              text-sm text-text-main outline-none
-              focus:border-info
-            "
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
+          <DateTimeRangePicker value={range} onChange={setRange} />
           <button
             className="
               cursor-pointer rounded-lg border border-border-card bg-transparent
@@ -145,10 +137,10 @@ export const AnalyticsScreen: React.FC = () => {
         ">
           <Calendar size={32} className="text-text-muted opacity-50" />
           <span className="text-[15px] font-semibold text-text-main">
-            No data for {selectedDate}
+            No data for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}
           </span>
           <span className="text-[13px] text-text-muted">
-            Try selecting a different date or run the AI pipeline to generate history.
+            Try selecting a different range or run the AI pipeline to generate history.
           </span>
         </div>
       )}
@@ -245,7 +237,7 @@ export const AnalyticsScreen: React.FC = () => {
               <div>
                 <h3 className="m-0 text-sm font-bold text-text-main">AI Health Diagnostics History</h3>
                 <p className="m-0 text-xs text-text-muted">
-                  Disease diagnosis runs executed on this date
+                  Disease diagnosis runs in this range
                 </p>
               </div>
               {diagnoses.length > 0 && !confirmClear && (
@@ -301,7 +293,7 @@ export const AnalyticsScreen: React.FC = () => {
                 flex flex-col items-center justify-center p-6 text-[13px]
                 text-text-muted
               ">
-                No health diagnostic records found for {selectedDate}.
+                No health diagnostic records found for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}.
               </div>
             ) : (
               <div className="mt-2 flex flex-col gap-3">
