@@ -3421,12 +3421,13 @@ export function getCompatibilityScore(a: SpeciesInfo, b: SpeciesInfo): number {
   if (phOverlap < 0.5) score -= 30;
   else if (phOverlap < 1) score -= 15;
 
-  // Aggression check
-  if (a.aggression === 'aggressive' && b.aggression === 'peaceful') score -= 25;
-  if (a.aggression === 'aggressive' && b.aggression === 'mostly_peaceful') score -= 15;
-  if (a.aggression === 'mostly_peaceful' && b.aggression === 'peaceful') score -= 5;
+  // Aggression check (symmetric — treat both orderings the same)
+  const aggressions = new Set([a.aggression, b.aggression]);
+  if (aggressions.has('aggressive') && aggressions.has('peaceful')) score -= 25;
+  else if (aggressions.has('aggressive') && aggressions.has('mostly_peaceful')) score -= 15;
+  else if (aggressions.has('mostly_peaceful') && aggressions.has('peaceful')) score -= 5;
 
-  // Behavior compatibility
+  // Behavior compatibility (symmetric)
   if (a.behavior === 'solitary' && b.behavior === 'schooling') score -= 10;
   if (a.behavior === 'schooling' && b.behavior === 'solitary') score -= 10;
 

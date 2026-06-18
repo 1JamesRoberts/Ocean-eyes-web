@@ -431,12 +431,15 @@ export const MyFishScreen: React.FC = () => {
             {/* ── Ideal Parameters ── */}
             <div className="mt-4 border-t border-border-card pt-4">
               <span className="
-                mb-3 block text-[11px] font-bold tracking-wider
-                text-text-muted uppercase
+                mb-3 block text-[11px] font-bold tracking-wider text-text-muted
+                uppercase
               ">
                 Ideal Parameters
               </span>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="
+                grid grid-cols-1 gap-3
+                sm:grid-cols-3
+              ">
                 {[
                   {
                     icon: <Maximize2 size={14} />,
@@ -444,6 +447,7 @@ export const MyFishScreen: React.FC = () => {
                     bg: 'var(--color-primary-light)',
                     label: 'Tank Size',
                     value: stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '\u2014',
+                    conflict: false,
                   },
                   {
                     icon: <Thermometer size={14} />,
@@ -477,7 +481,7 @@ export const MyFishScreen: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
-                      {(item as any).conflict && (
+                      {item.conflict && (
                         <span
                           className="mt-0.5 shrink-0"
                           title="Species have conflicting requirements \u2014 showing the full range"
