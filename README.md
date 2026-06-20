@@ -25,6 +25,8 @@ OceanEyes Web is a modern, high-performance web dashboard designed to monitor sm
 
 ## 📂 Directory Scaffolding
 
+The frontend is organised using **Model–View–ViewModel**:
+
 ```text
 C:\Hope\Project\Ocean-eyes-web/
 ├── .agents/                 # AI Agent workflows, skills, and configurations
@@ -34,12 +36,18 @@ C:\Hope\Project\Ocean-eyes-web/
 ├── public/                  # Static assets & favicons
 ├── src/
 │   ├── assets/              # SVGs, images, local media
-│   ├── context/             # AppContext React providers & state managers
-│   ├── pages/
-│   │   ├── ViewerApp.tsx    # Customer dashboard views (Home, Live cam, Analytics)
-│   │   └── IoTMonitor.tsx   # IoT Scanner Console (Simulator workspace)
-│   ├── services/
-│   │   └── mock_service.ts  # Datastore & local mock state managers
+│   ├── models/              # Framework-agnostic data layer
+│   │   ├── repositories/    # localStorage CRUD + event emission
+│   │   ├── services/        # Pure domain logic & transformers
+│   │   └── api/             # FastAPI backend client
+│   ├── viewModels/          # React hooks exposing state + commands
+│   │   ├── pages/           # Page-level ViewModels
+│   │   └── live/            # Live camera / AI ViewModels
+│   ├── components/          # UI components by feature
+│   ├── pages/               # Route-level Views
+│   │   ├── ViewerApp.tsx    # Customer dashboard views
+│   │   └── IoTMonitor.tsx   # IoT Scanner Console
+│   ├── context/             # React Context providers
 │   ├── App.tsx              # Sidebar dashboard layout entry point
 │   ├── index.css            # Premium CSS variable design system
 │   └── main.tsx             # DOM bootstrapper & entry script

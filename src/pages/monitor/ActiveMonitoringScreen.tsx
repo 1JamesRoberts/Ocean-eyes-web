@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { useTank } from '../../hooks/useTank';
-import { useReadings } from '../../hooks/useReadings';
-import { useFish } from '../../hooks/useFish';
-import { useAlerts } from '../../hooks/useAlerts';
-import { useLiveState } from '../../hooks/useLiveState';
+import { useTankViewModel } from '../../viewModels/useTankViewModel';
+import { useReadingsViewModel } from '../../viewModels/useReadingsViewModel';
+import { useFishViewModel } from '../../viewModels/useFishViewModel';
+import { useAlertsViewModel } from '../../viewModels/useAlertsViewModel';
+import { useLiveFeedViewModel } from '../../viewModels/useLiveFeedViewModel';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
 }
 
 export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
-  const { activeTank: contextActiveTank, tanks, tankId } = useTank();
-  const { readings, writeReading } = useReadings();
-  const { fishList } = useFish(tankId);
-  const { alerts, addAlert } = useAlerts();
-  const { liveState } = useLiveState(tankId);
+  const { activeTank: contextActiveTank, tanks, tankId } = useTankViewModel();
+  const { readings, writeReading } = useReadingsViewModel();
+  const { fishList } = useFishViewModel(tankId);
+  const { alerts, addAlert } = useAlertsViewModel();
+  const { liveState } = useLiveFeedViewModel(tankId);
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
   const activeFeedCalibration = liveState?.feeds.find(f => f.id === liveState?.selected_feed_id)?.calibration;
   const [hasClarityIssue, setHasClarityIssue] = useState(false);

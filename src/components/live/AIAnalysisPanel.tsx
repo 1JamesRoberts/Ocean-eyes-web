@@ -1,7 +1,7 @@
 import React from 'react';
 import { Brain } from 'lucide-react';
 import { getSpeciesById } from '../../data/speciesCatalog';
-import { resolveCropUrl } from '../../services/ai_service';
+import { resolveCropUrl } from '../../models/api/aiApi';
 import type { AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
 
 interface AIAnalysisPanelProps {

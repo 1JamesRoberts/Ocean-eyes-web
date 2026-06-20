@@ -18,23 +18,29 @@ OceanEyes is a React + TypeScript dashboard for real-time AI aquarium monitoring
 | State      | React Context + localStorage (mock Firestore)                |
 | AI Backend | Python FastAPI + ONNX models (port 8000)                     |
 
-## Key Architecture
+## Key Architecture (MVVM)
+
+The frontend follows a **Model–View–ViewModel** architecture:
+
+- **Model** (`src/models/`) — Framework-agnostic data layer. Repositories persist to `localStorage`, the API client talks to the Python backend, and services contain pure domain logic.
+- **ViewModel** (`src/viewModels/`) — React hooks that expose observable state and commands to Views. Page-level ViewModels live in `src/viewModels/pages/`; live AI ViewModels live in `src/viewModels/live/`.
+- **View** (`src/components/`, `src/pages/`) — Styled React components. They consume ViewModels and contain no business rules or direct Model imports.
 
 ```
 src/
-├── context/          # React Context providers (NavigationContext)
-├── hooks/            # Custom hooks (useTank, useFish, useAlerts, useReadings, useLiveState, useHistory)
-├── services/         # Business logic & API
-│   ├── mock_service.ts      # localStorage-backed Firestore simulation
-│   ├── realDataService.ts   # Fetches real AI inference records from backend
-│   ├── ai_service.ts        # FastAPI backend communication
-│   ├── healthCalculator.ts  # Pure health score calculation
-│   └── chemistrySimulator.ts # Placeholder water chemistry values
+├── models/           # Data layer (no React imports)
+│   ├── repositories/ # localStorage CRUD + event emission
+│   ├── services/     # Pure domain logic & transformers
+│   └── api/          # FastAPI client
+├── viewModels/       # React hooks: state + commands
+│   ├── pages/        # Page-level ViewModels
+│   └── live/         # Live camera / AI ViewModels
 ├── components/       # UI components by feature (home/, live/, analytics/, fish/)
-├── pages/            # Route-level components (ViewerApp, IoTMonitor)
+├── pages/            # Route-level Views (ViewerApp, IoTMonitor)
+├── context/          # React Context providers (NavigationContext)
 ├── types/            # TypeScript interfaces (aquarium.ts)
 ├── data/             # Species catalog (auto-generated, do not edit)
-└── utils/            # Shared formatting utilities
+└── utils/            # Shared formatting utilities & constants
 ```
 
 ## Styling with Tailwind CSS v4
@@ -68,10 +74,12 @@ See the dedicated [Styling with Tailwind CSS v4](#styling-with-tailwind-css-v4) 
 
 ### Data Flow
 
-- **Mock mode** (default): `MockFirestore` class reads/writes localStorage. Hooks subscribe via `subscribeToDb()` for cross-component sync.
-- **Real mode**: `realDataService.ts` fetches from AI backend (`localhost:8000`).
+- **Model layer** (`src/models/repositories/`) reads/writes `localStorage` and emits scoped `CustomEvent`s for cross-component sync.
+- **ViewModel layer** (`src/viewModels/`) subscribes to repositories via `useSyncExternalStore` or `useEffect`, transforms data for Views, and exposes commands.
+- **Real mode**: `src/models/api/aiApi.ts` fetches from the AI backend (`localhost:8000`).
 - AI backend endpoints: `/health`, `/predict/detection`, `/predict/turbidity`, `/history/detections`, `/history/turbidity`.
 - Backend proxy: Vite dev server proxies `/history` to `localhost:8000`.
+- Views import only from `src/viewModels/` and `src/types/`; they never import from `src/models/` or `src/services/` directly.
 
 ### Species Data
 

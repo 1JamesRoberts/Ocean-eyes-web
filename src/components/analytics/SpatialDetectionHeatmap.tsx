@@ -4,7 +4,7 @@
 import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
-import { useCameraFeed } from '../../hooks/useCameraFeed';
+import { useLiveFeedViewModel } from '../../viewModels/useLiveFeedViewModel';
 import { CameraFeed } from '../live/CameraFeed';
 import { ChartEmptyState } from './ChartEmptyState';
 
@@ -173,7 +173,7 @@ function debounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number)
 
 export const SpatialDetectionHeatmap = React.memo<Props>(
   ({ records, tankId, inventorySpeciesIds, selectedSpecies, onSelectedSpeciesChange }) => {
-    const { activeFeed, isWebcam, isStreaming, videoRef } = useCameraFeed(tankId ?? null);
+    const { activeFeed, isWebcam, isStreaming, videoRef } = useLiveFeedViewModel(tankId ?? null);
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);

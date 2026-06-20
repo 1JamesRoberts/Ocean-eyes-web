@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useTank } from '../../hooks/useTank';
+import { useTankViewModel } from '../../viewModels/useTankViewModel';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
 }
 
 export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
-  const { tankId, tanks } = useTank();
+  const { tankId, tanks } = useTankViewModel();
   const [isCopied, setIsCopied] = useState(false);
 
   const activeTankId = tankId || (tanks.length > 0 ? tanks[0].id : '');

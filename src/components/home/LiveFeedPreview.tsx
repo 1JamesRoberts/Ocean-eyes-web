@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Video, Maximize2 } from 'lucide-react';
-import { useCameraFeed } from '../../hooks/useCameraFeed';
+import { useLiveFeedViewModel } from '../../viewModels/useLiveFeedViewModel';
 import { CameraFeed } from '../live/CameraFeed';
 import type { TankBrief } from '../../types/aquarium';
 
@@ -19,7 +19,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   onViewAdvanced,
   onGoFullscreen
 }) => {
-  const { activeFeed, isWebcam, isStreaming, videoRef, startStream } = useCameraFeed(activeTank?.id ?? null);
+  const { activeFeed, isWebcam, isStreaming, videoRef, startStream } = useLiveFeedViewModel(activeTank?.id ?? null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [isHoveringVideo, setIsHoveringVideo] = useState(false);
 

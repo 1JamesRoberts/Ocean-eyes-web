@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { useTank } from '../../hooks/useTank';
-import { useLiveState } from '../../hooks/useLiveState';
+import { useTankViewModel } from '../../viewModels/useTankViewModel';
+import { useLiveFeedViewModel } from '../../viewModels/useLiveFeedViewModel';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
 }
 
 export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
-  const { activeTank: contextActiveTank, tanks } = useTank();
+  const { activeTank: contextActiveTank, tanks } = useTankViewModel();
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
-  const { liveState, updateCalibration } = useLiveState(activeTank?.id ?? null);
+  const { liveState, updateCalibration } = useLiveFeedViewModel(activeTank?.id ?? null);
   const activeFeedCalibration = liveState?.feeds.find(f => f.id === liveState?.selected_feed_id)?.calibration;
   const [lineY, setLineY] = useState(activeFeedCalibration?.water_line_y || 120);
   const [isSaved, setIsSaved] = useState(false);
