@@ -1,0 +1,56 @@
+import { useSyncExternalStore, useCallback } from 'react';
+import {
+  getFish,
+  addFish as addFishToRepository,
+  updateFishCount as updateFishCountInRepository,
+  updateDetectedCount as updateDetectedCountInRepository,
+  removeFish as removeFishFromRepository,
+  subscribeFish,
+} from '../models/repositories/fishRepository';
+import type { FishEntry } from '../types/aquarium';
+
+const EMPTY_FISH: FishEntry[] = [];
+
+export const useFishViewModel = (tankId: string | null) => {
+  const subscribeFishCallback = useCallback(
+    (callback: () => void) => {
+      if (!tankId) return () => {};
+      return subscribeFish(tankId, callback);
+    },
+    [tankId]
+  );
+
+  const fishList = useSyncExternalStore<FishEntry[]>(
+    subscribeFishCallback,
+    () => (tankId ? getFish(tankId) : EMPTY_FISH),
+    () => EMPTY_FISH
+  );
+
+  const addFish = (name: string, imageUrl: string, count: number) => {
+    if (!tankId) return;
+    addFishToRepository(tankId, name, imageUrl, count);
+  };
+
+  const updateFishCount = (docId: string, count: number) => {
+    if (!tankId) return;
+    updateFishCountInRepository(tankId, docId, count);
+  };
+
+  const updateDetectedCount = (docId: string, detected: number) => {
+    if (!tankId) return;
+    updateDetectedCountInRepository(tankId, docId, detected);
+  };
+
+  const removeFish = (docId: string) => {
+    if (!tankId) return;
+    removeFishFromRepository(tankId, docId);
+  };
+
+  return {
+    fishList,
+    addFish,
+    updateFishCount,
+    updateDetectedCount,
+    removeFish,
+  };
+};
