@@ -1,9 +1,14 @@
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { useAlerts } from '../useAlerts';
-import { useReadings } from '../useReadings';
-import { LocalStorageStore, getSnapshot } from '../../services/localStorageStore';
-import { isVideoReady, captureFrame, sendFrameForDetection } from '../../services/ai_service';
+import {
+  getSnapshot,
+  safeSetItem,
+  notifyUpdate,
+} from '../../models/repositories/storageBase';
+import { sendFrameForDetection } from '../../services/ai_service';
+import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
 import { buildDiseaseAlert } from '../../models/services/alertBuilder';
+import { recordFeedReading } from '../../models/services/readingRecorder';
 import {
   AI_POLL_INTERVAL_MS,
   DIAGNOSIS_COOLDOWN_MS,
@@ -36,14 +41,13 @@ export const useAIPolling = ({
   isWebcam,
   activeTank,
   liveState,
-  saveLiveState,
+  saveLiveState: _saveLiveState,
   fishList,
   updateDetectedCount,
   backendStatus,
   checkBackend,
 }: UseAIPollingOptions): UseAIPollingResult => {
   const { addAlert } = useAlerts();
-  const { writeReading } = useReadings();
 
   const [isAIActive, setIsAIActive] = useState(() => liveState?.ai_active ?? false);
   const [lastPrediction, setLastPrediction] = useState<AIDetectionResult | null>(
@@ -110,7 +114,7 @@ export const useAIPolling = ({
       aiAbortControllerRef.current = controller;
 
       try {
-        const blob = await captureFrame(video);
+        const blob = await captureVideoFrame(video);
 
         const lastDiag = getSnapshot<number>('oceaneyes_last_diagnosis_time', 0);
         const shouldDiagnose = Date.now() - lastDiag > DIAGNOSIS_COOLDOWN_MS;
@@ -127,7 +131,11 @@ export const useAIPolling = ({
         setLastPrediction(result);
 
         if (shouldDiagnose) {
-          LocalStorageStore.safeWriteRaw('oceaneyes_last_diagnosis_time', Date.now().toString());
+          const lastDiagResult = safeSetItem(
+            'oceaneyes_last_diagnosis_time',
+            Date.now().toString()
+          );
+          if (lastDiagResult.success) notifyUpdate('oceaneyes_last_diagnosis_time');
 
           const diagnosedFish = result.detections.find((d) => d.diagnosis);
           if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
@@ -138,22 +146,12 @@ export const useAIPolling = ({
         if (activeTank && liveState) {
           const totalFish = result.summary.total_detections;
 
-          writeReading({
+          recordFeedReading({
             tankId: activeTank.id,
+            liveState,
+            activeFeed,
             clarity: activeFeed.current_clarity ?? 0,
             fishCount: totalFish,
-          });
-
-          const updatedFeeds = liveState.feeds.map((f) => {
-            if (f.id === activeFeed.id) {
-              return { ...f, current_fish_count: totalFish };
-            }
-            return f;
-          });
-          saveLiveState({
-            ...liveState,
-            current_fish_count: totalFish,
-            feeds: updatedFeeds,
           });
 
           fishList.forEach((fish) => {

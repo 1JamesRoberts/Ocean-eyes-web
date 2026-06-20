@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { useAlerts } from '../useAlerts';
-import { LocalStorageStore } from '../../services/localStorageStore';
-import { isVideoReady, captureFrame, sendFrameForDetection } from '../../services/ai_service';
+import {
+  safeSetItem,
+  notifyUpdate,
+} from '../../models/repositories/storageBase';
+import { sendFrameForDetection } from '../../services/ai_service';
+import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
 import { buildDiseaseAlert } from '../../models/services/alertBuilder';
 import {
   DETECTION_CONFIDENCE,
@@ -75,7 +79,7 @@ export const useManualDiagnosis = ({
     manualDiagnosisAbortControllerRef.current = controller;
 
     try {
-      const blob = await captureFrame(video);
+      const blob = await captureVideoFrame(video);
       const result = await sendFrameForDetection(
         blob,
         DETECTION_CONFIDENCE,
@@ -86,7 +90,11 @@ export const useManualDiagnosis = ({
 
       setLastPrediction(result);
       setLastManualDiagnosis(result);
-      LocalStorageStore.safeWriteRaw('oceaneyes_last_diagnosis_time', Date.now().toString());
+      const lastDiagResult = safeSetItem(
+        'oceaneyes_last_diagnosis_time',
+        Date.now().toString()
+      );
+      if (lastDiagResult.success) notifyUpdate('oceaneyes_last_diagnosis_time');
 
       const diagnosedFish = result.detections.find((d) => d.diagnosis);
       if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {

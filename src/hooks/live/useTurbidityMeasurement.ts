@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useReadings } from '../useReadings';
-import { isVideoReady, captureFrame, sendFrameForTurbidity } from '../../services/ai_service';
+import { sendFrameForTurbidity } from '../../services/ai_service';
+import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
+import { recordFeedReading } from '../../models/services/readingRecorder';
 import { BACKEND_OFFLINE_MESSAGE } from '../../utils/constants';
 import type { AITurbidityResult } from '../../types/aquarium';
 import type { BackendStatus } from './useBackendStatus';
@@ -24,12 +25,10 @@ export const useTurbidityMeasurement = ({
   activeFeed,
   activeTank,
   liveState,
-  saveLiveState,
+  saveLiveState: _saveLiveState,
   backendStatus,
   checkBackend,
 }: UseTurbidityMeasurementOptions): UseTurbidityMeasurementResult => {
-  const { writeReading } = useReadings();
-
   const [turbidityLoading, setTurbidityLoading] = useState(false);
   const [turbidityError, setTurbidityError] = useState<string | null>(null);
   const turbidityAbortControllerRef = useRef<AbortController | null>(null);
@@ -56,6 +55,8 @@ export const useTurbidityMeasurement = ({
       return;
     }
 
+    const currentFeed = activeFeed;
+
     const video = cameraFeedRef.current.videoElement;
     if (!isVideoReady(video)) {
       setTurbidityError('Camera feed is not ready yet');
@@ -73,29 +74,20 @@ export const useTurbidityMeasurement = ({
     turbidityAbortControllerRef.current = controller;
 
     try {
-      const blob = await captureFrame(video);
+      const blob = await captureVideoFrame(video);
       const result = await sendFrameForTurbidity(blob, controller.signal);
       setLastTurbidityResult(result);
 
       if (activeTank && liveState) {
         const fnuValue = result.turbidity.fnu;
+        const clarity = parseFloat(fnuValue.toFixed(2));
 
-        writeReading({
+        recordFeedReading({
           tankId: activeTank.id,
-          clarity: parseFloat(fnuValue.toFixed(2)),
-          fishCount: activeFeed.current_fish_count ?? 0,
-        });
-
-        const updatedFeeds = liveState.feeds.map((f) => {
-          if (f.id === activeFeed.id) {
-            return { ...f, current_clarity: parseFloat(fnuValue.toFixed(2)) };
-          }
-          return f;
-        });
-        saveLiveState({
-          ...liveState,
-          current_clarity: parseFloat(fnuValue.toFixed(2)),
-          feeds: updatedFeeds,
+          liveState,
+          activeFeed: currentFeed,
+          clarity,
+          fishCount: currentFeed.current_fish_count ?? 0,
         });
       }
     } catch (err) {
@@ -107,16 +99,13 @@ export const useTurbidityMeasurement = ({
     }
   }, [
     cameraFeedRef,
-    activeFeed.id,
-    activeFeed.current_fish_count,
+    activeFeed,
     activeTank,
     turbidityLoading,
     isStreaming,
     backendStatus,
     checkBackend,
     liveState,
-    saveLiveState,
-    writeReading,
   ]);
 
   return {

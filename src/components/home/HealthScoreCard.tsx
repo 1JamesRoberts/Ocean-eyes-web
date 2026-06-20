@@ -1,5 +1,5 @@
 import React from 'react';
-import { calculateHealthScore, getHealthColor, getHealthMessage, type HealthReading } from '../../services/healthCalculator';
+import { calculateHealthScore, getHealthColor, getHealthMessage, type HealthReading } from '../../models/services/healthService';
 
 interface HealthScoreCardProps {
   reading: HealthReading;

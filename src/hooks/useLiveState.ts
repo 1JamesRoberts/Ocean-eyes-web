@@ -1,33 +1,38 @@
 import { useSyncExternalStore, useCallback } from 'react';
-import { LocalStorageStore, subscribe } from '../services/localStorageStore';
+import {
+  getLiveState,
+  saveLiveState as saveLiveStateToRepository,
+  updateCalibration as updateCalibrationInRepository,
+  subscribeLiveState,
+} from '../models/repositories/liveStateRepository';
 import type { LiveState } from '../types/aquarium';
 
 export const useLiveState = (tankId: string | null) => {
-  const subscribeLiveState = useCallback(
+  const subscribeLiveStateCallback = useCallback(
     (callback: () => void) => {
       if (!tankId) return () => {};
-      return subscribe(`live_state_${tankId}`, callback);
+      return subscribeLiveState(tankId, callback);
     },
     [tankId]
   );
 
   const liveState = useSyncExternalStore<LiveState | null>(
-    subscribeLiveState,
-    () => (tankId ? LocalStorageStore.getSnapshot(`live_state_${tankId}`, LocalStorageStore.getLiveState(tankId)) : null),
+    subscribeLiveStateCallback,
+    () => (tankId ? getLiveState(tankId) : null),
     () => null
   );
 
   const saveLiveState = (state: LiveState) => {
     if (tankId) {
-      LocalStorageStore.saveLiveState(tankId, state);
+      saveLiveStateToRepository(tankId, state);
     }
   };
 
   const updateCalibration = (waterLineY: number) => {
     if (tankId) {
-      const current = LocalStorageStore.getLiveState(tankId);
+      const current = getLiveState(tankId);
       const activeFeedId = current.selected_feed_id || '';
-      LocalStorageStore.updateCalibration(tankId, activeFeedId, waterLineY);
+      updateCalibrationInRepository(tankId, activeFeedId, waterLineY);
     }
   };
 

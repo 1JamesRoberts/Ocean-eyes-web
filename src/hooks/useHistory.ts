@@ -7,7 +7,7 @@ import {
   fetchDetectionHistoryRange,
   fetchTurbidityHistory,
   fetchTurbidityHistoryRange,
-} from '../services/ai_service';
+} from '../models/api/aiApi';
 import { recordInRange } from '../models/services/historyFilter';
 import { HISTORY_DEFAULT_LIMIT } from '../utils/constants';
 

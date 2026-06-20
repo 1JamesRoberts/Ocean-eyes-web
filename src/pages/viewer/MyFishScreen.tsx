@@ -12,7 +12,11 @@ import {
   getSpeciesById, getSpeciesColor, getSpeciesInitials,
   type SpeciesInfo
 } from '../../data/speciesCatalog';
-import { checkTankCompatibility, getCompatibilityLevel, getCompatibilityColor, getOverallCompatibilityScore } from '../../data/speciesCatalog';
+import { checkTankCompatibility, getCompatibilityLevel, getCompatibilityColor } from '../../data/speciesCatalog';
+import {
+  analyzeFishTank,
+  formatRange,
+} from '../../models/services/speciesService';
 import type { Difficulty, Aggression, BehaviorType, SwimLocation, Availability, BreedingDifficulty } from '../../types/aquarium';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -35,39 +39,6 @@ const availabilityLabel: Record<Availability, string> = {
 const breedingLabel: Record<BreedingDifficulty, string> = {
   easy: 'Easy', medium: 'Medium', hard: 'Hard', no_record: 'No Record'
 };
-
-// ─── Range Helpers ────────────────────────────────────────────────────────────
-
-function intersectRanges(
-  ranges: Array<{ min: number; max: number }>
-): { range: [number, number] | null; conflict: boolean } {
-  if (ranges.length === 0) return { range: null, conflict: false };
-
-  let low = -Infinity;
-  let high = Infinity;
-
-  for (const r of ranges) {
-    low = Math.max(low, r.min);
-    high = Math.min(high, r.max);
-  }
-
-  if (low <= high) {
-    // Normal intersection
-    return { range: [low, high], conflict: false };
-  }
-
-  // No overlap — return the full span (union) and flag conflict
-  const allMins = ranges.map(r => r.min);
-  const allMaxs = ranges.map(r => r.max);
-  return { range: [Math.min(...allMins), Math.max(...allMaxs)], conflict: true };
-}
-
-function formatRange(min: number, max: number, unit: string, decimals?: number): string {
-  const d = decimals ?? (Number.isInteger(min) && Number.isInteger(max) ? 0 : 1);
-  const fmt = (v: number) => (d === 0 ? v.toString() : v.toFixed(d));
-  if (min === max) return `${fmt(min)}${unit ? ` ${unit}` : ''}`;
-  return `${fmt(min)}\u2013${fmt(max)} ${unit}`;
-}
 
 // ─── DonutChart ──────────────────────────────────────────────────────────────
 
@@ -246,63 +217,10 @@ export const MyFishScreen: React.FC = () => {
 
   // ─── Memoized stats ──────────────────────────────────────────────────────
 
-  const { stats, speciesDistribution } = useMemo(() => {
-    const totalFish = fishList.reduce((sum, f) => sum + f.count, 0);
-    const uniqueSpecies = new Set(fishList.map(f => f.speciesId)).size;
-
-    // ── Ideal parameter computation ────────────────────────────────────────
-    const speciesData = fishList
-      .map(f => getSpeciesById(f.speciesId))
-      .filter((s): s is SpeciesInfo => !!s);
-
-    // Tank size: max of all species' minimum requirements
-    let idealTankSizeL: number | null = null;
-    const tankSizes = speciesData
-      .map(s => s.minTankSizeL)
-      .filter((v): v is number => v !== undefined);
-    if (tankSizes.length > 0) {
-      idealTankSizeL = Math.max(...tankSizes);
-    }
-
-    // Temperature: intersection of all species' ranges
-    const tempRanges = speciesData
-      .filter(s => s.tempMin !== undefined && s.tempMax !== undefined)
-      .map(s => ({ min: s.tempMin!, max: s.tempMax! }));
-    const tempResult = intersectRanges(tempRanges);
-
-    // pH: intersection of all species' ranges
-    const phRanges = speciesData
-      .filter(s => s.phMin !== undefined && s.phMax !== undefined)
-      .map(s => ({ min: s.phMin!, max: s.phMax! }));
-    const phResult = intersectRanges(phRanges);
-
-    // ── Species distribution ────────────────────────────────────────────────
-    const dist: Record<string, { name: string; count: number; color: string; initials: string }> = {};
-    fishList.forEach(fish => {
-      const species = getSpeciesById(fish.speciesId);
-      const name = species ? species.displayName : fish.name;
-      const color = species ? species.color : getSpeciesColor(fish.speciesId);
-      const initials = species ? species.initials : getSpeciesInitials(fish.speciesId);
-      if (dist[fish.speciesId]) {
-        dist[fish.speciesId].count += fish.count;
-      } else {
-        dist[fish.speciesId] = { name, count: fish.count, color, initials };
-      }
-    });
-
-    const totalDetected = fishList.reduce((sum, f) => sum + f.detected, 0);
-    const totalExpected = totalFish;
-
-    const overallCompatibility = getOverallCompatibilityScore(speciesData);
-
-    return {
-      stats: {
-        totalFish, uniqueSpecies, idealTankSizeL, tempResult, phResult,
-        totalDetected, totalExpected, overallCompatibility
-      },
-      speciesDistribution: Object.values(dist).sort((a, b) => b.count - a.count)
-    };
-  }, [fishList]);
+  const { stats, speciesDistribution } = useMemo(
+    () => analyzeFishTank(fishList),
+    [fishList]
+  );
 
   // ─── Render ──────────────────────────────────────────────────────────────
 

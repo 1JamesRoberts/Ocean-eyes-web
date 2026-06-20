@@ -1,26 +1,30 @@
 import { useSyncExternalStore } from 'react';
 import {
-  LocalStorageStore,
-  subscribe,
   DEMO_TANK_ID,
   DEMO_TANK,
-} from '../services/localStorageStore';
+  getTanks,
+  createTank,
+  joinTank,
+  unlinkTank as unlinkTankFromRepository,
+  updateTankName as updateTankNameInRepository,
+  updateThresholds as updateThresholdsInRepository,
+  getLinkedTanks,
+  subscribeTanks,
+} from '../models/repositories/tankRepository';
 import type { TankBrief } from '../types/aquarium';
 
 const LAST_TANK_ID_KEY = 'oceaneyes_last_tank_id';
 const DEFAULT_TANKS: TankBrief[] = [DEMO_TANK];
 
-const subscribeTanks = (callback: () => void) => subscribe('tanks', callback);
-
 export const useTank = () => {
   const tanks = useSyncExternalStore<TankBrief[]>(
     subscribeTanks,
-    () => LocalStorageStore.getSnapshot('tanks', DEFAULT_TANKS),
+    () => getTanks() ?? DEFAULT_TANKS,
     () => DEFAULT_TANKS
   );
 
   const activeTank = tanks.find((t) => t.id === DEMO_TANK_ID) ?? DEMO_TANK;
-  const linkedTanks = [DEMO_TANK_ID];
+  const linkedTanks = getLinkedTanks();
   const tankId = DEMO_TANK_ID;
 
   const selectTank = (id: string | null) => {
@@ -36,27 +40,28 @@ export const useTank = () => {
 
   const linkTank = async (_targetId: string): Promise<boolean> => {
     // Single demo tank mode: linking additional tanks is disabled.
-    return false;
+    return joinTank(_targetId);
   };
 
   const unlinkTank = () => {
     // Single demo tank mode: unlinking is disabled.
+    unlinkTankFromRepository(tankId);
   };
 
   const createAndLinkTank = async (
-    _name: string,
-    _cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }
+    name: string,
+    cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }
   ): Promise<string> => {
     // Single demo tank mode: creation is a no-op that returns the demo id.
-    return DEMO_TANK_ID;
+    return createTank(name, cameraSource);
   };
 
   const updateTankName = (name: string) => {
-    LocalStorageStore.updateTankName(DEMO_TANK_ID, name);
+    updateTankNameInRepository(DEMO_TANK_ID, name);
   };
 
   const updateThresholds = (clarityMin: number, fishPct: number) => {
-    LocalStorageStore.updateThresholds(DEMO_TANK_ID, clarityMin, fishPct);
+    updateThresholdsInRepository(DEMO_TANK_ID, clarityMin, fishPct);
   };
 
   return {

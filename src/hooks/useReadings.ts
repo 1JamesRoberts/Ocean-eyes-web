@@ -1,15 +1,17 @@
 import { useSyncExternalStore } from 'react';
-import { LocalStorageStore, subscribe } from '../services/localStorageStore';
+import {
+  getReadings,
+  writeReading as writeReadingToRepository,
+  subscribeReadings,
+} from '../models/repositories/readingRepository';
 import type { ReadingItem } from '../types/aquarium';
 
 const EMPTY_READINGS: ReadingItem[] = [];
 
-const subscribeReadings = (callback: () => void) => subscribe('readings', callback);
-
 export const useReadings = () => {
   const readings = useSyncExternalStore<ReadingItem[]>(
     subscribeReadings,
-    () => LocalStorageStore.getSnapshot('readings', EMPTY_READINGS),
+    () => getReadings(),
     () => EMPTY_READINGS
   );
 
@@ -22,7 +24,7 @@ export const useReadings = () => {
     ammonia?: number;
     nitrite?: number;
   }) => {
-    LocalStorageStore.writeReading(data);
+    writeReadingToRepository(data);
   };
 
   return { readings, writeReading };

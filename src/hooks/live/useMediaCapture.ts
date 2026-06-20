@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import type { CameraFilters } from '../../types/aquarium';
 import type { CameraFeedHandle } from '../../components/live/CameraFeed';
-import { LocalStorageStore } from '../../services/localStorageStore';
+import {
+  safeSetItem,
+  notifyUpdate,
+} from '../../models/repositories/storageBase';
 import {
   getTemperatureRgba,
   getTintRgba,
@@ -79,12 +82,14 @@ export const useMediaCapture = ({
 
   // Persist snapshots to localStorage
   useEffect(() => {
-    LocalStorageStore.safeWriteRaw(SNAPSHOTS_KEY, JSON.stringify(snapshots));
+    const result = safeSetItem(SNAPSHOTS_KEY, JSON.stringify(snapshots));
+    if (result.success) notifyUpdate(SNAPSHOTS_KEY);
   }, [snapshots]);
 
   // Persist recordings to localStorage
   useEffect(() => {
-    LocalStorageStore.safeWriteRaw(RECORDINGS_KEY, JSON.stringify(recordings));
+    const result = safeSetItem(RECORDINGS_KEY, JSON.stringify(recordings));
+    if (result.success) notifyUpdate(RECORDINGS_KEY);
   }, [recordings]);
 
   // Recording timer

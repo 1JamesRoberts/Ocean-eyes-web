@@ -1,24 +1,27 @@
 import { useSyncExternalStore } from 'react';
-import { LocalStorageStore, subscribe } from '../services/localStorageStore';
+import {
+  getAlerts,
+  addAlert as addAlertToRepository,
+  resolveAlert as resolveAlertInRepository,
+  subscribeAlerts,
+} from '../models/repositories/alertRepository';
 import type { AlertItem } from '../types/aquarium';
 
 const EMPTY_ALERTS: AlertItem[] = [];
 
-const subscribeAlerts = (callback: () => void) => subscribe('alerts', callback);
-
 export const useAlerts = () => {
   const alerts = useSyncExternalStore<AlertItem[]>(
     subscribeAlerts,
-    () => LocalStorageStore.getSnapshot('alerts', EMPTY_ALERTS),
+    () => getAlerts(),
     () => EMPTY_ALERTS
   );
 
   const addAlert = (alert: AlertItem) => {
-    LocalStorageStore.saveAlerts([alert, ...LocalStorageStore.getAlerts()]);
+    addAlertToRepository(alert);
   };
 
   const resolveAlert = (alertId: string) => {
-    LocalStorageStore.resolveAlert(alertId);
+    resolveAlertInRepository(alertId);
   };
 
   return {
