@@ -19,13 +19,11 @@ OceanEyes Web is a modern, high-performance web dashboard designed to monitor sm
 *   **Build System & HMR**: Vite
 *   **Styling**: Vanilla CSS (CSS Custom Variables with HSL colors)
 *   **Iconography**: Lucide React (`lucide-react`)
-*   **Datastore/Mocking**: LocalStorage-backed simulation model (`src/services/mock_service.ts`) emulating real-time Firestore synchronization.
+*   **Datastore/Mocking**: LocalStorage-backed simulation model (`src/models/repositories/storageBase.ts`) emulating real-time Firestore synchronization.
 
 ---
 
 ## 📂 Directory Scaffolding
-
-The frontend is organised using **Model–View–ViewModel**:
 
 ```text
 C:\Hope\Project\Ocean-eyes-web/
@@ -36,15 +34,15 @@ C:\Hope\Project\Ocean-eyes-web/
 ├── public/                  # Static assets & favicons
 ├── src/
 │   ├── assets/              # SVGs, images, local media
-│   ├── models/              # Framework-agnostic data layer
-│   │   ├── repositories/    # localStorage CRUD + event emission
+│   ├── hooks/               # React hooks: state, side effects, lifecycle
+│   │   ├── pages/           # Page-level hooks
+│   │   └── live/            # Live camera / AI hooks
+│   ├── models/              # Data access, persistence, and pure helpers
+│   │   ├── repositories/    # localStorage primitives + CRUD helpers
 │   │   ├── services/        # Pure domain logic & transformers
 │   │   └── api/             # FastAPI backend client
-│   ├── viewModels/          # React hooks exposing state + commands
-│   │   ├── pages/           # Page-level ViewModels
-│   │   └── live/            # Live camera / AI ViewModels
 │   ├── components/          # UI components by feature
-│   ├── pages/               # Route-level Views
+│   ├── pages/               # Route-level components
 │   │   ├── ViewerApp.tsx    # Customer dashboard views
 │   │   └── IoTMonitor.tsx   # IoT Scanner Console
 │   ├── context/             # React Context providers

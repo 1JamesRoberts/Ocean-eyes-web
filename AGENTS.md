@@ -18,29 +18,29 @@ OceanEyes is a React + TypeScript dashboard for real-time AI aquarium monitoring
 | State      | React Context + localStorage (mock Firestore)                |
 | AI Backend | Python FastAPI + ONNX models (port 8000)                     |
 
-## Key Architecture (MVVM)
+## Key Architecture
 
-The frontend follows a **Model–View–ViewModel** architecture:
+The frontend uses a simple, practical split:
 
-- **Model** (`src/models/`) — Framework-agnostic data layer. Repositories persist to `localStorage`, the API client talks to the Python backend, and services contain pure domain logic.
-- **ViewModel** (`src/viewModels/`) — React hooks that expose observable state and commands to Views. Page-level ViewModels live in `src/viewModels/pages/`; live AI ViewModels live in `src/viewModels/live/`.
-- **View** (`src/components/`, `src/pages/`) — Styled React components. They consume ViewModels and contain no business rules or direct Model imports.
+- **Hooks** (`src/hooks/`) — React hooks that own state, side effects, and lifecycle. They are the public API that components consume.
+- **Model** (`src/models/`) — Data access, persistence, transport, and pure domain helpers. No React imports.
+- **UI** (`src/components/`, `src/pages/`) — JSX, Tailwind classes, and event wiring.
 
 ```
 src/
+├── hooks/            # State & side effects
+│   ├── pages/        # Page-level hooks
+│   └── live/         # Live camera / AI hooks
 ├── models/           # Data layer (no React imports)
-│   ├── repositories/ # localStorage CRUD + event emission
+│   ├── repositories/ # localStorage primitives + CRUD helpers
 │   ├── services/     # Pure domain logic & transformers
 │   └── api/          # FastAPI client
-├── viewModels/       # React hooks: state + commands
-│   ├── pages/        # Page-level ViewModels
-│   └── live/         # Live camera / AI ViewModels
-├── components/       # UI components by feature (home/, live/, analytics/, fish/)
-├── pages/            # Route-level Views (ViewerApp, IoTMonitor)
-├── context/          # React Context providers (NavigationContext)
-├── types/            # TypeScript interfaces (aquarium.ts)
-├── data/             # Species catalog (auto-generated, do not edit)
-└── utils/            # Shared formatting utilities & constants
+├── components/       # UI components by feature
+├── pages/            # Route-level components
+├── context/          # React Context providers
+├── types/            # TypeScript interfaces
+├── data/             # Species catalog (auto-generated)
+└── utils/            # Shared utilities & constants
 ```
 
 ## Styling with Tailwind CSS v4
@@ -65,7 +65,7 @@ Tailwind CSS v4 is the default and preferred styling system for all UI work. Use
 ### React & Hooks
 
 - Functional components with hooks only (no class components).
-- Hooks in `src/hooks/` follow the pattern: state init from `MockFirestore`, `useEffect` with `subscribeToDb` for sync, return state + actions.
+- Hooks in `src/hooks/` follow the pattern: state init from `storageBase`, `useEffect` with `subscribeToDb` for sync, return state + actions.
 - `// eslint-disable-next-line react-hooks/set-state-in-effect` and `react-hooks/exhaustive-deps` are commonly used in hooks — accept these where justified.
 
 ### Styling
@@ -74,12 +74,12 @@ See the dedicated [Styling with Tailwind CSS v4](#styling-with-tailwind-css-v4) 
 
 ### Data Flow
 
-- **Model layer** (`src/models/repositories/`) reads/writes `localStorage` and emits scoped `CustomEvent`s for cross-component sync.
-- **ViewModel layer** (`src/viewModels/`) subscribes to repositories via `useSyncExternalStore` or `useEffect`, transforms data for Views, and exposes commands.
+- **Model layer** (`src/models/repositories/storageBase.ts`) reads/writes `localStorage` and emits scoped `CustomEvent`s for cross-component sync.
+- **Hooks** (`src/hooks/`) subscribe to storage changes, talk to the backend through `src/models/api/aiApi.ts`, transform data for components, and expose commands.
 - **Real mode**: `src/models/api/aiApi.ts` fetches from the AI backend (`localhost:8000`).
 - AI backend endpoints: `/health`, `/predict/detection`, `/predict/turbidity`, `/history/detections`, `/history/turbidity`.
 - Backend proxy: Vite dev server proxies `/history` to `localhost:8000`.
-- Views import only from `src/viewModels/` and `src/types/`; they never import from `src/models/` or `src/services/` directly.
+- Components/pages import hooks from `src/hooks/` and types from `src/types/`.
 
 ### Species Data
 
