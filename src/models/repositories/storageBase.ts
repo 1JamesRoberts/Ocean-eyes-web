@@ -344,7 +344,7 @@ export const migrateLocalStorage = (): void => {
 // ===========================================================================
 
 export const getTanks = (): TankBrief[] => {
-  return getOrDefault<TankBrief[]>(STORAGE_KEYS.tanks, []);
+  return getSnapshot<TankBrief[]>(STORAGE_KEYS.tanks, []);
 };
 
 export const saveTanks = (tanks: TankBrief[]) => {
@@ -407,7 +407,7 @@ export const subscribeTanks = (callback: () => void) =>
 // ===========================================================================
 
 export const getFish = (tankId: string): FishEntry[] =>
-  getOrDefault<FishEntry[]>(STORAGE_KEYS.fish(tankId), []);
+  getSnapshot<FishEntry[]>(STORAGE_KEYS.fish(tankId), []);
 
 export const saveFish = (tankId: string, fish: FishEntry[]) => {
   const key = STORAGE_KEYS.fish(tankId);
@@ -482,7 +482,7 @@ export const subscribeFish = (tankId: string, callback: () => void) =>
 // ===========================================================================
 
 export const getReadings = (): ReadingItem[] =>
-  getOrDefault<ReadingItem[]>(STORAGE_KEYS.readings, []);
+  getSnapshot<ReadingItem[]>(STORAGE_KEYS.readings, []);
 
 export const saveReadings = (readings: ReadingItem[]) => {
   const result = safeSetItem(STORAGE_KEYS.readings, JSON.stringify(readings));
@@ -528,7 +528,7 @@ export const subscribeReadings = (callback: () => void) =>
 // ===========================================================================
 
 export const getAlerts = (): AlertItem[] =>
-  getOrDefault<AlertItem[]>(STORAGE_KEYS.alerts, []);
+  getSnapshot<AlertItem[]>(STORAGE_KEYS.alerts, []);
 
 export const saveAlerts = (alerts: AlertItem[]) => {
   const result = safeSetItem(STORAGE_KEYS.alerts, JSON.stringify(alerts));
@@ -558,7 +558,7 @@ export const subscribeAlerts = (callback: () => void) =>
 
 export const getLiveState = (tankId: string): LiveState => {
   const key = STORAGE_KEYS.liveState(tankId);
-  return getOrDefault<LiveState>(key, getDefaultLiveState());
+  return getSnapshot<LiveState>(key, getDefaultLiveState());
 };
 
 export const saveLiveState = (tankId: string, state: LiveState) => {
