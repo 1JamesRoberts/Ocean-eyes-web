@@ -1,6 +1,6 @@
 // readingRecorder.ts - Coordinator for recording readings and feed metrics
 import type { CameraFeedConfig, LiveState } from '../../types/aquarium';
-import { writeReading } from '../repositories/readingRepository';
+import { writeReading as defaultWriteReading } from '../repositories/readingRepository';
 import { saveLiveState } from '../repositories/liveStateRepository';
 
 export interface RecordFeedReadingInput {
@@ -9,6 +9,7 @@ export interface RecordFeedReadingInput {
   activeFeed: CameraFeedConfig;
   clarity: number;
   fishCount: number;
+  writeReading?: (data: { tankId: string; clarity: number; fishCount: number }) => void;
 }
 
 export function recordFeedReading({
@@ -17,8 +18,10 @@ export function recordFeedReading({
   activeFeed,
   clarity,
   fishCount,
+  writeReading,
 }: RecordFeedReadingInput): void {
-  writeReading({
+  const write = writeReading ?? defaultWriteReading;
+  write({
     tankId,
     clarity,
     fishCount,

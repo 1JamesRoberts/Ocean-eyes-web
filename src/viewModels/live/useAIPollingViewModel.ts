@@ -1,31 +1,49 @@
-import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { useAlerts } from '../useAlerts';
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
+import type { CameraFeedConfig, LiveState, TankBrief, AIDetectionResult } from '../../types/aquarium';
+import type { CameraFeedHandle } from '../../components/live/CameraFeed';
+import { sendFrameForDetection } from '../../models/api/aiApi';
+import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
+import { buildDiseaseAlert } from '../../models/services/alertBuilder';
+import { recordFeedReading } from '../../models/services/readingRecorder';
 import {
   getSnapshot,
   safeSetItem,
   notifyUpdate,
 } from '../../models/repositories/storageBase';
-import { sendFrameForDetection } from '../../services/ai_service';
-import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
-import { buildDiseaseAlert } from '../../models/services/alertBuilder';
-import { recordFeedReading } from '../../models/services/readingRecorder';
+import { useAlertsViewModel } from '../useAlertsViewModel';
+import { useReadingsViewModel } from '../useReadingsViewModel';
+import { useFishViewModel } from '../useFishViewModel';
 import {
   AI_POLL_INTERVAL_MS,
   DIAGNOSIS_COOLDOWN_MS,
   DETECTION_CONFIDENCE,
   DIAGNOSIS_MIN_CONF,
   BACKEND_OFFLINE_MESSAGE,
+  LAST_DIAGNOSIS_TIME_KEY,
 } from '../../utils/constants';
-import type { AIDetectionResult } from '../../types/aquarium';
-import type { BackendStatus } from './useBackendStatus';
-import type { UseAIAnalyticsOptions } from './useAIAnalytics';
+import type { BackendStatus } from './useBackendStatusViewModel';
 
-interface UseAIPollingOptions extends UseAIAnalyticsOptions {
+export interface UseAIPollingViewModelOptions {
+  cameraFeedRef: React.RefObject<CameraFeedHandle | null>;
+  isStreaming: boolean;
+  activeFeed: CameraFeedConfig;
+  isWebcam: boolean;
+  activeTank: TankBrief | null;
+  liveState: LiveState | null;
+  saveLiveState?: (state: LiveState) => void;
   backendStatus: BackendStatus;
   checkBackend: (signal?: AbortSignal) => Promise<boolean>;
+  tankId: string | null;
 }
 
-interface UseAIPollingResult {
+export interface UseAIPollingViewModelResult {
   isAIActive: boolean;
   aiLoading: boolean;
   aiError: string | null;
@@ -34,7 +52,7 @@ interface UseAIPollingResult {
   toggleAI: () => Promise<void>;
 }
 
-export const useAIPolling = ({
+export const useAIPollingViewModel = ({
   cameraFeedRef,
   isStreaming,
   activeFeed,
@@ -42,16 +60,17 @@ export const useAIPolling = ({
   activeTank,
   liveState,
   saveLiveState: _saveLiveState,
-  fishList,
-  updateDetectedCount,
   backendStatus,
   checkBackend,
-}: UseAIPollingOptions): UseAIPollingResult => {
-  const { addAlert } = useAlerts();
+  tankId,
+}: UseAIPollingViewModelOptions): UseAIPollingViewModelResult => {
+  const { addAlert } = useAlertsViewModel();
+  const { writeReading } = useReadingsViewModel();
+  const { fishList, updateDetectedCount } = useFishViewModel(tankId);
 
   const [isAIActive, setIsAIActive] = useState(() => liveState?.ai_active ?? false);
   const [lastPrediction, setLastPrediction] = useState<AIDetectionResult | null>(
-    () => liveState?.last_prediction ?? null,
+    () => liveState?.last_prediction ?? null
   );
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -116,7 +135,7 @@ export const useAIPolling = ({
       try {
         const blob = await captureVideoFrame(video);
 
-        const lastDiag = getSnapshot<number>('oceaneyes_last_diagnosis_time', 0);
+        const lastDiag = getSnapshot<number>(LAST_DIAGNOSIS_TIME_KEY, 0);
         const shouldDiagnose = Date.now() - lastDiag > DIAGNOSIS_COOLDOWN_MS;
 
         const result = await sendFrameForDetection(
@@ -124,18 +143,15 @@ export const useAIPolling = ({
           DETECTION_CONFIDENCE,
           shouldDiagnose,
           DIAGNOSIS_MIN_CONF,
-          controller.signal,
+          controller.signal
         );
 
         if (!aiMountedRef.current) return;
         setLastPrediction(result);
 
         if (shouldDiagnose) {
-          const lastDiagResult = safeSetItem(
-            'oceaneyes_last_diagnosis_time',
-            Date.now().toString()
-          );
-          if (lastDiagResult.success) notifyUpdate('oceaneyes_last_diagnosis_time');
+          const lastDiagResult = safeSetItem(LAST_DIAGNOSIS_TIME_KEY, Date.now().toString());
+          if (lastDiagResult.success) notifyUpdate(LAST_DIAGNOSIS_TIME_KEY);
 
           const diagnosedFish = result.detections.find((d) => d.diagnosis);
           if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
@@ -152,6 +168,7 @@ export const useAIPolling = ({
             activeFeed,
             clarity: activeFeed.current_clarity ?? 0,
             fishCount: totalFish,
+            writeReading,
           });
 
           fishList.forEach((fish) => {

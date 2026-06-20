@@ -1,21 +1,19 @@
 import { useEffect } from 'react';
-import { useBackendStatus } from './useBackendStatus';
-import { useAIPolling } from './useAIPolling';
-import { useTurbidityMeasurement } from './useTurbidityMeasurement';
-import { useManualDiagnosis } from './useManualDiagnosis';
-import { selectActiveFeedMetrics } from '../../models/services/feedMetricsService';
 import type {
   AIDetectionResult,
   AITurbidityResult,
   CameraFeedConfig,
-  FishEntry,
   LiveState,
   TankBrief,
 } from '../../types/aquarium';
 import type { CameraFeedHandle } from '../../components/live/CameraFeed';
-import type { BackendStatus } from './useBackendStatus';
+import { selectActiveFeedMetrics } from '../../models/services/feedMetricsService';
+import { useBackendStatusViewModel, type BackendStatus } from './useBackendStatusViewModel';
+import { useAIPollingViewModel } from './useAIPollingViewModel';
+import { useTurbidityMeasurementViewModel } from './useTurbidityMeasurementViewModel';
+import { useManualDiagnosisViewModel } from './useManualDiagnosisViewModel';
 
-export interface UseAIAnalyticsOptions {
+export interface UseAIAnalyticsViewModelOptions {
   cameraFeedRef: React.RefObject<CameraFeedHandle | null>;
   isStreaming: boolean;
   activeFeed: CameraFeedConfig;
@@ -23,11 +21,10 @@ export interface UseAIAnalyticsOptions {
   activeTank: TankBrief | null;
   liveState: LiveState | null;
   saveLiveState: (state: LiveState) => void;
-  fishList: FishEntry[];
-  updateDetectedCount: (fishId: string, count: number) => void;
+  tankId: string | null;
 }
 
-interface UseAIAnalyticsResult {
+export interface UseAIAnalyticsViewModelResult {
   isAIActive: boolean;
   aiLoading: boolean;
   aiError: string | null;
@@ -46,7 +43,7 @@ interface UseAIAnalyticsResult {
   currentFishCount: number;
 }
 
-export const useAIAnalytics = ({
+export const useAIAnalyticsViewModel = ({
   cameraFeedRef,
   isStreaming,
   activeFeed,
@@ -54,10 +51,9 @@ export const useAIAnalytics = ({
   activeTank,
   liveState,
   saveLiveState,
-  fishList,
-  updateDetectedCount,
-}: UseAIAnalyticsOptions): UseAIAnalyticsResult => {
-  const { backendStatus, checkBackend } = useBackendStatus(isStreaming);
+  tankId,
+}: UseAIAnalyticsViewModelOptions): UseAIAnalyticsViewModelResult => {
+  const { backendStatus, checkBackend } = useBackendStatusViewModel(isStreaming);
   const {
     isAIActive,
     aiLoading,
@@ -65,7 +61,7 @@ export const useAIAnalytics = ({
     lastPrediction,
     setLastPrediction,
     toggleAI,
-  } = useAIPolling({
+  } = useAIPollingViewModel({
     cameraFeedRef,
     isStreaming,
     activeFeed,
@@ -73,10 +69,9 @@ export const useAIAnalytics = ({
     activeTank,
     liveState,
     saveLiveState,
-    fishList,
-    updateDetectedCount,
     backendStatus,
     checkBackend,
+    tankId,
   });
 
   const {
@@ -84,16 +79,13 @@ export const useAIAnalytics = ({
     turbidityLoading,
     turbidityError,
     measureTurbidity,
-  } = useTurbidityMeasurement({
+  } = useTurbidityMeasurementViewModel({
     cameraFeedRef,
     isStreaming,
     activeFeed,
-    isWebcam,
     activeTank,
     liveState,
     saveLiveState,
-    fishList,
-    updateDetectedCount,
     backendStatus,
     checkBackend,
   });
@@ -103,16 +95,9 @@ export const useAIAnalytics = ({
     manualDiagnosisError,
     lastManualDiagnosis,
     manualDiagnose,
-  } = useManualDiagnosis({
+  } = useManualDiagnosisViewModel({
     cameraFeedRef,
     isStreaming,
-    activeFeed,
-    isWebcam,
-    activeTank,
-    liveState,
-    saveLiveState,
-    fishList,
-    updateDetectedCount,
     backendStatus,
     checkBackend,
     aiLoading,

@@ -1,22 +1,16 @@
 import React, { useRef } from 'react';
-import { useNavigation } from '../../context/NavigationContext';
-import { useTank } from '../../hooks/useTank';
-import { useCameraFeed } from '../../hooks/useCameraFeed';
-import { useFish } from '../../hooks/useFish';
-import { useFullscreen } from '../../hooks/live/useFullscreen';
-import { useViewportSize } from '../../hooks/live/useViewportSize';
-import { useCameraFilters } from '../../hooks/live/useCameraFilters';
-import { useMediaCapture } from '../../hooks/live/useMediaCapture';
-import { useAIAnalytics } from '../../hooks/live/useAIAnalytics';
+import { useNavigationViewModel } from '../../viewModels/useNavigationViewModel';
+import { useTankViewModel } from '../../viewModels/useTankViewModel';
+import { useLiveFeedViewModel } from '../../viewModels/useLiveFeedViewModel';
+import { useFishViewModel } from '../../viewModels/useFishViewModel';
+import { useFullscreenViewModel } from '../../viewModels/live/useFullscreenViewModel';
+import { useViewportSizeViewModel } from '../../viewModels/live/useViewportSizeViewModel';
+import { useCameraFiltersViewModel } from '../../viewModels/live/useCameraFiltersViewModel';
+import { useMediaCaptureViewModel } from '../../viewModels/live/useMediaCaptureViewModel';
+import { useAIAnalyticsViewModel } from '../../viewModels/live/useAIAnalyticsViewModel';
 
 import { Video } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
-import {
-  getTemperatureColor,
-  getTemperatureOpacity,
-  getTintColor,
-  getTintOpacity,
-} from '../../models/services/cameraFilterModel';
 import { AIBoundingBoxes } from '../../components/live/AIBoundingBoxes';
 import { CameraControls } from '../../components/live/CameraControls';
 import { CameraFeed } from '../../components/live/CameraFeed';
@@ -28,8 +22,8 @@ import { AIAnalysisPanel } from '../../components/live/AIAnalysisPanel';
 import { VideoDecorations } from '../../components/live/VideoDecorations';
 
 export const LiveScreen: React.FC = () => {
-  const { autoFullscreen, setAutoFullscreen, setActiveTab } = useNavigation();
-  const { activeTank } = useTank();
+  const { autoFullscreen, setAutoFullscreen, setActiveTab } = useNavigationViewModel();
+  const { activeTank, tankId } = useTankViewModel();
   const {
     liveState,
     saveLiveState,
@@ -38,20 +32,20 @@ export const LiveScreen: React.FC = () => {
     isStreaming,
     videoRef,
     startStream
-  } = useCameraFeed(activeTank?.id ?? null);
-  const { fishList, updateDetectedCount } = useFish(activeTank?.id ?? null);
+  } = useLiveFeedViewModel(tankId);
+  const { fishList } = useFishViewModel(tankId);
 
   const cameraFeedRef = useRef<CameraFeedHandle>(null);
 
-  const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen({
+  const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreenViewModel({
     autoFullscreen,
     setAutoFullscreen,
     setActiveTab,
   });
 
-  const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSize();
+  const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSizeViewModel();
 
-  const { filters, handleFilterChange } = useCameraFilters();
+  const { filters, temperatureOverlay, tintOverlay, handleFilterChange } = useCameraFiltersViewModel();
 
   const {
     snapshots,
@@ -65,7 +59,7 @@ export const LiveScreen: React.FC = () => {
     toggleRecording,
     downloadRecording,
     deleteRecording,
-  } = useMediaCapture({
+  } = useMediaCaptureViewModel({
     cameraFeedRef,
     isStreaming,
     filters,
@@ -87,7 +81,7 @@ export const LiveScreen: React.FC = () => {
     manualDiagnose,
     currentClarity,
     currentFishCount,
-  } = useAIAnalytics({
+  } = useAIAnalyticsViewModel({
     cameraFeedRef,
     isStreaming,
     activeFeed,
@@ -95,8 +89,7 @@ export const LiveScreen: React.FC = () => {
     activeTank,
     liveState,
     saveLiveState,
-    fishList,
-    updateDetectedCount,
+    tankId,
   });
 
   return (
@@ -150,28 +143,22 @@ export const LiveScreen: React.FC = () => {
                 filters={filters}
                 onDimensions={handleDimensions}
               >
-                {filters.temperature !== 0 && (
+                {temperatureOverlay && (
                   <div
                     className="
                       pointer-events-none absolute top-0 left-0 z-4 size-full
                       mix-blend-color
                     "
-                    style={{
-                      backgroundColor: getTemperatureColor(filters.temperature),
-                      opacity: getTemperatureOpacity(filters.temperature)
-                    }}
+                    style={temperatureOverlay}
                   />
                 )}
-                {filters.tint !== 0 && (
+                {tintOverlay && (
                   <div
                     className="
                       pointer-events-none absolute top-0 left-0 z-5 size-full
                       mix-blend-color
                     "
-                    style={{
-                      backgroundColor: getTintColor(filters.tint),
-                      opacity: getTintOpacity(filters.tint)
-                    }}
+                    style={tintOverlay}
                   />
                 )}
               </CameraFeed>

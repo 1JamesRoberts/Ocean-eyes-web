@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
-import { isBackendAvailable } from '../../services/ai_service';
+import { isBackendAvailable } from '../../models/api/aiApi';
 import { BACKEND_HEALTH_CHECK_INTERVAL_MS } from '../../utils/constants';
 
 export type BackendStatus = 'unknown' | 'checking' | 'online' | 'offline';
 
-export interface UseBackendStatusResult {
+export interface UseBackendStatusViewModelResult {
   backendStatus: BackendStatus;
   checkBackend: (signal?: AbortSignal) => Promise<boolean>;
 }
 
-export const useBackendStatus = (isStreaming: boolean): UseBackendStatusResult => {
+export const useBackendStatusViewModel = (isStreaming: boolean): UseBackendStatusViewModelResult => {
   const [backendStatus, setBackendStatus] = useState<BackendStatus>('unknown');
 
   useEffect(() => {

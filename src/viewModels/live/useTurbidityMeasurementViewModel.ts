@@ -1,25 +1,32 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { sendFrameForTurbidity } from '../../services/ai_service';
+import type { CameraFeedConfig, LiveState, TankBrief, AITurbidityResult } from '../../types/aquarium';
+import type { CameraFeedHandle } from '../../components/live/CameraFeed';
+import { sendFrameForTurbidity } from '../../models/api/aiApi';
 import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
 import { recordFeedReading } from '../../models/services/readingRecorder';
+import { useReadingsViewModel } from '../useReadingsViewModel';
 import { BACKEND_OFFLINE_MESSAGE } from '../../utils/constants';
-import type { AITurbidityResult } from '../../types/aquarium';
-import type { BackendStatus } from './useBackendStatus';
-import type { UseAIAnalyticsOptions } from './useAIAnalytics';
+import type { BackendStatus } from './useBackendStatusViewModel';
 
-interface UseTurbidityMeasurementOptions extends UseAIAnalyticsOptions {
+export interface UseTurbidityMeasurementViewModelOptions {
+  cameraFeedRef: React.RefObject<CameraFeedHandle | null>;
+  isStreaming: boolean;
+  activeFeed: CameraFeedConfig;
+  activeTank: TankBrief | null;
+  liveState: LiveState | null;
+  saveLiveState?: (state: LiveState) => void;
   backendStatus: BackendStatus;
   checkBackend: (signal?: AbortSignal) => Promise<boolean>;
 }
 
-interface UseTurbidityMeasurementResult {
+export interface UseTurbidityMeasurementViewModelResult {
   lastTurbidityResult: AITurbidityResult | null;
   turbidityLoading: boolean;
   turbidityError: string | null;
   measureTurbidity: () => Promise<void>;
 }
 
-export const useTurbidityMeasurement = ({
+export const useTurbidityMeasurementViewModel = ({
   cameraFeedRef,
   isStreaming,
   activeFeed,
@@ -28,12 +35,14 @@ export const useTurbidityMeasurement = ({
   saveLiveState: _saveLiveState,
   backendStatus,
   checkBackend,
-}: UseTurbidityMeasurementOptions): UseTurbidityMeasurementResult => {
+}: UseTurbidityMeasurementViewModelOptions): UseTurbidityMeasurementViewModelResult => {
+  const { writeReading } = useReadingsViewModel();
+
   const [turbidityLoading, setTurbidityLoading] = useState(false);
   const [turbidityError, setTurbidityError] = useState<string | null>(null);
   const turbidityAbortControllerRef = useRef<AbortController | null>(null);
   const [lastTurbidityResult, setLastTurbidityResult] = useState<AITurbidityResult | null>(
-    () => liveState?.last_turbidity_result ?? null,
+    () => liveState?.last_turbidity_result ?? null
   );
 
   useEffect(() => {
@@ -88,6 +97,7 @@ export const useTurbidityMeasurement = ({
           activeFeed: currentFeed,
           clarity,
           fishCount: currentFeed.current_fish_count ?? 0,
+          writeReading,
         });
       }
     } catch (err) {
@@ -106,6 +116,7 @@ export const useTurbidityMeasurement = ({
     backendStatus,
     checkBackend,
     liveState,
+    writeReading,
   ]);
 
   return {

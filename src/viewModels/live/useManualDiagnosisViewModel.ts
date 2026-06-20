@@ -1,44 +1,44 @@
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { useAlerts } from '../useAlerts';
-import {
-  safeSetItem,
-  notifyUpdate,
-} from '../../models/repositories/storageBase';
-import { sendFrameForDetection } from '../../services/ai_service';
+import type { AIDetectionResult } from '../../types/aquarium';
+import type { CameraFeedHandle } from '../../components/live/CameraFeed';
+import { sendFrameForDetection } from '../../models/api/aiApi';
 import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
 import { buildDiseaseAlert } from '../../models/services/alertBuilder';
+import { safeSetItem, notifyUpdate } from '../../models/repositories/storageBase';
+import { useAlertsViewModel } from '../useAlertsViewModel';
 import {
   DETECTION_CONFIDENCE,
   DIAGNOSIS_MIN_CONF,
   BACKEND_OFFLINE_MESSAGE,
+  LAST_DIAGNOSIS_TIME_KEY,
 } from '../../utils/constants';
-import type { AIDetectionResult } from '../../types/aquarium';
-import type { BackendStatus } from './useBackendStatus';
-import type { UseAIAnalyticsOptions } from './useAIAnalytics';
+import type { BackendStatus } from './useBackendStatusViewModel';
 
-interface UseManualDiagnosisOptions extends UseAIAnalyticsOptions {
+export interface UseManualDiagnosisViewModelOptions {
+  cameraFeedRef: React.RefObject<CameraFeedHandle | null>;
+  isStreaming: boolean;
   backendStatus: BackendStatus;
   checkBackend: (signal?: AbortSignal) => Promise<boolean>;
   aiLoading: boolean;
   setLastPrediction: Dispatch<SetStateAction<AIDetectionResult | null>>;
 }
 
-interface UseManualDiagnosisResult {
+export interface UseManualDiagnosisViewModelResult {
   manualDiagnosisLoading: boolean;
   manualDiagnosisError: string | null;
   lastManualDiagnosis: AIDetectionResult | null;
   manualDiagnose: () => Promise<void>;
 }
 
-export const useManualDiagnosis = ({
+export const useManualDiagnosisViewModel = ({
   cameraFeedRef,
   isStreaming,
   backendStatus,
   checkBackend,
   aiLoading,
   setLastPrediction,
-}: UseManualDiagnosisOptions): UseManualDiagnosisResult => {
-  const { addAlert } = useAlerts();
+}: UseManualDiagnosisViewModelOptions): UseManualDiagnosisViewModelResult => {
+  const { addAlert } = useAlertsViewModel();
 
   const [manualDiagnosisLoading, setManualDiagnosisLoading] = useState(false);
   const [manualDiagnosisError, setManualDiagnosisError] = useState<string | null>(null);
@@ -85,16 +85,13 @@ export const useManualDiagnosis = ({
         DETECTION_CONFIDENCE,
         true,
         DIAGNOSIS_MIN_CONF,
-        controller.signal,
+        controller.signal
       );
 
       setLastPrediction(result);
       setLastManualDiagnosis(result);
-      const lastDiagResult = safeSetItem(
-        'oceaneyes_last_diagnosis_time',
-        Date.now().toString()
-      );
-      if (lastDiagResult.success) notifyUpdate('oceaneyes_last_diagnosis_time');
+      const lastDiagResult = safeSetItem(LAST_DIAGNOSIS_TIME_KEY, Date.now().toString());
+      if (lastDiagResult.success) notifyUpdate(LAST_DIAGNOSIS_TIME_KEY);
 
       const diagnosedFish = result.detections.find((d) => d.diagnosis);
       if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
