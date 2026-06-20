@@ -10,6 +10,10 @@ export const AI_POLL_INTERVAL_MS = 10000;
 export const BACKEND_HEALTH_CHECK_INTERVAL_MS = 30000;
 export const DIAGNOSIS_COOLDOWN_MS = 3600000; // 1 hour between disease diagnoses
 export const DEFAULT_CONFIDENCE_THRESHOLD = 0.35;
+export const DETECTION_CONFIDENCE = 0.35;
+export const DIAGNOSIS_MIN_CONF = 0.6;
+export const BACKEND_OFFLINE_MESSAGE =
+  'AI Backend is offline. Please start it first: cd ai && python api_server.py';
 
 // ─── Health Score ───────────────────────────────────────────────────────────
 export const HEALTH_IDEAL_PH = 7.2;

@@ -1,7 +1,6 @@
 // useHistory.ts - Fetch AI inference history from the backend
 import { useEffect, useState, useCallback, useMemo } from 'react';
 
-const DEFAULT_LIMIT = 1000;
 import type { DateRange, HistoryDetectionResponse, HistoryTurbidityResponse } from '../types/aquarium';
 import {
   fetchDetectionHistory,
@@ -9,7 +8,8 @@ import {
   fetchTurbidityHistory,
   fetchTurbidityHistoryRange,
 } from '../services/ai_service';
-import { combineDateTime } from '../utils/formatters';
+import { recordInRange } from '../models/services/historyFilter';
+import { HISTORY_DEFAULT_LIMIT } from '../utils/constants';
 
 export interface UseHistoryResult {
   detectionData: HistoryDetectionResponse | null;
@@ -17,13 +17,6 @@ export interface UseHistoryResult {
   loading: boolean;
   error: string | null;
   refetch: () => void;
-}
-
-function recordInRange(record: { timestamp: string }, range: DateRange): boolean {
-  const ts = new Date(record.timestamp);
-  const start = combineDateTime(range.startDate, range.startTime);
-  const end = combineDateTime(range.endDate, range.endTime);
-  return ts >= start && ts <= end;
 }
 
 export const useHistory = (range: DateRange): UseHistoryResult => {
@@ -46,12 +39,12 @@ export const useHistory = (range: DateRange): UseHistoryResult => {
         const [det, turb] =
           startDate === endDate
             ? await Promise.all([
-                fetchDetectionHistory(startDate, DEFAULT_LIMIT, controller.signal),
-                fetchTurbidityHistory(startDate, DEFAULT_LIMIT, controller.signal),
+                fetchDetectionHistory(startDate, HISTORY_DEFAULT_LIMIT, controller.signal),
+                fetchTurbidityHistory(startDate, HISTORY_DEFAULT_LIMIT, controller.signal),
               ])
             : await Promise.all([
-                fetchDetectionHistoryRange(startDate, endDate, DEFAULT_LIMIT, controller.signal),
-                fetchTurbidityHistoryRange(startDate, endDate, DEFAULT_LIMIT, controller.signal),
+                fetchDetectionHistoryRange(startDate, endDate, HISTORY_DEFAULT_LIMIT, controller.signal),
+                fetchTurbidityHistoryRange(startDate, endDate, HISTORY_DEFAULT_LIMIT, controller.signal),
               ]);
         if (!cancelled) {
           setRawDetectionData(det);

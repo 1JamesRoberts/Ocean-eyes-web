@@ -3,6 +3,7 @@ import { useBackendStatus } from './useBackendStatus';
 import { useAIPolling } from './useAIPolling';
 import { useTurbidityMeasurement } from './useTurbidityMeasurement';
 import { useManualDiagnosis } from './useManualDiagnosis';
+import { selectActiveFeedMetrics } from '../../models/services/feedMetricsService';
 import type {
   AIDetectionResult,
   AITurbidityResult,
@@ -129,8 +130,11 @@ export const useAIAnalytics = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAIActive, lastPrediction, lastTurbidityResult]);
 
-  const currentClarity = isStreaming && liveState?.is_live ? activeFeed.current_clarity : 0;
-  const currentFishCount = isStreaming && liveState?.is_live ? activeFeed.current_fish_count : 0;
+  const { clarity: currentClarity, fishCount: currentFishCount } = selectActiveFeedMetrics(
+    isStreaming ? liveState : null,
+    activeFeed,
+    undefined
+  );
 
   return {
     isAIActive,

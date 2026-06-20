@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { isBackendAvailable } from '../../services/ai_service';
+import { BACKEND_HEALTH_CHECK_INTERVAL_MS } from '../../utils/constants';
 
 export type BackendStatus = 'unknown' | 'checking' | 'online' | 'offline';
 
@@ -7,8 +8,6 @@ export interface UseBackendStatusResult {
   backendStatus: BackendStatus;
   checkBackend: (signal?: AbortSignal) => Promise<boolean>;
 }
-
-const HEALTH_CHECK_INTERVAL_MS = 30_000;
 
 export const useBackendStatus = (isStreaming: boolean): UseBackendStatusResult => {
   const [backendStatus, setBackendStatus] = useState<BackendStatus>('unknown');
@@ -22,7 +21,7 @@ export const useBackendStatus = (isStreaming: boolean): UseBackendStatusResult =
     };
 
     check();
-    const interval = setInterval(check, HEALTH_CHECK_INTERVAL_MS);
+    const interval = setInterval(check, BACKEND_HEALTH_CHECK_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [isStreaming]);
 

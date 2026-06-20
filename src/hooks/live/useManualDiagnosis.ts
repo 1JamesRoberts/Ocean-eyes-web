@@ -2,6 +2,12 @@ import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateA
 import { useAlerts } from '../useAlerts';
 import { LocalStorageStore } from '../../services/localStorageStore';
 import { isVideoReady, captureFrame, sendFrameForDetection } from '../../services/ai_service';
+import { buildDiseaseAlert } from '../../models/services/alertBuilder';
+import {
+  DETECTION_CONFIDENCE,
+  DIAGNOSIS_MIN_CONF,
+  BACKEND_OFFLINE_MESSAGE,
+} from '../../utils/constants';
 import type { AIDetectionResult } from '../../types/aquarium';
 import type { BackendStatus } from './useBackendStatus';
 import type { UseAIAnalyticsOptions } from './useAIAnalytics';
@@ -19,9 +25,6 @@ interface UseManualDiagnosisResult {
   lastManualDiagnosis: AIDetectionResult | null;
   manualDiagnose: () => Promise<void>;
 }
-
-const DETECTION_CONFIDENCE = 0.35;
-const DIAGNOSIS_MIN_CONF = 0.6;
 
 export const useManualDiagnosis = ({
   cameraFeedRef,
@@ -51,9 +54,7 @@ export const useManualDiagnosis = ({
     if (manualDiagnosisLoading || aiLoading || backendStatus === 'checking' || !isStreaming) return;
 
     if (!(await checkBackend())) {
-      setManualDiagnosisError(
-        'AI Backend is offline. Please start it first: cd ai && python api_server.py',
-      );
+      setManualDiagnosisError(BACKEND_OFFLINE_MESSAGE);
       return;
     }
 
@@ -89,21 +90,7 @@ export const useManualDiagnosis = ({
 
       const diagnosedFish = result.detections.find((d) => d.diagnosis);
       if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
-        const diag = diagnosedFish.diagnosis;
-        addAlert({
-          id: `alert-disease-${Date.now()}`,
-          title: `Disease Alert: ${diag.disease}`,
-          message: `AI detected signs of ${diag.disease} on a ${diagnosedFish.species_display}: ${diag.description}`,
-          tip: `Recommended Action: ${diag.treatment}`,
-          severity: 'critical' as const,
-          timeAgo: 'Just now',
-          clarityBefore: '',
-          clarityAfter: '',
-          fishBefore: '',
-          fishAfter: '',
-          resolved: false,
-          timestamp: new Date().toISOString(),
-        });
+        addAlert(buildDiseaseAlert(diagnosedFish));
       }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;

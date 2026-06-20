@@ -3,6 +3,14 @@ import { useAlerts } from '../useAlerts';
 import { useReadings } from '../useReadings';
 import { LocalStorageStore, getSnapshot } from '../../services/localStorageStore';
 import { isVideoReady, captureFrame, sendFrameForDetection } from '../../services/ai_service';
+import { buildDiseaseAlert } from '../../models/services/alertBuilder';
+import {
+  AI_POLL_INTERVAL_MS,
+  DIAGNOSIS_COOLDOWN_MS,
+  DETECTION_CONFIDENCE,
+  DIAGNOSIS_MIN_CONF,
+  BACKEND_OFFLINE_MESSAGE,
+} from '../../utils/constants';
 import type { AIDetectionResult } from '../../types/aquarium';
 import type { BackendStatus } from './useBackendStatus';
 import type { UseAIAnalyticsOptions } from './useAIAnalytics';
@@ -20,11 +28,6 @@ interface UseAIPollingResult {
   setLastPrediction: Dispatch<SetStateAction<AIDetectionResult | null>>;
   toggleAI: () => Promise<void>;
 }
-
-const AI_POLL_INTERVAL_MS = 10_000;
-const ONE_HOUR_MS = 3_600_000;
-const DETECTION_CONFIDENCE = 0.35;
-const DIAGNOSIS_MIN_CONF = 0.6;
 
 export const useAIPolling = ({
   cameraFeedRef,
@@ -70,7 +73,7 @@ export const useAIPolling = ({
     }
 
     if (!(await checkBackend())) {
-      setAiError('AI Backend is offline. Please start it first: cd ai && python api_server.py');
+      setAiError(BACKEND_OFFLINE_MESSAGE);
       return;
     }
     setIsAIActive(true);
@@ -110,7 +113,7 @@ export const useAIPolling = ({
         const blob = await captureFrame(video);
 
         const lastDiag = getSnapshot<number>('oceaneyes_last_diagnosis_time', 0);
-        const shouldDiagnose = Date.now() - lastDiag > ONE_HOUR_MS;
+        const shouldDiagnose = Date.now() - lastDiag > DIAGNOSIS_COOLDOWN_MS;
 
         const result = await sendFrameForDetection(
           blob,
@@ -128,21 +131,7 @@ export const useAIPolling = ({
 
           const diagnosedFish = result.detections.find((d) => d.diagnosis);
           if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
-            const diag = diagnosedFish.diagnosis;
-            addAlert({
-              id: `alert-disease-${Date.now()}`,
-              title: `Disease Alert: ${diag.disease}`,
-              message: `AI detected signs of ${diag.disease} on a ${diagnosedFish.species_display}: ${diag.description}`,
-              tip: `Recommended Action: ${diag.treatment}`,
-              severity: 'critical' as const,
-              timeAgo: 'Just now',
-              clarityBefore: '',
-              clarityAfter: '',
-              fishBefore: '',
-              fishAfter: '',
-              resolved: false,
-              timestamp: new Date().toISOString(),
-            });
+            addAlert(buildDiseaseAlert(diagnosedFish));
           }
         }
 

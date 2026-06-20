@@ -5,7 +5,8 @@ import { useReadings } from '../../hooks/useReadings';
 import { useFish } from '../../hooks/useFish';
 import { useAlerts } from '../../hooks/useAlerts';
 import { useLiveState } from '../../hooks/useLiveState';
-import type { ReadingItem } from '../../types/aquarium';
+import { selectActiveFeedMetrics } from '../../models/services/feedMetricsService';
+import type { ReadingItem, CameraFeedConfig } from '../../types/aquarium';
 import { TankHeader } from '../../components/home/TankHeader';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { LiveFeedPreview } from '../../components/home/LiveFeedPreview';
@@ -27,13 +28,14 @@ export const HomeScreen: React.FC = () => {
 
   const latestReading: ReadingItem | undefined = readings[0];
 
-  const displayClarity = liveState?.is_live 
-    ? (liveState.feeds.find(f => f.id === liveState.selected_feed_id)?.current_clarity ?? latestReading?.clarity ?? 0)
-    : (latestReading?.clarity ?? 0);
-  
-  const displayFishCount = liveState?.is_live
-    ? (liveState.feeds.find(f => f.id === liveState.selected_feed_id)?.current_fish_count ?? latestReading?.fish_count ?? 0)
-    : (latestReading?.fish_count ?? 0);
+  const activeFeed: CameraFeedConfig | undefined = liveState?.feeds.find(
+    (f) => f.id === liveState?.selected_feed_id
+  );
+  const { clarity: displayClarity, fishCount: displayFishCount } = selectActiveFeedMetrics(
+    liveState,
+    activeFeed,
+    latestReading
+  );
 
   const activeAlertCount = alerts.filter(a => !a.resolved).length;
   const hasReadingData = latestReading !== undefined;

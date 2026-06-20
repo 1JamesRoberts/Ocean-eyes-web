@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import type { CameraFilters } from '../../types/aquarium';
 import type { CameraFeedHandle } from '../../components/live/CameraFeed';
 import { LocalStorageStore } from '../../services/localStorageStore';
+import {
+  getTemperatureRgba,
+  getTintRgba,
+  buildCanvasFilterString,
+} from '../../models/services/cameraFilterModel';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -101,9 +106,7 @@ export const useMediaCapture = ({
     if (filters.temperature !== 0) {
       ctx.save();
       ctx.globalCompositeOperation = 'color';
-      ctx.fillStyle = filters.temperature > 0
-        ? `rgba(255, 176, 0, ${Math.abs(filters.temperature) / 300})`
-        : `rgba(0, 160, 255, ${Math.abs(filters.temperature) / 300})`;
+      ctx.fillStyle = getTemperatureRgba(filters.temperature);
       ctx.fillRect(0, 0, SNAPSHOT_CANVAS_WIDTH, SNAPSHOT_CANVAS_HEIGHT);
       ctx.restore();
     }
@@ -111,9 +114,7 @@ export const useMediaCapture = ({
     if (filters.tint !== 0) {
       ctx.save();
       ctx.globalCompositeOperation = 'color';
-      ctx.fillStyle = filters.tint > 0
-        ? `rgba(255, 0, 187, ${Math.abs(filters.tint) / 400})`
-        : `rgba(0, 255, 68, ${Math.abs(filters.tint) / 400})`;
+      ctx.fillStyle = getTintRgba(filters.tint);
       ctx.fillRect(0, 0, SNAPSHOT_CANVAS_WIDTH, SNAPSHOT_CANVAS_HEIGHT);
       ctx.restore();
     }
@@ -134,7 +135,7 @@ export const useMediaCapture = ({
     const videoElement = cameraFeedRef.current?.videoElement;
 
     // Apply CSS-like filters via canvas filter
-    ctx.filter = `contrast(${filters.contrast}%) brightness(${filters.brightness}%) saturate(${filters.saturation}%)`;
+    ctx.filter = buildCanvasFilterString(filters);
 
     if (videoElement) {
       ctx.drawImage(videoElement, 0, 0, SNAPSHOT_CANVAS_WIDTH, SNAPSHOT_CANVAS_HEIGHT);

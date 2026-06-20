@@ -11,6 +11,12 @@ import { useAIAnalytics } from '../../hooks/live/useAIAnalytics';
 
 import { Video } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
+import {
+  getTemperatureColor,
+  getTemperatureOpacity,
+  getTintColor,
+  getTintOpacity,
+} from '../../models/services/cameraFilterModel';
 import { AIBoundingBoxes } from '../../components/live/AIBoundingBoxes';
 import { CameraControls } from '../../components/live/CameraControls';
 import { CameraFeed } from '../../components/live/CameraFeed';
@@ -151,8 +157,8 @@ export const LiveScreen: React.FC = () => {
                       mix-blend-color
                     "
                     style={{
-                      backgroundColor: filters.temperature > 0 ? '#ffb000' : '#00a0ff',
-                      opacity: Math.abs(filters.temperature) / 300
+                      backgroundColor: getTemperatureColor(filters.temperature),
+                      opacity: getTemperatureOpacity(filters.temperature)
                     }}
                   />
                 )}
@@ -163,8 +169,8 @@ export const LiveScreen: React.FC = () => {
                       mix-blend-color
                     "
                     style={{
-                      backgroundColor: filters.tint > 0 ? '#ff00bb' : '#00ff44',
-                      opacity: Math.abs(filters.tint) / 400
+                      backgroundColor: getTintColor(filters.tint),
+                      opacity: getTintOpacity(filters.tint)
                     }}
                   />
                 )}

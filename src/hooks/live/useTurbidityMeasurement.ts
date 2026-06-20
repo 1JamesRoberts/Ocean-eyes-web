@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useReadings } from '../useReadings';
 import { isVideoReady, captureFrame, sendFrameForTurbidity } from '../../services/ai_service';
+import { BACKEND_OFFLINE_MESSAGE } from '../../utils/constants';
 import type { AITurbidityResult } from '../../types/aquarium';
 import type { BackendStatus } from './useBackendStatus';
 import type { UseAIAnalyticsOptions } from './useAIAnalytics';
@@ -62,9 +63,7 @@ export const useTurbidityMeasurement = ({
     }
 
     if (!(await checkBackend())) {
-      setTurbidityError(
-        'AI Backend is offline. Please start it first: cd ai && python api_server.py',
-      );
+      setTurbidityError(BACKEND_OFFLINE_MESSAGE);
       return;
     }
 
