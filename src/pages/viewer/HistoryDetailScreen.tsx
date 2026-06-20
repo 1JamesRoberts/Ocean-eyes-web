@@ -1,11 +1,9 @@
 import React from 'react';
-import { useNavigation } from '../../context/NavigationContext';
-import { useReadings } from '../../hooks/useReadings';
+import { useHistoryDetailViewModel } from '../../viewModels/pages/useHistoryDetailViewModel';
 import { MiniClarityChart } from '../../components/analytics/MiniClarityChart';
 
 export const HistoryDetailScreen: React.FC = () => {
-  const { setActiveTab } = useNavigation();
-  const { readings } = useReadings();
+  const { readings, recentReadings, onBack } = useHistoryDetailViewModel();
 
   return (
     <div className="flex flex-col gap-6">
@@ -25,7 +23,7 @@ export const HistoryDetailScreen: React.FC = () => {
             cursor-pointer border-none bg-transparent font-main text-sm
             font-semibold text-primary-dark
           "
-          onClick={() => setActiveTab('home')}
+          onClick={onBack}
         >
           ← Back
         </button>
@@ -65,7 +63,7 @@ export const HistoryDetailScreen: React.FC = () => {
       {/* Diagnostic Logs */}
       <h3 className="mb-3 text-[15px] font-bold text-text-main">Database Reading Log Entries</h3>
       <div className="flex flex-col gap-2.5">
-        {readings.slice(0, 8).map(reading => {
+        {recentReadings.map(reading => {
           const date = new Date(reading.timestamp);
           const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           const day = date.toLocaleDateString([], { month: 'short', day: 'numeric' });

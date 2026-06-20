@@ -1,12 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigation } from '../../context/NavigationContext';
-import { useTank } from '../../hooks/useTank';
-import { useReadings } from '../../hooks/useReadings';
-import { useFish } from '../../hooks/useFish';
-import { useAlerts } from '../../hooks/useAlerts';
-import { useLiveState } from '../../hooks/useLiveState';
-import { selectActiveFeedMetrics } from '../../models/services/feedMetricsService';
-import type { ReadingItem, CameraFeedConfig } from '../../types/aquarium';
+import React from 'react';
+import { useHomeViewModel } from '../../viewModels/pages/useHomeViewModel';
 import { TankHeader } from '../../components/home/TankHeader';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { LiveFeedPreview } from '../../components/home/LiveFeedPreview';
@@ -17,46 +10,32 @@ import { ActiveAlertsList } from '../../components/home/ActiveAlertsList';
 import { AddTankModal } from '../../components/home/AddTankModal';
 
 export const HomeScreen: React.FC = () => {
-  const { setActiveTab, setSelectedAlertId, setAutoFullscreen } = useNavigation();
-  const { activeTank, tanks, linkedTanks, tankId, selectTank, createAndLinkTank, linkTank } = useTank();
-  const { readings } = useReadings();
-  const { fishList } = useFish(tankId);
-  const { alerts } = useAlerts();
-  const { liveState } = useLiveState(tankId);
-
-  const [showAddTankModal, setShowAddTankModal] = useState(false);
-
-  const latestReading: ReadingItem | undefined = readings[0];
-
-  const activeFeed: CameraFeedConfig | undefined = liveState?.feeds.find(
-    (f) => f.id === liveState?.selected_feed_id
-  );
-  const { clarity: displayClarity, fishCount: displayFishCount } = selectActiveFeedMetrics(
-    liveState,
-    activeFeed,
-    latestReading
-  );
-
-  const activeAlertCount = alerts.filter(a => !a.resolved).length;
-  const hasReadingData = latestReading !== undefined;
-
-  const handleSelectAlert = (alertId: string) => {
-    setSelectedAlertId(alertId);
-    setActiveTab('alerts');
-  };
-
-  const handleGoLiveFullscreen = () => {
-    setAutoFullscreen(true);
-    setActiveTab('live');
-  };
-
-  const handleCreateTank = async (name: string, cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }) => {
-    await createAndLinkTank(name, cameraSource);
-  };
-
-  const handleLinkTank = async (tankId: string): Promise<boolean> => {
-    return await linkTank(tankId);
-  };
+  const {
+    activeTank,
+    tanks,
+    linkedTanks,
+    tankId,
+    fishList,
+    latestReading,
+    displayClarity,
+    displayFishCount,
+    activeAlertCount,
+    hasReadingData,
+    readings,
+    alerts,
+    showAddTankModal,
+    selectTank,
+    onViewAlerts,
+    onGoLive,
+    onViewAdvanced,
+    onManageFish,
+    onViewHistory,
+    onAddTank,
+    onCloseAddTankModal,
+    onCreateTank,
+    onLinkTank,
+    onSelectAlert,
+  } = useHomeViewModel();
 
   return (
     <div className="flex flex-col gap-6">
@@ -67,8 +46,8 @@ export const HomeScreen: React.FC = () => {
         tankId={tankId}
         activeAlertCount={activeAlertCount}
         onSelectTank={selectTank}
-        onAddTank={() => setShowAddTankModal(true)}
-        onViewAlerts={() => setActiveTab('alerts')}
+        onAddTank={onAddTank}
+        onViewAlerts={onViewAlerts}
       />
 
       {!hasReadingData ? (
@@ -106,14 +85,14 @@ export const HomeScreen: React.FC = () => {
                 activeTank={activeTank}
                 displayClarity={displayClarity}
                 displayFishCount={displayFishCount}
-                onViewAdvanced={() => setActiveTab('live')}
-                onGoFullscreen={handleGoLiveFullscreen}
+                onViewAdvanced={onViewAdvanced}
+                onGoFullscreen={onGoLive}
               />
 
               <FishInventorySummary
                 fishList={fishList}
                 displayFishCount={displayFishCount}
-                onManageFish={() => setActiveTab('my_fish')}
+                onManageFish={onManageFish}
               />
             </div>
           </div>
@@ -122,7 +101,7 @@ export const HomeScreen: React.FC = () => {
             <WaterClarityCard
               displayClarity={displayClarity}
               readings={readings}
-              onClick={() => setActiveTab('history')}
+              onClick={onViewHistory}
             />
 
             <div>
@@ -134,7 +113,7 @@ export const HomeScreen: React.FC = () => {
 
             <ActiveAlertsList
               alerts={alerts}
-              onSelectAlert={handleSelectAlert}
+              onSelectAlert={onSelectAlert}
             />
           </div>
         </div>
@@ -142,9 +121,9 @@ export const HomeScreen: React.FC = () => {
 
       <AddTankModal
         show={showAddTankModal}
-        onClose={() => setShowAddTankModal(false)}
-        onCreateTank={handleCreateTank}
-        onLinkTank={handleLinkTank}
+        onClose={onCloseAddTankModal}
+        onCreateTank={onCreateTank}
+        onLinkTank={onLinkTank}
       />
     </div>
   );

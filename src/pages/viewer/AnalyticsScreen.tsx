@@ -1,73 +1,38 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
-import React, { useState } from 'react';
+import React from 'react';
 import { Calendar, RotateCcw, Loader2, ArrowRight, Trash2 } from 'lucide-react';
-import { useNavigation } from '../../context/NavigationContext';
-import { useReadings } from '../../hooks/useReadings';
-import { useHistory } from '../../hooks/useHistory';
-import { useFish } from '../../hooks/useFish';
-import {
-  resolveCropUrl,
-  clearDetectionHistoryRange,
-  clearTurbidityHistoryRange,
-} from '../../services/ai_service';
+import { useAnalyticsViewModel } from '../../viewModels/pages/useAnalyticsViewModel';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
 import { formatDateForDisplay } from '../../utils/formatters';
-import { useDateRangeFromUrl } from '../../hooks/useDateRangeFromUrl';
-import { useTank } from '../../hooks/useTank';
 
 export const AnalyticsScreen: React.FC = () => {
-  const { setActiveTab } = useNavigation();
-  const { tankId } = useTank();
-  const { readings } = useReadings();
-  const { fishList } = useFish(tankId);
-  const { range, setRange } = useDateRangeFromUrl();
-  const { detectionData, turbidityData, loading, error, refetch } = useHistory(range);
-  const inventorySpeciesIds = React.useMemo(
-    () => new Set(fishList.map((f) => f.speciesId)),
-    [fishList],
-  );
-
-  const detectionRecords = detectionData?.records ?? [];
-  const turbidityRecords = turbidityData?.records ?? [];
-  const hasAnyData = detectionRecords.length > 0 || turbidityRecords.length > 0 || readings.length > 0;
-
-  const diagnoses = detectionRecords
-    .flatMap(record => 
-      record.detections
-        .filter(det => det.diagnosis)
-        .map(det => ({
-          timestamp: record.timestamp,
-          species: det.species_display,
-          cropUrl: det.diagnosis!.crop_url,
-          diagnosis: det.diagnosis!
-        }))
-    )
-    .reverse();
-
-  const [selectedSpecies, setSelectedSpecies] = useState<string>('all');
-
-  const [confirmClear, setConfirmClear] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
-
-  const handleClearHistory = async () => {
-    setIsClearing(true);
-    try {
-      await Promise.all([
-        clearDetectionHistoryRange(range.startDate, range.endDate),
-        clearTurbidityHistoryRange(range.startDate, range.endDate),
-      ]);
-      setConfirmClear(false);
-      refetch();
-    } catch (err) {
-      console.error('Failed to clear history:', err);
-    } finally {
-      setIsClearing(false);
-    }
-  };
+  const {
+    tankId,
+    range,
+    setRange,
+    readings,
+    detectionRecords,
+    turbidityRecords,
+    diagnoses,
+    inventorySpeciesIds,
+    selectedSpecies,
+    setSelectedSpecies,
+    hasAnyData,
+    loading,
+    error,
+    refetch,
+    confirmClear,
+    isClearing,
+    onStartClear,
+    onCancelClear,
+    onConfirmClear,
+    onViewHistory,
+    resolveCropUrl,
+  } = useAnalyticsViewModel();
 
   return (
     <div className="flex flex-col gap-6">
@@ -206,10 +171,10 @@ export const AnalyticsScreen: React.FC = () => {
               transition-smooth
               lg:col-span-2
             "
-            onClick={() => setActiveTab('history')}
+            onClick={onViewHistory}
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter') setActiveTab('history'); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') onViewHistory(); }}
           >
             <div className="flex items-center justify-between">
               <div>
@@ -231,7 +196,7 @@ export const AnalyticsScreen: React.FC = () => {
                     font-semibold text-primary-dark
                     hover:bg-primary-dark hover:text-white
                   "
-                  onClick={(e) => { e.stopPropagation(); setActiveTab('history'); }}
+                  onClick={(e) => { e.stopPropagation(); onViewHistory(); }}
                 >
                   View Clarity Analytics →
                 </button>
@@ -262,7 +227,7 @@ export const AnalyticsScreen: React.FC = () => {
                       text-critical
                       hover:bg-critical/10
                     "
-                  onClick={() => setConfirmClear(true)}
+                  onClick={onStartClear}
                   title="Clear all diagnostics for this date"
                 >
                   <Trash2 size={14} />
@@ -280,7 +245,7 @@ export const AnalyticsScreen: React.FC = () => {
                       hover:opacity-90
                       disabled:cursor-not-allowed disabled:opacity-50
                     "
-                    onClick={handleClearHistory}
+                    onClick={onConfirmClear}
                     disabled={isClearing}
                   >
                     {isClearing ? 'Deleting…' : 'Yes, clear'}
@@ -293,7 +258,7 @@ export const AnalyticsScreen: React.FC = () => {
                       hover:bg-black/5
                       disabled:cursor-not-allowed disabled:opacity-50
                     "
-                    onClick={() => setConfirmClear(false)}
+                    onClick={onCancelClear}
                     disabled={isClearing}
                   >
                     Cancel

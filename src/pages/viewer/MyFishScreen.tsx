@@ -1,23 +1,31 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useTank } from '../../hooks/useTank';
-import { useFish } from '../../hooks/useFish';
+import React from 'react';
+import { useMyFishViewModel } from '../../viewModels/pages/useMyFishViewModel';
 import {
   Plus, Trash2, Fish, Hash, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle, HelpCircle, Heart
 } from 'lucide-react';
 import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
+import { DonutChart } from '../../components/fish/DonutChart';
+import { FishThumbnail } from '../../components/fish/FishThumbnail';
+import { DetailChip } from '../../components/fish/DetailChip';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
 import {
-  getSpeciesById, getSpeciesColor, getSpeciesInitials,
+  getSpeciesById,
+  checkTankCompatibility,
+  getCompatibilityLevel,
+  getCompatibilityColor,
   type SpeciesInfo
 } from '../../data/speciesCatalog';
-import { checkTankCompatibility, getCompatibilityLevel, getCompatibilityColor } from '../../data/speciesCatalog';
-import {
-  analyzeFishTank,
-  formatRange,
-} from '../../models/services/speciesService';
-import type { Difficulty, Aggression, BehaviorType, SwimLocation, Availability, BreedingDifficulty } from '../../types/aquarium';
+import { formatRange } from '../../models/services/speciesService';
+import type {
+  Difficulty,
+  Aggression,
+  BehaviorType,
+  SwimLocation,
+  Availability,
+  BreedingDifficulty,
+} from '../../types/aquarium';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -40,187 +48,27 @@ const breedingLabel: Record<BreedingDifficulty, string> = {
   easy: 'Easy', medium: 'Medium', hard: 'Hard', no_record: 'No Record'
 };
 
-// ─── DonutChart ──────────────────────────────────────────────────────────────
-
-interface DonutChartProps {
-  speciesDistribution: { name: string; count: number; color: string; initials: string }[];
-}
-
-const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
-  if (speciesDistribution.length === 0) {
-    return (
-      <div className="
-        flex h-[200px] items-center justify-center text-text-muted
-      ">
-        No fish data available
-      </div>
-    );
-  }
-
-  const total = speciesDistribution.reduce((sum, s) => sum + s.count, 0);
-  const radius = 80;
-  const circumference = 2 * Math.PI * radius;
-  
-  const segmentsWithOffsets = speciesDistribution.reduce<
-    Array<{ species: typeof speciesDistribution[0]; dashLength: number; gapLength: number; index: number; offset: number }>
-  >((acc, species, index) => {
-    const percentage = species.count / total;
-    const dashLength = circumference * percentage;
-    const gapLength = circumference - dashLength;
-    const offset = acc.length > 0 ? acc[acc.length - 1].offset + acc[acc.length - 1].dashLength : 0;
-    acc.push({ species, dashLength, gapLength, index, offset });
-    return acc;
-  }, []);
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative size-[200px]">
-        <svg width="200" height="200" viewBox="0 0 200 200">
-          <g transform="rotate(-90 100 100)">
-            {segmentsWithOffsets.map(({ species, dashLength, gapLength, offset, index }) => (
-              <circle
-                key={index}
-                cx="100"
-                cy="100"
-                r={radius}
-                fill="none"
-                stroke={species.color}
-                strokeWidth="24"
-                strokeDasharray={`${dashLength} ${gapLength}`}
-                strokeDashoffset={-offset}
-                className="transition-all duration-300 ease-in-out"
-              />
-            ))}
-          </g>
-        </svg>
-        <div className="absolute top-1/2 left-1/2 -translate-1/2 text-center">
-          <div className="text-[28px] font-extrabold text-text-main">{total}</div>
-          <div className="text-[11px] font-semibold text-text-muted">TOTAL FISH</div>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="flex w-full flex-wrap justify-center gap-2">
-        {speciesDistribution.map((species, index) => (
-          <div key={index} className="
-            flex items-center gap-1.5 text-xs font-semibold
-          ">
-            <div 
-              className="size-2.5 rounded-[3px]"
-              style={{ backgroundColor: species.color }} 
-            />
-            <span className="text-text-muted">
-              {species.name} ({species.count})
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// ─── FishThumbnail ────────────────────────────────────────────────────────────
-
-const FishThumbnail: React.FC<{ imagePath?: string; initials: string; color: string; size?: number }> =
-  ({ imagePath, initials, color, size = 40 }) => {
-    const [hasError, setHasError] = useState(false);
-    const s = size;
-    if (!imagePath || hasError) {
-      return (
-        <div 
-          className="
-            flex shrink-0 items-center justify-center rounded-lg font-bold
-            text-white shadow-[0_1px_2px_rgba(0,0,0,0.3)]
-          "
-          style={{
-            width: s, height: s,
-            backgroundColor: color, fontSize: Math.round(s * 0.3),
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-          }}
-        >
-          {initials}
-        </div>
-      );
-    }
-    return (
-      <img src={imagePath} alt={initials}
-        className="shrink-0 rounded-lg object-contain"
-        style={{ width: s, height: s }}
-        onError={() => setHasError(true)}
-      />
-    );
-  };
-
-// ─── Detail chip component ────────────────────────────────────────────────────
-
-const DetailChip: React.FC<{ icon: React.ReactNode; label: string; value: string; colorClass?: string }> =
-  ({ icon, label, value, colorClass }) => (
-    <div className={`
-      flex items-center gap-1.5 rounded-xl p-[8px_12px] text-xs font-semibold
-      text-text-main
-      ${colorClass || `bg-[rgba(148,163,184,0.12)]`}
-    `}>
-      {icon}
-      <span className="
-        mr-0.5 text-[10px] font-medium tracking-wider text-text-muted uppercase
-      ">{label}</span>
-      {value}
-    </div>
-  );
-
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 export const MyFishScreen: React.FC = () => {
-  const { tankId } = useTank();
-  const { fishList, addFish, removeFish, updateFishCount } = useFish(tankId);
-  const [name, setName] = useState('');
-  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [activeFishId, setActiveFishId] = useState<string | null>(null);
-  const [fishToDelete, setFishToDelete] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const fishCard = target.closest('[data-fish-card]');
-      if (!fishCard) setActiveFishId(null);
-    };
-    if (activeFishId) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [activeFishId]);
-
-  const handleAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !tankId) return;
-    const species = selectedSpeciesId ? getSpeciesById(selectedSpeciesId) : null;
-    const imageUrl = species ? species.imagePath : '/species-placeholder.png';
-    addFish(name.trim(), imageUrl, 1);
-    setName('');
-    setSelectedSpeciesId(null);
-    setShowAddForm(false);
-  };
-
-  const handleSpeciesSelect = (species: SpeciesInfo | null, customName?: string) => {
-    if (species) { setSelectedSpeciesId(species.id); setName(species.name); }
-    else if (customName) { setSelectedSpeciesId(null); setName(customName); }
-  };
-
-  const getSpeciesDisplay = (fish: typeof fishList[0]) => {
-    const species = getSpeciesById(fish.speciesId);
-    if (species) {
-      return { initials: species.initials, color: species.color, name: species.displayName, imagePath: species.imagePath };
-    }
-    return { initials: getSpeciesInitials(fish.speciesId), color: getSpeciesColor(fish.speciesId), name: fish.name, imagePath: undefined as string | undefined };
-  };
-
-  // ─── Memoized stats ──────────────────────────────────────────────────────
-
-  const { stats, speciesDistribution } = useMemo(
-    () => analyzeFishTank(fishList),
-    [fishList]
-  );
+  const {
+    fishList,
+    stats,
+    speciesDistribution,
+    selectedSpeciesId,
+    showAddForm,
+    activeFishId,
+    fishToDelete,
+    getSpeciesDisplay,
+    onToggleAddForm,
+    onCloseAddForm,
+    onSpeciesSelect,
+    onAdd,
+    onToggleFish,
+    onIncrementCount,
+    onDecrementCount,
+    onRequestDelete,
+    onCancelDelete,
+    onConfirmDelete,
+  } = useMyFishViewModel();
 
   // ─── Render ──────────────────────────────────────────────────────────────
 
@@ -244,7 +92,7 @@ export const MyFishScreen: React.FC = () => {
           className="
             cursor-pointer border-none bg-transparent p-1.5 text-primary-dark
           "
-          onClick={() => setShowAddForm(!showAddForm)}
+          onClick={onToggleAddForm}
         >
           <Plus size={24} />
         </button>
@@ -260,7 +108,7 @@ export const MyFishScreen: React.FC = () => {
         `
       }
       `}>
-        <form onSubmit={handleAdd} className="
+        <form onSubmit={onAdd} className="
           flex flex-col gap-3.5 rounded-[20px] border
           border-[rgba(13,148,136,0.02)] bg-surface-card p-6 shadow-card
           transition-smooth
@@ -273,7 +121,7 @@ export const MyFishScreen: React.FC = () => {
             ">SPECIES</label>
             <SpeciesSelector
               selectedSpeciesId={selectedSpeciesId}
-              onSelect={handleSpeciesSelect}
+              onSelect={onSpeciesSelect}
               placeholder="Search or select a species..."
               excludeSpeciesIds={fishList.map(f => f.speciesId)}
             />
@@ -296,7 +144,7 @@ export const MyFishScreen: React.FC = () => {
               transition-smooth
               hover:border-text-muted hover:bg-surface-hover
             " type="button"
-              onClick={() => { setShowAddForm(false); setName(''); setSelectedSpeciesId(null); }}>
+              onClick={onCloseAddForm}>
               Cancel
             </button>
           </div>
@@ -464,7 +312,7 @@ export const MyFishScreen: React.FC = () => {
                   transition-[box-shadow_0.25s_cubic-bezier(0.4,0,0.2,1)]
                   hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
                 "
-                onClick={() => setActiveFishId(isActive ? null : fish.id)}
+                onClick={() => onToggleFish(fish.id)}
               >
                 {/* Main row — always visible */}
                 <div className="flex items-center justify-between p-3">
@@ -500,7 +348,7 @@ export const MyFishScreen: React.FC = () => {
                             justify-center border-none bg-transparent text-base
                             font-extrabold text-text-main
                           "
-                            onClick={() => updateFishCount(fish.id, Math.max(1, fish.count - 1))}>−</button>
+                            onClick={() => onDecrementCount(fish.id, fish.count)}>−</button>
                           <span className="
                             w-6 text-center text-[13px] font-bold text-text-main
                           ">{fish.count}</span>
@@ -509,13 +357,13 @@ export const MyFishScreen: React.FC = () => {
                             justify-center border-none bg-transparent text-base
                             font-extrabold text-text-main
                           "
-                            onClick={() => updateFishCount(fish.id, fish.count + 1)}>+</button>
+                            onClick={() => onIncrementCount(fish.id, fish.count)}>+</button>
                         </div>
                         <button className="
                           flex cursor-pointer border-none bg-transparent p-1
                           text-[#94A3B8] transition-colors duration-200
                           hover:text-critical
-                        " onClick={() => setFishToDelete(fish.id)}>
+                        " onClick={() => onRequestDelete(fish.id)}>
                           <Trash2 size={16} />
                         </button>
                       </>
@@ -614,7 +462,7 @@ export const MyFishScreen: React.FC = () => {
 
       {/* ─── Delete Confirmation ─── */}
       {fishToDelete && (
-        <div className="modal-overlay" onClick={() => setFishToDelete(null)}>
+        <div className="modal-overlay" onClick={onCancelDelete}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h3 className="mb-2 text-lg font-bold text-text-main">Delete Fish Entry</h3>
             <p className="mb-6 text-sm text-text-muted">
@@ -628,7 +476,7 @@ export const MyFishScreen: React.FC = () => {
                 transition-smooth
                 hover:border-text-muted hover:bg-surface-hover
               "
-                onClick={() => setFishToDelete(null)}>Cancel</button>
+                onClick={onCancelDelete}>Cancel</button>
               <button className="
                 inline-flex cursor-pointer items-center justify-center gap-2
                 rounded-3xl border-none bg-critical px-5 py-2.5 font-main
@@ -637,7 +485,7 @@ export const MyFishScreen: React.FC = () => {
                 hover:opacity-90
                 active:scale-[0.98]
               "
-                onClick={() => { if (fishToDelete) { removeFish(fishToDelete); setFishToDelete(null); } }}>
+                onClick={onConfirmDelete}>
                 Delete
               </button>
             </div>

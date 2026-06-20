@@ -1,26 +1,24 @@
 import React from 'react';
-import { useNavigation } from '../../context/NavigationContext';
-import { useAlerts } from '../../hooks/useAlerts';
+import { useAlertsScreenViewModel } from '../../viewModels/pages/useAlertsScreenViewModel';
 import { AlertDetail } from '../../components/shared/AlertDetail';
 
 export const AlertsScreen: React.FC = () => {
-  const { setActiveTab, selectedAlertId, setSelectedAlertId } = useNavigation();
-  const { alerts, resolveAlert } = useAlerts();
-
-  const handleBack = () => {
-    setSelectedAlertId(null);
-    setActiveTab('home');
-  };
-
-  const selectedAlert = alerts.find(a => a.id === selectedAlertId);
+  const {
+    alerts,
+    selectedAlert,
+    onBack,
+    onSelectAlert,
+    onCloseDetail,
+    onResolve,
+  } = useAlertsScreenViewModel();
 
   // If an alert is selected, render the extracted AlertDetail component
   if (selectedAlert) {
     return (
       <AlertDetail
         alert={selectedAlert}
-        onBack={() => setSelectedAlertId(null)}
-        onResolve={resolveAlert}
+        onBack={onCloseDetail}
+        onResolve={onResolve}
       />
     );
   }
@@ -44,7 +42,7 @@ export const AlertsScreen: React.FC = () => {
             cursor-pointer border-none bg-transparent font-main text-sm
             font-semibold text-primary-dark
           "
-          onClick={handleBack}
+          onClick={onBack}
         >
           ← Back
         </button>
@@ -63,7 +61,7 @@ export const AlertsScreen: React.FC = () => {
               ${alert.resolved ? `opacity-60` : ''}
             `}
             style={{ borderLeftWidth: '5px', borderLeftColor: alert.resolved ? 'var(--color-good)' : alert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)' }}
-            onClick={() => setSelectedAlertId(alert.id)}
+            onClick={() => onSelectAlert(alert.id)}
           >
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-bold text-text-main">{alert.title}</h4>

@@ -1,36 +1,30 @@
-import React, { useState, useRef } from 'react';
-import { useNavigation } from '../../context/NavigationContext';
-import { useTank } from '../../hooks/useTank';
+import React from 'react';
+import { useSettingsViewModel } from '../../viewModels/pages/useSettingsViewModel';
 import { ChevronRight } from 'lucide-react';
 
 export const SettingsScreen: React.FC = () => {
-  const { setActiveTab } = useNavigation();
-  const { activeTank, unlinkTank, updateTankName, updateThresholds } = useTank();
-  const [name, setName] = useState(activeTank?.name || 'Living Room Reef');
-  const [editing, setEditing] = useState(false);
-  const [showConfirmUnlink, setShowConfirmUnlink] = useState(false);
-
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const debouncedUpdateThresholds = (clarityMin: number, fishPct: number) => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => {
-      updateThresholds(clarityMin, fishPct);
-    }, 300);
-  };
-
-  const flushThresholds = (clarityMin: number, fishPct: number) => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = null;
-    updateThresholds(clarityMin, fishPct);
-  };
-
-  const handleNameChange = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    updateTankName(name.trim());
-    setEditing(false);
-  };
+  const {
+    activeTank,
+    name,
+    setName,
+    editing,
+    showConfirmUnlink,
+    maxTurbidity,
+    fishChangePct,
+    handleNameChange,
+    onStartRename,
+    onTurbidityChange,
+    onTurbidityCommit,
+    onFishPctChange,
+    onFishPctCommit,
+    onRequestUnlink,
+    onCancelUnlink,
+    onConfirmUnlink,
+    onNavigateToFish,
+    onNavigateToHistory,
+    onNavigateToAlerts,
+    onNavigateToMonitor,
+  } = useSettingsViewModel();
 
   return (
     <div className="flex flex-col gap-6">
@@ -89,7 +83,7 @@ export const SettingsScreen: React.FC = () => {
                 font-main text-xs font-semibold text-text-main transition-smooth
                 hover:border-text-muted hover:bg-surface-hover
               "
-              onClick={() => setEditing(true)}
+              onClick={onStartRename}
             >
               Rename
             </button>
@@ -118,7 +112,7 @@ export const SettingsScreen: React.FC = () => {
             flex cursor-pointer items-center justify-between border-b
             border-border-card py-4
           "
-          onClick={() => setActiveTab('my_fish')}
+          onClick={onNavigateToFish}
         >
           <span className="text-[15px] font-semibold">Manage Fish Inventory</span>
           <ChevronRight size={18} className="text-text-muted" />
@@ -129,7 +123,7 @@ export const SettingsScreen: React.FC = () => {
             flex cursor-pointer items-center justify-between border-b
             border-border-card py-4
           "
-          onClick={() => setActiveTab('history')}
+          onClick={onNavigateToHistory}
         >
           <span className="text-[15px] font-semibold">Water Clarity Reports</span>
           <ChevronRight size={18} className="text-text-muted" />
@@ -140,7 +134,7 @@ export const SettingsScreen: React.FC = () => {
             flex cursor-pointer items-center justify-between border-b
             border-border-card py-4
           "
-          onClick={() => setActiveTab('alerts')}
+          onClick={onNavigateToAlerts}
         >
           <span className="text-[15px] font-semibold">Safety Alert Logs</span>
           <ChevronRight size={18} className="text-text-muted" />
@@ -148,7 +142,7 @@ export const SettingsScreen: React.FC = () => {
 
         <div
           className="flex cursor-pointer items-center justify-between py-4"
-          onClick={() => setActiveTab('monitor')}
+          onClick={onNavigateToMonitor}
         >
           <span className="text-[15px] font-semibold text-primary-dark">IoT Scanner Console</span>
           <ChevronRight size={18} className="text-primary-dark" />
@@ -165,29 +159,17 @@ export const SettingsScreen: React.FC = () => {
         <div className="mb-4">
           <div className="mb-1.5 flex justify-between text-[13px]">
             <span className="text-text-muted">Maximum FNU Threshold</span>
-            <strong className="text-primary-dark">{activeTank?.thresholds.max_turbidity_fnu || 6.0} FNU</strong>
+            <strong className="text-primary-dark">{maxTurbidity} FNU</strong>
           </div>
           <input
             type="range"
             min="1.0"
             max="10.0"
             step="0.5"
-            value={activeTank?.thresholds.max_turbidity_fnu || 6.0}
-            onChange={(e) => {
-              const val = parseFloat(e.target.value);
-              const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
-              debouncedUpdateThresholds(val, fishPct);
-            }}
-            onMouseUp={(e) => {
-              const val = parseFloat((e.target as HTMLInputElement).value);
-              const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
-              flushThresholds(val, fishPct);
-            }}
-            onTouchEnd={(e) => {
-              const val = parseFloat((e.target as HTMLInputElement).value);
-              const fishPct = activeTank?.thresholds.fish_change_pct || 50.0;
-              flushThresholds(val, fishPct);
-            }}
+            value={maxTurbidity}
+            onChange={(e) => onTurbidityChange(parseFloat(e.target.value))}
+            onMouseUp={(e) => onTurbidityCommit(parseFloat((e.target as HTMLInputElement).value))}
+            onTouchEnd={(e) => onTurbidityCommit(parseFloat((e.target as HTMLInputElement).value))}
             className="w-full accent-primary-dark"
           />
         </div>
@@ -195,29 +177,17 @@ export const SettingsScreen: React.FC = () => {
         <div>
           <div className="mb-1.5 flex justify-between text-[13px]">
             <span className="text-text-muted">Discrepancy Alarm Trigger</span>
-            <strong className="text-primary-dark">{activeTank?.thresholds.fish_change_pct || 50.0}% visibility</strong>
+            <strong className="text-primary-dark">{fishChangePct}% visibility</strong>
           </div>
           <input
             type="range"
             min="20"
             max="80"
             step="10"
-            value={activeTank?.thresholds.fish_change_pct || 50.0}
-            onChange={(e) => {
-              const val = parseInt(e.target.value);
-              const clar = activeTank?.thresholds.max_turbidity_fnu || 6.0;
-              debouncedUpdateThresholds(clar, val);
-            }}
-            onMouseUp={(e) => {
-              const val = parseInt((e.target as HTMLInputElement).value);
-              const clar = activeTank?.thresholds.max_turbidity_fnu || 6.0;
-              flushThresholds(clar, val);
-            }}
-            onTouchEnd={(e) => {
-              const val = parseInt((e.target as HTMLInputElement).value);
-              const clar = activeTank?.thresholds.max_turbidity_fnu || 6.0;
-              flushThresholds(clar, val);
-            }}
+            value={fishChangePct}
+            onChange={(e) => onFishPctChange(parseInt(e.target.value))}
+            onMouseUp={(e) => onFishPctCommit(parseInt((e.target as HTMLInputElement).value))}
+            onTouchEnd={(e) => onFishPctCommit(parseInt((e.target as HTMLInputElement).value))}
             className="w-full accent-primary-dark"
           />
         </div>
@@ -242,7 +212,7 @@ export const SettingsScreen: React.FC = () => {
                 transition-smooth
                 hover:border-text-muted hover:bg-surface-hover
               "
-              onClick={() => setShowConfirmUnlink(false)}
+              onClick={onCancelUnlink}
             >
               Cancel
             </button>
@@ -254,7 +224,7 @@ export const SettingsScreen: React.FC = () => {
                 hover:opacity-90
                 active:scale-[0.98]
               "
-              onClick={() => { unlinkTank(); setShowConfirmUnlink(false); }}
+              onClick={onConfirmUnlink}
             >
               Yes, Disconnect
             </button>
@@ -268,7 +238,7 @@ export const SettingsScreen: React.FC = () => {
             font-main text-[14px] font-semibold text-critical transition-smooth
             hover:bg-critical/5
           "
-          onClick={() => setShowConfirmUnlink(true)}
+          onClick={onRequestUnlink}
         >
           Disconnect from Tank
         </button>
