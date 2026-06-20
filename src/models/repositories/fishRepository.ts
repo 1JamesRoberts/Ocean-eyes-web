@@ -70,6 +70,31 @@ export const updateDetectedCount = (
   }
 };
 
+export const updateDetectedFromSpeciesCounts = (
+  tankId: string,
+  speciesCounts: Record<string, number>
+) => {
+  const fish = getFish(tankId);
+  let changed = false;
+
+  fish.forEach((entry) => {
+    entry.detected = 0;
+    changed = true;
+  });
+
+  Object.entries(speciesCounts).forEach(([speciesId, count]) => {
+    const entry = fish.find((f) => f.speciesId === speciesId);
+    if (entry) {
+      entry.detected = count;
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    saveFish(tankId, fish);
+  }
+};
+
 export const removeFish = (tankId: string, docId: string) => {
   const fish = getFish(tankId);
   const updated = fish.filter((f) => f.id !== docId);

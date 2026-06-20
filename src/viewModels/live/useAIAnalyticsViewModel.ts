@@ -98,6 +98,10 @@ export const useAIAnalyticsViewModel = ({
   } = useManualDiagnosisViewModel({
     cameraFeedRef,
     isStreaming,
+    activeFeed,
+    activeTank,
+    liveState,
+    tankId,
     backendStatus,
     checkBackend,
     aiLoading,
@@ -112,8 +116,7 @@ export const useAIAnalyticsViewModel = ({
       last_prediction: lastPrediction,
       last_turbidity_result: lastTurbidityResult,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAIActive, lastPrediction, lastTurbidityResult]);
+  }, [activeTank, liveState, isAIActive, lastPrediction, lastTurbidityResult, saveLiveState]);
 
   const { clarity: currentClarity, fishCount: currentFishCount } = selectActiveFeedMetrics(
     isStreaming ? liveState : null,

@@ -1,20 +1,11 @@
 // feedMetricsService.ts - Pure derivation of displayed clarity / fish count
 import type { CameraFeedConfig, LiveState, ReadingItem } from '../../types/aquarium';
+import { DEFAULT_FEED } from './feedDefaults';
 
 export interface FeedMetrics {
   clarity: number;
   fishCount: number;
 }
-
-const DEFAULT_FEED: CameraFeedConfig = {
-  id: 'feed-default',
-  name: 'Default Feed',
-  stream_url: 'webcam:default',
-  is_live: false,
-  started_at: null,
-  current_clarity: 0,
-  current_fish_count: 0,
-};
 
 export function selectActiveFeedMetrics(
   liveState: LiveState | null,

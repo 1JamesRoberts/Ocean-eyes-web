@@ -8,25 +8,14 @@ import {
 } from 'react';
 import type { CameraFeedConfig, LiveState, TankBrief, AIDetectionResult } from '../../types/aquarium';
 import type { CameraFeedHandle } from '../../components/live/CameraFeed';
-import { sendFrameForDetection } from '../../models/api/aiApi';
 import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
-import { buildDiseaseAlert } from '../../models/services/alertBuilder';
-import { recordFeedReading } from '../../models/services/readingRecorder';
-import {
-  getSnapshot,
-  safeSetItem,
-  notifyUpdate,
-} from '../../models/repositories/storageBase';
+import { processDetectionFrame } from '../../models/services/aiFrameProcessor';
 import { useAlertsViewModel } from '../useAlertsViewModel';
 import { useReadingsViewModel } from '../useReadingsViewModel';
 import { useFishViewModel } from '../useFishViewModel';
 import {
   AI_POLL_INTERVAL_MS,
-  DIAGNOSIS_COOLDOWN_MS,
-  DETECTION_CONFIDENCE,
-  DIAGNOSIS_MIN_CONF,
   BACKEND_OFFLINE_MESSAGE,
-  LAST_DIAGNOSIS_TIME_KEY,
 } from '../../utils/constants';
 import type { BackendStatus } from './useBackendStatusViewModel';
 
@@ -66,7 +55,7 @@ export const useAIPollingViewModel = ({
 }: UseAIPollingViewModelOptions): UseAIPollingViewModelResult => {
   const { addAlert } = useAlertsViewModel();
   const { writeReading } = useReadingsViewModel();
-  const { fishList, updateDetectedCount } = useFishViewModel(tankId);
+  useFishViewModel(tankId);
 
   const [isAIActive, setIsAIActive] = useState(() => liveState?.ai_active ?? false);
   const [lastPrediction, setLastPrediction] = useState<AIDetectionResult | null>(
@@ -77,6 +66,18 @@ export const useAIPollingViewModel = ({
   const aiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const aiAbortControllerRef = useRef<AbortController | null>(null);
   const aiMountedRef = useRef(false);
+
+  const activeTankRef = useRef(activeTank);
+  const liveStateRef = useRef(liveState);
+  const activeFeedRef = useRef(activeFeed);
+  const tankIdRef = useRef(tankId);
+
+  useEffect(() => {
+    activeTankRef.current = activeTank;
+    liveStateRef.current = liveState;
+    activeFeedRef.current = activeFeed;
+    tankIdRef.current = tankId;
+  });
 
   const toggleAI = useCallback(async () => {
     if (aiLoading || backendStatus === 'checking' || !isStreaming) return;
@@ -134,53 +135,30 @@ export const useAIPollingViewModel = ({
 
       try {
         const blob = await captureVideoFrame(video);
+        const currentTank = activeTankRef.current;
+        const currentLiveState = liveStateRef.current;
+        const currentFeed = activeFeedRef.current;
+        const currentTankId = tankIdRef.current;
 
-        const lastDiag = getSnapshot<number>(LAST_DIAGNOSIS_TIME_KEY, 0);
-        const shouldDiagnose = Date.now() - lastDiag > DIAGNOSIS_COOLDOWN_MS;
+        if (!currentTank || !currentLiveState || !currentTankId) {
+          return;
+        }
 
-        const result = await sendFrameForDetection(
+        const { result } = await processDetectionFrame(
           blob,
-          DETECTION_CONFIDENCE,
-          shouldDiagnose,
-          DIAGNOSIS_MIN_CONF,
+          {
+            tankId: currentTankId,
+            activeTankId: currentTank.id,
+            activeFeed: currentFeed,
+            liveState: currentLiveState,
+            writeReading,
+            addAlert,
+          },
           controller.signal
         );
 
         if (!aiMountedRef.current) return;
         setLastPrediction(result);
-
-        if (shouldDiagnose) {
-          const lastDiagResult = safeSetItem(LAST_DIAGNOSIS_TIME_KEY, Date.now().toString());
-          if (lastDiagResult.success) notifyUpdate(LAST_DIAGNOSIS_TIME_KEY);
-
-          const diagnosedFish = result.detections.find((d) => d.diagnosis);
-          if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
-            addAlert(buildDiseaseAlert(diagnosedFish));
-          }
-        }
-
-        if (activeTank && liveState) {
-          const totalFish = result.summary.total_detections;
-
-          recordFeedReading({
-            tankId: activeTank.id,
-            liveState,
-            activeFeed,
-            clarity: activeFeed.current_clarity ?? 0,
-            fishCount: totalFish,
-            writeReading,
-          });
-
-          fishList.forEach((fish) => {
-            updateDetectedCount(fish.id, 0);
-          });
-          Object.entries(result.summary.species_counts).forEach(([speciesId, count]) => {
-            const fishEntry = fishList.find((f) => f.speciesId === speciesId);
-            if (fishEntry) {
-              updateDetectedCount(fishEntry.id, count);
-            }
-          });
-        }
       } catch (err) {
         if (!aiMountedRef.current) return;
         if (err instanceof Error && err.name === 'AbortError') return;
@@ -209,8 +187,16 @@ export const useAIPollingViewModel = ({
         aiAbortControllerRef.current = null;
       }
     };
+    // Polling loop lifecycle is driven by the flags below; mutable frame data is read from refs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAIActive, isStreaming, backendStatus, activeFeed.mock_image, activeFeed.id, isWebcam]);
+  }, [
+    isAIActive,
+    isStreaming,
+    backendStatus,
+    activeFeed.mock_image,
+    activeFeed.id,
+    isWebcam,
+  ]);
 
   return {
     isAIActive,

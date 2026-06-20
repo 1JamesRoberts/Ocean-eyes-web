@@ -1,7 +1,6 @@
 // readingRepository.ts - Reading CRUD and live-state feed metric updates
 import type { ReadingItem } from '../../types/aquarium';
 import {
-  DEMO_TANK_ID,
   STORAGE_KEYS,
   getOrDefault,
   safeSetItem,
@@ -32,7 +31,7 @@ export const writeReading = (data: WriteReadingInput) => {
   const readings = getReadings();
   const newReading: ReadingItem = {
     id: `r-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    tank_id: DEMO_TANK_ID,
+    tank_id: data.tankId,
     timestamp: new Date().toISOString(),
     clarity: data.clarity,
     fish_count: data.fishCount,
