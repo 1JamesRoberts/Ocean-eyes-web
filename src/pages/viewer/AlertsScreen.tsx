@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAlertsScreenViewModel } from '../../viewModels/pages/useAlertsScreenViewModel';
+import { useAlertsScreen } from '../../hooks/pages/useAlertsScreen';
 import { AlertDetail } from '../../components/shared/AlertDetail';
 
 export const AlertsScreen: React.FC = () => {
@@ -10,7 +10,7 @@ export const AlertsScreen: React.FC = () => {
     onSelectAlert,
     onCloseDetail,
     onResolve,
-  } = useAlertsScreenViewModel();
+  } = useAlertsScreen();
 
   // If an alert is selected, render the extracted AlertDetail component
   if (selectedAlert) {

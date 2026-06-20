@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMyFishViewModel } from '../../viewModels/pages/useMyFishViewModel';
+import { useMyFish } from '../../hooks/pages/useMyFish';
 import {
   Plus, Trash2, Fish, Hash, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
@@ -68,7 +68,7 @@ export const MyFishScreen: React.FC = () => {
     onRequestDelete,
     onCancelDelete,
     onConfirmDelete,
-  } = useMyFishViewModel();
+  } = useMyFish();
 
   // ─── Render ──────────────────────────────────────────────────────────────
 

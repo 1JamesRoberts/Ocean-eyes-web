@@ -1,4 +1,4 @@
-// useDateRangeViewModel.ts - Sync analytics date range with URL query params
+// useDateRangeFromUrl.ts - Sync analytics date range with URL query params
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { format, isValid, parseISO, startOfDay } from 'date-fns';
 import type { DateRange } from '../types/aquarium';
@@ -47,7 +47,7 @@ export interface UseDateRangeViewModelResult {
   resetToToday: () => void;
 }
 
-export const useDateRangeViewModel = (): UseDateRangeViewModelResult => {
+export const useDateRangeFromUrl = (): UseDateRangeViewModelResult => {
   const [range, setLocalRange] = useState<DateRange>(() => {
     if (typeof window === 'undefined') return getDefaultRange();
     return buildRangeFromUrl(new URLSearchParams(window.location.search));

@@ -4,12 +4,12 @@ import {
   addAlert as addAlertToRepository,
   resolveAlert as resolveAlertInRepository,
   subscribeAlerts,
-} from '../models/repositories/alertRepository';
+} from '../models/repositories/storageBase';
 import type { AlertItem } from '../types/aquarium';
 
 const EMPTY_ALERTS: AlertItem[] = [];
 
-export const useAlertsViewModel = () => {
+export const useAlerts = () => {
   const alerts = useSyncExternalStore<AlertItem[]>(
     subscribeAlerts,
     () => getAlerts(),

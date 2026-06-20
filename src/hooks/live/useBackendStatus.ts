@@ -9,7 +9,7 @@ export interface UseBackendStatusViewModelResult {
   checkBackend: (signal?: AbortSignal) => Promise<boolean>;
 }
 
-export const useBackendStatusViewModel = (isStreaming: boolean): UseBackendStatusViewModelResult => {
+export const useBackendStatus = (isStreaming: boolean): UseBackendStatusViewModelResult => {
   const [backendStatus, setBackendStatus] = useState<BackendStatus>('unknown');
 
   useEffect(() => {

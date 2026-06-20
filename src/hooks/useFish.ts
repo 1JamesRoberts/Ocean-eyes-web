@@ -6,12 +6,12 @@ import {
   updateDetectedCount as updateDetectedCountInRepository,
   removeFish as removeFishFromRepository,
   subscribeFish,
-} from '../models/repositories/fishRepository';
+} from '../models/repositories/storageBase';
 import type { FishEntry } from '../types/aquarium';
 
 const EMPTY_FISH: FishEntry[] = [];
 
-export const useFishViewModel = (tankId: string | null) => {
+export const useFish = (tankId: string | null) => {
   const subscribeFishCallback = useCallback(
     (callback: () => void) => {
       if (!tankId) return () => {};

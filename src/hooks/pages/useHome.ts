@@ -1,20 +1,20 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useTankViewModel } from '../useTankViewModel';
-import { useReadingsViewModel } from '../useReadingsViewModel';
-import { useFishViewModel } from '../useFishViewModel';
-import { useAlertsViewModel } from '../useAlertsViewModel';
-import { useLiveFeedViewModel } from '../useLiveFeedViewModel';
-import { useNavigationViewModel } from '../useNavigationViewModel';
-import { selectActiveFeedMetrics } from '../../models/services/feedMetricsService';
+import { useTank } from '../useTank';
+import { useReadings } from '../useReadings';
+import { useFish } from '../useFish';
+import { useAlerts } from '../useAlerts';
+import { useLiveFeed } from '../useLiveFeed';
+import { useNavigation } from '../../context/NavigationContext';
+import { selectActiveFeedMetrics } from '../../models/services/inferenceHelpers';
 
-export const useHomeViewModel = () => {
-  const navigation = useNavigationViewModel();
+export const useHome = () => {
+  const navigation = useNavigation();
   const { activeTank, tanks, linkedTanks, tankId, selectTank, createAndLinkTank, linkTank } =
-    useTankViewModel();
-  const { readings } = useReadingsViewModel();
-  const { fishList } = useFishViewModel(tankId);
-  const { alerts } = useAlertsViewModel();
-  const { liveState, activeFeed } = useLiveFeedViewModel(tankId);
+    useTank();
+  const { readings } = useReadings();
+  const { fishList } = useFish(tankId);
+  const { alerts } = useAlerts();
+  const { liveState, activeFeed } = useLiveFeed(tankId);
 
   const [showAddTankModal, setShowAddTankModal] = useState(false);
 

@@ -7,7 +7,7 @@ export interface UseViewportSizeViewModelResult {
   handleDimensions: (width: number, height: number) => void;
 }
 
-export const useViewportSizeViewModel = (): UseViewportSizeViewModelResult => {
+export const useViewportSize = (): UseViewportSizeViewModelResult => {
   const imageContainerRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 640, height: 360 });
   const [imageNaturalSize, setImageNaturalSize] = useState({ width: 0, height: 0 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTankViewModel } from '../../viewModels/useTankViewModel';
+import { useTank } from '../../hooks/useTank';
 import { Camera } from 'lucide-react';
 
 interface ScreenProps {
@@ -7,7 +7,7 @@ interface ScreenProps {
 }
 
 export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
-  const { tankId, activeTank: contextActiveTank, tanks } = useTankViewModel();
+  const { tankId, activeTank: contextActiveTank, tanks } = useTank();
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
 
   return (

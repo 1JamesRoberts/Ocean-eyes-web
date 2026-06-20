@@ -1,7 +1,6 @@
 // readingRecorder.ts - Coordinator for recording readings and feed metrics
 import type { CameraFeedConfig, LiveState } from '../../types/aquarium';
-import { writeReading as defaultWriteReading } from '../repositories/readingRepository';
-import { saveLiveState } from '../repositories/liveStateRepository';
+import { writeReading as defaultWriteReading, saveLiveState } from '../repositories/storageBase';
 
 export interface RecordFeedReadingInput {
   tankId: string;

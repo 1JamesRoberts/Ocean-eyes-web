@@ -1,13 +1,13 @@
 import React, { useRef } from 'react';
-import { useNavigationViewModel } from '../../viewModels/useNavigationViewModel';
-import { useTankViewModel } from '../../viewModels/useTankViewModel';
-import { useLiveFeedViewModel } from '../../viewModels/useLiveFeedViewModel';
-import { useFishViewModel } from '../../viewModels/useFishViewModel';
-import { useFullscreenViewModel } from '../../viewModels/live/useFullscreenViewModel';
-import { useViewportSizeViewModel } from '../../viewModels/live/useViewportSizeViewModel';
-import { useCameraFiltersViewModel } from '../../viewModels/live/useCameraFiltersViewModel';
-import { useMediaCaptureViewModel } from '../../viewModels/live/useMediaCaptureViewModel';
-import { useAIAnalyticsViewModel } from '../../viewModels/live/useAIAnalyticsViewModel';
+import { useNavigation } from '../../context/NavigationContext';
+import { useTank } from '../../hooks/useTank';
+import { useLiveFeed } from '../../hooks/useLiveFeed';
+import { useFish } from '../../hooks/useFish';
+import { useFullscreen } from '../../hooks/live/useFullscreen';
+import { useViewportSize } from '../../hooks/live/useViewportSize';
+import { useCameraFilters } from '../../hooks/live/useCameraFilters';
+import { useMediaCapture } from '../../hooks/live/useMediaCapture';
+import { useAIAnalytics } from '../../hooks/live/useAIAnalytics';
 
 import { Video } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
@@ -22,8 +22,8 @@ import { AIAnalysisPanel } from '../../components/live/AIAnalysisPanel';
 import { VideoDecorations } from '../../components/live/VideoDecorations';
 
 export const LiveScreen: React.FC = () => {
-  const { autoFullscreen, setAutoFullscreen, setActiveTab } = useNavigationViewModel();
-  const { activeTank, tankId } = useTankViewModel();
+  const { autoFullscreen, setAutoFullscreen, setActiveTab } = useNavigation();
+  const { activeTank, tankId } = useTank();
   const {
     liveState,
     saveLiveState,
@@ -32,20 +32,20 @@ export const LiveScreen: React.FC = () => {
     isStreaming,
     videoRef,
     startStream
-  } = useLiveFeedViewModel(tankId);
-  const { fishList } = useFishViewModel(tankId);
+  } = useLiveFeed(tankId);
+  const { fishList } = useFish(tankId);
 
   const cameraFeedRef = useRef<CameraFeedHandle>(null);
 
-  const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreenViewModel({
+  const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen({
     autoFullscreen,
     setAutoFullscreen,
     setActiveTab,
   });
 
-  const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSizeViewModel();
+  const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSize();
 
-  const { filters, temperatureOverlay, tintOverlay, handleFilterChange } = useCameraFiltersViewModel();
+  const { filters, temperatureOverlay, tintOverlay, handleFilterChange } = useCameraFilters();
 
   const {
     snapshots,
@@ -59,7 +59,7 @@ export const LiveScreen: React.FC = () => {
     toggleRecording,
     downloadRecording,
     deleteRecording,
-  } = useMediaCaptureViewModel({
+  } = useMediaCapture({
     cameraFeedRef,
     isStreaming,
     filters,
@@ -81,7 +81,7 @@ export const LiveScreen: React.FC = () => {
     manualDiagnose,
     currentClarity,
     currentFishCount,
-  } = useAIAnalyticsViewModel({
+  } = useAIAnalytics({
     cameraFeedRef,
     isStreaming,
     activeFeed,

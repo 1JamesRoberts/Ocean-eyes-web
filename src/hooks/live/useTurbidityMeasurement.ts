@@ -2,11 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { CameraFeedConfig, LiveState, TankBrief, AITurbidityResult } from '../../types/aquarium';
 import type { CameraFeedHandle } from '../../components/live/CameraFeed';
 import { sendFrameForTurbidity } from '../../models/api/aiApi';
-import { isVideoReady, captureVideoFrame } from '../../models/services/frameCapture';
+import { isVideoReady, captureVideoFrame } from '../../models/services/inferenceHelpers';
 import { recordFeedReading } from '../../models/services/readingRecorder';
-import { useReadingsViewModel } from '../useReadingsViewModel';
+import { useReadings } from '../useReadings';
 import { BACKEND_OFFLINE_MESSAGE } from '../../utils/constants';
-import type { BackendStatus } from './useBackendStatusViewModel';
+import type { BackendStatus } from './useBackendStatus';
 
 export interface UseTurbidityMeasurementViewModelOptions {
   cameraFeedRef: React.RefObject<CameraFeedHandle | null>;
@@ -26,7 +26,7 @@ export interface UseTurbidityMeasurementViewModelResult {
   measureTurbidity: () => Promise<void>;
 }
 
-export const useTurbidityMeasurementViewModel = ({
+export const useTurbidityMeasurement = ({
   cameraFeedRef,
   isStreaming,
   activeFeed,
@@ -36,7 +36,7 @@ export const useTurbidityMeasurementViewModel = ({
   backendStatus,
   checkBackend,
 }: UseTurbidityMeasurementViewModelOptions): UseTurbidityMeasurementViewModelResult => {
-  const { writeReading } = useReadingsViewModel();
+  const { writeReading } = useReadings();
 
   const [turbidityLoading, setTurbidityLoading] = useState(false);
   const [turbidityError, setTurbidityError] = useState<string | null>(null);

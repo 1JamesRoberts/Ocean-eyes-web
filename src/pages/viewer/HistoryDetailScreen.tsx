@@ -1,9 +1,9 @@
 import React from 'react';
-import { useHistoryDetailViewModel } from '../../viewModels/pages/useHistoryDetailViewModel';
+import { useHistoryDetail } from '../../hooks/pages/useHistoryDetail';
 import { MiniClarityChart } from '../../components/analytics/MiniClarityChart';
 
 export const HistoryDetailScreen: React.FC = () => {
-  const { readings, recentReadings, onBack } = useHistoryDetailViewModel();
+  const { readings, recentReadings, onBack } = useHistoryDetail();
 
   return (
     <div className="flex flex-col gap-6">

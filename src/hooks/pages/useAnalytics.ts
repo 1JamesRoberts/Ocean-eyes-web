@@ -1,10 +1,10 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useTankViewModel } from '../useTankViewModel';
-import { useReadingsViewModel } from '../useReadingsViewModel';
-import { useFishViewModel } from '../useFishViewModel';
-import { useDateRangeViewModel } from '../useDateRangeViewModel';
-import { useHistoryViewModel } from '../useHistoryViewModel';
-import { useNavigationViewModel } from '../useNavigationViewModel';
+import { useTank } from '../useTank';
+import { useReadings } from '../useReadings';
+import { useFish } from '../useFish';
+import { useDateRangeFromUrl } from '../useDateRangeFromUrl';
+import { useHistory } from '../useHistory';
+import { useNavigation } from '../../context/NavigationContext';
 import {
   resolveCropUrl,
   clearDetectionHistoryRange,
@@ -13,13 +13,13 @@ import {
 import { selectDiagnoses, selectSpeciesList } from '../../models/services/historyAnalytics';
 import type { DateRange } from '../../types/aquarium';
 
-export const useAnalyticsViewModel = () => {
-  const navigation = useNavigationViewModel();
-  const { tankId } = useTankViewModel();
-  const { readings } = useReadingsViewModel();
-  const { fishList } = useFishViewModel(tankId);
-  const { range, setRange } = useDateRangeViewModel();
-  const { detectionData, turbidityData, loading, error, refetch } = useHistoryViewModel(range);
+export const useAnalytics = () => {
+  const navigation = useNavigation();
+  const { tankId } = useTank();
+  const { readings } = useReadings();
+  const { fishList } = useFish(tankId);
+  const { range, setRange } = useDateRangeFromUrl();
+  const { detectionData, turbidityData, loading, error, refetch } = useHistory(range);
 
   const detectionRecords = useMemo(() => detectionData?.records ?? [], [detectionData]);
   const turbidityRecords = useMemo(() => turbidityData?.records ?? [], [turbidityData]);

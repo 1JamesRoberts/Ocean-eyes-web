@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useTankViewModel } from '../useTankViewModel';
-import { useFishViewModel } from '../useFishViewModel';
+import { useTank } from '../useTank';
+import { useFish } from '../useFish';
 import { analyzeFishTank, type FishTankAnalysis } from '../../models/services/speciesService';
 import {
   getSpeciesById,
@@ -17,9 +17,9 @@ interface SpeciesDisplay {
   imagePath: string | undefined;
 }
 
-export const useMyFishViewModel = () => {
-  const { tankId } = useTankViewModel();
-  const { fishList, addFish, removeFish, updateFishCount } = useFishViewModel(tankId);
+export const useMyFish = () => {
+  const { tankId } = useTank();
+  const { fishList, addFish, removeFish, updateFishCount } = useFish(tankId);
 
   const [name, setName] = useState('');
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string | null>(null);

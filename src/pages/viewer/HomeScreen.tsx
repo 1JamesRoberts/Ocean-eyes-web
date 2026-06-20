@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHomeViewModel } from '../../viewModels/pages/useHomeViewModel';
+import { useHome } from '../../hooks/pages/useHome';
 import { TankHeader } from '../../components/home/TankHeader';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { LiveFeedPreview } from '../../components/home/LiveFeedPreview';
@@ -35,7 +35,7 @@ export const HomeScreen: React.FC = () => {
     onCreateTank,
     onLinkTank,
     onSelectAlert,
-  } = useHomeViewModel();
+  } = useHome();
 
   return (
     <div className="flex flex-col gap-6">

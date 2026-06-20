@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSettingsViewModel } from '../../viewModels/pages/useSettingsViewModel';
+import { useSettings } from '../../hooks/pages/useSettings';
 import { ChevronRight } from 'lucide-react';
 
 export const SettingsScreen: React.FC = () => {
@@ -24,7 +24,7 @@ export const SettingsScreen: React.FC = () => {
     onNavigateToHistory,
     onNavigateToAlerts,
     onNavigateToMonitor,
-  } = useSettingsViewModel();
+  } = useSettings();
 
   return (
     <div className="flex flex-col gap-6">

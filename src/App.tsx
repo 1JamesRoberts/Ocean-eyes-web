@@ -1,9 +1,9 @@
 // App.tsx - Full-Screen Desktop Dashboard Playground Coordinator
 import React from 'react';
 import { NavigationProvider } from './context/NavigationContext';
-import { useNavigationViewModel } from './viewModels/useNavigationViewModel';
-import { useTankViewModel } from './viewModels/useTankViewModel';
-import { useAlertsViewModel } from './viewModels/useAlertsViewModel';
+import { useNavigation } from './context/NavigationContext';
+import { useTank } from './hooks/useTank';
+import { useAlerts } from './hooks/useAlerts';
 import { ViewerApp } from './pages/ViewerApp';
 import {
   Home,
@@ -23,9 +23,9 @@ const NAV_ITEMS = [
 ];
 
 const OceanEyesDashboard: React.FC = () => {
-  const { activeTab, setActiveTab } = useNavigationViewModel();
-  const { tankId, activeTank, tanks, linkedTanks, selectTank } = useTankViewModel();
-  const { alerts } = useAlertsViewModel();
+  const { activeTab, setActiveTab } = useNavigation();
+  const { tankId, activeTank, tanks, linkedTanks, selectTank } = useTank();
+  const { alerts } = useAlerts();
   const activeAlertCount = alerts.filter(a => !a.resolved).length;
 
   return (

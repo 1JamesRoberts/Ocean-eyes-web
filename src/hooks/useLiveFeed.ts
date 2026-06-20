@@ -4,9 +4,8 @@ import {
   saveLiveState as saveLiveStateToRepository,
   updateCalibration as updateCalibrationInRepository,
   subscribeLiveState,
-} from '../models/repositories/liveStateRepository';
+} from '../models/repositories/storageBase';
 import type { CameraFeedConfig, LiveState } from '../types/aquarium';
-import { DEFAULT_FEED } from '../models/services/feedDefaults';
 
 export interface UseLiveFeedViewModelResult {
   liveState: LiveState | null;
@@ -20,7 +19,18 @@ export interface UseLiveFeedViewModelResult {
   updateCalibration: (waterLineY: number) => void;
 }
 
-export const useLiveFeedViewModel = (tankId: string | null): UseLiveFeedViewModelResult => {
+const DEFAULT_FEED: CameraFeedConfig = {
+  id: 'feed-main',
+  name: 'Local Webcam',
+  stream_url: 'webcam:default',
+  is_live: false,
+  started_at: null,
+  current_clarity: 1.2,
+  current_fish_count: 0,
+  mock_image: ''
+};
+
+export const useLiveFeed = (tankId: string | null): UseLiveFeedViewModelResult => {
   const subscribeLiveStateCallback = useCallback(
     (callback: () => void) => {
       if (!tankId) return () => {};

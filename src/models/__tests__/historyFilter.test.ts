@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { recordInRange } from '../services/historyFilter';
+import { recordInRange } from '../services/inferenceHelpers';
 import type { DateRange } from '../../types/aquarium';
 
 describe('historyFilter', () => {

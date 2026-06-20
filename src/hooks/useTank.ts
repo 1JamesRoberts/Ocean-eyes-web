@@ -10,13 +10,13 @@ import {
   updateThresholds as updateThresholdsInRepository,
   getLinkedTanks,
   subscribeTanks,
-} from '../models/repositories/tankRepository';
+} from '../models/repositories/storageBase';
 import type { TankBrief } from '../types/aquarium';
 
 const LAST_TANK_ID_KEY = 'oceaneyes_last_tank_id';
 const DEFAULT_TANKS: TankBrief[] = [DEMO_TANK];
 
-export const useTankViewModel = () => {
+export const useTank = () => {
   const tanks = useSyncExternalStore<TankBrief[]>(
     subscribeTanks,
     () => getTanks() ?? DEFAULT_TANKS,

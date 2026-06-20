@@ -1,4 +1,4 @@
-// useHistoryViewModel.ts - Fetch AI inference history from the backend
+// useHistory.ts - Fetch AI inference history from the backend
 import { useEffect, useState, useCallback, useMemo } from 'react';
 
 import type { DateRange, HistoryDetectionResponse, HistoryTurbidityResponse } from '../types/aquarium';
@@ -8,7 +8,7 @@ import {
   fetchTurbidityHistory,
   fetchTurbidityHistoryRange,
 } from '../models/api/aiApi';
-import { recordInRange } from '../models/services/historyFilter';
+import { recordInRange } from '../models/services/inferenceHelpers';
 import { HISTORY_DEFAULT_LIMIT } from '../utils/constants';
 
 export interface UseHistoryViewModelResult {
@@ -19,7 +19,7 @@ export interface UseHistoryViewModelResult {
   refetch: () => void;
 }
 
-export const useHistoryViewModel = (range: DateRange): UseHistoryViewModelResult => {
+export const useHistory = (range: DateRange): UseHistoryViewModelResult => {
   const [rawDetectionData, setRawDetectionData] = useState<HistoryDetectionResponse | null>(null);
   const [rawTurbidityData, setRawTurbidityData] = useState<HistoryTurbidityResponse | null>(null);
   const [loading, setLoading] = useState(false);

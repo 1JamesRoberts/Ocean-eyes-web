@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { selectActiveFeedMetrics } from '../services/feedMetricsService';
+import { selectActiveFeedMetrics } from '../services/inferenceHelpers';
 import type { CameraFeedConfig, LiveState, ReadingItem } from '../../types/aquarium';
 
 describe('feedMetricsService', () => {

@@ -1,5 +1,6 @@
 // storageBase.ts - Shared localStorage primitives and schema migrations
 import type {
+  AlertItem,
   FishEntry,
   LiveState,
   ReadingItem,
@@ -337,3 +338,261 @@ export const migrateLocalStorage = (): void => {
 
   safeSetItem(STORAGE_KEYS.schemaVersion, JSON.stringify(CURRENT_SCHEMA_VERSION));
 };
+
+// ===========================================================================
+// Tank repository
+// ===========================================================================
+
+export const getTanks = (): TankBrief[] => {
+  return getOrDefault<TankBrief[]>(STORAGE_KEYS.tanks, []);
+};
+
+export const saveTanks = (tanks: TankBrief[]) => {
+  const result = safeSetItem(STORAGE_KEYS.tanks, JSON.stringify(tanks));
+  if (result.success) notifyUpdate(STORAGE_KEYS.tanks);
+  return result;
+};
+
+export const updateTankName = (tankId: string, name: string) => {
+  const tanks = getTanks();
+  const index = tanks.findIndex((t) => t.id === tankId);
+  if (index !== -1) {
+    tanks[index].name = name;
+    saveTanks(tanks);
+  }
+};
+
+export const updateThresholds = (
+  tankId: string,
+  maxTurbidityFnu: number,
+  fishPct: number
+) => {
+  const tanks = getTanks();
+  const index = tanks.findIndex((t) => t.id === tankId);
+  if (index !== -1) {
+    tanks[index].thresholds = {
+      max_turbidity_fnu: maxTurbidityFnu,
+      fish_change_pct: fishPct,
+    };
+    saveTanks(tanks);
+  }
+};
+
+export async function createTank(
+  _name: string,
+  _cameraSource?: { type: 'mock' | 'webcam'; deviceId?: string }
+): Promise<string> {
+  // Single demo tank mode: creation is a no-op that returns the demo id.
+  return DEMO_TANK_ID;
+}
+
+export async function joinTank(_tankId: string): Promise<boolean> {
+  // Single demo tank mode: linking additional tanks is disabled.
+  return false;
+}
+
+export const getLinkedTanks = (): string[] => {
+  return [DEMO_TANK_ID];
+};
+
+export const unlinkTank = (_tankId: string) => {
+  // Single demo tank mode: unlinking is disabled.
+};
+
+export const subscribeTanks = (callback: () => void) =>
+  subscribeToDb(STORAGE_KEYS.tanks, callback);
+
+// ===========================================================================
+// Fish repository
+// ===========================================================================
+
+export const getFish = (tankId: string): FishEntry[] =>
+  getOrDefault<FishEntry[]>(STORAGE_KEYS.fish(tankId), []);
+
+export const saveFish = (tankId: string, fish: FishEntry[]) => {
+  const key = STORAGE_KEYS.fish(tankId);
+  const result = safeSetItem(key, JSON.stringify(fish));
+  if (result.success) notifyUpdate(key);
+  return result;
+};
+
+export const addFish = (
+  tankId: string,
+  name: string,
+  imageUrl: string,
+  count: number
+) => {
+  const fish = getFish(tankId);
+  const speciesId = name.toLowerCase().replace(/\s+/g, '_');
+
+  const existingIndex = fish.findIndex((f) => f.speciesId === speciesId);
+  if (existingIndex !== -1) {
+    fish[existingIndex].count += count;
+    fish[existingIndex].detected = fish[existingIndex].count;
+    saveFish(tankId, fish);
+    return;
+  }
+
+  const newEntry: FishEntry = {
+    id: `fish-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    tankId,
+    speciesId,
+    name,
+    imageUrl,
+    count,
+    detected: count,
+  };
+  fish.push(newEntry);
+  saveFish(tankId, fish);
+};
+
+export const updateFishCount = (tankId: string, docId: string, count: number) => {
+  const fish = getFish(tankId);
+  const index = fish.findIndex((f) => f.id === docId);
+  if (index !== -1) {
+    fish[index].count = count;
+    saveFish(tankId, fish);
+  }
+};
+
+export const updateDetectedCount = (
+  tankId: string,
+  docId: string,
+  detected: number
+) => {
+  const fish = getFish(tankId);
+  const index = fish.findIndex((f) => f.id === docId);
+  if (index !== -1) {
+    fish[index].detected = detected;
+    saveFish(tankId, fish);
+  }
+};
+
+export const removeFish = (tankId: string, docId: string) => {
+  const fish = getFish(tankId);
+  const updated = fish.filter((f) => f.id !== docId);
+  saveFish(tankId, updated);
+};
+
+export const subscribeFish = (tankId: string, callback: () => void) =>
+  subscribeToDb(STORAGE_KEYS.fish(tankId), callback);
+
+// ===========================================================================
+// Reading repository
+// ===========================================================================
+
+export const getReadings = (): ReadingItem[] =>
+  getOrDefault<ReadingItem[]>(STORAGE_KEYS.readings, []);
+
+export const saveReadings = (readings: ReadingItem[]) => {
+  const result = safeSetItem(STORAGE_KEYS.readings, JSON.stringify(readings));
+  if (result.success) notifyUpdate(STORAGE_KEYS.readings);
+  return result;
+};
+
+export interface WriteReadingInput {
+  tankId: string;
+  clarity: number;
+  fishCount: number;
+  ph?: number;
+  temp?: number;
+  ammonia?: number;
+  nitrite?: number;
+}
+
+export const writeReading = (data: WriteReadingInput) => {
+  const readings = getReadings();
+  const newReading: ReadingItem = {
+    id: `r-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    tank_id: DEMO_TANK_ID,
+    timestamp: new Date().toISOString(),
+    clarity: data.clarity,
+    fish_count: data.fishCount,
+    fish_count_confidence: 0.95,
+    frame_url: '',
+  };
+  if (data.ph !== undefined) newReading.ph = data.ph;
+  if (data.temp !== undefined) newReading.temp = data.temp;
+  if (data.ammonia !== undefined) newReading.ammonia = data.ammonia;
+  if (data.nitrite !== undefined) newReading.nitrite = data.nitrite;
+
+  readings.unshift(newReading);
+  saveReadings(readings.slice(0, 50));
+};
+
+export const subscribeReadings = (callback: () => void) =>
+  subscribeToDb(STORAGE_KEYS.readings, callback);
+
+// ===========================================================================
+// Alert repository
+// ===========================================================================
+
+export const getAlerts = (): AlertItem[] =>
+  getOrDefault<AlertItem[]>(STORAGE_KEYS.alerts, []);
+
+export const saveAlerts = (alerts: AlertItem[]) => {
+  const result = safeSetItem(STORAGE_KEYS.alerts, JSON.stringify(alerts));
+  if (result.success) notifyUpdate(STORAGE_KEYS.alerts);
+  return result;
+};
+
+export const addAlert = (alert: AlertItem) => {
+  saveAlerts([alert, ...getAlerts()]);
+};
+
+export const resolveAlert = (alertId: string) => {
+  const alerts = getAlerts();
+  const index = alerts.findIndex((a) => a.id === alertId);
+  if (index !== -1) {
+    alerts[index].resolved = true;
+    saveAlerts(alerts);
+  }
+};
+
+export const subscribeAlerts = (callback: () => void) =>
+  subscribeToDb(STORAGE_KEYS.alerts, callback);
+
+// ===========================================================================
+// Live state repository
+// ===========================================================================
+
+export const getLiveState = (tankId: string): LiveState => {
+  const key = STORAGE_KEYS.liveState(tankId);
+  return getOrDefault<LiveState>(key, getDefaultLiveState());
+};
+
+export const saveLiveState = (tankId: string, state: LiveState) => {
+  const key = STORAGE_KEYS.liveState(tankId);
+  const result = safeSetItem(key, JSON.stringify(state));
+  if (result.success) notifyUpdate(key);
+  return result;
+};
+
+export const switchActiveFeed = (tankId: string, feedId: string) => {
+  const liveState = getLiveState(tankId);
+  const activeFeed = liveState.feeds.find((f) => f.id === feedId);
+  if (activeFeed) {
+    liveState.selected_feed_id = feedId;
+    liveState.stream_url = activeFeed.stream_url;
+    liveState.current_clarity = activeFeed.current_clarity;
+    liveState.current_fish_count = activeFeed.current_fish_count;
+    liveState.started_at = activeFeed.started_at;
+    saveLiveState(tankId, liveState);
+  }
+};
+
+export const updateCalibration = (
+  tankId: string,
+  feedId: string,
+  waterLineY: number
+) => {
+  const liveState = getLiveState(tankId);
+  const feedIndex = liveState.feeds.findIndex((f) => f.id === feedId);
+  if (feedIndex === -1) return;
+  liveState.feeds[feedIndex].calibration = { water_line_y: waterLineY };
+  saveLiveState(tankId, liveState);
+};
+
+export const subscribeLiveState = (tankId: string, callback: () => void) =>
+  subscribeToDb(STORAGE_KEYS.liveState(tankId), callback);
+

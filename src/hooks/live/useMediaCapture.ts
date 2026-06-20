@@ -48,7 +48,7 @@ interface UseMediaCaptureViewModelResult {
 const SNAPSHOT_CANVAS_WIDTH = 640;
 const SNAPSHOT_CANVAS_HEIGHT = 360;
 
-export const useMediaCaptureViewModel = ({
+export const useMediaCapture = ({
   cameraFeedRef,
   isStreaming,
   filters,

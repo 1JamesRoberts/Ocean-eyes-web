@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { useTankViewModel } from '../useTankViewModel';
-import { useNavigationViewModel } from '../useNavigationViewModel';
+import { useTank } from '../useTank';
+import { useNavigation } from '../../context/NavigationContext';
 
-export const useSettingsViewModel = () => {
-  const navigation = useNavigationViewModel();
-  const { activeTank, unlinkTank, updateTankName, updateThresholds } = useTankViewModel();
+export const useSettings = () => {
+  const navigation = useNavigation();
+  const { activeTank, unlinkTank, updateTankName, updateThresholds } = useTank();
 
   const [name, setName] = useState(() => activeTank?.name || 'Living Room Reef');
   const [editing, setEditing] = useState(false);

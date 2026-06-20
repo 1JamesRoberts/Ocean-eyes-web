@@ -1,10 +1,10 @@
 import { useMemo, useCallback } from 'react';
-import { useAlertsViewModel } from '../useAlertsViewModel';
-import { useNavigationViewModel } from '../useNavigationViewModel';
+import { useAlerts } from '../useAlerts';
+import { useNavigation } from '../../context/NavigationContext';
 
-export const useAlertsScreenViewModel = () => {
-  const { setActiveTab, selectedAlertId, setSelectedAlertId } = useNavigationViewModel();
-  const { alerts, resolveAlert } = useAlertsViewModel();
+export const useAlertsScreen = () => {
+  const { setActiveTab, selectedAlertId, setSelectedAlertId } = useNavigation();
+  const { alerts, resolveAlert } = useAlerts();
 
   const selectedAlert = useMemo(
     () => alerts.find((a) => a.id === selectedAlertId),

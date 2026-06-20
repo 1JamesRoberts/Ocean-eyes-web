@@ -15,7 +15,7 @@ export interface UseFullscreenViewModelResult {
   toggleFullscreen: () => void;
 }
 
-export const useFullscreenViewModel = ({
+export const useFullscreen = ({
   autoFullscreen,
   setAutoFullscreen,
   setActiveTab,

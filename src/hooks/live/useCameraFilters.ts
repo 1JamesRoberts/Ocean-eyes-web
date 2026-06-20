@@ -24,7 +24,7 @@ export interface UseCameraFiltersViewModelResult {
   handleFilterChange: (partial: Partial<CameraFilters>) => void;
 }
 
-export const useCameraFiltersViewModel = (): UseCameraFiltersViewModelResult => {
+export const useCameraFilters = (): UseCameraFiltersViewModelResult => {
   const [filters, setFilters] = useState<CameraFilters>(DEFAULT_FILTERS);
 
   const handleFilterChange = useCallback((partial: Partial<CameraFilters>) => {

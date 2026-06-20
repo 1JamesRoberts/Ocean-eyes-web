@@ -1,7 +1,7 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React from 'react';
 import { Calendar, RotateCcw, Loader2, ArrowRight, Trash2 } from 'lucide-react';
-import { useAnalyticsViewModel } from '../../viewModels/pages/useAnalyticsViewModel';
+import { useAnalytics } from '../../hooks/pages/useAnalytics';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
@@ -32,7 +32,7 @@ export const AnalyticsScreen: React.FC = () => {
     onConfirmClear,
     onViewHistory,
     resolveCropUrl,
-  } = useAnalyticsViewModel();
+  } = useAnalytics();
 
   return (
     <div className="flex flex-col gap-6">

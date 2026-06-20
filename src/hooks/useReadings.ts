@@ -3,12 +3,12 @@ import {
   getReadings,
   writeReading as writeReadingToRepository,
   subscribeReadings,
-} from '../models/repositories/readingRepository';
+} from '../models/repositories/storageBase';
 import type { ReadingItem } from '../types/aquarium';
 
 const EMPTY_READINGS: ReadingItem[] = [];
 
-export const useReadingsViewModel = () => {
+export const useReadings = () => {
   const readings = useSyncExternalStore<ReadingItem[]>(
     subscribeReadings,
     () => getReadings(),
