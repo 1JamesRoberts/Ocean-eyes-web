@@ -21,11 +21,12 @@ export function calculateHealthScore(reading: HealthReading): number {
   const ph = reading.ph ?? HEALTH_IDEAL_PH;
   const ammonia = reading.ammonia ?? 0;
   const nitrite = reading.nitrite ?? 0;
+  const clarity = reading.clarity ?? 0;
   const score = Math.max(
     HEALTH_MIN_SCORE,
     HEALTH_MAX_SCORE -
       Math.abs(HEALTH_IDEAL_PH - ph) * HEALTH_PH_PENALTY_FACTOR -
-      Math.max(0, reading.clarity - HEALTH_CLARITY_THRESHOLD) * HEALTH_CLARITY_PENALTY_FACTOR -
+      Math.max(0, clarity - HEALTH_CLARITY_THRESHOLD) * HEALTH_CLARITY_PENALTY_FACTOR -
       ammonia * HEALTH_AMMONIA_PENALTY_FACTOR -
       nitrite * HEALTH_NITRITE_PENALTY_FACTOR
   );

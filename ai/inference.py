@@ -226,7 +226,7 @@ def diagnose_fish_image_openai(crop_bytes: bytes) -> dict:
     Configured via LLM_API_URL, LLM_MODEL, and LLM_API_KEY environment variables.
     """
     api_url = os.getenv("LLM_API_URL")
-    model = os.getenv("LLM_MODEL")
+    model = os.getenv("LLM_MODEL") or "gpt-4o-mini"
     api_key = os.getenv("LLM_API_KEY")
 
     if not api_url:
