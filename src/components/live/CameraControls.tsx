@@ -104,6 +104,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         className={getBtnClasses(false, false)} 
         onClick={onTakeSnapshot} 
         title="Capture Snapshot"
+        aria-label="Capture Snapshot"
       >
         <Camera size={16} />
       </button>
@@ -112,6 +113,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         className={getBtnClasses(isRecording, false, 'bg-critical border-white/30 animate-pulse-recording')}
         onClick={onToggleRecording}
         title={isRecording ? "Stop Recording" : "Start Recording"}
+        aria-label={isRecording ? "Stop Recording" : "Start Recording"}
       >
         {isRecording ? <Square size={14} /> : <Video size={16} />}
       </button>
@@ -120,6 +122,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         onClick={onMeasureTurbidity}
         disabled={turbidityLoading || isChecking || !isStreaming || !hasImageSource}
         title={getTurbidityButtonTitle()}
+        aria-label={getTurbidityButtonTitle()}
         className={getBtnClasses(false, turbidityLoading || isChecking || !isStreaming || !hasImageSource)}
       >
         {turbidityLoading || isChecking ? <Loader2 size={16} className="
@@ -131,6 +134,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         onClick={onToggleAI}
         disabled={aiLoading || isChecking || !isStreaming}
         title={getAIButtonTitle()}
+        aria-label={getAIButtonTitle()}
         className={getBtnClasses(isAIActive, aiLoading || isChecking || !isStreaming, 'animate-pulse-ai')}
       >
         {aiLoading || isChecking ? <Loader2 size={16} className="animate-spin" /> : <Brain size={16} />}
@@ -140,6 +144,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         onClick={onManualDiagnose}
         disabled={manualDiagnoseLoading || aiLoading || isChecking || !isStreaming}
         title={getDiagnoseButtonTitle()}
+        aria-label={getDiagnoseButtonTitle()}
         className={getBtnClasses(false, manualDiagnoseLoading || aiLoading || isChecking || !isStreaming)}
       >
         {manualDiagnoseLoading ? <Loader2 size={16} className="animate-spin" /> : <Stethoscope size={16} />}
@@ -149,6 +154,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         <button
           onClick={onToggleFsInventory}
           title={showFsInventory ? "Hide Fish Inventory" : "Show Fish Inventory"}
+          aria-label={showFsInventory ? "Hide Fish Inventory" : "Show Fish Inventory"}
           className={getBtnClasses(showFsInventory, false)}
         >
           <Fish size={16} />
@@ -158,6 +164,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       <button
         onClick={onToggleFullscreen}
         title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+        aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
         className={getBtnClasses(false, false)}
       >
         {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}

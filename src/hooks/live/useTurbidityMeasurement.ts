@@ -40,13 +40,15 @@ export const useTurbidityMeasurement = ({
 
   const [turbidityLoading, setTurbidityLoading] = useState(false);
   const [turbidityError, setTurbidityError] = useState<string | null>(null);
-  const turbidityAbortControllerRef = useRef<AbortController | null>(null);
   const [lastTurbidityResult, setLastTurbidityResult] = useState<AITurbidityResult | null>(
     () => liveState?.last_turbidity_result ?? null
   );
+  const turbidityAbortControllerRef = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     return () => {
+      mountedRef.current = false;
       if (turbidityAbortControllerRef.current) {
         turbidityAbortControllerRef.current.abort();
         turbidityAbortControllerRef.current = null;
@@ -84,7 +86,9 @@ export const useTurbidityMeasurement = ({
 
     try {
       const blob = await captureVideoFrame(video);
+      if (!mountedRef.current) return;
       const result = await sendFrameForTurbidity(blob, controller.signal);
+      if (!mountedRef.current) return;
       setLastTurbidityResult(result);
 
       if (activeTank && liveState) {

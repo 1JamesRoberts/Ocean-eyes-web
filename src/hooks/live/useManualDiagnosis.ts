@@ -42,9 +42,11 @@ export const useManualDiagnosis = ({
   const [manualDiagnosisError, setManualDiagnosisError] = useState<string | null>(null);
   const [lastManualDiagnosis, setLastManualDiagnosis] = useState<AIDetectionResult | null>(null);
   const manualDiagnosisAbortControllerRef = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     return () => {
+      mountedRef.current = false;
       if (manualDiagnosisAbortControllerRef.current) {
         manualDiagnosisAbortControllerRef.current.abort();
         manualDiagnosisAbortControllerRef.current = null;
@@ -78,6 +80,7 @@ export const useManualDiagnosis = ({
 
     try {
       const blob = await captureVideoFrame(video);
+      if (!mountedRef.current) return;
       const result = await sendFrameForDetection(
         blob,
         DETECTION_CONFIDENCE,
@@ -85,6 +88,7 @@ export const useManualDiagnosis = ({
         DIAGNOSIS_MIN_CONF,
         controller.signal
       );
+      if (!mountedRef.current) return;
 
       setLastPrediction(result);
       setLastManualDiagnosis(result);

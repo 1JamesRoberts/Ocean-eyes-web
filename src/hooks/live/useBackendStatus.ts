@@ -17,7 +17,7 @@ export const useBackendStatus = (isStreaming: boolean): UseBackendStatusViewMode
 
     const check = async () => {
       const ok = await isBackendAvailable();
-      setBackendStatus((prev) => (prev === 'checking' ? prev : ok ? 'online' : 'offline'));
+      setBackendStatus(ok ? 'online' : 'offline');
     };
 
     check();
@@ -32,7 +32,7 @@ export const useBackendStatus = (isStreaming: boolean): UseBackendStatusViewMode
       setBackendStatus(ok ? 'online' : 'offline');
       return ok;
     },
-    [backendStatus]
+    []
   );
 
   return { backendStatus, checkBackend };
