@@ -27,8 +27,6 @@ export const useBackendStatus = (isStreaming: boolean): UseBackendStatusViewMode
 
   const checkBackend = useCallback(
     async (signal?: AbortSignal): Promise<boolean> => {
-      if (backendStatus === 'online') return true;
-
       setBackendStatus('checking');
       const ok = await isBackendAvailable(signal);
       setBackendStatus(ok ? 'online' : 'offline');

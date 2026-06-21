@@ -54,13 +54,21 @@ export const useMediaCapture = ({
   filters,
 }: UseMediaCaptureViewModelOptions): UseMediaCaptureViewModelResult => {
   const [snapshots, setSnapshots] = useState<SnapshotEntry[]>(() => {
-    const saved = localStorage.getItem(SNAPSHOTS_STORAGE_KEY);
-    return saved ? (JSON.parse(saved) as SnapshotEntry[]) : [];
+    try {
+      const saved = localStorage.getItem(SNAPSHOTS_STORAGE_KEY);
+      return saved ? (JSON.parse(saved) as SnapshotEntry[]) : [];
+    } catch {
+      return [];
+    }
   });
 
   const [recordings, setRecordings] = useState<RecordingEntry[]>(() => {
-    const saved = localStorage.getItem(RECORDINGS_STORAGE_KEY);
-    return saved ? (JSON.parse(saved) as RecordingEntry[]) : [];
+    try {
+      const saved = localStorage.getItem(RECORDINGS_STORAGE_KEY);
+      return saved ? (JSON.parse(saved) as RecordingEntry[]) : [];
+    } catch {
+      return [];
+    }
   });
 
   const [isRecording, setIsRecording] = useState(false);

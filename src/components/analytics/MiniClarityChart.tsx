@@ -36,7 +36,7 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
     const history = [...readings].reverse().slice(-7);
     if (history.length === 0) return [];
     return history.map((r, idx) => {
-      const x = PADDING + (idx * (width - 2 * PADDING) / (history.length - 1));
+      const x = PADDING + (idx * (width - 2 * PADDING) / Math.max(1, history.length - 1));
       const y = HEIGHT - PADDING - ((r.clarity - MIN_VAL) * (HEIGHT - 2 * PADDING) / (MAX_VAL - MIN_VAL));
       return { x, y, clarity: r.clarity };
     });

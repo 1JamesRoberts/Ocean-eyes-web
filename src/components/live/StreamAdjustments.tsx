@@ -41,8 +41,12 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedPresetId, setSelectedPresetId] = useState<string>('normal');
   const [customPresets, setCustomPresets] = useState<FilterPreset[]>(() => {
-    const saved = localStorage.getItem('oceaneyes_camera_presets');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('oceaneyes_camera_presets');
+      return saved ? (JSON.parse(saved) as FilterPreset[]) : [];
+    } catch {
+      return [];
+    }
   });
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [newPresetName, setNewPresetName] = useState('');

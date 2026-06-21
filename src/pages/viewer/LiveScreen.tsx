@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { useNavigation } from '../../context/NavigationContext';
 import { useTank } from '../../hooks/useTank';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
 import { useFish } from '../../hooks/useFish';
@@ -22,7 +21,6 @@ import { AIAnalysisPanel } from '../../components/live/AIAnalysisPanel';
 import { VideoDecorations } from '../../components/live/VideoDecorations';
 
 export const LiveScreen: React.FC = () => {
-  const { autoFullscreen, setAutoFullscreen, setActiveTab } = useNavigation();
   const { activeTank, tankId } = useTank();
   const {
     liveState,
@@ -37,11 +35,7 @@ export const LiveScreen: React.FC = () => {
 
   const cameraFeedRef = useRef<CameraFeedHandle>(null);
 
-  const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen({
-    autoFullscreen,
-    setAutoFullscreen,
-    setActiveTab,
-  });
+  const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen();
 
   const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSize();
 

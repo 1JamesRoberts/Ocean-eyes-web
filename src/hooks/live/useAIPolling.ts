@@ -75,6 +75,10 @@ export const useAIPolling = ({
   const aiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const aiAbortControllerRef = useRef<AbortController | null>(null);
   const aiMountedRef = useRef(false);
+  const fishListRef = useRef(fishList);
+  const addAlertRef = useRef(addAlert);
+  const writeReadingRef = useRef(writeReading);
+  const updateDetectedCountRef = useRef(updateDetectedCount);
 
   const toggleAI = useCallback(async () => {
     if (aiLoading || backendStatus === 'checking' || !isStreaming) return;
@@ -100,6 +104,11 @@ export const useAIPolling = ({
     setIsAIActive(true);
     setAiError(null);
   }, [aiLoading, backendStatus, isStreaming, isAIActive, checkBackend]);
+
+  useEffect(() => { fishListRef.current = fishList; }, [fishList]);
+  useEffect(() => { addAlertRef.current = addAlert; }, [addAlert]);
+  useEffect(() => { writeReadingRef.current = writeReading; }, [writeReading]);
+  useEffect(() => { updateDetectedCountRef.current = updateDetectedCount; }, [updateDetectedCount]);
 
   useEffect(() => {
     if (!isAIActive || !isStreaming || backendStatus !== 'online') {
@@ -151,7 +160,7 @@ export const useAIPolling = ({
 
           const diagnosedFish = result.detections.find((d) => d.diagnosis);
           if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
-            addAlert(buildDiseaseAlert(diagnosedFish));
+            addAlertRef.current(buildDiseaseAlert(diagnosedFish));
           }
         }
 
@@ -164,16 +173,16 @@ export const useAIPolling = ({
             activeFeed,
             clarity: activeFeed.current_clarity ?? 0,
             fishCount: totalFish,
-            writeReading,
+            writeReading: writeReadingRef.current,
           });
 
-          fishList.forEach((fish) => {
-            updateDetectedCount(fish.id, 0);
+          fishListRef.current.forEach((fish) => {
+            updateDetectedCountRef.current(fish.id, 0);
           });
           Object.entries(result.summary.species_counts).forEach(([speciesId, count]) => {
-            const fishEntry = fishList.find((f) => f.speciesId === speciesId);
+            const fishEntry = fishListRef.current.find((f) => f.speciesId === speciesId);
             if (fishEntry) {
-              updateDetectedCount(fishEntry.id, count);
+              updateDetectedCountRef.current(fishEntry.id, count);
             }
           });
         }
@@ -205,7 +214,6 @@ export const useAIPolling = ({
         aiAbortControllerRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAIActive, isStreaming, backendStatus, activeFeed.mock_image, activeFeed.id, isWebcam]);
 
   return {

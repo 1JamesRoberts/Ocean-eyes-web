@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type {
   AIDetectionResult,
   AITurbidityResult,
@@ -104,15 +104,22 @@ export const useAIAnalytics = ({
     setLastPrediction,
   });
 
+  const activeTankRef = useRef(activeTank);
+  const liveStateRef = useRef(liveState);
+  const saveLiveStateRef = useRef(saveLiveState);
+
+  useEffect(() => { activeTankRef.current = activeTank; }, [activeTank]);
+  useEffect(() => { liveStateRef.current = liveState; }, [liveState]);
+  useEffect(() => { saveLiveStateRef.current = saveLiveState; }, [saveLiveState]);
+
   useEffect(() => {
-    if (!activeTank || !liveState) return;
-    saveLiveState({
-      ...liveState,
+    if (!activeTankRef.current || !liveStateRef.current) return;
+    saveLiveStateRef.current({
+      ...liveStateRef.current,
       ai_active: isAIActive,
       last_prediction: lastPrediction,
       last_turbidity_result: lastTurbidityResult,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAIActive, lastPrediction, lastTurbidityResult]);
 
   const { clarity: currentClarity, fishCount: currentFishCount } = selectActiveFeedMetrics(
