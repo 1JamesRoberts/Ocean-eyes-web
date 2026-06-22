@@ -146,18 +146,10 @@ export const AnalyticsScreen: React.FC = () => {
               border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
               transition-smooth
             ">
-            <div>
-              <h3 className="m-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
-              <p className="m-0 text-xs text-text-muted">
-                {detectionRecords.length} detection frames
-              </p>
-            </div>
+            <h3 className="m-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
             <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
             <div className="mt-2">
               <h3 className="m-0 text-sm font-bold text-text-main">Mean Nearest-Neighbor Distance</h3>
-              <p className="m-0 text-xs text-text-muted">
-                Average distance between fish per frame
-              </p>
             </div>
             <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
           </div>
