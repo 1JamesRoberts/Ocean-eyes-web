@@ -134,9 +134,11 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
         type="button"
         onClick={handleDone}
         className="
-          mt-3 w-full cursor-pointer rounded-full border-none bg-critical py-2.5
-          text-[15px] font-semibold text-white
-          hover:opacity-90
+          mt-3 w-full cursor-pointer rounded-full border-none
+          bg-primary-gradient py-2.5 text-[15px] font-semibold text-text-inv
+          transition-smooth
+          hover:bg-primary-hover-gradient
+          active:scale-[0.98]
         "
       >
         Done

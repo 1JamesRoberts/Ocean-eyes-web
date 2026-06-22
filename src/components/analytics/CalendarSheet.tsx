@@ -42,7 +42,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
           <span className="text-lg font-bold text-text-main">
             {format(viewMonth, 'MMMM yyyy')}
           </span>
-          <ChevronDown size={16} className="text-critical" />
+          <ChevronDown size={16} className="text-text-muted" />
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -50,8 +50,8 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             onClick={() => setViewMonth((m) => subMonths(m, 1))}
             className="
               cursor-pointer rounded-full border-none bg-transparent p-2
-              text-critical
-              hover:bg-surface-hover
+              text-text-muted transition-smooth
+              hover:bg-surface-hover hover:text-text-main
             "
             aria-label="Previous month"
           >
@@ -62,8 +62,8 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             onClick={() => setViewMonth((m) => addMonths(m, 1))}
             className="
               cursor-pointer rounded-full border-none bg-transparent p-2
-              text-critical
-              hover:bg-surface-hover
+              text-text-muted transition-smooth
+              hover:bg-surface-hover hover:text-text-main
             "
             aria-label="Next month"
           >
@@ -93,13 +93,19 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
               type="button"
               onClick={() => onSelect(day)}
               className={`
-                mx-auto flex size-9 cursor-pointer items-center justify-center
-                rounded-full border-none text-[15px] font-medium
-                transition-colors
+                relative mx-auto flex size-9 cursor-pointer items-center
+                justify-center rounded-full border-none text-[15px] font-medium
+                transition-smooth
                 ${selected
-                  ? 'bg-critical text-white'
+                  ? `
+                    bg-primary-gradient text-text-inv
+                    shadow-[0_4px_12px_rgba(13,148,136,0.25)]
+                  `
                   : today
-                    ? 'bg-transparent text-critical'
+                    ? `
+                      bg-transparent font-semibold text-primary-dark
+                      hover:bg-surface-hover
+                    `
                     : inMonth
                       ? `
                         bg-transparent text-text-main
@@ -110,6 +116,14 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
               `}
             >
               {format(day, 'd')}
+              {today && !selected && (
+                <span
+                  className="
+                    absolute bottom-1.5 left-1/2 size-1 -translate-x-1/2
+                    rounded-full bg-primary-dark
+                  "
+                />
+              )}
             </button>
           );
         })}

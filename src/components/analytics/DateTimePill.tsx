@@ -19,7 +19,10 @@ export const DateTimePill: React.FC<DateTimePillProps> = ({
       cursor-pointer rounded-full border-none px-4 py-2.5 text-[15px]
       font-medium whitespace-nowrap transition-colors
       ${isActive
-        ? 'bg-critical text-white'
+        ? `
+          bg-primary-gradient text-text-inv
+          shadow-[0_2px_8px_rgba(13,148,136,0.20)]
+        `
         : `
           bg-surface-hover text-text-main
           hover:bg-border-card
