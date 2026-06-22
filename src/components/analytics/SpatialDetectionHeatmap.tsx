@@ -12,7 +12,7 @@ interface Props {
   records: AIDetectionResult[];
   /** Tank ID to resolve the active camera feed. */
   tankId?: string | null;
-  /** Set of species IDs that exist in the tank inventory (filters the dropdown). */
+  /** Set of species IDs that exist in the tank inventory (source of dropdown options). */
   inventorySpeciesIds?: Set<string>;
   /** Currently selected species filter. Controls the heatmap and external charts. */
   selectedSpecies: string;
@@ -193,12 +193,15 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       return points;
     }, [records]);
 
-    // Unique species for the filter dropdown — only those in the tank inventory
+    // Unique species for the filter dropdown — sourced from the tank inventory
     const speciesList = useMemo(
-      () =>
-        Array.from(new Set(allCenters.map((c) => c.species)))
-          .filter((s) => !inventorySpeciesIds || inventorySpeciesIds.has(s))
-          .sort(),
+      () => {
+        // Show inventory species when available; fall back to detected species
+        if (inventorySpeciesIds && inventorySpeciesIds.size > 0) {
+          return Array.from(inventorySpeciesIds).sort();
+        }
+        return Array.from(new Set(allCenters.map((c) => c.species))).sort();
+      },
       [allCenters, inventorySpeciesIds],
     );
 
@@ -289,13 +292,11 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
 
     return (
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h3 className="m-0 text-sm font-bold text-text-main">Detection Density Heatmap</h3>
-          </div>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="m-0 text-sm font-bold text-text-main">Detection Density Heatmap</h3>
           <select
             className="
-              w-full cursor-pointer rounded-xl border border-border-card
+              w-auto cursor-pointer rounded-xl border border-border-card
               bg-background-app px-3 py-2.5 font-main text-sm font-semibold
               text-text-main outline-none
               focus:border-info
