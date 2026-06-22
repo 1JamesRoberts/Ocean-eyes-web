@@ -4,11 +4,9 @@
 import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
-import { debounce } from '../../utils/helpers';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
 import { CameraFeed } from '../live/CameraFeed';
 import { ChartEmptyState } from './ChartEmptyState';
-import { gaussianBlur, JET_LUT } from '../../models/services/heatmap';
 
 interface Props {
   records: AIDetectionResult[];
@@ -24,19 +22,99 @@ interface Props {
 
 const MAX_RENDER_WIDTH = 800;
 const HEATMAP_ALPHA = 0.55;
-const BLUR_SIGMA_PROP = 0.03; // σ as proportion of image width
+const BLUR_SIGMA_PROP = 0.05; // σ as proportion of image width
 
-// ─── Main-thread fallback (used when OffscreenCanvas / Worker is unavailable) ──
+// ─── Precomputed JET colourmap LUT (matches OpenCV COLORMAP_JET) ──────────
+
+function jetColor(t: number): [number, number, number] {
+  const c = Math.max(0, Math.min(1, t));
+  if (c < 0.125) {
+    const p = c / 0.125;
+    return [0, 0, Math.round(128 + p * 127)];
+  } else if (c < 0.375) {
+    const p = (c - 0.125) / 0.25;
+    return [0, Math.round(p * 255), 255];
+  } else if (c < 0.625) {
+    const p = (c - 0.375) / 0.25;
+    return [Math.round(p * 255), 255, Math.round((1 - p) * 255)];
+  } else if (c < 0.875) {
+    const p = (c - 0.625) / 0.25;
+    return [255, Math.round((1 - p) * 255), 0];
+  } else {
+    const p = (c - 0.875) / 0.125;
+    return [Math.round(255 - p * 127), 0, 0];
+  }
+}
+
+const JET_LUT: readonly (readonly [number, number, number])[] = Array.from(
+  { length: 256 },
+  (_, i) => jetColor(i / 255),
+);
+
+// ─── Separable Gaussian blur ────────────────────────────────────────────────
+
+function gaussianBlur(
+  src: Float32Array,
+  w: number,
+  h: number,
+  sigma: number,
+): Float32Array {
+  const radius = Math.ceil(sigma * 3);
+  const size = radius * 2 + 1;
+
+  // Build normalised 1-D kernel
+  const kernel = new Float32Array(size);
+  let sum = 0;
+  for (let i = 0; i < size; i++) {
+    const x = i - radius;
+    kernel[i] = Math.exp(-(x * x) / (2 * sigma * sigma));
+    sum += kernel[i];
+  }
+  for (let i = 0; i < size; i++) kernel[i] /= sum;
+
+  const temp = new Float32Array(w * h);
+
+  // Horizontal pass
+  for (let y = 0; y < h; y++) {
+    const off = y * w;
+    for (let x = 0; x < w; x++) {
+      let acc = 0;
+      for (let k = 0; k < size; k++) {
+        const sx = x + k - radius;
+        if (sx >= 0 && sx < w) acc += src[off + sx] * kernel[k];
+      }
+      temp[off + x] = acc;
+    }
+  }
+
+  // Vertical pass
+  const dst = new Float32Array(w * h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let acc = 0;
+      for (let k = 0; k < size; k++) {
+        const sy = y + k - radius;
+        if (sy >= 0 && sy < h) acc += temp[sy * w + x] * kernel[k];
+      }
+      dst[y * w + x] = acc;
+    }
+  }
+
+  return dst;
+}
+
+// ─── Heatmap overlay builder ───────────────────────────────────────────────
 
 function buildHeatmapOverlay(
-  centers: { nx: number; ny: number }[],
+  centers: { nx: number; ny: number; species: string }[],
   renderW: number,
   renderH: number,
-  sigma: number,
-  alpha: number,
 ): HTMLCanvasElement | null {
   if (centers.length === 0) return null;
 
+  const sigma = Math.max(1, Math.round(renderW * BLUR_SIGMA_PROP));
+
+  // 1. Float32 density accumulation
   const density = new Float32Array(renderW * renderH);
   for (const c of centers) {
     const px = Math.round(c.nx * (renderW - 1));
@@ -46,13 +124,16 @@ function buildHeatmapOverlay(
     }
   }
 
+  // 2. Gaussian blur
   const blurred = gaussianBlur(density, renderW, renderH, sigma);
 
+  // 3. Find max, build colourised ImageData via JET LUT
   let maxVal = 0;
   for (let i = 0; i < blurred.length; i++) {
     if (blurred[i] > maxVal) maxVal = blurred[i];
   }
 
+  // 4. Build overlay canvas
   const overlay = document.createElement('canvas');
   overlay.width = renderW;
   overlay.height = renderH;
@@ -61,7 +142,7 @@ function buildHeatmapOverlay(
   const pixels = imageData.data;
 
   if (maxVal > 0) {
-    const alpha255 = Math.round(alpha * 255);
+    const alpha255 = Math.round(HEATMAP_ALPHA * 255);
     for (let i = 0; i < blurred.length; i++) {
       const lutIdx = Math.round((blurred[i] / maxVal) * 255);
       const [r, g, b] = JET_LUT[lutIdx];
@@ -79,15 +160,23 @@ function buildHeatmapOverlay(
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
+function debounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number) {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeoutId !== null) clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+      fn(...args);
+    }, ms);
+  };
+}
+
 export const SpatialDetectionHeatmap = React.memo<Props>(
   ({ records, tankId, inventorySpeciesIds, selectedSpecies, onSelectedSpeciesChange }) => {
     const { activeFeed, isWebcam, isStreaming, videoRef } = useLiveFeed(tankId ?? null);
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
-    const workerRef = useRef<Worker | null>(null);
-    const requestIdRef = useRef(0);
-    const rafScheduledRef = useRef(false);
-    const pendingBitmapRef = useRef<ImageBitmap | null>(null);
+    const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
     const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
     const [videoSize, setVideoSize] = React.useState<{ width: number; height: number } | null>(null);
 
@@ -118,71 +207,6 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       () => (selectedSpecies === 'all' ? allCenters : allCenters.filter((c) => c.species === selectedSpecies)),
       [allCenters, selectedSpecies],
     );
-
-    // Initialize Web Worker on mount
-    useEffect(() => {
-      const hasOffscreenCanvas = typeof OffscreenCanvas !== 'undefined';
-      if (!hasOffscreenCanvas) return;
-
-      try {
-        const worker = new Worker(
-          new URL('../../models/workers/heatmap.worker.ts', import.meta.url),
-          { type: 'module' },
-        );
-
-        worker.onmessage = (e: MessageEvent) => {
-          const { type, bitmap, requestId } = e.data;
-          if (type !== 'result') return;
-
-          // Discard stale responses from outdated requests
-          if (requestId !== requestIdRef.current) {
-            bitmap.close();
-            return;
-          }
-
-          // Close the previous bitmap to avoid an ImageBitmap memory leak
-          const prev = pendingBitmapRef.current;
-          if (prev) prev.close();
-          pendingBitmapRef.current = bitmap;
-
-          if (!rafScheduledRef.current) {
-            rafScheduledRef.current = true;
-            requestAnimationFrame(() => {
-              rafScheduledRef.current = false;
-              drawOverlay();
-            });
-          }
-        };
-
-        workerRef.current = worker;
-      } catch {
-        // Worker creation failed — will fall back to inline computation
-      }
-
-      return () => {
-        workerRef.current?.terminate();
-        workerRef.current = null;
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const drawOverlay = useCallback(() => {
-      const canvas = overlayCanvasRef.current;
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const bitmap = pendingBitmapRef.current;
-      if (bitmap) {
-        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-      }
-
-      // Bitmap has been consumed; clear the ref so it isn't re-drawn on next cycle
-      pendingBitmapRef.current = null;
-    }, []);
 
     // ResizeObserver: keep overlay canvas sized to container pixels
     useEffect(() => {
@@ -221,10 +245,28 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       };
     }, []);
 
-    // Build heatmap whenever centers or container size change
+    const drawOverlay = useCallback(() => {
+      const canvas = overlayCanvasRef.current;
+      const texture = heatmapTextureRef.current;
+      if (!canvas || !texture) {
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        return;
+      }
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(texture, 0, 0, canvas.width, canvas.height);
+    }, []);
+
+    // Build heatmap texture whenever centers or container size change
     useEffect(() => {
       if (centers.length === 0) {
-        pendingBitmapRef.current = null;
+        heatmapTextureRef.current = null;
         drawOverlay();
         return;
       }
@@ -235,46 +277,8 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       const workW = Math.min(MAX_RENDER_WIDTH, Math.round(width));
       const workH = Math.round(workW * (height / width));
 
-      const hasOffscreenCanvas = typeof OffscreenCanvas !== 'undefined';
-      const worker = workerRef.current;
-
-      if (hasOffscreenCanvas && worker) {
-        // Use Web Worker for off-thread computation
-        const requestId = ++requestIdRef.current;
-
-        // Flatten centers to Float32Array for transfer
-        const centroids = new Float32Array(centers.length * 2);
-        for (let i = 0; i < centers.length; i++) {
-          centroids[i * 2] = centers[i].nx;
-          centroids[i * 2 + 1] = centers[i].ny;
-        }
-
-        worker.postMessage(
-          {
-            type: 'compute',
-            centroids,
-            renderW: workW,
-            renderH: workH,
-            sigma: BLUR_SIGMA_PROP,
-            alpha: HEATMAP_ALPHA,
-            requestId,
-          },
-          [centroids.buffer],
-        );
-      } else {
-        // Fallback: inline computation on the main thread
-        pendingBitmapRef.current = null;
-        const sigma = Math.max(1, Math.round(workW * BLUR_SIGMA_PROP));
-        const texture = buildHeatmapOverlay(centers, workW, workH, sigma, HEATMAP_ALPHA);
-        const canvas = overlayCanvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (texture) {
-          ctx.drawImage(texture, 0, 0, canvas.width, canvas.height);
-        }
-      }
+      heatmapTextureRef.current = buildHeatmapOverlay(centers, workW, workH);
+      drawOverlay();
     }, [centers, containerSize, drawOverlay]);
 
     // ── Render ──
@@ -337,14 +341,8 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       </div>
     );
   },
-  // Note: Uses `.size` as a cheap proxy for Set equality. This is acceptable for the
-  // current use case because the inventory set only grows/shrinks when the user changes
-  // which tank is selected. A deep element-by-element comparison would be O(n) and
-  // unnecessary here.
   (prevProps, nextProps) =>
     prevProps.tankId === nextProps.tankId &&
     prevProps.records === nextProps.records &&
-    prevProps.selectedSpecies === nextProps.selectedSpecies &&
-    (prevProps.inventorySpeciesIds === nextProps.inventorySpeciesIds ||
-      prevProps.inventorySpeciesIds?.size === nextProps.inventorySpeciesIds?.size),
+    prevProps.selectedSpecies === nextProps.selectedSpecies,
 );
