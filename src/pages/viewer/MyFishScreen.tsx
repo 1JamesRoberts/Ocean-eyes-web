@@ -100,7 +100,7 @@ export const MyFishScreen: React.FC = () => {
 
       {/* ─── Add Form ─── */}
       <div className={`
-        relative z-50 origin-top -translate-y-3 overflow-hidden
+        shimmer z-50 origin-top -translate-y-3
         transition-[max-height_0.4s_cubic-bezier(0.4,0,0.2,1),opacity_0.3s_ease,transform_0.4s_cubic-bezier(0.4,0,0.2,1),margin_0.4s_ease]
         ${
         showAddForm ? 'mb-5 max-h-[500px] translate-y-0 opacity-100' : `

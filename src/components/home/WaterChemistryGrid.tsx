@@ -1,5 +1,5 @@
 import React from 'react';
-import { Droplet, Thermometer, Shield, Activity, Cloud } from 'lucide-react';
+import { FlaskConical, Thermometer, Shield, Zap, Cloud } from 'lucide-react';
 import type { ReadingItem } from '../../types/aquarium';
 
 interface WaterChemistryGridProps {
@@ -11,67 +11,80 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
     {
       label: 'pH Value',
       value: reading.ph === undefined ? '—' : `${reading.ph} pH`,
-      colorClass: 'text-good bg-good/8',
-      icon: Droplet,
+      colorClass: 'text-secondary bg-secondary-container/30',
+      icon: FlaskConical,
       isCritical: false
     },
     {
       label: 'Temperature',
       value: reading.temp === undefined ? '—' : `${reading.temp}°C`,
-      colorClass: 'text-warning bg-warning/8',
+      colorClass: 'text-orange-600 bg-orange-100/30',
       icon: Thermometer,
       isCritical: false
     },
     {
       label: 'Ammonia (NH₃)',
       value: reading.ammonia === undefined ? '—' : `${reading.ammonia} ppm`,
-      colorClass: 'text-good bg-good/8',
+      colorClass: 'text-primary-dark bg-primary-dark/10',
       icon: Shield,
       isCritical: (reading.ammonia ?? 0) > 0
     },
     {
       label: 'Nitrite (NO₂⁻)',
       value: reading.nitrite === undefined ? '—' : `${reading.nitrite} ppm`,
-      colorClass: 'text-[#8B5CF6] bg-[rgba(139,92,246,0.08)]',
-      icon: Activity,
+      colorClass: 'text-purple-600 bg-purple-100/30',
+      icon: Zap,
       isCritical: (reading.nitrite ?? 0) > 0.2
     },
     {
       label: 'CO₂',
       value: '—',
-      colorClass: 'text-[#0891B2] bg-[rgba(8,145,178,0.08)]',
+      colorClass: 'text-blue-600 bg-blue-100/30',
       icon: Cloud,
       isCritical: false
     }
   ];
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
-      {parameters.map(param => (
-        <div key={param.label} className="
-          flex items-center gap-2.5 rounded-2xl border border-border-subtle
-          bg-surface-card p-3 shadow-card
-        ">
+    <section className="rounded-3xl p-6 glass-card">
+      <h3 className="
+        mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
+        uppercase
+      ">
+        Water Chemistry Parameters
+      </h3>
+
+      <div className="space-y-3">
+        {parameters.map(param => (
           <div
-            className={`
-              flex size-9 shrink-0 items-center justify-center rounded-xl
-              ${param.colorClass}
-            `}
+            key={param.label}
+            className="
+              flex items-center gap-4 rounded-2xl border border-white/20
+              bg-white/20 p-3 transition-colors
+              hover:bg-white/40
+            "
           >
-            <param.icon size={16} />
+            <div
+              className={`
+                flex size-10 shrink-0 items-center justify-center rounded-xl
+                ${param.colorClass}
+              `}
+            >
+              <param.icon size={18} />
+            </div>
+            <div className="flex-1">
+              <span className="block text-xs text-on-surface-variant">{param.label}</span>
+              <span className={`
+                text-base font-bold
+                ${param.isCritical ? `text-critical` : `text-primary-dark`}
+              `}>
+                {param.value}
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="block text-caption font-semibold text-text-muted">{param.label}</span>
-            <span className={`
-              text-base font-bold
-              ${param.isCritical ? `text-critical` : `text-text-main`}
-            `}>
-              {param.value}
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </section>
   );
 });
 

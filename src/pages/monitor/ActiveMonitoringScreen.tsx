@@ -83,8 +83,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
       {/* Live aquatic scanner simulation */}
       <div
         className="
-          relative mb-4 flex-1 overflow-hidden rounded-lg border
-          border-[#1E293B]
+          shimmer mb-4 flex-1 rounded-lg border border-[#1E293B]
           bg-[radial-gradient(circle_at_center,#1E293B_0%,#0F172A_100%)]
         "
       >

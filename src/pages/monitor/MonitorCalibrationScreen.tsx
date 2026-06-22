@@ -58,8 +58,8 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
         onMouseDown={handleDrag}
         onTouchMove={handleDrag}
         className="
-          relative flex h-[240px] cursor-ns-resize items-center justify-center
-          overflow-hidden rounded-xl border-2 border-[#1E293B]
+          shimmer flex h-[240px] cursor-ns-resize items-center justify-center
+          rounded-xl border-2 border-[#1E293B]
           bg-[radial-gradient(circle_at_center,#1E293B_0%,#0F172A_100%)]
         "
       >

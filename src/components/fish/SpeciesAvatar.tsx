@@ -6,6 +6,7 @@ interface SpeciesAvatarProps {
   size?: number;
   radius?: number;
   className?: string;
+  objectFit?: 'contain' | 'cover';
 }
 
 export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
@@ -13,6 +14,7 @@ export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
   size = 32,
   radius = 6,
   className = '',
+  objectFit = 'contain',
 }) => {
   const [hasError, setHasError] = useState(false);
   const species = getSpeciesById(speciesId);
@@ -52,7 +54,7 @@ export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
       alt={species.initials}
       style={{
         ...commonStyle,
-        objectFit: 'contain',
+        objectFit,
       }}
       onError={() => setHasError(true)}
     />

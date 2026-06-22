@@ -38,7 +38,7 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
   return (
     <div
       className={`
-        relative w-full overflow-hidden
+        shimmer w-full
         ${className}
       `}
       style={style}

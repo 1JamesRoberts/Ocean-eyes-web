@@ -1,76 +1,51 @@
 import React from 'react';
 import { useHome } from '../../hooks/pages/useHome';
-import { TankHeader } from '../../components/home/TankHeader';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { LiveFeedPreview } from '../../components/home/LiveFeedPreview';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
 import { WaterClarityCard } from '../../components/home/WaterClarityCard';
 import { WaterChemistryGrid } from '../../components/home/WaterChemistryGrid';
 import { ActiveAlertsList } from '../../components/home/ActiveAlertsList';
-import { AddTankModal } from '../../components/home/AddTankModal';
 
 export const HomeScreen: React.FC = () => {
   const {
     activeTank,
-    tanks,
-    linkedTanks,
-    tankId,
     fishList,
     latestReading,
     displayClarity,
     displayFishCount,
-    activeAlertCount,
     hasReadingData,
     readings,
     alerts,
-    showAddTankModal,
-    selectTank,
-    onViewAlerts,
     onGoLive,
     onViewAdvanced,
     onManageFish,
     onViewHistory,
-    onAddTank,
-    onCloseAddTankModal,
-    onCreateTank,
-    onLinkTank,
     onSelectAlert,
   } = useHome();
 
   return (
     <div className="flex flex-col gap-6">
-      <TankHeader
-        activeTank={activeTank}
-        linkedTanks={linkedTanks}
-        tanks={tanks}
-        tankId={tankId}
-        activeAlertCount={activeAlertCount}
-        onSelectTank={selectTank}
-        onAddTank={onAddTank}
-        onViewAlerts={onViewAlerts}
-      />
-
       {!hasReadingData ? (
         <div className="
-          rounded-[20px] border border-border-subtle bg-surface-card p-10
-          text-center shadow-card transition-smooth
+          rounded-3xl p-10 text-center glass-card transition-smooth
         ">
           <span className="mb-3 block text-hero">🐠</span>
-          <h3 className="mb-2 text-lg font-bold text-text-main">
+          <h3 className="mb-2 text-lg font-bold text-on-surface">
             Waiting for monitor data…
           </h3>
           <p className="
-            mx-auto max-w-[420px] text-sm leading-[150%] text-text-muted
+            mx-auto max-w-[420px] text-sm leading-[150%] text-on-surface-variant
           ">
             The AI backend has not yet returned any readings for today. Make sure the OceanEyes inference service is running and has processed at least one frame.
           </p>
         </div>
       ) : (
-        <div className="
-          grid grid-cols-[2fr_1fr] gap-6
-          max-lg:grid-cols-1
-        ">
-          <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-12 gap-6">
+          <div className="
+            col-span-12 flex flex-col gap-6
+            lg:col-span-8
+          ">
             <HealthScoreCard
               reading={{
                 ph: latestReading.ph,
@@ -80,35 +55,31 @@ export const HomeScreen: React.FC = () => {
               }}
             />
 
-            <div className="flex flex-col gap-6">
-              <LiveFeedPreview
-                activeTank={activeTank}
-                displayClarity={displayClarity}
-                displayFishCount={displayFishCount}
-                onViewAdvanced={onViewAdvanced}
-                onGoFullscreen={onGoLive}
-              />
+            <LiveFeedPreview
+              activeTank={activeTank}
+              displayClarity={displayClarity}
+              displayFishCount={displayFishCount}
+              onViewAdvanced={onViewAdvanced}
+              onGoFullscreen={onGoLive}
+            />
 
-              <FishInventorySummary
-                fishList={fishList}
-                onManageFish={onManageFish}
-              />
-            </div>
+            <FishInventorySummary
+              fishList={fishList}
+              onManageFish={onManageFish}
+            />
           </div>
 
-          <div className="flex flex-col gap-6">
+          <div className="
+            col-span-12 flex flex-col gap-6
+            lg:col-span-4
+          ">
             <WaterClarityCard
               displayClarity={displayClarity}
               readings={readings}
               onClick={onViewHistory}
             />
 
-            <div>
-              <h3 className="mb-3 text-base font-bold text-text-main">
-                Water Chemistry Parameters
-              </h3>
-              <WaterChemistryGrid reading={latestReading} />
-            </div>
+            <WaterChemistryGrid reading={latestReading} />
 
             <ActiveAlertsList
               alerts={alerts}
@@ -117,13 +88,6 @@ export const HomeScreen: React.FC = () => {
           </div>
         </div>
       )}
-
-      <AddTankModal
-        show={showAddTankModal}
-        onClose={onCloseAddTankModal}
-        onCreateTank={onCreateTank}
-        onLinkTank={onLinkTank}
-      />
     </div>
   );
 };

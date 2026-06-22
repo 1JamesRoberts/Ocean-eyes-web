@@ -12,56 +12,60 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
 
   if (activeAlerts.length === 0) {
     return (
-      <div className="
-        rounded-[20px] border border-dashed border-border-card bg-surface-card
-        px-4 py-8 text-center shadow-card
+      <section className="
+        flex flex-col items-center justify-center rounded-3xl border-2
+        border-dashed border-white/40 p-6 text-center glass-card
       ">
-        <span className="mb-2 block text-2xl">✓</span>
-        <strong className="text-sm text-good">System Operating Safely</strong>
-        <p className="mt-1 text-xs text-text-muted">No active safety alarms triggered.</p>
-      </div>
+        <div className="
+          mb-4 flex size-12 items-center justify-center rounded-full
+          bg-secondary/10 text-secondary
+        ">
+          <span className="material-symbols-outlined text-display">check_circle</span>
+        </div>
+        <h4 className="text-lg font-bold text-secondary">System Operating Safely</h4>
+        <p className="mt-1 text-xs text-on-surface-variant">
+          No active safety alarms triggered.
+        </p>
+      </section>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <h3 className="mb-3 text-base font-bold text-text-main">
+    <section className="rounded-3xl p-6 glass-card">
+      <h3 className="
+        mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
+        uppercase
+      ">
         Active Safety Alerts
       </h3>
 
-      {activeAlerts.map(alert => (
-        <button
-          key={alert.id}
-          type="button"
-          className={`
-            w-full cursor-pointer rounded-[20px] border border-l-4
-            border-border-subtle bg-surface-card p-4 text-left shadow-card
-            transition-smooth
-            hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-            hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
-            ${alert.severity === 'critical'
-              ? `
-                border-l-critical
-                hover:border-l-critical
-              `
-              : `
-                border-l-warning
-                hover:border-l-warning
-              `
-            }
-          `}
-          onClick={() => onSelectAlert(alert.id)}
-        >
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-bold text-text-main">{alert.title}</h4>
-            <ChevronRight size={16} className="text-text-muted" />
-          </div>
-          <p className="mt-1 text-xs leading-[135%] text-text-muted">
-            {alert.message}
-          </p>
-        </button>
-      ))}
-    </div>
+      <div className="space-y-3">
+        {activeAlerts.map(alert => (
+          <button
+            key={alert.id}
+            type="button"
+            className={`
+              w-full cursor-pointer rounded-2xl border border-white/20
+              bg-white/20 p-4 text-left transition-colors
+              hover:bg-white/40
+              ${alert.severity === 'critical'
+                ? `border-l-4 border-l-critical`
+                : `border-l-4 border-l-warning`
+              }
+            `}
+            onClick={() => onSelectAlert(alert.id)}
+          >
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-primary-dark">{alert.title}</h4>
+              <ChevronRight size={16} className="text-on-surface-variant" />
+            </div>
+            <p className="mt-1 text-xs/relaxed text-on-surface-variant">
+              {alert.message}
+            </p>
+          </button>
+        ))}
+      </div>
+    </section>
   );
 });
 

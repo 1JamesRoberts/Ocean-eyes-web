@@ -53,7 +53,7 @@ export const IoTMonitor: React.FC = () => {
       </div>
 
       {/* Screen Body */}
-      <div className="relative flex flex-1 flex-col overflow-hidden">
+      <div className="shimmer flex flex-1 flex-col">
         {renderScreen()}
       </div>
     </div>

@@ -12,65 +12,61 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
   onManageFish
 }) => {
   return (
-    <div className="flex flex-col gap-3">
-      <h3 className="
-        m-0 flex items-center justify-between text-base font-bold text-text-main
-      ">
-        <span>Top species detected</span>
+    <section className="rounded-3xl p-6 glass-card">
+      <div className="mb-5 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-primary-dark">Top species detected</h3>
         <button
           onClick={onManageFish}
           className="
-            cursor-pointer border-none bg-transparent font-main text-xs
-            font-semibold text-primary-dark
+            cursor-pointer border-none bg-transparent font-main text-sm
+            font-semibold text-secondary transition-opacity
+            hover:opacity-80
           "
         >
           Manage list
         </button>
-      </h3>
+      </div>
 
-      <div className="
-        rounded-[20px] border border-border-subtle bg-surface-card px-5 py-1
-        shadow-card transition-smooth
-        hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-        hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
-      ">
-        {fishList.slice(0, 3).map((fish, idx) => (
-          <div
-            key={fish.id}
-            className={`
-              flex items-center justify-between py-3.5
-              ${idx === Math.min(2, fishList.length - 1) ? '' : `
-                border-b border-border-card
-              `}
-            `}
-          >
-            <div className="flex items-center gap-3">
-              <SpeciesAvatar speciesId={fish.speciesId} />
-              <div>
-                <span className="text-h3 font-semibold text-text-main">{fish.name}</span>
-                <span className="
-                  mt-0.5 block text-caption font-medium text-text-muted
-                ">
-                  Expected: {fish.count} species limit
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <span className="
-                rounded-[10px] px-2 py-0.5 text-caption font-semibold
+      <div className="space-y-3">
+        {fishList.slice(0, 3).map((fish) => {
+          const isComplete = fish.detected === fish.count;
+          return (
+            <div
+              key={fish.id}
+              className="
+                flex items-center justify-between rounded-2xl border
+                border-white/10 bg-white/30 p-4 transition-colors
+                hover:bg-white/50
               "
+            >
+              <div className="flex items-center gap-4">
+                <div className="
+                  flex size-12 items-center justify-center overflow-hidden
+                  rounded-xl border border-white/30 bg-primary-container/20
+                ">
+                  <SpeciesAvatar speciesId={fish.speciesId} size={40} radius={8} objectFit="cover" />
+                </div>
+                <div>
+                  <p className="font-semibold text-primary-dark">{fish.name}</p>
+                  <p className="text-xs text-on-surface-variant">
+                    Expected: {fish.count} species limit
+                  </p>
+                </div>
+              </div>
+              <span
+                className="rounded-full px-3 py-1 text-xs font-bold"
                 style={{
-                  backgroundColor: fish.detected === fish.count ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                  color: fish.detected === fish.count ? 'var(--color-good)' : 'var(--color-critical)'
+                  backgroundColor: isComplete ? 'rgba(25, 106, 89, 0.12)' : 'rgba(186, 26, 26, 0.12)',
+                  color: isComplete ? 'var(--color-good)' : 'var(--color-critical)'
                 }}
               >
-                {fish.detected === fish.count ? 'All Visible' : `${fish.detected} / ${fish.count} detected`}
+                {isComplete ? 'All Visible' : `${fish.detected} / ${fish.count} detected`}
               </span>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-    </div>
+    </section>
   );
 });
 

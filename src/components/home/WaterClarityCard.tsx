@@ -1,5 +1,4 @@
 import React from 'react';
-import { Droplet } from 'lucide-react';
 import type { ReadingItem } from '../../types/aquarium';
 
 interface WaterClarityCardProps {
@@ -10,33 +9,37 @@ interface WaterClarityCardProps {
 
 export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClarity, onClick }) => {
   return (
-    <div>
-      <h3 className="mb-2 text-base font-bold text-text-main">Water Clarity</h3>
+    <section className="rounded-3xl p-6 glass-card">
+      <h3 className="
+        mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
+        uppercase
+      ">
+        Water Clarity
+      </h3>
 
       <button
         type="button"
         className="
-          flex w-full cursor-pointer items-center gap-2.5 rounded-2xl border
-          border-border-subtle bg-surface-card p-3 text-left shadow-card
-          transition-smooth
-          hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+          flex w-full cursor-pointer items-center gap-4 rounded-2xl border
+          border-white/20 bg-white/20 p-4 text-left transition-colors
+          hover:bg-white/40
         "
         onClick={onClick}
       >
         <div className="
-          flex size-9 shrink-0 items-center justify-center rounded-xl bg-info/8
-          text-info
+          flex size-12 shrink-0 items-center justify-center rounded-full
+          bg-primary-dark/10 text-primary-dark
         ">
-          <Droplet size={16} />
+          <span className="material-symbols-outlined">water_drop</span>
         </div>
         <div>
-          <span className="block text-caption font-semibold text-text-muted">Clarity</span>
-          <span className="text-base font-bold text-text-main">
+          <span className="block text-xs text-on-surface-variant">Clarity</span>
+          <span className="text-xl font-bold text-primary-dark">
             {displayClarity.toFixed(2)} FNU
           </span>
         </div>
       </button>
-    </div>
+    </section>
   );
 });
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { calculateHealthScore, getHealthColor, getHealthMessage, type HealthReading } from '../../models/services/healthService';
+import { calculateHealthScore, getHealthMessage, type HealthReading } from '../../models/services/healthService';
 
 interface HealthScoreCardProps {
   reading: HealthReading;
@@ -7,51 +7,56 @@ interface HealthScoreCardProps {
 
 export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) => {
   const healthScore = calculateHealthScore(reading);
-  const healthColor = getHealthColor(healthScore);
   const healthMessage = getHealthMessage(healthScore);
-  const circumference = 2 * Math.PI * 38;
+  const radius = 56;
+  const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference * (1 - healthScore / 10);
 
   return (
-    <div className="
-      flex items-center gap-6 rounded-[20px] border border-border-subtle
-      bg-surface-card p-5 shadow-card transition-smooth
-      hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-      hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+    <section className="
+      shimmer flex items-center gap-6 rounded-3xl p-6 glass-card
     ">
       <div className="
-        relative flex size-[90px] shrink-0 items-center justify-center
+        relative flex size-32 shrink-0 items-center justify-center
       ">
-        <svg className="absolute size-[90px] -rotate-90">
-          <circle cx="45" cy="45" r="38" stroke="var(--color-background)" strokeWidth="8" fill="none" />
+        <svg className="progress-ring size-32" height="128" width="128">
           <circle
-            cx="45"
-            cy="45"
-            r="38"
-            stroke={healthColor}
+            cx="64"
+            cy="64"
+            r={radius}
+            className="text-surface-variant"
+            stroke="currentColor"
+            strokeWidth="8"
+            fill="none"
+          />
+          <circle
+            cx="64"
+            cy="64"
+            r={radius}
+            className="progress-ring-circle text-secondary"
+            stroke="currentColor"
             strokeWidth="8"
             fill="none"
             strokeDasharray={circumference}
             strokeDashoffset={dashOffset}
             strokeLinecap="round"
-            className="transition-smooth"
           />
         </svg>
-        <div className="z-50 text-center">
-          <span className="text-display font-extrabold text-text-main">{healthScore}</span>
-          <span className="
-            -mt-1 block text-caption font-semibold text-text-muted
-          ">Score</span>
+        <div className="
+          absolute inset-0 flex flex-col items-center justify-center
+        ">
+          <span className="text-3xl font-bold text-primary-dark">{healthScore}</span>
+          <span className="text-xs font-medium text-on-surface-variant">Score</span>
         </div>
       </div>
 
       <div className="flex-1">
-        <h3 className="text-lg font-bold text-text-main">Aquarium Health Index</h3>
-        <p className="mt-1.5 text-sm leading-[145%] text-text-muted">
+        <h3 className="text-xl font-semibold text-primary-dark">Aquarium Health Index</h3>
+        <p className="mt-1.5 text-sm/relaxed text-on-surface-variant">
           {healthMessage}
         </p>
       </div>
-    </div>
+    </section>
   );
 });
 

@@ -314,7 +314,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
 
         <div
           ref={containerRef}
-          className="relative w-full overflow-hidden rounded-xl bg-camera-bg"
+          className="shimmer w-full rounded-xl bg-camera-bg"
           style={
             videoSize
               ? { aspectRatio: `${videoSize.width} / ${videoSize.height}` }

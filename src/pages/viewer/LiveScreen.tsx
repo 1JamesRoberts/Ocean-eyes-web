@@ -112,9 +112,8 @@ export const LiveScreen: React.FC = () => {
       <div
         ref={viewportRef}
         className="
-          fs-reset relative mb-6 flex items-center justify-center
-          overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.05)]
-          bg-camera-bg shadow-premium
+          fs-reset shimmer mb-6 flex items-center justify-center rounded-[20px]
+          border border-[rgba(255,255,255,0.05)] bg-camera-bg shadow-premium
           max-sm:rounded-xl
         "
       >
@@ -125,9 +124,7 @@ export const LiveScreen: React.FC = () => {
               ${flashActive ? 'flash-active' : ''}
             `} />
 
-            <div ref={imageContainerRef} className="
-              relative w-full overflow-hidden
-            ">
+            <div ref={imageContainerRef} className="shimmer w-full">
               <CameraFeed
                 ref={cameraFeedRef}
                 feed={activeFeed}

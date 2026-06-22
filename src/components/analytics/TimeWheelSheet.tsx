@@ -50,7 +50,7 @@ const WheelColumn: React.FC<WheelColumnProps> = ({ items, selected, onSelect }) 
   }, [selectedIndex]);
 
   return (
-    <div className="relative h-[220px] flex-1 overflow-hidden">
+    <div className="shimmer h-[220px] flex-1">
       <div
         ref={containerRef}
         className="
