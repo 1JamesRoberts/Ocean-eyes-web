@@ -34,8 +34,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
     <div
       className="
         flex cursor-pointer flex-col gap-3.5 rounded-[20px] border
-        border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-        transition-smooth
+        border-border-subtle bg-surface-card p-5 shadow-card transition-smooth
         hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
         hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
       "
@@ -43,7 +42,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
     >
       <div className="flex items-center justify-between">
         <h3 className="
-          m-0 flex items-center gap-1.5 text-[15px] font-bold text-text-main
+          m-0 flex items-center gap-1.5 text-h3 font-bold text-text-main
         ">
           <Video size={16} className="text-primary-dark" />
           <span>Live Feed Monitor</span>
@@ -53,7 +52,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
       <div
         ref={videoContainerRef}
         className="
-          live-camera-feed relative flex w-full cursor-pointer items-center
+          fs-reset relative flex w-full cursor-pointer items-center
           justify-center overflow-hidden rounded-xl border border-border-card
           bg-background-app
         "
@@ -86,13 +85,13 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 
             <div className="absolute bottom-2 left-2 z-10 flex gap-1.5">
               <div className="
-                rounded-md bg-[rgba(15,23,42,0.85)] px-1.5 py-0.5 text-[9px]
+                rounded-md bg-[rgba(15,23,42,0.85)] px-1.5 py-0.5 text-3xs
                 text-white
               ">
                 <strong>{displayFishCount} fish</strong>
               </div>
               <div className="
-                rounded-md bg-[rgba(15,23,42,0.85)] px-1.5 py-0.5 text-[9px]
+                rounded-md bg-[rgba(15,23,42,0.85)] px-1.5 py-0.5 text-3xs
                 text-white
               ">
                 <strong className="text-info">{displayClarity.toFixed(2)} FNU</strong>
@@ -109,7 +108,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               >
                 <Maximize2 size={24} color="#FFF" className="opacity-90" />
                 <span className="
-                  text-[11px] font-semibold text-white opacity-90
+                  text-caption font-semibold text-white opacity-90
                 ">
                   Click for fullscreen
                 </span>
@@ -129,7 +128,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                 mx-auto inline-flex cursor-pointer items-center justify-center
                 gap-2 rounded-3xl border-none bg-primary-gradient px-3 py-1.5
                 font-main text-xs font-semibold text-text-inv
-                shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+                shadow-primary-hover transition-smooth
                 hover:bg-primary-hover-gradient
                 active:scale-[0.98]
               "

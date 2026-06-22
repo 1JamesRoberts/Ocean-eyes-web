@@ -14,9 +14,8 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
 
   return (
     <div className="
-      flex items-center gap-6 rounded-[20px] border
-      border-[rgba(13,148,136,0.02)] bg-surface-card p-6 shadow-card
-      transition-smooth
+      flex items-center gap-6 rounded-[20px] border border-border-subtle
+      bg-surface-card p-5 shadow-card transition-smooth
       hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
       hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
     ">
@@ -39,9 +38,9 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
           />
         </svg>
         <div className="z-50 text-center">
-          <span className="text-[28px] font-extrabold text-text-main">{healthScore}</span>
+          <span className="text-display font-extrabold text-text-main">{healthScore}</span>
           <span className="
-            -mt-1 block text-[11px] font-semibold text-text-muted
+            -mt-1 block text-caption font-semibold text-text-muted
           ">Score</span>
         </div>
       </div>

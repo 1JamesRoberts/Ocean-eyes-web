@@ -18,7 +18,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     ">
       <div>
         <span className="block text-xs font-semibold text-text-muted uppercase">Alert Details</span>
-        <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Alert Diagnostics</h1>
+        <h1 className="mt-0.5 text-display font-extrabold text-text-main">Alert Diagnostics</h1>
       </div>
       <button
         className="
@@ -33,8 +33,8 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
 
     <div
       className="
-        mb-5 rounded-[20px] border border-[rgba(13,148,136,0.02)]
-        bg-surface-card p-6 shadow-card transition-smooth
+        mb-5 rounded-[20px] border border-border-subtle bg-surface-card p-5
+        shadow-card transition-smooth
       "
       style={{
         borderLeftWidth: '6px',
@@ -55,8 +55,8 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     <div className="mb-5 grid grid-cols-2 gap-4">
       {alert.clarityBefore && (
         <div className="
-          rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-          p-4 text-center shadow-card transition-smooth
+          rounded-[20px] border border-border-subtle bg-surface-card p-5
+          text-center shadow-card transition-smooth
         ">
           <span className="block text-xs text-text-muted">Clarity Shift</span>
           <strong className="mt-1.5 block text-xl">
@@ -67,8 +67,8 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
 
       {alert.fishBefore && (
         <div className="
-          rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-          p-4 text-center shadow-card transition-smooth
+          rounded-[20px] border border-border-subtle bg-surface-card p-5
+          text-center shadow-card transition-smooth
         ">
           <span className="block text-xs text-text-muted">Fish Discrepancy</span>
           <strong className="mt-1.5 block text-xl">
@@ -80,11 +80,11 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
 
     {/* Correction tip card */}
     <div className="
-      mb-6 rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-      p-5 shadow-card transition-smooth
+      mb-6 rounded-[20px] border border-border-subtle bg-surface-card p-5
+      shadow-card transition-smooth
     ">
       <h4 className="mb-2 text-sm font-bold text-text-main">Action Plan & Tips</h4>
-      <p className="text-[13px] leading-[145%] text-text-muted">
+      <p className="text-sm leading-[145%] text-text-muted">
         {alert.tip}
       </p>
     </div>
@@ -94,8 +94,8 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
         className="
           inline-flex w-full cursor-pointer items-center justify-center gap-2
           rounded-3xl border-none bg-primary-gradient px-6 py-3.5 font-main
-          text-[15px] font-semibold text-text-inv
-          shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+          text-h3 font-semibold text-text-inv shadow-primary-hover
+          transition-smooth
           hover:bg-primary-hover-gradient
           active:scale-[0.98]
         "

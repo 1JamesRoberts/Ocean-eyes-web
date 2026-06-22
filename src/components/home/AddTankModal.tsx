@@ -53,7 +53,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
         onSubmit={handleSubmit}
         className="
           flex w-[380px] flex-col gap-4 rounded-[20px] border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-6
+          border-border-subtle bg-surface-card p-6
           shadow-[0_20px_25px_-5px_rgba(0,0,0,0.15)]
         "
       >
@@ -92,7 +92,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
           <div className="flex flex-col gap-3">
             <div>
               <label className="
-                mb-1 block text-[11px] font-semibold text-text-muted
+                mb-1 block text-caption font-semibold text-text-muted
               ">AQUARIUM NAME</label>
               <input
                 type="text"
@@ -101,7 +101,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
                 onChange={e => setNewTankName(e.target.value)}
                 className="
                   w-full rounded-[10px] border border-border-card
-                  bg-surface-card px-3 py-2 font-main text-[13px] text-text-main
+                  bg-surface-card px-3 py-2 font-main text-sm text-text-main
                   outline-none
                 "
                 required
@@ -110,20 +110,20 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
 
             <div>
               <label className="
-                mb-1.5 block text-[11px] font-semibold text-text-muted
+                mb-1.5 block text-caption font-semibold text-text-muted
               ">CAMERA SOURCE</label>
               <div className="
                 rounded-[10px] border border-border-card bg-surface-card px-3
                 py-2
               ">
-                <span className="text-[13px] text-text-main">Local Webcam</span>
+                <span className="text-sm text-text-main">Local Webcam</span>
               </div>
             </div>
           </div>
         ) : (
           <div>
             <label className="
-              mb-1 block text-[11px] font-semibold text-text-muted
+              mb-1 block text-caption font-semibold text-text-muted
             ">TANK REFERENCE ID / CODE</label>
             <input
               type="text"
@@ -132,7 +132,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
               onChange={e => setLinkTankCode(e.target.value)}
               className="
                 w-full rounded-[10px] border border-border-card bg-surface-card
-                px-3 py-2 font-main text-[13px] text-text-main outline-none
+                px-3 py-2 font-main text-sm text-text-main outline-none
               "
               required
             />
@@ -145,7 +145,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
             className="
               inline-flex flex-1 cursor-pointer items-center justify-center
               gap-2 rounded-[10px] border border-border-card bg-surface-card
-              px-5 py-2.5 font-main text-[13px] font-semibold text-text-main
+              px-5 py-2.5 font-main text-sm font-semibold text-text-main
               transition-smooth
               hover:border-text-muted hover:bg-surface-hover
             "
@@ -157,9 +157,9 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
             type="submit"
             className="
               inline-flex flex-1 cursor-pointer items-center justify-center
-              gap-2 rounded-[10px] border-none bg-primary-gradient px-5 py-2.5
-              font-main text-[13px] font-semibold text-text-inv
-              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              gap-2 rounded-3xl border-none bg-primary-gradient px-5 py-2.5
+              font-main text-sm font-semibold text-text-inv shadow-primary-hover
+              transition-smooth
               hover:bg-primary-hover-gradient
               active:scale-[0.98]
             "

@@ -75,7 +75,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
       {/* Weekday labels */}
       <div className="mb-2 grid grid-cols-7 text-center">
         {WEEKDAYS.map((day) => (
-          <span key={day} className="text-[11px] font-medium text-text-muted">
+          <span key={day} className="text-caption font-medium text-text-muted">
             {day}
           </span>
         ))}
@@ -94,13 +94,10 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
               onClick={() => onSelect(day)}
               className={`
                 relative mx-auto flex size-9 cursor-pointer items-center
-                justify-center rounded-full border-none text-[15px] font-medium
+                justify-center rounded-full border-none text-h3 font-medium
                 transition-smooth
                 ${selected
-                  ? `
-                    bg-primary-gradient text-text-inv
-                    shadow-[0_4px_12px_rgba(13,148,136,0.25)]
-                  `
+                  ? `bg-primary-gradient text-text-inv shadow-primary-hover`
                   : today
                     ? `
                       bg-transparent font-semibold text-primary-dark

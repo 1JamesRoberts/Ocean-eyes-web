@@ -22,8 +22,8 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
 }) => (
   <div
     className={`
-      rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card p-5
-      shadow-card transition-smooth
+      rounded-[20px] border border-border-subtle bg-surface-card p-5 shadow-card
+      transition-smooth
       ${className}
     `}
     {...rest}

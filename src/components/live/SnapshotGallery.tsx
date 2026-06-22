@@ -40,7 +40,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
       <div className="flex flex-col gap-3">
         <div className="
           flex items-center justify-between border-b border-border-card pb-2
-          text-[15px] font-bold text-text-main
+          text-h3 font-bold text-text-main
         ">
           <span className="flex items-center gap-1.5"><Camera size={16} /> Snapshots</span>
           <span className="text-xs font-medium text-text-muted">{snapshots.length} saved</span>
@@ -52,7 +52,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           [&::-webkit-scrollbar-thumb]:bg-border-card
         ">
           {snapshots.length === 0 ? (
-            <div className="p-5 text-center text-[13px] text-text-muted">
+            <div className="p-5 text-center text-sm text-text-muted">
               No snapshots yet
             </div>
           ) : (
@@ -73,7 +73,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                 <div className="flex flex-1 flex-col justify-between p-3">
                   <div>
                     <span className="text-xs font-semibold text-text-main">{snap.timestamp}</span>
-                    <div className="mt-0.5 text-[11px] text-text-muted">
+                    <div className="mt-0.5 text-caption text-text-muted">
                       {snap.fishCount} fish · {snap.clarity.toFixed(2)} FNU
                     </div>
                   </div>
@@ -123,7 +123,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
       <div className="flex flex-col gap-3">
         <div className="
           flex items-center justify-between border-b border-border-card pb-2
-          text-[15px] font-bold text-text-main
+          text-h3 font-bold text-text-main
         ">
           <span className="flex items-center gap-1.5"><Video size={16} /> Recordings</span>
           <span className="text-xs font-medium text-text-muted">{recordings.length} saved</span>
@@ -135,7 +135,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           [&::-webkit-scrollbar-thumb]:bg-border-card
         ">
           {recordings.length === 0 ? (
-            <div className="p-5 text-center text-[13px] text-text-muted">
+            <div className="p-5 text-center text-sm text-text-muted">
               No recordings yet
             </div>
           ) : (
@@ -148,7 +148,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
               ">
                 <div>
                   <span className="text-xs font-semibold text-text-main">{rec.timestamp}</span>
-                  <div className="mt-0.5 text-[11px] text-text-muted">
+                  <div className="mt-0.5 text-caption text-text-muted">
                     ⏱ {formatDuration(rec.duration)} · {rec.fishCount} fish · {rec.clarity.toFixed(2)} FNU
                   </div>
                 </div>

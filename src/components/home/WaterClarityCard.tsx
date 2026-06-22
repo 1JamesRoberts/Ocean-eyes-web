@@ -17,8 +17,8 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
         type="button"
         className="
           flex w-full cursor-pointer items-center gap-2.5 rounded-2xl border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-3 text-left
-          shadow-card transition-smooth
+          border-border-subtle bg-surface-card p-3 text-left shadow-card
+          transition-smooth
           hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
         "
         onClick={onClick}
@@ -30,7 +30,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
           <Droplet size={16} />
         </div>
         <div>
-          <span className="block text-[11px] font-semibold text-text-muted">Clarity</span>
+          <span className="block text-caption font-semibold text-text-muted">Clarity</span>
           <span className="text-base font-bold text-text-main">
             {displayClarity.toFixed(2)} FNU
           </span>

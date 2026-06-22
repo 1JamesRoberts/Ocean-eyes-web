@@ -35,16 +35,15 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
       </h3>
 
       <div className="
-        flex cursor-pointer flex-col rounded-[20px] border
-        border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-        transition-smooth
+        flex cursor-pointer flex-col rounded-[20px] border border-border-subtle
+        bg-surface-card p-5 shadow-card transition-smooth
         hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
         hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
       " onClick={onManageFish}>
         <div className="mb-3 flex items-start justify-between">
           <div>
-            <span className="text-[28px] font-extrabold">{displayFishCount}</span>
-            <span className="ml-1 text-[13px] text-text-muted">fish visible</span>
+            <span className="text-display font-extrabold">{displayFishCount}</span>
+            <span className="ml-1 text-sm text-text-muted">fish visible</span>
           </div>
           <Fish size={20} className="text-primary-dark" />
         </div>
@@ -54,8 +53,8 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
       </div>
 
       <div className="
-        rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-        px-5 py-1 shadow-card transition-smooth
+        rounded-[20px] border border-border-subtle bg-surface-card px-5 py-1
+        shadow-card transition-smooth
         hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
         hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
       ">
@@ -72,9 +71,9 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
             <div className="flex items-center gap-3">
               <SpeciesAvatar speciesId={fish.speciesId} />
               <div>
-                <span className="text-[15px] font-semibold text-text-main">{fish.name}</span>
+                <span className="text-h3 font-semibold text-text-main">{fish.name}</span>
                 <span className="
-                  mt-0.5 block text-[11px] font-medium text-text-muted
+                  mt-0.5 block text-caption font-medium text-text-muted
                 ">
                   Expected: {fish.count} species limit
                 </span>
@@ -82,7 +81,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
             </div>
             <div className="flex items-center gap-2.5">
               <span className="
-                rounded-[10px] px-2 py-0.5 text-[11px] font-semibold
+                rounded-[10px] px-2 py-0.5 text-caption font-semibold
               "
                 style={{
                   backgroundColor: fish.detected === fish.count ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',

@@ -16,8 +16,8 @@ export const DateTimePill: React.FC<DateTimePillProps> = ({
     type="button"
     onClick={onClick}
     className={`
-      cursor-pointer rounded-full border-none px-4 py-2.5 text-[15px]
-      font-medium whitespace-nowrap transition-colors
+      cursor-pointer rounded-full border-none px-4 py-2.5 text-h3 font-medium
+      whitespace-nowrap transition-colors
       ${isActive
         ? `
           bg-primary-gradient text-text-inv

@@ -35,7 +35,7 @@ export const AlertsScreen: React.FC = () => {
           <span className="
             block text-xs font-semibold text-text-muted uppercase
           ">Notifications</span>
-          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Safety Alerts</h1>
+          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Safety Alerts</h1>
         </div>
         <button
           className="
@@ -53,9 +53,8 @@ export const AlertsScreen: React.FC = () => {
           <div
             key={alert.id}
             className={`
-              cursor-pointer rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card p-4 shadow-card
-              transition-smooth
+              cursor-pointer rounded-[20px] border border-border-subtle
+              bg-surface-card p-5 shadow-card transition-smooth
               hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
               hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
               ${alert.resolved ? `opacity-60` : ''}
@@ -65,13 +64,13 @@ export const AlertsScreen: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-bold text-text-main">{alert.title}</h4>
-              <span className="text-[11px] text-text-muted">{alert.timeAgo}</span>
+              <span className="text-caption text-text-muted">{alert.timeAgo}</span>
             </div>
             <p className="mt-1 truncate text-xs text-text-muted">
               {alert.message}
             </p>
             {alert.resolved && (
-              <span className="mt-2 block text-[10px] font-semibold text-good">
+              <span className="mt-2 block text-2xs font-semibold text-good">
                 ✓ RESOLVED
               </span>
             )}

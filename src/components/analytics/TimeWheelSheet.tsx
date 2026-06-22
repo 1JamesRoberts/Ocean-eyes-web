@@ -73,7 +73,7 @@ const WheelColumn: React.FC<WheelColumnProps> = ({ items, selected, onSelect }) 
               }}
               className={`
                 flex h-[44px] w-full cursor-pointer items-center justify-center
-                border-none bg-transparent text-[22px] font-normal
+                border-none bg-transparent text-title font-normal
                 transition-colors
                 ${isSelected ? 'text-text-main' : 'text-text-muted/45'}
               `}
@@ -135,7 +135,7 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
         onClick={handleDone}
         className="
           mt-3 w-full cursor-pointer rounded-full border-none
-          bg-primary-gradient py-2.5 text-[15px] font-semibold text-text-inv
+          bg-primary-gradient py-2.5 text-h3 font-semibold text-text-inv
           transition-smooth
           hover:bg-primary-hover-gradient
           active:scale-[0.98]

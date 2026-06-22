@@ -70,8 +70,8 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
           </g>
         </svg>
         <div className="absolute top-1/2 left-1/2 -translate-1/2 text-center">
-          <div className="text-[28px] font-extrabold text-text-main">{total}</div>
-          <div className="text-[11px] font-semibold text-text-muted">TOTAL FISH</div>
+          <div className="text-display font-extrabold text-text-main">{total}</div>
+          <div className="text-caption font-semibold text-text-muted">TOTAL FISH</div>
         </div>
       </div>
 

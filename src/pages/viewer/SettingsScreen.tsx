@@ -35,14 +35,14 @@ export const SettingsScreen: React.FC = () => {
       ">
         <div>
           <span className="text-xs font-semibold text-text-muted uppercase">Control Panel</span>
-          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Tank Settings</h1>
+          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Tank Settings</h1>
         </div>
       </div>
 
       {/* Tank Identity */}
       <div className="
-        mb-5 rounded-[20px] border border-[rgba(13,148,136,0.02)]
-        bg-surface-card p-5 shadow-card transition-smooth
+        mb-5 rounded-[20px] border border-border-subtle bg-surface-card p-5
+        shadow-card transition-smooth
       ">
         {editing ? (
           <form onSubmit={handleNameChange} className="flex gap-2.5">
@@ -57,9 +57,9 @@ export const SettingsScreen: React.FC = () => {
             />
             <button className="
               inline-flex cursor-pointer items-center justify-center gap-2
-              rounded-[10px] border-none bg-primary-gradient px-4 py-2 font-main
-              text-[13px] font-semibold text-text-inv
-              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              rounded-3xl border-none bg-primary-gradient px-4 py-2 font-main
+              text-sm font-semibold text-text-inv shadow-primary-hover
+              transition-smooth
               hover:bg-primary-hover-gradient
               active:scale-[0.98]
             " type="submit">
@@ -70,7 +70,7 @@ export const SettingsScreen: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <span className="
-                text-[11px] font-semibold text-text-muted uppercase
+                text-caption font-semibold text-text-muted uppercase
               ">Tank Name</span>
               <strong className="mt-0.5 block text-lg text-text-main">
                 {activeTank?.name}
@@ -95,7 +95,7 @@ export const SettingsScreen: React.FC = () => {
         ">
           <span>Tank Reference Code: </span>
           <code className="
-            ml-1 inline-block px-1.5 py-0.5 align-middle text-[11px]
+            ml-1 inline-block px-1.5 py-0.5 align-middle text-caption
           ">
             {activeTank?.id}
           </code>
@@ -104,8 +104,8 @@ export const SettingsScreen: React.FC = () => {
 
       {/* Menu Options */}
       <div className="
-        mb-5 rounded-[20px] border border-[rgba(13,148,136,0.02)]
-        bg-surface-card px-4 py-1 shadow-card transition-smooth
+        mb-5 rounded-[20px] border border-border-subtle bg-surface-card px-4
+        py-1 shadow-card transition-smooth
       ">
         <div
           className="
@@ -114,7 +114,7 @@ export const SettingsScreen: React.FC = () => {
           "
           onClick={onNavigateToFish}
         >
-          <span className="text-[15px] font-semibold">Manage Fish Inventory</span>
+          <span className="text-h3 font-semibold">Manage Fish Inventory</span>
           <ChevronRight size={18} className="text-text-muted" />
         </div>
 
@@ -125,7 +125,7 @@ export const SettingsScreen: React.FC = () => {
           "
           onClick={onNavigateToHistory}
         >
-          <span className="text-[15px] font-semibold">Water Clarity Reports</span>
+          <span className="text-h3 font-semibold">Water Clarity Reports</span>
           <ChevronRight size={18} className="text-text-muted" />
         </div>
 
@@ -136,7 +136,7 @@ export const SettingsScreen: React.FC = () => {
           "
           onClick={onNavigateToAlerts}
         >
-          <span className="text-[15px] font-semibold">Safety Alert Logs</span>
+          <span className="text-h3 font-semibold">Safety Alert Logs</span>
           <ChevronRight size={18} className="text-text-muted" />
         </div>
 
@@ -144,20 +144,20 @@ export const SettingsScreen: React.FC = () => {
           className="flex cursor-pointer items-center justify-between py-4"
           onClick={onNavigateToMonitor}
         >
-          <span className="text-[15px] font-semibold text-primary-dark">IoT Scanner Console</span>
+          <span className="text-h3 font-semibold text-primary-dark">IoT Scanner Console</span>
           <ChevronRight size={18} className="text-primary-dark" />
         </div>
       </div>
 
       {/* Safety Threshold Settings Slider equivalent */}
       <div className="
-        mb-6 rounded-[20px] border border-[rgba(13,148,136,0.02)]
-        bg-surface-card p-5 shadow-card transition-smooth
+        mb-6 rounded-[20px] border border-border-subtle bg-surface-card p-5
+        shadow-card transition-smooth
       ">
         <h4 className="mb-4 text-sm font-bold text-text-main">Safety Boundaries & Notification Thresholds</h4>
 
         <div className="mb-4">
-          <div className="mb-1.5 flex justify-between text-[13px]">
+          <div className="mb-1.5 flex justify-between text-sm">
             <span className="text-text-muted">Maximum FNU Threshold</span>
             <strong className="text-primary-dark">{maxTurbidity} FNU</strong>
           </div>
@@ -175,7 +175,7 @@ export const SettingsScreen: React.FC = () => {
         </div>
 
         <div>
-          <div className="mb-1.5 flex justify-between text-[13px]">
+          <div className="mb-1.5 flex justify-between text-sm">
             <span className="text-text-muted">Discrepancy Alarm Trigger</span>
             <strong className="text-primary-dark">{fishChangePct}% visibility</strong>
           </div>
@@ -235,7 +235,7 @@ export const SettingsScreen: React.FC = () => {
           className="
             inline-flex w-full cursor-pointer items-center justify-center gap-2
             rounded-3xl border border-critical/20 bg-surface-card px-5 py-3.5
-            font-main text-[14px] font-semibold text-critical transition-smooth
+            font-main text-sm font-semibold text-critical transition-smooth
             hover:bg-critical/5
           "
           onClick={onRequestUnlink}

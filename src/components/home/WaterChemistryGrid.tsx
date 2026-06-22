@@ -42,8 +42,8 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
     <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
       {parameters.map(param => (
         <div key={param.label} className="
-          flex items-center gap-2.5 rounded-2xl border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-3 shadow-card
+          flex items-center gap-2.5 rounded-2xl border border-border-subtle
+          bg-surface-card p-3 shadow-card
         ">
           <div
             className={`
@@ -54,7 +54,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
             <param.icon size={16} />
           </div>
           <div>
-            <span className="block text-[11px] font-semibold text-text-muted">{param.label}</span>
+            <span className="block text-caption font-semibold text-text-muted">{param.label}</span>
             <span className={`
               text-base font-bold
               ${param.isCritical ? `text-critical` : `text-text-main`}

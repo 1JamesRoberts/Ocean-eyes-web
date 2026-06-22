@@ -95,14 +95,14 @@ export const LiveScreen: React.FC = () => {
       ">
         <div>
           <span className="text-xs font-semibold text-text-muted uppercase">Camera Monitor</span>
-          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Live Video Stream</h1>
+          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Live Video Stream</h1>
         </div>
       </div>
 
       {!activeTank && (
         <div className="
           mb-5 flex items-center gap-2.5 rounded-xl border border-warning
-          bg-warning/8 px-4 py-3 text-[13px] font-semibold text-[#B45309]
+          bg-warning/8 px-4 py-3 text-sm font-semibold text-warning
         ">
           <span className="text-base font-extrabold text-warning">!</span>
           <span>No aquarium linked. Link a tank from the Dashboard to save camera feeds and enable AI detection.</span>
@@ -112,7 +112,7 @@ export const LiveScreen: React.FC = () => {
       <div
         ref={viewportRef}
         className="
-          live-camera-feed relative mb-6 flex items-center justify-center
+          fs-reset relative mb-6 flex items-center justify-center
           overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.05)]
           bg-camera-bg shadow-premium
           max-sm:rounded-xl
@@ -176,7 +176,7 @@ export const LiveScreen: React.FC = () => {
                 className="
                   absolute top-3 left-1/2 z-16 flex -translate-x-1/2
                   items-center gap-1.5 rounded-[20px] bg-[rgba(15,23,42,0.85)]
-                  px-3 py-1.5 text-[11px] font-semibold text-white
+                  px-3 py-1.5 text-caption font-semibold text-white
                 "
               >
                 <div
@@ -196,7 +196,7 @@ export const LiveScreen: React.FC = () => {
               <div className="
                 absolute top-11 left-1/2 z-16 flex -translate-x-1/2 items-center
                 gap-1.5 rounded-[20px] border border-critical
-                bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-[11px] font-semibold
+                bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-caption font-semibold
                 text-white
               ">
                 <div className="size-2 rounded-full bg-critical" />
@@ -257,8 +257,8 @@ export const LiveScreen: React.FC = () => {
             <button className="
               inline-flex cursor-pointer items-center justify-center gap-2
               rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
-              text-[15px] font-semibold text-text-inv
-              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              text-h3 font-semibold text-text-inv shadow-primary-hover
+              transition-smooth
               hover:bg-primary-hover-gradient
               active:scale-[0.98]
             " onClick={startStream}>

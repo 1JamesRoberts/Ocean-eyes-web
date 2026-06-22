@@ -51,6 +51,7 @@
   --color-text-muted: var(--color-text-secondary);
   --color-text-inv: var(--color-text-inverse);
   --color-border-card: var(--color-border);
+  --color-border-subtle: rgba(13, 148, 136, 0.02);
 
   --color-critical: var(--color-critical);
   --color-warning: var(--color-warning);
@@ -59,6 +60,15 @@
   --color-camera-bg: var(--color-camera-bg);
 
   --font-main: 'Outfit', system-ui, -apple-system, sans-serif;
+
+  --text-display: 28px;
+  --text-hero: 32px;
+  --text-title: 22px;
+  --text-section: 26px;
+  --text-h3: 15px;
+  --text-caption: 11px;
+  --text-2xs: 10px;
+  --text-3xs: 9px;
 
   --background-image-primary-gradient: var(--color-primary);
   --background-image-primary-hover-gradient: var(--color-primary-hover);
@@ -94,6 +104,20 @@
 
 @utility transition-smooth {
   transition: var(--transition-smooth);
+}
+
+@layer utilities {
+  /* Opt-in reset that only applies when the element is in fullscreen mode. */
+  .fs-reset:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    aspect-ratio: auto !important;
+    border-radius: 0 !important;
+    border: none !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
 }
 
 @layer base {
@@ -141,17 +165,6 @@
 
 
 /* ─── Live Camera & Visualizer ─── */
-.live-camera-feed:fullscreen {
-  width: 100vw !important;
-  height: 100vh !important;
-  aspect-ratio: auto !important;
-  border-radius: 0 !important;
-  border: none !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
-
 .camera-scanline {
   position: absolute;
   top: 0;

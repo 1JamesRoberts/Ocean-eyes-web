@@ -37,7 +37,7 @@ export const RootGateOnboarding: React.FC = () => {
         ">
           <QrCode size={36} />
         </div>
-        <h2 className="mb-2 text-[26px] font-extrabold text-text-main">Link Your Aquarium</h2>
+        <h2 className="mb-2 text-section font-extrabold text-text-main">Link Your Aquarium</h2>
         <p className="text-sm leading-[145%] text-text-muted">
           Scan the QR code displayed on your OceanEyes smart monitoring hardware unit or enter the code manually.
         </p>
@@ -53,7 +53,7 @@ export const RootGateOnboarding: React.FC = () => {
               onChange={(e) => setQrInput(e.target.value)}
               className="
                 w-full rounded-2xl border border-border-card bg-surface-card
-                px-5 py-4 font-main text-[15px] text-text-main
+                px-5 py-4 font-main text-h3 text-text-main
                 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)] outline-none
                 transition-smooth
                 focus:border-primary-dark
@@ -61,15 +61,13 @@ export const RootGateOnboarding: React.FC = () => {
             />
           </div>
 
-          {error && <p className="
-            text-center text-[13px] font-medium text-critical
-          ">{error}</p>}
+          {error && <p className="text-center text-sm font-medium text-critical">{error}</p>}
 
           <button type="submit" className="
             inline-flex w-full cursor-pointer items-center justify-center gap-2
             rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
-            text-[15px] font-semibold text-text-inv
-            shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+            text-h3 font-semibold text-text-inv shadow-primary-hover
+            transition-smooth
             hover:bg-primary-hover-gradient
             active:scale-[0.98]
           ">
@@ -99,7 +97,7 @@ export const RootGateOnboarding: React.FC = () => {
             onChange={(e) => setTankName(e.target.value)}
             className="
               w-full rounded-2xl border border-border-card bg-surface-card px-5
-              py-4 font-main text-[15px] text-text-main outline-none
+              py-4 font-main text-h3 text-text-main outline-none
               transition-smooth
               focus:border-primary-dark
             "
@@ -108,8 +106,8 @@ export const RootGateOnboarding: React.FC = () => {
           <button type="submit" className="
             inline-flex w-full cursor-pointer items-center justify-center gap-2
             rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
-            text-[15px] font-semibold text-text-inv
-            shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+            text-h3 font-semibold text-text-inv shadow-primary-hover
+            transition-smooth
             hover:bg-primary-hover-gradient
             active:scale-[0.98]
           ">
@@ -121,7 +119,7 @@ export const RootGateOnboarding: React.FC = () => {
             className="
               inline-flex w-full cursor-pointer items-center justify-center
               gap-2 rounded-3xl border border-border-card bg-surface-card px-5
-              py-3 font-main text-[14px] font-semibold text-text-main
+              py-3 font-main text-sm font-semibold text-text-main
               transition-smooth
               hover:border-text-muted hover:bg-surface-hover
             "

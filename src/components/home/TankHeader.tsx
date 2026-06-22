@@ -52,7 +52,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
               onClick={() => setIsOpen(!isOpen)}
               className="
                 flex cursor-pointer items-center gap-2 border-none
-                bg-transparent p-0 text-left font-main text-[28px]
+                bg-transparent p-0 text-left font-main text-display
                 font-extrabold text-text-main outline-none
               "
             >
@@ -86,15 +86,11 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
                       w-full cursor-pointer rounded-[10px] border-none px-3
                       py-2.5 text-left font-main text-sm font-semibold
                       transition-colors
-                      ${t.id === tankId ? `text-primary-dark` : `text-text-main`}
+                      hover:bg-background-app
+                      ${t.id === tankId ? `bg-info/8 text-primary-dark` : `
+                        bg-transparent text-text-main
+                      `}
                     `}
-                    style={{ backgroundColor: t.id === tankId ? 'rgba(0, 116, 217, 0.08)' : 'transparent' }}
-                    onMouseEnter={(e) => {
-                      if (t.id !== tankId) e.currentTarget.style.backgroundColor = 'var(--color-background)';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (t.id !== tankId) e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
                   >
                     {t.name}
                   </button>
@@ -124,12 +120,12 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
         ) : (
           <div className="flex items-center gap-3">
             <h1 className="
-              mt-0.5 inline-block text-[28px] font-extrabold text-text-main
+              mt-0.5 inline-block text-display font-extrabold text-text-main
             ">{activeTank?.name || 'Living Room Reef'}</h1>
             <button
               className="
                 inline-flex cursor-pointer items-center gap-1 rounded-lg border
-                border-border-card bg-surface-card px-2 py-1 text-[11px]
+                border-border-card bg-surface-card px-2 py-1 text-caption
                 font-semibold text-text-main transition-smooth
                 hover:border-text-muted hover:bg-surface-hover
               "

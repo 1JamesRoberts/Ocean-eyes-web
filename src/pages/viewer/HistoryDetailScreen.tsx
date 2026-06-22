@@ -16,7 +16,7 @@ export const HistoryDetailScreen: React.FC = () => {
           <span className="
             block text-xs font-semibold text-text-muted uppercase
           ">History</span>
-          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Clarity Analytics</h1>
+          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Clarity Analytics</h1>
         </div>
         <button
           className="
@@ -31,15 +31,13 @@ export const HistoryDetailScreen: React.FC = () => {
 
       {/* Main Clarity Area Chart */}
       <div className="
-        mb-5 rounded-[20px] border border-[rgba(13,148,136,0.02)]
-        bg-surface-card p-5 shadow-card transition-smooth
+        mb-5 rounded-[20px] border border-border-subtle bg-surface-card p-5
+        shadow-card transition-smooth
       ">
-        <h3 className="
-          mb-4 flex items-center justify-between text-[15px] font-bold
-        ">
+        <h3 className="mb-4 flex items-center justify-between text-h3 font-bold">
           <span>Water Clarity Trend</span>
           <span className="
-            rounded-[10px] bg-primary-light-gradient px-2 py-0.5 text-[11px]
+            rounded-[10px] bg-primary-light-gradient px-2 py-0.5 text-caption
             font-semibold text-primary-dark
           ">
             Live Sync
@@ -51,7 +49,7 @@ export const HistoryDetailScreen: React.FC = () => {
         </div>
 
         <div className="
-          mt-2 flex justify-between px-2.5 text-[9px] font-semibold
+          mt-2 flex justify-between px-2.5 text-3xs font-semibold
           text-text-muted
         ">
           <span>OLDER</span>
@@ -61,7 +59,7 @@ export const HistoryDetailScreen: React.FC = () => {
       </div>
 
       {/* Diagnostic Logs */}
-      <h3 className="mb-3 text-[15px] font-bold text-text-main">Database Reading Log Entries</h3>
+      <h3 className="mb-3 text-h3 font-bold text-text-main">Database Reading Log Entries</h3>
       <div className="flex flex-col gap-2.5">
         {recentReadings.map(reading => {
           const date = new Date(reading.timestamp);
@@ -71,12 +69,12 @@ export const HistoryDetailScreen: React.FC = () => {
           return (
             <div key={reading.id} className="
               flex items-center justify-between rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card px-4 py-3
-              shadow-card transition-smooth
+              border-border-subtle bg-surface-card px-4 py-3 shadow-card
+              transition-smooth
             ">
               <div>
                 <strong className="text-sm text-text-main">Clarity: {reading.clarity}/10</strong>
-                <span className="mt-0.5 block text-[11px] text-text-muted">
+                <span className="mt-0.5 block text-caption text-text-muted">
                   {day} · {time} · {reading.fish_count} fish visible
                 </span>
               </div>

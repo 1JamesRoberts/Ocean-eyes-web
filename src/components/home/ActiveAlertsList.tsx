@@ -35,8 +35,8 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
           type="button"
           className={`
             w-full cursor-pointer rounded-[20px] border border-l-4
-            border-[rgba(13,148,136,0.02)] bg-surface-card p-4 text-left
-            shadow-card transition-smooth
+            border-border-subtle bg-surface-card p-4 text-left shadow-card
+            transition-smooth
             hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
             hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
             ${alert.severity === 'critical'

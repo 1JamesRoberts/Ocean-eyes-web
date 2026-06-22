@@ -171,8 +171,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
           aria-controls="date-range-editor"
           className="
             flex cursor-pointer items-center gap-2 rounded-full border-none
-            bg-surface-hover px-4 py-2.5 text-[15px] font-medium
-            whitespace-nowrap text-text-main transition-colors
+            bg-surface-hover px-4 py-2.5 text-h3 font-medium whitespace-nowrap
+            text-text-main transition-colors
             hover:bg-border-card
           "
         >
@@ -189,7 +189,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
           aria-label="Date range editor"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[15px] font-medium text-text-main">
+            <span className="text-h3 font-medium text-text-main">
               {summaryText}
             </span>
             <button
@@ -245,8 +245,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
           <div
             ref={popoverRef}
             className="
-              animate-fade-in rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card shadow-premium
+              animate-fade-in rounded-[20px] border border-border-subtle
+              bg-surface-card shadow-premium
             "
             style={popoverStyle}
           >

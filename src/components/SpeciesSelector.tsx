@@ -10,8 +10,8 @@ const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
   const bgColor = type === 'shrimp' ? '#FF9800' : type === 'snail' ? '#8BC34A' : type === 'crab' ? '#E91E63' : 'var(--color-border)';
   return (
     <span className="
-      rounded-sm px-1.5 py-0.5 text-[10px] leading-tight font-semibold
-      tracking-[0.5px] text-white uppercase
+      rounded-sm px-1.5 py-0.5 text-2xs/tight font-semibold tracking-[0.5px]
+      text-white uppercase
     " style={{ backgroundColor: bgColor }}>
       {emoji} {type}
     </span>
@@ -190,7 +190,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 <div
                   className="
                     flex size-8 shrink-0 items-center justify-center rounded-md
-                    bg-border-card text-[11px] font-bold text-text-muted
+                    bg-border-card text-caption font-bold text-text-muted
                   "
                 >
                   ??
@@ -200,7 +200,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             )}
 
             {filteredSpecies.length === 0 && !showCustomOption && (
-              <div className="py-3 text-center text-[13px] text-text-muted">
+              <div className="py-3 text-center text-sm text-text-muted">
                 No species found
               </div>
             )}

@@ -22,7 +22,7 @@ export const DetailChip: React.FC<DetailChipProps> = ({
   >
     {icon}
     <span className="
-      mr-0.5 text-[10px] font-medium tracking-wider text-text-muted uppercase
+      mr-0.5 text-2xs font-medium tracking-wider text-text-muted uppercase
     ">
       {label}
     </span>

@@ -52,10 +52,10 @@ export const HomeScreen: React.FC = () => {
 
       {!hasReadingData ? (
         <div className="
-          rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-          p-10 text-center shadow-card transition-smooth
+          rounded-[20px] border border-border-subtle bg-surface-card p-10
+          text-center shadow-card transition-smooth
         ">
-          <span className="mb-3 block text-[32px]">🐠</span>
+          <span className="mb-3 block text-hero">🐠</span>
           <h3 className="mb-2 text-lg font-bold text-text-main">
             Waiting for monitor data…
           </h3>

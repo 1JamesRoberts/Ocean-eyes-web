@@ -85,7 +85,7 @@ export const MyFishScreen: React.FC = () => {
           ">
             My Fish
           </span>
-          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Fish Inventory</h1>
+          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Fish Inventory</h1>
         </div>
         <button
           aria-label={showAddForm ? 'Close' : 'Add fish'}
@@ -109,14 +109,13 @@ export const MyFishScreen: React.FC = () => {
       }
       `}>
         <form onSubmit={onAdd} className="
-          flex flex-col gap-3.5 rounded-[20px] border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-6 shadow-card
-          transition-smooth
+          flex flex-col gap-3.5 rounded-[20px] border border-border-subtle
+          bg-surface-card p-6 shadow-card transition-smooth
         ">
           <h4 className="text-sm font-bold text-text-main">Add New Species Entry</h4>
           <div>
             <label className="
-              mb-1 block text-[11px] font-semibold tracking-wider
+              mb-1 block text-caption font-semibold tracking-wider
               text-text-muted uppercase
             ">SPECIES</label>
             <SpeciesSelector
@@ -130,8 +129,8 @@ export const MyFishScreen: React.FC = () => {
             <button className="
               inline-flex flex-1 cursor-pointer items-center justify-center
               gap-2 rounded-3xl border-none bg-primary-gradient px-5 py-2.5
-              font-main text-[13px] font-semibold text-text-inv
-              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
+              font-main text-sm font-semibold text-text-inv shadow-primary-hover
+              transition-smooth
               hover:bg-primary-hover-gradient
               active:scale-[0.98]
             " type="submit">
@@ -140,7 +139,7 @@ export const MyFishScreen: React.FC = () => {
             <button className="
               inline-flex cursor-pointer items-center justify-center gap-2
               rounded-3xl border border-border-card bg-surface-card px-3.5
-              py-2.5 font-main text-[13px] font-semibold text-text-main
+              py-2.5 font-main text-sm font-semibold text-text-main
               transition-smooth
               hover:border-text-muted hover:bg-surface-hover
             " type="button"
@@ -159,8 +158,8 @@ export const MyFishScreen: React.FC = () => {
         {/* Left Column — Chart & Stats */}
         <div className="flex flex-col gap-4">
           <div className="
-            rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-            p-5 shadow-card
+            rounded-[20px] border border-border-subtle bg-surface-card p-5
+            shadow-card
           ">
             <div className="mb-4 flex items-center gap-2">
               <BarChart3 size={18} className="text-primary-dark" />
@@ -170,8 +169,8 @@ export const MyFishScreen: React.FC = () => {
           </div>
 
           <div className="
-            rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-            p-5 shadow-card
+            rounded-[20px] border border-border-subtle bg-surface-card p-5
+            shadow-card
           ">
             <div className="mb-4 flex items-center gap-2">
               <Fish size={18} className="text-primary-dark" />
@@ -197,7 +196,7 @@ export const MyFishScreen: React.FC = () => {
                     <div className="flex items-center gap-1.5">
                       <span style={{ color: item.color }}>{item.icon}</span>
                       <span style={{ color: item.color }} className="
-                        text-[11px] font-bold tracking-wider uppercase
+                        text-caption font-bold tracking-wider uppercase
                       ">{item.label}</span>
                     </div>
                     <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
@@ -209,7 +208,7 @@ export const MyFishScreen: React.FC = () => {
             {/* ── Ideal Parameters ── */}
             <div className="mt-4 border-t border-border-card pt-4">
               <span className="
-                mb-3 block text-[11px] font-bold tracking-wider text-text-muted
+                mb-3 block text-caption font-bold tracking-wider text-text-muted
                 uppercase
               ">
                 Ideal Parameters
@@ -254,7 +253,7 @@ export const MyFishScreen: React.FC = () => {
                     <div className="flex items-center gap-1.5">
                       <span style={{ color: item.color }}>{item.icon}</span>
                       <span style={{ color: item.color }} className="
-                        text-[11px] font-bold tracking-wider uppercase
+                        text-caption font-bold tracking-wider uppercase
                       ">{item.label}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -280,8 +279,8 @@ export const MyFishScreen: React.FC = () => {
           {fishList.length === 0 && (
             <div className="
               flex flex-col items-center justify-center gap-3 rounded-[20px]
-              border border-[rgba(13,148,136,0.02)] bg-surface-card p-10
-              text-text-muted shadow-card
+              border border-border-subtle bg-surface-card p-10 text-text-muted
+              shadow-card
             ">
               <span className="text-5xl">🐟</span>
               <p className="text-base font-bold text-text-main">No fish in your inventory</p>
@@ -307,8 +306,7 @@ export const MyFishScreen: React.FC = () => {
               <div key={fish.id} data-fish-card
                 className="
                   flex cursor-pointer flex-col overflow-hidden rounded-[20px]
-                  border border-[rgba(13,148,136,0.02)] bg-surface-card
-                  shadow-card
+                  border border-border-subtle bg-surface-card shadow-card
                   transition-[box-shadow_0.25s_cubic-bezier(0.4,0,0.2,1)]
                   hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
                 "
@@ -350,7 +348,7 @@ export const MyFishScreen: React.FC = () => {
                           "
                             onClick={() => onDecrementCount(fish.id, fish.count)}>−</button>
                           <span className="
-                            w-6 text-center text-[13px] font-bold text-text-main
+                            w-6 text-center text-sm font-bold text-text-main
                           ">{fish.count}</span>
                           <button className="
                             flex size-6 cursor-pointer items-center
@@ -361,7 +359,7 @@ export const MyFishScreen: React.FC = () => {
                         </div>
                         <button className="
                           flex cursor-pointer border-none bg-transparent p-1
-                          text-[#94A3B8] transition-colors duration-200
+                          text-text-muted transition-colors duration-200
                           hover:text-critical
                         " onClick={() => onRequestDelete(fish.id)}>
                           <Trash2 size={16} />
@@ -409,7 +407,7 @@ export const MyFishScreen: React.FC = () => {
                             <span className="
                               inline-block rounded-[20px]
                               bg-[rgba(13,148,136,0.08)] p-[4px_10px]
-                              text-[11px] font-semibold text-primary-dark
+                              text-caption font-semibold text-primary-dark
                             ">{species.origin}</span>
                           )}
 
@@ -417,7 +415,7 @@ export const MyFishScreen: React.FC = () => {
                           {compResults.length > 0 && (
                             <div className="mt-4">
                               <div className="
-                                mb-2 text-[11px] font-bold tracking-wider
+                                mb-2 text-caption font-bold tracking-wider
                                 text-text-muted uppercase
                               ">
                                 Tank Compatibility
@@ -438,7 +436,7 @@ export const MyFishScreen: React.FC = () => {
                                       flex-1 text-xs font-semibold
                                       text-text-main
                                     ">{cr.speciesName}</span>
-                                    <span className="text-[11px] font-bold" style={{ color }}>{cr.score}%</span>
+                                    <span className="text-caption font-bold" style={{ color }}>{cr.score}%</span>
                                   </div>
                                 );
                               })}

@@ -40,9 +40,8 @@ export const ViewerApp: React.FC = () => {
     <div className="flex w-full flex-1 flex-col">
       {tankId === null && activeTab !== 'live' ? (
         <div className="
-          mx-auto mt-10 max-w-[480px] rounded-[20px] border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-10 shadow-card
-          transition-smooth
+          mx-auto mt-10 max-w-[480px] rounded-[20px] border border-border-subtle
+          bg-surface-card p-10 shadow-card transition-smooth
         ">
           <RootGateOnboarding />
         </div>

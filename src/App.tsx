@@ -40,7 +40,7 @@ const OceanEyesDashboard: React.FC = () => {
         max-md:w-full max-md:gap-4 max-md:border-r-0 max-md:border-b max-md:p-4
       ">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-[26px] font-extrabold">
+          <div className="flex items-center gap-2 text-section font-extrabold">
             <img src="/logo.png" alt="" className="block h-9 w-auto" />
             <span className="
               bg-logo-gradient bg-clip-text font-main tracking-tight
@@ -78,7 +78,7 @@ const OceanEyesDashboard: React.FC = () => {
                 <span>{item.label}</span>
                 {item.tab === 'settings' && activeAlertCount > 0 && (
                   <span className="
-                    ml-auto rounded-full bg-critical px-1.5 py-0.5 text-[10px]
+                    ml-auto rounded-full bg-critical px-1.5 py-0.5 text-2xs
                     font-bold text-white
                   ">
                     {activeAlertCount}
@@ -95,7 +95,7 @@ const OceanEyesDashboard: React.FC = () => {
         ">
           <div className="flex flex-col gap-1.5">
             <span className="
-              text-[10px] font-semibold tracking-wider text-text-muted uppercase
+              text-2xs font-semibold tracking-wider text-text-muted uppercase
             ">
               Active Tank
             </span>

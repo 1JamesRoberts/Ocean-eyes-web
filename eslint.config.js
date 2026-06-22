@@ -32,7 +32,7 @@ export default defineConfig([
         detectComponentClasses: true,
         lineBreakStyle: 'windows',
         ignore: [
-          '^live-camera-feed$',
+          '^fs-reset$',
           '^camera-scanline$',
           '^qr-code-canvas$',
           '^camera-flash-overlay$',

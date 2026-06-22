@@ -26,12 +26,12 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
     ">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="
-          m-0 flex items-center gap-2 text-[15px] font-bold text-text-main
+          m-0 flex items-center gap-2 text-h3 font-bold text-text-main
         ">
           <Brain size={18} className="text-primary-dark" />
           AI Analysis Results
         </h3>
-        <span className="text-[11px] font-semibold text-text-muted">
+        <span className="text-caption font-semibold text-text-muted">
           {new Date(lastPrediction.timestamp).toLocaleTimeString()}
         </span>
       </div>
@@ -43,11 +43,11 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           rounded-xl border border-border-card bg-background-app p-3
         ">
           <span className="
-            block text-[10px] font-semibold text-text-muted uppercase
+            block text-2xs font-semibold text-text-muted uppercase
           ">
             Fish Detected
           </span>
-          <strong className="mt-1 block text-[22px] text-primary-dark">
+          <strong className="mt-1 block text-title text-primary-dark">
             {lastPrediction.summary.total_detections}
           </strong>
         </div>
@@ -57,11 +57,11 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             rounded-xl border border-border-card bg-background-app p-3
           ">
             <span className="
-              block text-[10px] font-semibold text-text-muted uppercase
+              block text-2xs font-semibold text-text-muted uppercase
             ">
               FNU
             </span>
-            <strong className="mt-1 block text-[22px] text-info">
+            <strong className="mt-1 block text-title text-info">
               {lastTurbidityResult.turbidity.fnu.toFixed(2)}
             </strong>
           </div>
@@ -71,11 +71,11 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           rounded-xl border border-border-card bg-background-app p-3
         ">
           <span className="
-            block text-[10px] font-semibold text-text-muted uppercase
+            block text-2xs font-semibold text-text-muted uppercase
           ">
             Species Found
           </span>
-          <strong className="mt-1 block text-[22px] text-good">
+          <strong className="mt-1 block text-title text-good">
             {Object.keys(lastPrediction.summary.species_counts).length}
           </strong>
         </div>
@@ -133,7 +133,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             </p>
           ) : (
             <>
-              <div className="mb-2 text-[13px]">
+              <div className="mb-2 text-sm">
                 <span className="font-bold text-text-main">Status: </span>
                 <span className={`
                   font-extrabold
@@ -141,13 +141,13 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                 `}>
                   {diagnosis.healthy ? 'HEALTHY' : `DISEASE DETECTED (${diagnosis.disease})`}
                 </span>
-                <span className="ml-2 text-[11px] text-text-muted">
+                <span className="ml-2 text-caption text-text-muted">
                   (Confidence: {Math.round(diagnosis.confidence * 100)}%)
                 </span>
               </div>
 
               {diagnosisDetection && (
-                <div className="mb-2 text-[11px] text-text-muted italic">
+                <div className="mb-2 text-caption text-text-muted italic">
                   Diagnosed Subject: {diagnosisDetection.species_display}
                 </div>
               )}

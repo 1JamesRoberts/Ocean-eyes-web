@@ -48,7 +48,7 @@ export const AnalyticsScreen: React.FC = () => {
           ">
             AI Insights
           </span>
-          <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Analytics</h1>
+          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Analytics</h1>
         </div>
         <div className="flex items-center gap-3">
           <DateTimeRangePicker value={range} onChange={setRange} />
@@ -72,7 +72,7 @@ export const AnalyticsScreen: React.FC = () => {
       {error && (
         <div className="
           flex items-center justify-between gap-3 rounded-xl border
-          border-critical bg-critical/10 px-4 py-3 text-[13px] text-critical
+          border-critical bg-critical/10 px-4 py-3 text-sm text-critical
         ">
           <span>{error}</span>
             <button className="
@@ -101,14 +101,14 @@ export const AnalyticsScreen: React.FC = () => {
       {!loading && !error && !hasAnyData && (
         <div className="
           flex flex-col items-center justify-center gap-2 rounded-[20px] border
-          border-[rgba(13,148,136,0.02)] bg-surface-card px-6 py-12 text-center
+          border-border-subtle bg-surface-card px-6 py-12 text-center
           shadow-card transition-smooth
         ">
           <Calendar size={32} className="text-text-muted opacity-50" />
-          <span className="text-[15px] font-semibold text-text-main">
+          <span className="text-h3 font-semibold text-text-main">
             No data for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}
           </span>
-          <span className="text-[13px] text-text-muted">
+          <span className="text-sm text-text-muted">
             Try selecting a different range or run the AI pipeline to generate history.
           </span>
         </div>
@@ -127,9 +127,8 @@ export const AnalyticsScreen: React.FC = () => {
           ">
             {/* Spatial Detection Heatmap */}
             <div className="
-              flex flex-col gap-3 rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-              transition-smooth
+              flex flex-col gap-3 rounded-[20px] border border-border-subtle
+              bg-surface-card p-5 shadow-card transition-smooth
             ">
               <SpatialDetectionHeatmap
                 records={detectionRecords}
@@ -142,9 +141,8 @@ export const AnalyticsScreen: React.FC = () => {
 
             {/* Fish Count Timeline */}
             <div className="
-              flex flex-col gap-3 rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-              transition-smooth
+              flex flex-col gap-3 rounded-[20px] border border-border-subtle
+              bg-surface-card p-5 shadow-card transition-smooth
             ">
             <h3 className="m-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
             <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
@@ -159,7 +157,7 @@ export const AnalyticsScreen: React.FC = () => {
           <div
             className="
               flex cursor-pointer flex-col gap-3 rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
+              border-border-subtle bg-surface-card p-5 shadow-card
               transition-smooth
               lg:col-span-2
             "
@@ -198,9 +196,8 @@ export const AnalyticsScreen: React.FC = () => {
 
           {/* AI Health Diagnostics Log */}
           <div className="
-            flex flex-col gap-3 rounded-[20px] border
-            border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-            transition-smooth
+            flex flex-col gap-3 rounded-[20px] border border-border-subtle
+            bg-surface-card p-5 shadow-card transition-smooth
             lg:col-span-2
           ">
             <div className="flex items-start justify-between">
@@ -232,7 +229,7 @@ export const AnalyticsScreen: React.FC = () => {
                   <button
                     className="
                       cursor-pointer rounded-sm border border-critical
-                      bg-critical px-2.5 py-1 text-[11px] font-bold
+                      bg-critical px-2.5 py-1 text-caption font-bold
                       whitespace-nowrap text-white
                       hover:opacity-90
                       disabled:cursor-not-allowed disabled:opacity-50
@@ -245,7 +242,7 @@ export const AnalyticsScreen: React.FC = () => {
                   <button
                     className="
                       cursor-pointer rounded-sm border border-border-card
-                      bg-transparent px-2.5 py-1 text-[11px] font-semibold
+                      bg-transparent px-2.5 py-1 text-caption font-semibold
                       whitespace-nowrap text-text-muted
                       hover:bg-black/5
                       disabled:cursor-not-allowed disabled:opacity-50
@@ -260,7 +257,7 @@ export const AnalyticsScreen: React.FC = () => {
             </div>
             {diagnoses.length === 0 ? (
               <div className="
-                flex flex-col items-center justify-center p-6 text-[13px]
+                flex flex-col items-center justify-center p-6 text-sm
                 text-text-muted
               ">
                 No health diagnostic records found for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}.
@@ -291,7 +288,7 @@ export const AnalyticsScreen: React.FC = () => {
                           </span>
                           <span
                             className={`
-                              rounded-xl px-2 py-0.5 text-[11px] font-bold
+                              rounded-xl px-2 py-0.5 text-caption font-bold
                               ${isErr ? `bg-critical/12 text-critical` : isHealthy ? `
                                 bg-good/12 text-good
                               ` : `bg-warning/12 text-warning`}
@@ -301,14 +298,14 @@ export const AnalyticsScreen: React.FC = () => {
                           </span>
                           {!isErr && (
                             <span className="
-                              text-[11px] font-semibold text-text-muted
+                              text-caption font-semibold text-text-muted
                             ">
                               {Math.round(diag.diagnosis.confidence * 100)}% confidence
                             </span>
                           )}
                         </div>
                         <span className="
-                          text-[11px] font-semibold text-text-muted
+                          text-caption font-semibold text-text-muted
                         ">
                           {new Date(diag.timestamp).toLocaleTimeString()}
                         </span>

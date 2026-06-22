@@ -295,9 +295,9 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
           </div>
           <select
             className="
-              cursor-pointer rounded-lg border border-border-card
-              bg-surface-card px-2.5 py-1.5 text-[13px] text-text-main
-              outline-none
+              w-full cursor-pointer rounded-xl border border-border-card
+              bg-background-app px-3 py-2.5 font-main text-sm font-semibold
+              text-text-main outline-none
               focus:border-info
             "
             value={selectedSpecies}
