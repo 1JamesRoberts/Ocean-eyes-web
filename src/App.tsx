@@ -1,5 +1,5 @@
 // App.tsx - Full-Screen Desktop Dashboard Playground Coordinator
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NavigationProvider } from './context/NavigationContext';
 import { useNavigation } from './context/NavigationContext';
 import { useTank } from './hooks/useTank';
@@ -13,7 +13,6 @@ import {
   Settings,
   Fish,
   BarChart3,
-  Plus,
   HelpCircle,
   LogOut
 } from 'lucide-react';
@@ -43,6 +42,29 @@ const OceanEyesDashboard: React.FC = () => {
 
   const [showAddTankModal, setShowAddTankModal] = useState(false);
 
+  // ── Sliding active indicator ──
+  const navRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [indicatorStyle, setIndicatorStyle] = useState({ top: 0, height: 0 });
+
+  const updateIndicator = useCallback(() => {
+    const activeButton = buttonRefs.current[activeTab];
+    if (activeButton && navRef.current) {
+      const navRect = navRef.current.getBoundingClientRect();
+      const btnRect = activeButton.getBoundingClientRect();
+      setIndicatorStyle({
+        top: btnRect.top - navRect.top,
+        height: btnRect.height,
+      });
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    updateIndicator();
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [updateIndicator]);
+
   return (
     <div className="
       flex min-h-screen w-full flex-col
@@ -67,22 +89,32 @@ const OceanEyesDashboard: React.FC = () => {
         </div>
 
         {/* Navigation Sidebar Links */}
-        <nav className="flex flex-1 flex-col gap-2">
+        <nav ref={navRef} className="relative flex flex-1 flex-col gap-2">
+          {/* Sliding active indicator */}
+          <div
+            className="
+              pointer-events-none absolute inset-x-0 z-0 rounded-xl
+              bg-primary-light-gradient transition-all duration-300 ease-out
+            "
+            style={{ top: indicatorStyle.top, height: indicatorStyle.height }}
+          />
+
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = item.isActive(activeTab);
             return (
               <button
                 key={item.tab}
+                ref={(el) => { buttonRefs.current[item.tab] = el; }}
                 className={`
-                  flex w-full cursor-pointer items-center gap-3 rounded-xl
-                  border-none px-4 py-3 text-left font-main text-sm
-                  font-semibold transition-all duration-300
+                  relative z-10 flex w-full cursor-pointer items-center gap-3
+                  rounded-xl border-none bg-none px-4 py-3 text-left font-main
+                  text-sm font-semibold transition-smooth
                   ${isActive
-                    ? `bg-secondary-container/50 text-primary-dark shadow-sm`
+                    ? `text-primary-dark`
                     : `
-                      bg-transparent text-on-surface-variant
-                      hover:bg-white/10 hover:text-primary-dark
+                      text-text-muted
+                      hover:bg-surface-hover hover:text-text-main
                     `
                   }
                 `}
@@ -107,21 +139,6 @@ const OceanEyesDashboard: React.FC = () => {
         <div className="
           mt-auto flex flex-col gap-3 border-t border-white/20 pt-4
         ">
-          <button
-            type="button"
-            onClick={() => setShowAddTankModal(true)}
-            className="
-              flex w-full cursor-pointer items-center justify-center gap-2
-              rounded-xl border-none bg-primary-dark px-4 py-3 font-main text-sm
-              font-semibold text-white shadow-lg shadow-primary-dark/20
-              transition-opacity
-              hover:opacity-90
-            "
-          >
-            <Plus size={18} />
-            <span>Add Tank</span>
-          </button>
-
           <div className="flex flex-col gap-1">
             <span className="
               text-2xs font-semibold tracking-wider text-on-surface-variant/70

@@ -11,7 +11,7 @@
   --color-surface-hover: #f4f3f3;
   --color-primary: linear-gradient(135deg, #004349 0%, #196a59 100%);
   --color-primary-hover: linear-gradient(135deg, #196a59 0%, #004349 100%);
-  --color-primary-light: linear-gradient(90deg, rgba(171, 238, 246, 0.8) 0%, rgba(171, 238, 246, 0.2) 100%);
+  --color-primary-light: linear-gradient(90deg, rgba(171, 246, 235, 0.493) 0%, rgba(206, 250, 255, 0.2) 40%);
   --color-primary-dark: #004349;
   --color-text-primary: #1a1c1c;
   --color-text-secondary: #3f484a;
