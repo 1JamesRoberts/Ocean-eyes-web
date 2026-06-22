@@ -1,5 +1,5 @@
 import React from 'react';
-import { Droplet, Thermometer, Shield, Activity } from 'lucide-react';
+import { Droplet, Thermometer, Shield, Activity, Cloud } from 'lucide-react';
 import type { ReadingItem } from '../../types/aquarium';
 
 interface WaterChemistryGridProps {
@@ -35,6 +35,13 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
       colorClass: 'text-[#8B5CF6] bg-[rgba(139,92,246,0.08)]',
       icon: Activity,
       isCritical: (reading.nitrite ?? 0) > 0.2
+    },
+    {
+      label: 'CO₂',
+      value: '—',
+      colorClass: 'text-[#0891B2] bg-[rgba(8,145,178,0.08)]',
+      icon: Cloud,
+      isCritical: false
     }
   ];
 

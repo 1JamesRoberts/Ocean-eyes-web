@@ -38,6 +38,7 @@ const OceanEyesDashboard: React.FC = () => {
         flex w-[280px] shrink-0 flex-col gap-8 border-r border-border-card
         bg-surface-card p-6
         max-md:w-full max-md:gap-4 max-md:border-r-0 max-md:border-b max-md:p-4
+        md:sticky md:top-0 md:h-screen
       ">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 text-section font-extrabold">

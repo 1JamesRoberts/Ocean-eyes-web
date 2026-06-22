@@ -1,28 +1,22 @@
 import React from 'react';
-import { Fish } from 'lucide-react';
 import { SpeciesAvatar } from '../fish/SpeciesAvatar';
 import type { FishEntry } from '../../types/aquarium';
 
 interface FishInventorySummaryProps {
   fishList: FishEntry[];
-  displayFishCount: number;
   onManageFish: () => void;
 }
 
 export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
   fishList,
-  displayFishCount,
   onManageFish
 }) => {
-  const totalExpected = fishList.reduce((sum, f) => sum + f.count, 0);
-
   return (
-    <div className="grid grid-cols-[1fr_2fr] items-start gap-x-6 gap-y-3">
-      <h3 className="m-0 text-base font-bold text-text-main">Camera Visualizer</h3>
+    <div className="flex flex-col gap-3">
       <h3 className="
         m-0 flex items-center justify-between text-base font-bold text-text-main
       ">
-        <span>Fish Inventory Summary</span>
+        <span>Top species detected</span>
         <button
           onClick={onManageFish}
           className="
@@ -33,24 +27,6 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
           Manage list
         </button>
       </h3>
-
-      <div className="
-        flex cursor-pointer flex-col rounded-[20px] border border-border-subtle
-        bg-surface-card p-5 shadow-card transition-smooth
-        hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-        hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
-      " onClick={onManageFish}>
-        <div className="mb-3 flex items-start justify-between">
-          <div>
-            <span className="text-display font-extrabold">{displayFishCount}</span>
-            <span className="ml-1 text-sm text-text-muted">fish visible</span>
-          </div>
-          <Fish size={20} className="text-primary-dark" />
-        </div>
-        <span className="text-xs text-text-muted">
-          Expected Target: {totalExpected} species count
-        </span>
-      </div>
 
       <div className="
         rounded-[20px] border border-border-subtle bg-surface-card px-5 py-1

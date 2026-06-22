@@ -91,7 +91,6 @@ export const HomeScreen: React.FC = () => {
 
               <FishInventorySummary
                 fishList={fishList}
-                displayFishCount={displayFishCount}
                 onManageFish={onManageFish}
               />
             </div>
