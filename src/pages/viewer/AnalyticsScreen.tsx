@@ -2,6 +2,9 @@
 import React from 'react';
 import { Calendar, RotateCcw, Loader2, ArrowRight, Trash2 } from 'lucide-react';
 import { useAnalytics } from '../../hooks/pages/useAnalytics';
+import { Button } from '../../components/shared/Button';
+import { DashboardCard } from '../../components/shared/DashboardCard';
+import { EmptyState } from '../../components/shared/EmptyState';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
@@ -52,19 +55,17 @@ export const AnalyticsScreen: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <DateTimeRangePicker value={range} onChange={setRange} />
-          <button
-            className="
-              cursor-pointer rounded-lg border border-border-card bg-transparent
-              px-3 py-1.5 text-xs font-semibold text-text-muted
-              hover:bg-black/5
-            "
+          <Button
+            variant="secondary"
+            size="sm"
+            className="rounded-lg px-3 py-1.5"
             onClick={refetch}
             disabled={loading}
             title="Refresh data"
             aria-label="Refresh analytics"
           >
             <RotateCcw size={14} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -75,13 +76,17 @@ export const AnalyticsScreen: React.FC = () => {
           border-critical bg-critical/10 px-4 py-3 text-[13px] text-critical
         ">
           <span>{error}</span>
-            <button className="
-              cursor-pointer rounded-lg border border-critical bg-transparent
-              px-3 py-1.5 text-xs font-semibold text-critical
+          <Button
+            variant="secondary"
+            size="sm"
+            className="
+              rounded-lg border-critical px-3 py-1.5 text-critical
               hover:bg-critical/12
-            " onClick={refetch}>
+            "
+            onClick={refetch}
+          >
             Retry
-          </button>
+          </Button>
         </div>
       )}
 
@@ -99,19 +104,14 @@ export const AnalyticsScreen: React.FC = () => {
 
       {/* Empty state */}
       {!loading && !error && !hasAnyData && (
-        <div className="
-          flex flex-col items-center justify-center gap-2 rounded-[20px] border
-          border-[rgba(13,148,136,0.02)] bg-surface-card px-6 py-12 text-center
-          shadow-card transition-smooth
-        ">
-          <Calendar size={32} className="text-text-muted opacity-50" />
-          <span className="text-[15px] font-semibold text-text-main">
-            No data for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}
-          </span>
-          <span className="text-[13px] text-text-muted">
-            Try selecting a different range or run the AI pipeline to generate history.
-          </span>
-        </div>
+        <DashboardCard>
+          <EmptyState
+            icon={Calendar}
+            message={`No data for ${formatDateForDisplay(range.startDate)} – ${formatDateForDisplay(range.endDate)}`}
+            hint="Try selecting a different range or run the AI pipeline to generate history."
+            size="md"
+          />
+        </DashboardCard>
       )}
 
       {/* Charts grid */}
@@ -126,11 +126,7 @@ export const AnalyticsScreen: React.FC = () => {
             lg:col-span-2 lg:grid-cols-[2fr_1fr]
           ">
             {/* Spatial Detection Heatmap */}
-            <div className="
-              flex flex-col gap-3 rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-              transition-smooth
-            ">
+            <DashboardCard>
               <SpatialDetectionHeatmap
                 records={detectionRecords}
                 tankId={tankId}
@@ -138,29 +134,23 @@ export const AnalyticsScreen: React.FC = () => {
                 selectedSpecies={selectedSpecies}
                 onSelectedSpeciesChange={setSelectedSpecies}
               />
-            </div>
+            </DashboardCard>
 
             {/* Fish Count Timeline */}
-            <div className="
-              flex flex-col gap-3 rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-              transition-smooth
-            ">
-            <h3 className="m-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
-            <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
-            <div className="mt-2">
-              <h3 className="m-0 text-sm font-bold text-text-main">Mean Nearest-Neighbor Distance</h3>
-            </div>
-            <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
-          </div>
+            <DashboardCard>
+              <h3 className="m-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
+              <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
+              <div className="mt-2">
+                <h3 className="m-0 text-sm font-bold text-text-main">Mean Nearest-Neighbor Distance</h3>
+              </div>
+              <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
+            </DashboardCard>
           </div>
 
           {/* Water Clarity Trend */}
-          <div
+          <DashboardCard
             className="
-              flex cursor-pointer flex-col gap-3 rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-              transition-smooth
+              flex cursor-pointer flex-col gap-3
               lg:col-span-2
             "
             onClick={onViewHistory}
@@ -181,26 +171,25 @@ export const AnalyticsScreen: React.FC = () => {
               records={turbidityRecords}
               readings={readings}
               emptyAction={
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
                   className="
-                    cursor-pointer rounded-lg border border-primary-dark
-                    bg-primary-light-gradient px-3.5 py-1.5 text-xs
-                    font-semibold text-primary-dark
+                    rounded-lg border-primary-dark bg-primary-light-gradient
+                    text-primary-dark
                     hover:bg-primary-dark hover:text-white
                   "
                   onClick={(e) => { e.stopPropagation(); onViewHistory(); }}
                 >
                   View Clarity Analytics →
-                </button>
+                </Button>
               }
             />
-          </div>
+          </DashboardCard>
 
           {/* AI Health Diagnostics Log */}
-          <div className="
-            flex flex-col gap-3 rounded-[20px] border
-            border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-            transition-smooth
+          <DashboardCard className="
+            flex flex-col gap-3
             lg:col-span-2
           ">
             <div className="flex items-start justify-between">
@@ -259,12 +248,10 @@ export const AnalyticsScreen: React.FC = () => {
               )}
             </div>
             {diagnoses.length === 0 ? (
-              <div className="
-                flex flex-col items-center justify-center p-6 text-[13px]
-                text-text-muted
-              ">
-                No health diagnostic records found for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}.
-              </div>
+              <EmptyState
+                message={`No health diagnostic records found for ${formatDateForDisplay(range.startDate)} – ${formatDateForDisplay(range.endDate)}.`}
+                size="sm"
+              />
             ) : (
               <div className="mt-2 flex flex-col gap-3">
                 {diagnoses.map((diag, index) => {
@@ -321,9 +308,8 @@ export const AnalyticsScreen: React.FC = () => {
                             alt={`Crop of ${diag.species} sent to LLM`}
                             className="
                               block max-h-[110px] w-40 shrink-0 rounded-sm
-                              object-contain
+                              object-contain [image-rendering:pixelated]
                             "
-                            style={{ imageRendering: 'pixelated' }}
                             onError={(e) => {
                               (e.currentTarget as HTMLImageElement).style.display = 'none';
                             }}
@@ -355,7 +341,7 @@ export const AnalyticsScreen: React.FC = () => {
                 })}
               </div>
             )}
-          </div>
+          </DashboardCard>
         </div>
       )}
     </div>

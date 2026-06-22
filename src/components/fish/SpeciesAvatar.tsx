@@ -17,27 +17,21 @@ export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
   const [hasError, setHasError] = useState(false);
   const species = getSpeciesById(speciesId);
 
-  const commonStyle: React.CSSProperties = {
-    width: `${size}px`,
-    height: `${size}px`,
-    borderRadius: `${radius}px`,
-    flexShrink: 0,
-  };
+  const sizeClass = `size-[${size}px]`;
+  const radiusClass = radius >= 8 ? 'rounded-lg' : 'rounded-md';
 
   if (!species || hasError) {
     return (
       <div
-        className={className}
+        className={`
+          flex shrink-0 items-center justify-center font-bold text-white
+          ${sizeClass}
+          ${radiusClass}
+          ${className}
+        `}
         style={{
-          ...commonStyle,
           backgroundColor: getSpeciesColor(speciesId),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           fontSize: `${Math.max(9, size * 0.34)}px`,
-          fontWeight: 700,
-          color: '#fff',
-          textShadow: '0 1px 2px rgba(0,0,0,0.3)',
         }}
       >
         {getSpeciesInitials(speciesId)}
@@ -47,13 +41,14 @@ export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
 
   return (
     <img
-      className={className}
+      className={`
+        shrink-0 object-contain
+        ${sizeClass}
+        ${radiusClass}
+        ${className}
+      `}
       src={species.imagePath}
       alt={species.initials}
-      style={{
-        ...commonStyle,
-        objectFit: 'contain',
-      }}
       onError={() => setHasError(true)}
     />
   );

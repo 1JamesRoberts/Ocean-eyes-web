@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Button } from '../shared/Button';
+import { Modal } from '../shared/Modal';
 
 interface AddTankModalProps {
   show: boolean;
@@ -16,8 +18,6 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
   const [addMode, setAddMode] = useState<'create' | 'link'>('create');
   const [newTankName, setNewTankName] = useState('');
   const [linkTankCode, setLinkTankCode] = useState('');
-
-  if (!show) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,20 +45,29 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
   };
 
   return (
-    <div className="
-      fixed inset-0 z-1000 flex items-center justify-center
-      bg-[rgba(15,23,42,0.6)] backdrop-blur-xs
-    ">
+    <Modal
+      isOpen={show}
+      onClose={handleClose}
+      title="Add Aquarium Tank"
+      className="w-[380px]"
+      footer={
+        <>
+          <Button variant="secondary" size="md" className="
+            flex-1 rounded-[10px]
+          " onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button type="submit" size="md" className="flex-1 rounded-[10px]" form="add-tank-form">
+            {addMode === 'create' ? 'Create Tank' : 'Link Tank'}
+          </Button>
+        </>
+      }
+    >
       <form
+        id="add-tank-form"
         onSubmit={handleSubmit}
-        className="
-          flex w-[380px] flex-col gap-4 rounded-[20px] border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-6
-          shadow-[0_20px_25px_-5px_rgba(0,0,0,0.15)]
-        "
+        className="flex flex-col gap-4"
       >
-        <h3 className="m-0 text-base font-bold text-text-main">Add Aquarium Tank</h3>
-
         <div className="flex gap-0.5 rounded-[10px] bg-border-card p-0.5">
           <button
             type="button"
@@ -139,35 +148,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
           </div>
         )}
 
-        <div className="mt-2 flex gap-2.5">
-          <button
-            type="button"
-            className="
-              inline-flex flex-1 cursor-pointer items-center justify-center
-              gap-2 rounded-[10px] border border-border-card bg-surface-card
-              px-5 py-2.5 font-main text-[13px] font-semibold text-text-main
-              transition-smooth
-              hover:border-text-muted hover:bg-surface-hover
-            "
-            onClick={handleClose}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="
-              inline-flex flex-1 cursor-pointer items-center justify-center
-              gap-2 rounded-[10px] border-none bg-primary-gradient px-5 py-2.5
-              font-main text-[13px] font-semibold text-text-inv
-              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
-              hover:bg-primary-hover-gradient
-              active:scale-[0.98]
-            "
-          >
-            {addMode === 'create' ? 'Create Tank' : 'Link Tank'}
-          </button>
-        </div>
       </form>
-    </div>
+    </Modal>
   );
 };

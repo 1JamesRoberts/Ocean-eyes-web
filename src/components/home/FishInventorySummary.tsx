@@ -1,5 +1,6 @@
 import React from 'react';
 import { Fish } from 'lucide-react';
+import { DashboardCard } from '../shared/DashboardCard';
 import { SpeciesAvatar } from '../fish/SpeciesAvatar';
 import type { FishEntry } from '../../types/aquarium';
 
@@ -34,13 +35,11 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
         </button>
       </h3>
 
-      <div className="
-        flex cursor-pointer flex-col rounded-[20px] border
-        border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-        transition-smooth
-        hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-        hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
-      " onClick={onManageFish}>
+      <DashboardCard
+        variant="hoverable"
+        className="flex cursor-pointer flex-col"
+        onClick={onManageFish}
+      >
         <div className="mb-3 flex items-start justify-between">
           <div>
             <span className="text-[28px] font-extrabold">{displayFishCount}</span>
@@ -51,14 +50,9 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
         <span className="text-xs text-text-muted">
           Expected Target: {totalExpected} species count
         </span>
-      </div>
+      </DashboardCard>
 
-      <div className="
-        rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-        px-5 py-1 shadow-card transition-smooth
-        hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-        hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
-      ">
+      <DashboardCard variant="hoverable" padding="default" className="px-5 py-1">
         {fishList.slice(0, 3).map((fish, idx) => (
           <div
             key={fish.id}
@@ -81,20 +75,19 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
               </div>
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="
+              <span className={`
                 rounded-[10px] px-2 py-0.5 text-[11px] font-semibold
-              "
-                style={{
-                  backgroundColor: fish.detected === fish.count ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                  color: fish.detected === fish.count ? 'var(--color-good)' : 'var(--color-critical)'
-                }}
-              >
+                ${fish.detected === fish.count
+                  ? 'bg-good/10 text-good'
+                  : 'bg-critical/10 text-critical'
+                }
+              `}>
                 {fish.detected === fish.count ? 'All Visible' : `${fish.detected} / ${fish.count} detected`}
               </span>
             </div>
           </div>
         ))}
-      </div>
+      </DashboardCard>
     </div>
   );
 });

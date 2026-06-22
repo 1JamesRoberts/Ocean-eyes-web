@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { EmptyState } from '../shared/EmptyState';
 
 interface SpeciesSlice {
   name: string;
@@ -39,13 +40,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
   );
 
   if (speciesDistribution.length === 0) {
-    return (
-      <div className="
-        flex h-[200px] items-center justify-center text-text-muted
-      ">
-        No fish data available
-      </div>
-    );
+    return <EmptyState message="No fish data available" size="sm" />;
   }
 
   return (

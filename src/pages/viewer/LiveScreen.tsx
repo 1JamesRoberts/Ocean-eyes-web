@@ -10,6 +10,7 @@ import { useAIAnalytics } from '../../hooks/live/useAIAnalytics';
 
 import { Video } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
+import { Button } from '../../components/shared/Button';
 import { AIBoundingBoxes } from '../../components/live/AIBoundingBoxes';
 import { CameraControls } from '../../components/live/CameraControls';
 import { CameraFeed } from '../../components/live/CameraFeed';
@@ -102,7 +103,7 @@ export const LiveScreen: React.FC = () => {
       {!activeTank && (
         <div className="
           mb-5 flex items-center gap-2.5 rounded-xl border border-warning
-          bg-warning/8 px-4 py-3 text-[13px] font-semibold text-[#B45309]
+          bg-warning/8 px-4 py-3 text-[13px] font-semibold text-warning
         ">
           <span className="text-base font-extrabold text-warning">!</span>
           <span>No aquarium linked. Link a tank from the Dashboard to save camera feeds and enable AI detection.</span>
@@ -254,16 +255,9 @@ export const LiveScreen: React.FC = () => {
             <p className="mb-4 text-sm text-text-muted">
               Feed is idle. Connect stream to monitor.
             </p>
-            <button className="
-              inline-flex cursor-pointer items-center justify-center gap-2
-              rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
-              text-[15px] font-semibold text-text-inv
-              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
-              hover:bg-primary-hover-gradient
-              active:scale-[0.98]
-            " onClick={startStream}>
+            <Button size="md" onClick={startStream}>
               Connect Stream
-            </button>
+            </Button>
           </div>
         )}
       </div>

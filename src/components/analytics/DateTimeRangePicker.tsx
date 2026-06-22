@@ -245,8 +245,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
           <div
             ref={popoverRef}
             className="
-              animate-fade-in rounded-[20px] border
-              border-[rgba(13,148,136,0.02)] bg-surface-card shadow-premium
+              animate-fade-in rounded-card border border-border-card-dim
+              bg-surface-card shadow-premium
             "
             style={popoverStyle}
           >

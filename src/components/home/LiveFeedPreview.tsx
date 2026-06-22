@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Video, Maximize2 } from 'lucide-react';
+import { Button } from '../shared/Button';
+import { DashboardCard } from '../shared/DashboardCard';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
 import { CameraFeed } from '../live/CameraFeed';
 import type { TankBrief } from '../../types/aquarium';
@@ -31,14 +33,9 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   };
 
   return (
-    <div
-      className="
-        flex cursor-pointer flex-col gap-3.5 rounded-[20px] border
-        border-[rgba(13,148,136,0.02)] bg-surface-card p-5 shadow-card
-        transition-smooth
-        hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-        hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
-      "
+    <DashboardCard
+      variant="hoverable"
+      className="flex cursor-pointer flex-col gap-3.5"
       onClick={onViewAdvanced}
     >
       <div className="flex items-center justify-between">
@@ -124,27 +121,21 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             <p className="mb-2.5 text-xs text-text-muted">
               Feed is idle. Connect stream to monitor.
             </p>
-            <button
-              className="
-                mx-auto inline-flex cursor-pointer items-center justify-center
-                gap-2 rounded-3xl border-none bg-primary-gradient px-3 py-1.5
-                font-main text-xs font-semibold text-text-inv
-                shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
-                hover:bg-primary-hover-gradient
-                active:scale-[0.98]
-              "
+            <Button
+              size="sm"
+              className="mx-auto"
               onClick={(e) => {
                 e.stopPropagation();
                 startStream();
               }}
             >
               Connect Stream
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
 
-    </div>
+    </DashboardCard>
   );
 };

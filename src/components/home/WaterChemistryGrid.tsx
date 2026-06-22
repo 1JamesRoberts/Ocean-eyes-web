@@ -1,5 +1,6 @@
 import React from 'react';
 import { Droplet, Thermometer, Shield, Activity } from 'lucide-react';
+import { DashboardCard } from '../shared/DashboardCard';
 import type { ReadingItem } from '../../types/aquarium';
 
 interface WaterChemistryGridProps {
@@ -32,7 +33,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
     {
       label: 'Nitrite (NO₂⁻)',
       value: reading.nitrite === undefined ? '—' : `${reading.nitrite} ppm`,
-      colorClass: 'text-[#8B5CF6] bg-[rgba(139,92,246,0.08)]',
+      colorClass: 'text-info bg-info/8',
       icon: Activity,
       isCritical: (reading.nitrite ?? 0) > 0.2
     }
@@ -41,9 +42,8 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
       {parameters.map(param => (
-        <div key={param.label} className="
-          flex items-center gap-2.5 rounded-2xl border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-3 shadow-card
+        <DashboardCard key={param.label} padding="compact" className="
+          flex items-center gap-2.5
         ">
           <div
             className={`
@@ -62,7 +62,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
               {param.value}
             </span>
           </div>
-        </div>
+        </DashboardCard>
       ))}
     </div>
   );

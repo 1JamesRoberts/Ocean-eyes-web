@@ -1,5 +1,7 @@
 import React from 'react';
 import { Download, Trash2, Camera, Video } from 'lucide-react';
+import { DashboardCard } from '../shared/DashboardCard';
+import { EmptyState } from '../shared/EmptyState';
 
 interface SnapshotGalleryProps {
   snapshots: {
@@ -52,19 +54,17 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           [&::-webkit-scrollbar-thumb]:bg-border-card
         ">
           {snapshots.length === 0 ? (
-            <div className="p-5 text-center text-[13px] text-text-muted">
-              No snapshots yet
-            </div>
+            <EmptyState message="No snapshots yet" size="sm" />
           ) : (
             snapshots.map(snap => (
-              <div key={snap.id} className="
-                flex overflow-hidden rounded-xl border border-border-card
-                bg-surface-card transition-smooth
-                hover:-translate-y-0.5 hover:shadow-card
-              ">
+              <DashboardCard
+                key={snap.id}
+                padding="compact"
+                className="flex overflow-hidden rounded-xl border-border-card"
+              >
                 <div className="
                   relative flex w-[110px] shrink-0 items-center justify-center
-                  bg-[#020617]
+                  bg-camera-bg
                 ">
                   <img src={snap.imageUrl} alt="Snapshot" className="
                     size-full object-cover
@@ -114,7 +114,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                     </button>
                   </div>
                 </div>
-              </div>
+              </DashboardCard>
             ))
           )}
         </div>
@@ -135,17 +135,17 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           [&::-webkit-scrollbar-thumb]:bg-border-card
         ">
           {recordings.length === 0 ? (
-            <div className="p-5 text-center text-[13px] text-text-muted">
-              No recordings yet
-            </div>
+            <EmptyState message="No recordings yet" size="sm" />
           ) : (
             recordings.map(rec => (
-              <div key={rec.id} className="
-                flex items-center justify-between rounded-xl border
-                border-border-card bg-surface-card p-[12px_16px]
-                transition-smooth
-                hover:-translate-y-0.5 hover:shadow-card
-              ">
+              <DashboardCard
+                key={rec.id}
+                padding="compact"
+                className="
+                  flex items-center justify-between rounded-xl
+                  border-border-card px-4 py-3
+                "
+              >
                 <div>
                   <span className="text-xs font-semibold text-text-main">{rec.timestamp}</span>
                   <div className="mt-0.5 text-[11px] text-text-muted">
@@ -188,7 +188,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                     <Trash2 size={12} />
                   </button>
                 </div>
-              </div>
+              </DashboardCard>
             ))
           )}
         </div>

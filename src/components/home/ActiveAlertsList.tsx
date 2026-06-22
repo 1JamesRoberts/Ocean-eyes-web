@@ -1,5 +1,7 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { Check, ChevronRight } from 'lucide-react';
+import { DashboardCard } from '../shared/DashboardCard';
+import { EmptyState } from '../shared/EmptyState';
 import type { AlertItem } from '../../types/aquarium';
 
 interface ActiveAlertsListProps {
@@ -12,14 +14,16 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
 
   if (activeAlerts.length === 0) {
     return (
-      <div className="
-        rounded-[20px] border border-dashed border-border-card bg-surface-card
-        px-4 py-8 text-center shadow-card
-      ">
-        <span className="mb-2 block text-2xl">✓</span>
-        <strong className="text-sm text-good">System Operating Safely</strong>
-        <p className="mt-1 text-xs text-text-muted">No active safety alarms triggered.</p>
-      </div>
+      <EmptyState
+        icon={Check}
+        message="System Operating Safely"
+        hint="No active safety alarms triggered."
+        size="sm"
+        className="
+          rounded-card border border-dashed border-border-card bg-surface-card
+          shadow-card
+        "
+      />
     );
   }
 
@@ -30,15 +34,12 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
       </h3>
 
       {activeAlerts.map(alert => (
-        <button
+        <DashboardCard
           key={alert.id}
-          type="button"
+          variant="hoverable"
+          padding="compact"
           className={`
-            w-full cursor-pointer rounded-[20px] border border-l-4
-            border-[rgba(13,148,136,0.02)] bg-surface-card p-4 text-left
-            shadow-card transition-smooth
-            hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-            hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+            w-full cursor-pointer border-l-4 text-left
             ${alert.severity === 'critical'
               ? `
                 border-l-critical
@@ -56,10 +57,10 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
             <h4 className="text-sm font-bold text-text-main">{alert.title}</h4>
             <ChevronRight size={16} className="text-text-muted" />
           </div>
-          <p className="mt-1 text-xs leading-[135%] text-text-muted">
+          <p className="mt-1 text-xs/relaxed text-text-muted">
             {alert.message}
           </p>
-        </button>
+        </DashboardCard>
       ))}
     </div>
   );

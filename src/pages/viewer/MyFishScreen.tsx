@@ -5,6 +5,10 @@ import {
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle, HelpCircle, Heart
 } from 'lucide-react';
+import { Button } from '../../components/shared/Button';
+import { DashboardCard } from '../../components/shared/DashboardCard';
+import { EmptyState } from '../../components/shared/EmptyState';
+import { Modal } from '../../components/shared/Modal';
 import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
 import { DonutChart } from '../../components/fish/DonutChart';
 import { FishThumbnail } from '../../components/fish/FishThumbnail';
@@ -87,15 +91,15 @@ export const MyFishScreen: React.FC = () => {
           </span>
           <h1 className="mt-0.5 text-[28px] font-extrabold text-text-main">Fish Inventory</h1>
         </div>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           aria-label={showAddForm ? 'Close' : 'Add fish'}
-          className="
-            cursor-pointer border-none bg-transparent p-1.5 text-primary-dark
-          "
+          className="p-1.5 text-primary-dark"
           onClick={onToggleAddForm}
         >
           <Plus size={24} />
-        </button>
+        </Button>
       </div>
 
       {/* ─── Add Form ─── */}
@@ -109,9 +113,8 @@ export const MyFishScreen: React.FC = () => {
       }
       `}>
         <form onSubmit={onAdd} className="
-          flex flex-col gap-3.5 rounded-[20px] border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-6 shadow-card
-          transition-smooth
+          flex flex-col gap-3.5 rounded-card border border-border-card-dim
+          bg-surface-card p-6 shadow-card transition-smooth
         ">
           <h4 className="text-sm font-bold text-text-main">Add New Species Entry</h4>
           <div>
@@ -127,26 +130,18 @@ export const MyFishScreen: React.FC = () => {
             />
           </div>
           <div className="mt-1.5 flex gap-2.5">
-            <button className="
-              inline-flex flex-1 cursor-pointer items-center justify-center
-              gap-2 rounded-3xl border-none bg-primary-gradient px-5 py-2.5
-              font-main text-[13px] font-semibold text-text-inv
-              shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
-              hover:bg-primary-hover-gradient
-              active:scale-[0.98]
-            " type="submit">
+            <Button type="submit" size="md" className="flex-1 text-[13px]">
               Add Species
-            </button>
-            <button className="
-              inline-flex cursor-pointer items-center justify-center gap-2
-              rounded-3xl border border-border-card bg-surface-card px-3.5
-              py-2.5 font-main text-[13px] font-semibold text-text-main
-              transition-smooth
-              hover:border-text-muted hover:bg-surface-hover
-            " type="button"
-              onClick={onCloseAddForm}>
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="px-3.5 py-2.5 text-[13px]"
+              onClick={onCloseAddForm}
+            >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -158,21 +153,15 @@ export const MyFishScreen: React.FC = () => {
       ">
         {/* Left Column — Chart & Stats */}
         <div className="flex flex-col gap-4">
-          <div className="
-            rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-            p-5 shadow-card
-          ">
+          <DashboardCard>
             <div className="mb-4 flex items-center gap-2">
               <BarChart3 size={18} className="text-primary-dark" />
               <h3 className="text-base font-bold text-text-main">Species Distribution</h3>
             </div>
             <DonutChart speciesDistribution={speciesDistribution} />
-          </div>
+          </DashboardCard>
 
-          <div className="
-            rounded-[20px] border border-[rgba(13,148,136,0.02)] bg-surface-card
-            p-5 shadow-card
-          ">
+          <DashboardCard>
             <div className="mb-4 flex items-center gap-2">
               <Fish size={18} className="text-primary-dark" />
               <h3 className="text-base font-bold text-text-main">Aquarium Overview</h3>
@@ -272,21 +261,19 @@ export const MyFishScreen: React.FC = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </DashboardCard>
         </div>
 
         {/* Right Column — Fish Cards */}
         <div className="flex flex-col gap-3">
           {fishList.length === 0 && (
-            <div className="
-              flex flex-col items-center justify-center gap-3 rounded-[20px]
-              border border-[rgba(13,148,136,0.02)] bg-surface-card p-10
-              text-text-muted shadow-card
-            ">
-              <span className="text-5xl">🐟</span>
-              <p className="text-base font-bold text-text-main">No fish in your inventory</p>
-              <p className="text-xs">Tap + to add your first species</p>
-            </div>
+            <DashboardCard className="text-center">
+              <EmptyState
+                message="No fish in your inventory"
+                hint="Tap + to add your first species"
+                size="md"
+              />
+            </DashboardCard>
           )}
 
           {fishList.map(fish => {
@@ -304,13 +291,12 @@ export const MyFishScreen: React.FC = () => {
               : [];
 
             return (
-              <div key={fish.id} data-fish-card
+              <DashboardCard
+                key={fish.id}
+                data-fish-card
                 className="
-                  flex cursor-pointer flex-col overflow-hidden rounded-[20px]
-                  border border-[rgba(13,148,136,0.02)] bg-surface-card
-                  shadow-card
-                  transition-[box-shadow_0.25s_cubic-bezier(0.4,0,0.2,1)]
-                  hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+                  flex cursor-pointer flex-col overflow-hidden
+                  hover:shadow-card-hover
                 "
                 onClick={() => onToggleFish(fish.id)}
               >
@@ -359,13 +345,17 @@ export const MyFishScreen: React.FC = () => {
                           "
                             onClick={() => onIncrementCount(fish.id, fish.count)}>+</button>
                         </div>
-                        <button className="
-                          flex cursor-pointer border-none bg-transparent p-1
-                          text-[#94A3B8] transition-colors duration-200
-                          hover:text-critical
-                        " onClick={() => onRequestDelete(fish.id)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="
+                            p-1 text-text-muted transition-colors duration-200
+                            hover:text-critical
+                          "
+                          onClick={() => onRequestDelete(fish.id)}
+                        >
                           <Trash2 size={16} />
-                        </button>
+                        </Button>
                       </>
                     )}
                   </div>
@@ -392,24 +382,23 @@ export const MyFishScreen: React.FC = () => {
                             mb-3.5 grid grid-cols-1 gap-3
                             sm:grid-cols-2
                           ">
-                            <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} colorClass="bg-[rgba(59,130,246,0.08)]" />
-                            <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass="bg-[rgba(16,185,129,0.08)]" />
-                            <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass="bg-[rgba(245,158,11,0.08)]" />
-                            <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} colorClass="bg-[rgba(147,112,219,0.08)]" />
-                            <DetailChip icon={<HelpCircle size={14} />} label="Difficulty" value={difficultyLabel[species.difficulty ?? 'medium']} colorClass="bg-[rgba(13,148,136,0.08)]" />
-                            <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} colorClass="bg-[rgba(16,185,129,0.08)]" />
-                            <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} colorClass="bg-[rgba(239,68,68,0.08)]" />
-                            <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} colorClass="bg-[rgba(59,130,246,0.08)]" />
-                            <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass="bg-[rgba(147,112,219,0.08)]" />
-                            <DetailChip icon={<HelpCircle size={14} />} label="Breeding" value={breedingLabel[species.breeding ?? 'no_record']} colorClass="bg-[rgba(148,163,184,0.12)]" />
+                            <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} colorClass="bg-info/8" />
+                            <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass="bg-good/8" />
+                            <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass="bg-warning/8" />
+                            <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} colorClass="bg-info/8" />
+                            <DetailChip icon={<HelpCircle size={14} />} label="Difficulty" value={difficultyLabel[species.difficulty ?? 'medium']} colorClass="bg-primary-dark/8" />
+                            <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} colorClass="bg-good/8" />
+                            <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} colorClass="bg-critical/8" />
+                            <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} colorClass="bg-info/8" />
+                            <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass="bg-info/8" />
+                            <DetailChip icon={<HelpCircle size={14} />} label="Breeding" value={breedingLabel[species.breeding ?? 'no_record']} colorClass="bg-surface-hover" />
                           </div>
 
                           {/* Origin */}
                           {species.origin && (
                             <span className="
-                              inline-block rounded-[20px]
-                              bg-[rgba(13,148,136,0.08)] p-[4px_10px]
-                              text-[11px] font-semibold text-primary-dark
+                              inline-block rounded-card bg-primary-dark/8 px-2.5
+                              py-1 text-[11px] font-semibold text-primary-dark
                             ">{species.origin}</span>
                           )}
 
@@ -454,44 +443,40 @@ export const MyFishScreen: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </DashboardCard>
             );
           })}
         </div>
       </div>
 
       {/* ─── Delete Confirmation ─── */}
-      {fishToDelete && (
-        <div className="modal-overlay" onClick={onCancelDelete}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3 className="mb-2 text-lg font-bold text-text-main">Delete Fish Entry</h3>
-            <p className="mb-6 text-sm text-text-muted">
-              Are you sure you want to delete this fish entry? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button className="
-                inline-flex cursor-pointer items-center justify-center gap-2
-                rounded-3xl border border-border-card bg-surface-card px-5
-                py-2.5 font-main text-sm font-semibold text-text-main
-                transition-smooth
-                hover:border-text-muted hover:bg-surface-hover
-              "
-                onClick={onCancelDelete}>Cancel</button>
-              <button className="
-                inline-flex cursor-pointer items-center justify-center gap-2
-                rounded-3xl border-none bg-critical px-5 py-2.5 font-main
-                text-sm font-semibold text-text-inv
-                shadow-[0_4px_12px_rgba(239,68,68,0.15)] transition-smooth
+      <Modal
+        isOpen={!!fishToDelete}
+        onClose={onCancelDelete}
+        title="Delete Fish Entry"
+        footer={
+          <>
+            <Button variant="secondary" size="md" onClick={onCancelDelete}>
+              Cancel
+            </Button>
+            <Button
+              size="md"
+              className="
+                bg-critical text-text-inv
+                shadow-[0_4px_12px_rgba(239,68,68,0.15)]
                 hover:opacity-90
-                active:scale-[0.98]
               "
-                onClick={onConfirmDelete}>
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              onClick={onConfirmDelete}
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-text-muted">
+          Are you sure you want to delete this fish entry? This action cannot be undone.
+        </p>
+      </Modal>
     </div>
   );
 };

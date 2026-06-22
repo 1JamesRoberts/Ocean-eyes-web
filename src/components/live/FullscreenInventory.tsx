@@ -1,5 +1,6 @@
 import React from 'react';
 import { Fish } from 'lucide-react';
+import { Button } from '../shared/Button';
 import { getSpeciesById, getSpeciesColor, getSpeciesInitials } from '../../data/speciesCatalog';
 import { SpeciesAvatar } from '../fish/SpeciesAvatar';
 import type { FishEntry } from '../../types/aquarium';
@@ -39,42 +40,36 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
           <Fish size={18} className="text-primary-dark" />
           <span>Fish Inventory</span>
         </h3>
-        <button
-          onClick={onClose}
+        <Button
+          variant="ghost"
+          size="sm"
           className="
-            cursor-pointer border-none bg-transparent p-1 text-xl leading-none
-            text-[rgba(255,255,255,0.6)]
+            p-1 text-xl leading-none text-white/60
+            hover:bg-white/10 hover:text-white
           "
+          onClick={onClose}
         >
           ×
-        </button>
+        </Button>
       </div>
 
       <div className="
         grid grid-cols-2 gap-2 border-b border-[rgba(255,255,255,0.1)] p-4
       ">
         <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
-          <span className="
-            block text-[9px] font-semibold text-[rgba(255,255,255,0.5)]
-          ">TOTAL FISH</span>
+          <span className="block text-[9px] font-semibold text-white/50">TOTAL FISH</span>
           <strong className="text-[15px] text-white">{totalFish}</strong>
         </div>
         <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
-          <span className="
-            block text-[9px] font-semibold text-[rgba(255,255,255,0.5)]
-          ">SPECIES</span>
+          <span className="block text-[9px] font-semibold text-white/50">SPECIES</span>
           <strong className="text-[15px] text-white">{uniqueSpecies}</strong>
         </div>
         <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
-          <span className="
-            block text-[9px] font-semibold text-[rgba(255,255,255,0.5)]
-          ">DETECTED</span>
+          <span className="block text-[9px] font-semibold text-white/50">DETECTED</span>
           <strong className="text-[15px] text-good">{totalDetected}</strong>
         </div>
         <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
-          <span className="
-            block text-[9px] font-semibold text-[rgba(255,255,255,0.5)]
-          ">DETECTION</span>
+          <span className="block text-[9px] font-semibold text-white/50">DETECTION</span>
           <strong className="text-[15px] text-warning">{detectionRate}%</strong>
         </div>
       </div>
@@ -92,7 +87,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
             name: fish.name
           };
           const visibilityPercent = fish.count > 0 ? Math.round((fish.detected / fish.count) * 100) : 0;
-          const barColor = visibilityPercent >= 80 ? '#16A34A' : visibilityPercent >= 50 ? '#D97706' : '#DC2626';
+          const barColor = visibilityPercent >= 80 ? 'var(--color-good)' : visibilityPercent >= 50 ? 'var(--color-warning)' : 'var(--color-critical)';
           const radius = 12;
           const circumference = 2 * Math.PI * radius;
           const dashLength = (circumference * visibilityPercent) / 100;

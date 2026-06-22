@@ -1,5 +1,6 @@
 // TimeWheelSheet.tsx - Apple-style hour/minute/AM-PM scroll wheel
 import React, { useMemo, useRef, useState } from 'react';
+import { Button } from '../shared/Button';
 
 interface TimeWheelSheetProps {
   selectedTime: string; // HH:mm (24-hour)
@@ -130,19 +131,9 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
         />
       </div>
 
-      <button
-        type="button"
-        onClick={handleDone}
-        className="
-          mt-3 w-full cursor-pointer rounded-full border-none
-          bg-primary-gradient py-2.5 text-[15px] font-semibold text-text-inv
-          transition-smooth
-          hover:bg-primary-hover-gradient
-          active:scale-[0.98]
-        "
-      >
+      <Button size="md" className="mt-3 w-full rounded-full" onClick={handleDone}>
         Done
-      </button>
+      </Button>
     </div>
   );
 };

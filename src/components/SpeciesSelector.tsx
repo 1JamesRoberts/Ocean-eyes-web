@@ -7,12 +7,13 @@ import { SpeciesAvatar } from './fish/SpeciesAvatar';
 /** Small coloured badge showing the creature type (shrimp/snail/crab) */
 const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
   const emoji = type === 'shrimp' ? '🦐' : type === 'snail' ? '🐌' : type === 'crab' ? '🦀' : '';
-  const bgColor = type === 'shrimp' ? '#FF9800' : type === 'snail' ? '#8BC34A' : type === 'crab' ? '#E91E63' : 'var(--color-border)';
+  const colorClass = type === 'shrimp' ? 'bg-warning' : type === 'snail' ? 'bg-good' : type === 'crab' ? 'bg-critical' : 'bg-border-card';
   return (
-    <span className="
+    <span className={`
       rounded-sm px-1.5 py-0.5 text-[10px] leading-tight font-semibold
       tracking-[0.5px] text-white uppercase
-    " style={{ backgroundColor: bgColor }}>
+      ${colorClass}
+    `}>
       {emoji} {type}
     </span>
   );
@@ -138,7 +139,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
           ref={dropdownRef}
           className="
             max-h-[280px] overflow-y-auto rounded-lg border border-border-card
-            bg-surface-card shadow-[0_4px_12px_rgba(0,0,0,0.1)]
+            bg-surface-card shadow-premium
           "
           style={dropdownStyle}
         >
@@ -155,7 +156,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 style={{ background: selectedSpeciesId === species.id ? 'var(--color-primary-light)' : 'transparent' }}
                 onMouseEnter={e => {
                   if (selectedSpeciesId !== species.id) {
-                    e.currentTarget.style.backgroundColor = 'var(--color-hover)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
                   }
                 }}
                 onMouseLeave={e => {
@@ -184,7 +185,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                   bg-transparent px-3 py-2 text-left font-main text-sm
                   text-primary-dark italic
                 "
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-hover)'}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 <div

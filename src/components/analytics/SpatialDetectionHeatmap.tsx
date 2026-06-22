@@ -6,7 +6,8 @@ import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
 import { CameraFeed } from '../live/CameraFeed';
-import { ChartEmptyState } from './ChartEmptyState';
+import { DashboardCard } from '../shared/DashboardCard';
+import { EmptyState } from '../shared/EmptyState';
 
 interface Props {
   records: AIDetectionResult[];
@@ -284,11 +285,11 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     // ── Render ──
 
     if (allCenters.length === 0) {
-      return <ChartEmptyState message="No detection data available" />;
+      return <EmptyState message="No detection data available" size="md" />;
     }
 
     return (
-      <div className="flex flex-col gap-3">
+      <DashboardCard className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="m-0 text-sm font-bold text-text-main">Detection Density Heatmap</h3>
@@ -338,7 +339,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
             className="pointer-events-none absolute inset-0 size-full"
           />
         </div>
-      </div>
+      </DashboardCard>
     );
   },
   (prevProps, nextProps) =>

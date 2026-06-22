@@ -1,5 +1,6 @@
 import React from 'react';
 import { Droplet } from 'lucide-react';
+import { DashboardCard } from '../shared/DashboardCard';
 import type { ReadingItem } from '../../types/aquarium';
 
 interface WaterClarityCardProps {
@@ -13,14 +14,10 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
     <div>
       <h3 className="mb-2 text-base font-bold text-text-main">Water Clarity</h3>
 
-      <button
-        type="button"
-        className="
-          flex w-full cursor-pointer items-center gap-2.5 rounded-2xl border
-          border-[rgba(13,148,136,0.02)] bg-surface-card p-3 text-left
-          shadow-card transition-smooth
-          hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
-        "
+      <DashboardCard
+        variant="hoverable"
+        padding="compact"
+        className="flex w-full cursor-pointer items-center gap-2.5 text-left"
         onClick={onClick}
       >
         <div className="
@@ -35,7 +32,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
             {displayClarity.toFixed(2)} FNU
           </span>
         </div>
-      </button>
+      </DashboardCard>
     </div>
   );
 });

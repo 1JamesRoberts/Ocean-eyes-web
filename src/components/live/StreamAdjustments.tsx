@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Plus, SlidersHorizontal } from 'lucide-react';
+import { Button } from '../shared/Button';
+import { DashboardCard } from '../shared/DashboardCard';
 import type { CameraFilters, FilterPreset } from '../../types/aquarium';
 
 interface StreamAdjustmentsProps {
@@ -89,12 +91,10 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
   const activePresetName = [...DEFAULT_PRESETS, ...customPresets].find(p => p.id === selectedPresetId)?.name || 'Custom';
 
   return (
-    <div
+    <DashboardCard
       className={`
-        flex flex-col rounded-[20px] border border-[rgba(13,148,136,0.02)]
-        bg-surface-card shadow-card transition-smooth
-        ${isExpanded ? `gap-5 p-6` : `gap-0 px-6 py-4`}
-        mb-6
+        flex flex-col
+        ${isExpanded ? 'gap-5' : 'gap-0 px-6 py-4'}
       `}
     >
       <div
@@ -156,15 +156,14 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
                     onChange={(e) => onFilterChange({ [key]: parseInt(e.target.value) })}
                     className="flex-1 accent-primary-dark"
                   />
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-[10px]"
                     onClick={() => onFilterChange({ [key]: key === 'temperature' || key === 'tint' ? 0 : 100 })}
-                    className="
-                      cursor-pointer border-none bg-transparent text-[10px]
-                      text-text-muted
-                    "
                   >
                     Reset
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -180,24 +179,15 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
 
             <div className="flex flex-wrap gap-2">
               {DEFAULT_PRESETS.map(preset => (
-                <button
+                <Button
                   key={preset.id}
+                  variant={selectedPresetId === preset.id ? 'primary' : 'secondary'}
+                  size="sm"
+                  className="rounded-lg px-3 py-2 text-xs"
                   onClick={() => applyPreset(preset)}
-                  className="
-                    inline-flex cursor-pointer items-center justify-center gap-2
-                    rounded-lg border border-border-card bg-surface-card px-3
-                    py-2 font-main text-xs font-semibold text-text-main
-                    transition-smooth
-                    hover:border-text-muted hover:bg-surface-hover
-                  "
-                  style={{
-                    background: selectedPresetId === preset.id ? 'var(--color-primary-light)' : undefined,
-                    color: selectedPresetId === preset.id ? 'var(--color-primary-dark)' : undefined,
-                    borderColor: selectedPresetId === preset.id ? 'var(--color-primary)' : undefined
-                  }}
                 >
                   {preset.name}
-                </button>
+                </Button>
               ))}
 
               {customPresets.map(preset => (
@@ -205,34 +195,26 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
                   key={preset.id}
                   className="relative flex items-center gap-1"
                 >
-                  <button
+                  <Button
+                    variant={selectedPresetId === preset.id ? 'primary' : 'secondary'}
+                    size="sm"
+                    className="rounded-lg py-2 pr-6 pl-3 text-xs"
                     onClick={() => applyPreset(preset)}
-                    className="
-                      inline-flex cursor-pointer items-center justify-center
-                      gap-2 rounded-lg border border-border-card bg-surface-card
-                      py-2 pr-6 pl-3 font-main text-xs font-semibold
-                      text-text-main transition-smooth
-                      hover:border-text-muted hover:bg-surface-hover
-                    "
-                    style={{
-                      background: selectedPresetId === preset.id ? 'var(--color-primary-light)' : undefined,
-                      color: selectedPresetId === preset.id ? 'var(--color-primary-dark)' : undefined,
-                      borderColor: selectedPresetId === preset.id ? 'var(--color-primary)' : undefined
-                    }}
                   >
                     {preset.name}
-                  </button>
-                  <button
-                    onClick={(e) => handleDeletePreset(preset.id, e)}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="
-                      absolute top-1/2 right-1.5 flex size-3.5 -translate-y-1/2
-                      cursor-pointer items-center justify-center border-none
-                      bg-transparent p-0 text-xs text-critical
+                      absolute top-1/2 right-1.5 size-3.5 -translate-y-1/2 p-0
+                      text-xs text-critical
                     "
+                    onClick={(e) => handleDeletePreset(preset.id, e)}
                     title="Delete Preset"
                   >
                     ×
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -251,51 +233,38 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
                   maxLength={20}
                   required
                 />
-                <button
-                  type="submit"
-                  className="
-                    inline-flex cursor-pointer items-center justify-center gap-2
-                    rounded-lg border-none bg-primary-gradient px-3 py-2
-                    font-main text-xs font-semibold text-text-inv
-                    shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
-                    hover:bg-primary-hover-gradient
-                    active:scale-[0.98]
-                  "
-                >
+                <Button type="submit" size="sm" className="
+                  rounded-lg px-3 py-2 text-xs
+                ">
                   Save
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="
-                    inline-flex cursor-pointer items-center justify-center gap-2
-                    rounded-lg border border-border-card bg-surface-card px-3
-                    py-2 font-main text-xs font-semibold text-text-main
-                    transition-smooth
-                    hover:border-text-muted hover:bg-surface-hover
-                  "
+                  variant="secondary"
+                  size="sm"
+                  className="rounded-lg px-3 py-2 text-xs"
                   onClick={() => { setShowSaveInput(false); setNewPresetName(''); }}
                 >
                   Cancel
-                </button>
+                </Button>
               </form>
             ) : (
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 className="
-                  mt-2 inline-flex cursor-pointer items-center gap-1 self-start
-                  rounded-lg border border-primary-dark bg-surface-card px-3
-                  py-2 font-main text-xs font-semibold text-primary-dark
-                  transition-smooth
-                  hover:bg-surface-hover
+                  mt-2 inline-flex items-center gap-1 self-start rounded-lg
+                  border-primary-dark px-3 py-2 text-xs text-primary-dark
                 "
                 onClick={() => setShowSaveInput(true)}
               >
-                <Plus size={12} className="text-primary-dark" />
-                <span className="text-primary-dark">Save Current as Preset</span>
-              </button>
+                <Plus size={12} />
+                <span>Save Current as Preset</span>
+              </Button>
             )}
           </div>
         </div>
       )}
-    </div>
+    </DashboardCard>
   );
 };

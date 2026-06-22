@@ -21,7 +21,7 @@ const DetectionVisibilityRing: React.FC<DetectionVisibilityRingProps> = ({
   className = '',
 }) => {
   const pct = expected > 0 ? Math.round((detected / expected) * 100) : 0;
-  const color = pct >= 80 ? '#16A34A' : pct >= 50 ? '#D97706' : '#DC2626';
+  const colorClass = pct >= 80 ? 'text-good' : pct >= 50 ? 'text-warning' : 'text-critical';
 
   const radius = (size - strokeWidth) / 2;
   const center = size / 2;
@@ -40,6 +40,7 @@ const DetectionVisibilityRing: React.FC<DetectionVisibilityRingProps> = ({
       title={title ?? defaultTitle}
     >
       <div className="relative" style={{ width: size, height: size }}>
+        {/* kept because size is dynamic prop */}
         <svg
           width={size}
           height={size}
@@ -59,7 +60,7 @@ const DetectionVisibilityRing: React.FC<DetectionVisibilityRingProps> = ({
             cy={center}
             r={radius}
             fill="none"
-            stroke={color}
+            stroke={pct >= 80 ? 'var(--color-good)' : pct >= 50 ? 'var(--color-warning)' : 'var(--color-critical)'}
             strokeWidth={strokeWidth}
             strokeDasharray={`${dash} ${gap}`}
             strokeLinecap="round"
@@ -68,11 +69,14 @@ const DetectionVisibilityRing: React.FC<DetectionVisibilityRingProps> = ({
           />
         </svg>
         <div className="absolute top-1/2 left-1/2 -translate-1/2">
-          <Eye size={size * 0.36} color={color} />
+          <Eye size={size * 0.36} className={colorClass} />
         </div>
       </div>
       {showLabel && (
-        <span className="min-w-[40px] text-[13px] font-bold" style={{ color }}>
+        <span className={`
+          min-w-[40px] text-[13px] font-bold
+          ${colorClass}
+        `}>
           {pct}%
         </span>
       )}

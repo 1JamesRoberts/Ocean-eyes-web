@@ -15,9 +15,9 @@ export const DetailChip: React.FC<DetailChipProps> = ({
 }) => (
   <div
     className={`
-      flex items-center gap-1.5 rounded-xl p-[8px_12px] text-xs font-semibold
+      flex items-center gap-1.5 rounded-xl p-2 px-3 text-xs font-semibold
       text-text-main
-      ${colorClass || `bg-[rgba(148,163,184,0.12)]`}
+      ${colorClass || 'bg-surface-hover'}
     `}
   >
     {icon}

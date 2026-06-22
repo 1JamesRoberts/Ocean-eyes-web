@@ -1,6 +1,7 @@
 // CalendarSheet.tsx - Apple-style month calendar for the analytics date picker
 import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { Button } from '../shared/Button';
 import {
   addMonths,
   eachDayOfInterval,
@@ -45,30 +46,24 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
           <ChevronDown size={16} className="text-text-muted" />
         </div>
         <div className="flex items-center gap-1">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="rounded-full p-2"
             onClick={() => setViewMonth((m) => subMonths(m, 1))}
-            className="
-              cursor-pointer rounded-full border-none bg-transparent p-2
-              text-text-muted transition-smooth
-              hover:bg-surface-hover hover:text-text-main
-            "
             aria-label="Previous month"
           >
             <ChevronLeft size={22} />
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="rounded-full p-2"
             onClick={() => setViewMonth((m) => addMonths(m, 1))}
-            className="
-              cursor-pointer rounded-full border-none bg-transparent p-2
-              text-text-muted transition-smooth
-              hover:bg-surface-hover hover:text-text-main
-            "
             aria-label="Next month"
           >
             <ChevronRight size={22} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -97,10 +92,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 justify-center rounded-full border-none text-[15px] font-medium
                 transition-smooth
                 ${selected
-                  ? `
-                    bg-primary-gradient text-text-inv
-                    shadow-[0_4px_12px_rgba(13,148,136,0.25)]
-                  `
+                  ? 'bg-primary-gradient text-text-inv shadow-button'
                   : today
                     ? `
                       bg-transparent font-semibold text-primary-dark
