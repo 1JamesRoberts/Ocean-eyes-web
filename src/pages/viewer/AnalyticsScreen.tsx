@@ -7,6 +7,7 @@ import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
+import { GlassCard, GlassButton, GlassIconButton } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
 
 export const AnalyticsScreen: React.FC = () => {
@@ -42,65 +43,50 @@ export const AnalyticsScreen: React.FC = () => {
         md:hidden
       ">
         <DateTimeRangePicker value={range} onChange={setRange} />
-        <button
-          className="
-            cursor-pointer rounded-lg border border-border-card bg-transparent
-            px-3 py-1.5 text-xs font-semibold text-text-muted
-            hover:bg-black/5
-          "
-          onClick={refetch}
-          disabled={loading}
-          title="Refresh data"
-          aria-label="Refresh analytics"
-        >
+        <GlassIconButton size="sm" onClick={refetch} label="Refresh">
           <RotateCcw size={14} />
-        </button>
+        </GlassIconButton>
       </div>
 
       {/* Error banner */}
       {error && (
-        <div className="
-          flex items-center justify-between gap-3 rounded-xl border
-          border-critical bg-critical/10 px-4 py-3 text-sm text-critical
-        ">
-          <span>{error}</span>
-            <button className="
-              cursor-pointer rounded-lg border border-critical bg-transparent
-              px-3 py-1.5 text-xs font-semibold text-critical
-              hover:bg-critical/12
-            " onClick={refetch}>
-            Retry
-          </button>
-        </div>
+        <GlassCard className="border-critical bg-critical/10 p-3">
+          <div className="
+            flex items-center justify-between gap-3 text-sm text-critical
+          ">
+            <span>{error}</span>
+            <GlassButton variant="outline" size="sm" onClick={refetch}>Retry</GlassButton>
+          </div>
+        </GlassCard>
       )}
 
       {/* Loading state */}
       {loading && (
-        <div className="
-          flex h-[240px] items-center justify-center text-sm text-text-muted
-        ">
-          <Loader2 size={28} className="animate-float-1 text-info" />
-          <span className="ml-2 text-sm text-text-muted">
-            Loading analytics data...
-          </span>
-        </div>
+        <GlassCard className="p-6">
+          <div className="
+            flex h-[240px] items-center justify-center text-sm text-text-muted
+          ">
+            <Loader2 size={28} className="animate-float-1 text-info" />
+            <span className="ml-2 text-sm text-text-muted">
+              Loading analytics data...
+            </span>
+          </div>
+        </GlassCard>
       )}
 
       {/* Empty state */}
       {!loading && !error && !hasAnyData && (
-        <div className="
-          flex flex-col items-center justify-center gap-2 rounded-[20px] border
-          border-border-subtle bg-surface-card px-6 py-12 text-center
-          shadow-card transition-smooth
-        ">
-          <Calendar size={32} className="text-text-muted opacity-50" />
-          <span className="text-h3 font-semibold text-text-main">
-            No data for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}
-          </span>
-          <span className="text-sm text-text-muted">
-            Try selecting a different range or run the AI pipeline to generate history.
-          </span>
-        </div>
+        <GlassCard className="px-6 py-12 text-center">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <Calendar size={32} className="text-text-muted opacity-50" />
+            <span className="text-h3 font-semibold text-text-main">
+              No data for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}
+            </span>
+            <span className="text-sm text-text-muted">
+              Try selecting a different range or run the AI pipeline to generate history.
+            </span>
+          </div>
+        </GlassCard>
       )}
 
       {/* Charts grid */}
@@ -115,11 +101,7 @@ export const AnalyticsScreen: React.FC = () => {
             lg:col-span-2 lg:grid-cols-[2fr_1fr]
           ">
             {/* Spatial Detection Heatmap */}
-            <div className="
-              flex h-full flex-col gap-3 rounded-[20px] border
-              border-border-subtle bg-surface-card p-5 shadow-card
-              transition-smooth
-            ">
+            <GlassCard className="p-5">
               <SpatialDetectionHeatmap
                 records={detectionRecords}
                 tankId={tankId}
@@ -127,13 +109,11 @@ export const AnalyticsScreen: React.FC = () => {
                 selectedSpecies={selectedSpecies}
                 onSelectedSpeciesChange={setSelectedSpecies}
               />
-            </div>
+            </GlassCard>
 
             {/* Fish Count Timeline */}
-            <div className="
-              flex h-full min-h-0 flex-col gap-2 overflow-hidden rounded-[20px]
-              border border-border-subtle bg-surface-card p-5 shadow-card
-              transition-smooth
+            <GlassCard className="
+              flex h-full min-h-0 flex-col gap-2 overflow-hidden p-5
             ">
               <h3 className="m-0 shrink-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
               <div className="min-h-0 flex-1">
@@ -143,15 +123,13 @@ export const AnalyticsScreen: React.FC = () => {
               <div className="min-h-0 flex-1">
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
-            </div>
+            </GlassCard>
           </div>
 
           {/* Water Clarity Trend */}
-          <div
+          <GlassCard
             className="
-              flex cursor-pointer flex-col gap-3 rounded-[20px] border
-              border-border-subtle bg-surface-card p-5 shadow-card
-              transition-smooth
+              cursor-pointer p-5
               lg:col-span-2
             "
             onClick={onViewHistory}
@@ -172,25 +150,16 @@ export const AnalyticsScreen: React.FC = () => {
               records={turbidityRecords}
               readings={readings}
               emptyAction={
-                <button
-                  className="
-                    cursor-pointer rounded-lg border border-primary-dark
-                    bg-primary-light-gradient px-3.5 py-1.5 text-xs
-                    font-semibold text-primary-dark
-                    hover:bg-primary-dark hover:text-white
-                  "
-                  onClick={(e) => { e.stopPropagation(); onViewHistory(); }}
-                >
+                <GlassButton variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onViewHistory(); }}>
                   View Clarity Analytics →
-                </button>
+                </GlassButton>
               }
             />
-          </div>
+          </GlassCard>
 
           {/* AI Health Diagnostics Log */}
-          <div className="
-            flex flex-col gap-3 rounded-[20px] border border-border-subtle
-            bg-surface-card p-5 shadow-card transition-smooth
+          <GlassCard className="
+            p-5
             lg:col-span-2
           ">
             <div className="flex items-start justify-between">
@@ -201,50 +170,23 @@ export const AnalyticsScreen: React.FC = () => {
                 </p>
               </div>
               {diagnoses.length > 0 && !confirmClear && (
-                <button
-                    className="
-                      flex shrink-0 cursor-pointer items-center gap-1.5
-                      rounded-lg border border-critical bg-transparent px-3
-                      py-1.5 text-xs font-semibold whitespace-nowrap
-                      text-critical
-                      hover:bg-critical/10
-                    "
-                  onClick={onStartClear}
-                  title="Clear all diagnostics for this date"
-                >
+                <GlassButton variant="outline" size="sm" className="
+                  border-critical text-critical
+                  hover:bg-critical/10
+                " onClick={onStartClear}>
                   <Trash2 size={14} />
                   Clear history
-                </button>
+                </GlassButton>
               )}
               {confirmClear && (
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="text-xs whitespace-nowrap text-text-muted">Delete all records for this date?</span>
-                  <button
-                    className="
-                      cursor-pointer rounded-sm border border-critical
-                      bg-critical px-2.5 py-1 text-caption font-bold
-                      whitespace-nowrap text-white
-                      hover:opacity-90
-                      disabled:cursor-not-allowed disabled:opacity-50
-                    "
-                    onClick={onConfirmClear}
-                    disabled={isClearing}
-                  >
+                  <GlassButton variant="danger" size="sm" onClick={onConfirmClear} disabled={isClearing}>
                     {isClearing ? 'Deleting…' : 'Yes, clear'}
-                  </button>
-                  <button
-                    className="
-                      cursor-pointer rounded-sm border border-border-card
-                      bg-transparent px-2.5 py-1 text-caption font-semibold
-                      whitespace-nowrap text-text-muted
-                      hover:bg-black/5
-                      disabled:cursor-not-allowed disabled:opacity-50
-                    "
-                    onClick={onCancelClear}
-                    disabled={isClearing}
-                  >
+                  </GlassButton>
+                  <GlassButton variant="outline" size="sm" onClick={onCancelClear} disabled={isClearing}>
                     Cancel
-                  </button>
+                  </GlassButton>
                 </div>
               )}
             </div>
@@ -345,7 +287,7 @@ export const AnalyticsScreen: React.FC = () => {
                 })}
               </div>
             )}
-          </div>
+          </GlassCard>
         </div>
       )}
     </div>

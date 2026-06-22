@@ -191,9 +191,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       <div
         id="date-range-editor"
         className="
-          absolute left-0 z-50 w-full overflow-hidden rounded-[20px] border
-          border-border-subtle bg-surface-card p-3 shadow-premium transition-all
-          duration-300 ease-in-out
+          absolute left-0 z-50 w-full overflow-hidden glass-card p-3
+          transition-all duration-300 ease-in-out
         "
         style={{
           top: 'calc(100% + 8px)',
@@ -240,10 +239,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         createPortal(
           <div
             ref={popoverRef}
-            className="
-              animate-fade-in rounded-[20px] border border-border-subtle
-              bg-surface-card shadow-premium
-            "
+            className="animate-fade-in glass-card"
             style={popoverStyle}
           >
             {isCalendar && (

@@ -35,8 +35,8 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
               key={fish.id}
               className="
                 flex items-center justify-between rounded-full border
-                border-white/10 bg-white/30 p-4 transition-colors
-                hover:bg-white/50
+                border-white/10 bg-white/20 p-4 transition-colors
+                hover:bg-white/40
               "
             >
               <div className="flex items-center gap-4">

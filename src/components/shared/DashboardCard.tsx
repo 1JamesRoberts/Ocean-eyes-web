@@ -1,5 +1,7 @@
 // DashboardCard.tsx - Reusable card wrapper for dashboard panels
+// Now wraps GlassCard for aquatic glass consistency.
 import React from 'react';
+import { GlassCard } from './GlassCard';
 
 interface DashboardCardProps {
   children: React.ReactNode;
@@ -12,7 +14,7 @@ interface DashboardCardProps {
 }
 
 /**
- * Reusable card component that encapsulates the common dashboard card styling.
+ * Reusable card component that wraps GlassCard with a compact padding.
  * Provides a consistent look across all dashboard panels.
  */
 export const DashboardCard: React.FC<DashboardCardProps> = ({
@@ -20,14 +22,10 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
   className = '',
   ...rest
 }) => (
-  <div
-    className={`
-      rounded-[20px] border border-border-subtle bg-surface-card p-5 shadow-card
-      transition-smooth
-      ${className}
-    `}
-    {...rest}
-  >
+  <GlassCard className={`
+    p-5
+    ${className}
+  `} {...rest}>
     {children}
-  </div>
+  </GlassCard>
 );

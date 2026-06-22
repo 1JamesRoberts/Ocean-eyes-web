@@ -6,6 +6,7 @@ import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
 import { CameraFeed } from '../live/CameraFeed';
+import { GlassSelect } from '../shared';
 import { ChartEmptyState } from './ChartEmptyState';
 
 interface Props {
@@ -293,13 +294,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
           <div>
             <h3 className="m-0 text-sm font-bold text-text-main">Detection Density Heatmap</h3>
           </div>
-          <select
-            className="
-              w-auto cursor-pointer rounded-xl border border-border-card
-              bg-background-app px-3 py-2.5 font-main text-sm font-semibold
-              text-text-main outline-none
-              focus:border-info
-            "
+          <GlassSelect
             value={selectedSpecies}
             onChange={(e) => onSelectedSpeciesChange(e.target.value)}
           >
@@ -309,7 +304,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
                 {formatSpeciesName(s)}
               </option>
             ))}
-          </select>
+          </GlassSelect>
         </div>
 
         <div

@@ -1,5 +1,6 @@
 // TimeWheelSheet.tsx - Apple-style hour/minute/AM-PM scroll wheel
 import React, { useMemo, useRef, useState } from 'react';
+import { GlassCard, GlassButton } from '../shared';
 
 interface TimeWheelSheetProps {
   selectedTime: string; // HH:mm (24-hour)
@@ -103,7 +104,7 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
   };
 
   return (
-    <div className="w-[320px] p-4">
+    <GlassCard className="w-[320px]">
       <div className="relative flex rounded-2xl bg-surface-hover px-2 py-1">
         {/* Center highlight bar */}
         <div
@@ -130,19 +131,9 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
         />
       </div>
 
-      <button
-        type="button"
-        onClick={handleDone}
-        className="
-          mt-3 w-full cursor-pointer rounded-full border-none
-          bg-primary-gradient py-2.5 text-h3 font-semibold text-text-inv
-          transition-smooth
-          hover:bg-primary-hover-gradient
-          active:scale-[0.98]
-        "
-      >
+      <GlassButton variant="primary" size="sm" className="mt-3 w-full" onClick={handleDone}>
         Done
-      </button>
-    </div>
+      </GlassButton>
+    </GlassCard>
   );
 };

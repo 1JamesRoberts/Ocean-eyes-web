@@ -20,8 +20,9 @@ export const FishThumbnail: React.FC<FishThumbnailProps> = ({
     return (
       <div
         className="
-          flex shrink-0 items-center justify-center rounded-lg font-bold
-          text-white shadow-[0_1px_2px_rgba(0,0,0,0.3)]
+          flex shrink-0 items-center justify-center rounded-lg border
+          border-white/20 font-bold text-white
+          shadow-[0_1px_2px_rgba(0,0,0,0.3)]
         "
         style={{
           width: s,

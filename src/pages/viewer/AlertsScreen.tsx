@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAlertsScreen } from '../../hooks/pages/useAlertsScreen';
 import { AlertDetail } from '../../components/shared/AlertDetail';
+import { GlassCard } from '../../components/shared';
 
 export const AlertsScreen: React.FC = () => {
   const {
@@ -40,11 +41,10 @@ export const AlertsScreen: React.FC = () => {
 
       <div className="flex flex-col gap-3">
         {alerts.map(alert => (
-          <div
+          <GlassCard
             key={alert.id}
             className={`
-              cursor-pointer rounded-[20px] border border-border-subtle
-              bg-surface-card p-5 shadow-card transition-smooth
+              cursor-pointer p-4 transition-smooth
               hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
               hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
               ${alert.resolved ? `opacity-60` : ''}
@@ -64,7 +64,7 @@ export const AlertsScreen: React.FC = () => {
                 ✓ RESOLVED
               </span>
             )}
-          </div>
+          </GlassCard>
         ))}
       </div>
     </div>

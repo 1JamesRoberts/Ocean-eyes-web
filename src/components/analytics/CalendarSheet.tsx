@@ -35,7 +35,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
   }, [viewMonth]);
 
   return (
-    <div className="w-[320px] p-4">
+    <div className="w-[320px] glass-card p-4">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
@@ -97,16 +97,16 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 justify-center rounded-full border-none text-h3 font-medium
                 transition-smooth
                 ${selected
-                  ? `bg-primary-gradient text-text-inv`
+                  ? `glass-button-primary bg-primary-gradient text-text-inv`
                   : today
                     ? `
                       bg-transparent font-semibold text-primary-dark
-                      hover:bg-surface-hover
+                      hover:bg-white/30
                     `
                     : inMonth
                       ? `
                         bg-transparent text-text-main
-                        hover:bg-surface-hover
+                        hover:bg-white/30
                       `
                       : 'bg-transparent text-text-muted/40'
                 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Plus, SlidersHorizontal } from 'lucide-react';
+import { GlassCard, GlassButton, GlassBadge, GlassInput } from '../shared';
 import type { CameraFilters, FilterPreset } from '../../types/aquarium';
 
 interface StreamAdjustmentsProps {
@@ -89,11 +90,10 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
   const activePresetName = [...DEFAULT_PRESETS, ...customPresets].find(p => p.id === selectedPresetId)?.name || 'Custom';
 
   return (
-    <div
+    <GlassCard
       className={`
-        flex flex-col rounded-[20px] border border-border-subtle bg-surface-card
-        shadow-card transition-smooth
-        ${isExpanded ? `gap-5 p-6` : `gap-0 px-6 py-4`}
+        flex flex-col
+        ${isExpanded ? 'gap-5 p-6' : 'gap-0 px-6 py-4'}
         mb-6
       `}
     >
@@ -106,12 +106,9 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
         ">
           <span className="flex items-center gap-1.5"><SlidersHorizontal size={16} /> Stream Image Adjustments</span>
           {!isExpanded && selectedPresetId !== 'normal' && (
-            <span className="
-              ml-2 rounded-xl bg-primary-light-gradient px-2 py-0.5 text-caption
-              font-medium text-primary-dark
-            ">
+            <GlassBadge color="info" className="ml-2">
               Active: {activePresetName}
-            </span>
+            </GlassBadge>
           )}
         </h3>
         <div className="flex items-center text-text-muted">
@@ -180,48 +177,28 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
 
             <div className="flex flex-wrap gap-2">
               {DEFAULT_PRESETS.map(preset => (
-                <button
+                <GlassButton
                   key={preset.id}
                   onClick={() => applyPreset(preset)}
-                  className="
-                    inline-flex cursor-pointer items-center justify-center gap-2
-                    rounded-lg border border-border-card bg-surface-card px-3
-                    py-2 font-main text-xs font-semibold text-text-main
-                    transition-smooth
-                    hover:border-text-muted hover:bg-surface-hover
-                  "
-                  style={{
-                    background: selectedPresetId === preset.id ? 'var(--color-primary-light)' : undefined,
-                    color: selectedPresetId === preset.id ? 'var(--color-primary-dark)' : undefined,
-                    borderColor: selectedPresetId === preset.id ? 'var(--color-primary)' : undefined
-                  }}
+                  variant={selectedPresetId === preset.id ? 'primary' : 'default'}
+                  size="sm"
                 >
                   {preset.name}
-                </button>
+                </GlassButton>
               ))}
 
               {customPresets.map(preset => (
-                <div
-                  key={preset.id}
-                  className="relative flex items-center gap-1"
-                >
-                  <button
+                <div key={preset.id} className="
+                  relative flex items-center gap-1
+                ">
+                  <GlassButton
                     onClick={() => applyPreset(preset)}
-                    className="
-                      inline-flex cursor-pointer items-center justify-center
-                      gap-2 rounded-lg border border-border-card bg-surface-card
-                      py-2 pr-6 pl-3 font-main text-xs font-semibold
-                      text-text-main transition-smooth
-                      hover:border-text-muted hover:bg-surface-hover
-                    "
-                    style={{
-                      background: selectedPresetId === preset.id ? 'var(--color-primary-light)' : undefined,
-                      color: selectedPresetId === preset.id ? 'var(--color-primary-dark)' : undefined,
-                      borderColor: selectedPresetId === preset.id ? 'var(--color-primary)' : undefined
-                    }}
+                    variant={selectedPresetId === preset.id ? 'primary' : 'default'}
+                    size="sm"
+                    className="pr-6"
                   >
                     {preset.name}
-                  </button>
+                  </GlassButton>
                   <button
                     onClick={(e) => handleDeletePreset(preset.id, e)}
                     className="
@@ -239,63 +216,40 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
 
             {showSaveInput ? (
               <form onSubmit={handleSavePreset} className="mt-2.5 flex gap-2">
-                <input
-                  type="text"
+                <GlassInput
                   placeholder="Preset Name..."
                   value={newPresetName}
                   onChange={e => setNewPresetName(e.target.value)}
-                  className="
-                    flex-1 rounded-lg border border-border-card bg-surface-card
-                    px-3 py-2 font-main text-xs text-text-main outline-none
-                  "
                   maxLength={20}
                   required
+                  className="flex-1 text-xs"
                 />
-                <button
-                  type="submit"
-                  className="
-                    inline-flex cursor-pointer items-center justify-center gap-2
-                    rounded-lg border-none bg-primary-gradient px-3 py-2
-                    font-main text-xs font-semibold text-text-inv
-                    shadow-primary-hover transition-smooth
-                    hover:bg-primary-hover-gradient
-                    active:scale-[0.98]
-                  "
-                >
+                <GlassButton type="submit" variant="primary" size="sm">
                   Save
-                </button>
-                <button
+                </GlassButton>
+                <GlassButton
                   type="button"
-                  className="
-                    inline-flex cursor-pointer items-center justify-center gap-2
-                    rounded-lg border border-border-card bg-surface-card px-3
-                    py-2 font-main text-xs font-semibold text-text-main
-                    transition-smooth
-                    hover:border-text-muted hover:bg-surface-hover
-                  "
+                  variant="outline"
+                  size="sm"
                   onClick={() => { setShowSaveInput(false); setNewPresetName(''); }}
                 >
                   Cancel
-                </button>
+                </GlassButton>
               </form>
             ) : (
-              <button
-                className="
-                  mt-2 inline-flex cursor-pointer items-center gap-1 self-start
-                  rounded-lg border border-primary-dark bg-surface-card px-3
-                  py-2 font-main text-xs font-semibold text-primary-dark
-                  transition-smooth
-                  hover:bg-surface-hover
-                "
+              <GlassButton
+                variant="outline"
+                size="sm"
+                className="mt-2 self-start"
                 onClick={() => setShowSaveInput(true)}
               >
-                <Plus size={12} className="text-primary-dark" />
-                <span className="text-primary-dark">Save Current as Preset</span>
-              </button>
+                <Plus size={12} />
+                Save Current as Preset
+              </GlassButton>
             )}
           </div>
         </div>
       )}
-    </div>
+    </GlassCard>
   );
 };

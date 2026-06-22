@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { GlassModal } from '../shared/GlassModal';
+import { GlassButton } from '../shared/GlassButton';
+import { GlassInput } from '../shared/GlassInput';
 
 interface AddTankModalProps {
   show: boolean;
@@ -24,13 +27,11 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
 
     if (addMode === 'create') {
       if (!newTankName.trim()) return;
-      // Mockup: call handler but do not actually create a tank in single-demo-tank mode.
       await onCreateTank(newTankName.trim(), { type: 'webcam' });
       setNewTankName('');
       onClose();
     } else {
       if (!linkTankCode.trim()) return;
-      // Mockup: call handler but linking additional tanks is disabled.
       await onLinkTank(linkTankCode.trim());
       setLinkTankCode('');
       onClose();
@@ -45,30 +46,23 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
   };
 
   return (
-    <div className="
-      fixed inset-0 z-1000 flex items-center justify-center
-      bg-[rgba(15,23,42,0.6)] backdrop-blur-xs
-    ">
-      <form
-        onSubmit={handleSubmit}
-        className="
-          flex w-[380px] flex-col gap-4 rounded-[20px] border
-          border-border-subtle bg-surface-card p-6
-          shadow-[0_20px_25px_-5px_rgba(0,0,0,0.15)]
-        "
-      >
-        <h3 className="m-0 text-base font-bold text-text-main">Add Aquarium Tank</h3>
+    <GlassModal isOpen={show} onClose={handleClose}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <h3 className="m-0 text-base font-bold text-primary-dark">Add Aquarium Tank</h3>
 
-        <div className="flex gap-0.5 rounded-[10px] bg-border-card p-0.5">
+        <div className="
+          flex gap-0.5 rounded-[10px] border border-white/20 bg-white/20 p-0.5
+        ">
           <button
             type="button"
             onClick={() => { setAddMode('create'); }}
             className={`
               flex-1 cursor-pointer rounded-lg border-none p-1.5 text-xs
               font-semibold transition-colors
-              ${addMode === 'create' ? `bg-surface-card text-text-main` : `
-                bg-transparent text-text-muted
-              `}
+              ${addMode === 'create'
+                ? 'bg-white/50 text-primary-dark'
+                : 'bg-transparent text-on-surface-variant'
+              }
             `}
           >
             Create New Tank
@@ -79,9 +73,10 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
             className={`
               flex-1 cursor-pointer rounded-lg border-none p-1.5 text-xs
               font-semibold transition-colors
-              ${addMode === 'link' ? `bg-surface-card text-text-main` : `
-                bg-transparent text-text-muted
-              `}
+              ${addMode === 'link'
+                ? 'bg-white/50 text-primary-dark'
+                : 'bg-transparent text-on-surface-variant'
+              }
             `}
           >
             Link Existing Tank
@@ -90,84 +85,59 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
 
         {addMode === 'create' ? (
           <div className="flex flex-col gap-3">
-            <div>
-              <label className="
-                mb-1 block text-caption font-semibold text-text-muted
-              ">AQUARIUM NAME</label>
-              <input
-                type="text"
-                placeholder="e.g. Bedroom Reef"
-                value={newTankName}
-                onChange={e => setNewTankName(e.target.value)}
-                className="
-                  w-full rounded-[10px] border border-border-card
-                  bg-surface-card px-3 py-2 font-main text-sm text-text-main
-                  outline-none
-                "
-                required
-              />
-            </div>
+            <GlassInput
+              id="tank-name"
+              label="AQUARIUM NAME"
+              type="text"
+              placeholder="e.g. Bedroom Reef"
+              value={newTankName}
+              onChange={e => setNewTankName(e.target.value)}
+              required
+            />
 
             <div>
               <label className="
-                mb-1.5 block text-caption font-semibold text-text-muted
-              ">CAMERA SOURCE</label>
-              <div className="
-                rounded-[10px] border border-border-card bg-surface-card px-3
-                py-2
+                mb-1.5 block text-caption font-semibold text-on-surface-variant
               ">
-                <span className="text-sm text-text-main">Local Webcam</span>
+                CAMERA SOURCE
+              </label>
+              <div className="glass-input">
+                <span className="text-sm">Local Webcam</span>
               </div>
             </div>
           </div>
         ) : (
-          <div>
-            <label className="
-              mb-1 block text-caption font-semibold text-text-muted
-            ">TANK REFERENCE ID / CODE</label>
-            <input
-              type="text"
-              placeholder="e.g. tank-123456"
-              value={linkTankCode}
-              onChange={e => setLinkTankCode(e.target.value)}
-              className="
-                w-full rounded-[10px] border border-border-card bg-surface-card
-                px-3 py-2 font-main text-sm text-text-main outline-none
-              "
-              required
-            />
-          </div>
+          <GlassInput
+            id="tank-code"
+            label="TANK REFERENCE ID / CODE"
+            type="text"
+            placeholder="e.g. tank-123456"
+            value={linkTankCode}
+            onChange={e => setLinkTankCode(e.target.value)}
+            required
+          />
         )}
 
         <div className="mt-2 flex gap-2.5">
-          <button
-            type="button"
-            className="
-              inline-flex flex-1 cursor-pointer items-center justify-center
-              gap-2 rounded-[10px] border border-border-card bg-surface-card
-              px-5 py-2.5 font-main text-sm font-semibold text-text-main
-              transition-smooth
-              hover:border-text-muted hover:bg-surface-hover
-            "
+          <GlassButton
+            variant="outline"
+            size="md"
+            fullWidth
             onClick={handleClose}
+            type="button"
           >
             Cancel
-          </button>
-          <button
+          </GlassButton>
+          <GlassButton
+            variant="primary"
+            size="md"
+            fullWidth
             type="submit"
-            className="
-              inline-flex flex-1 cursor-pointer items-center justify-center
-              gap-2 rounded-3xl border-none bg-primary-gradient px-5 py-2.5
-              font-main text-sm font-semibold text-text-inv shadow-primary-hover
-              transition-smooth
-              hover:bg-primary-hover-gradient
-              active:scale-[0.98]
-            "
           >
             {addMode === 'create' ? 'Create Tank' : 'Link Tank'}
-          </button>
+          </GlassButton>
         </div>
       </form>
-    </div>
+    </GlassModal>
   );
 };

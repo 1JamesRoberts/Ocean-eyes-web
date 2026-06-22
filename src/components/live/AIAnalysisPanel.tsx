@@ -1,5 +1,6 @@
 import React from 'react';
 import { Brain } from 'lucide-react';
+import { GlassCard } from '../shared';
 import { getSpeciesById } from '../../data/speciesCatalog';
 import { resolveCropUrl } from '../../models/api/aiApi';
 import type { AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
@@ -21,9 +22,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
   const diagnosisDetection = diagnosisSource.detections.find(d => d.diagnosis);
   const diagnosis = diagnosisDetection?.diagnosis;
   return (
-    <div className="
-      mb-6 rounded-2xl border border-border-card bg-surface-card p-5
-    ">
+    <GlassCard className="mb-6 p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="
           m-0 flex items-center gap-2 text-h3 font-bold text-text-main
@@ -39,9 +38,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
       <div className="
         mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3
       ">
-        <div className="
-          rounded-xl border border-border-card bg-background-app p-3
-        ">
+        <GlassCard className="p-3" hover>
           <span className="
             block text-2xs font-semibold text-text-muted uppercase
           ">
@@ -50,12 +47,10 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <strong className="mt-1 block text-title text-primary-dark">
             {lastPrediction.summary.total_detections}
           </strong>
-        </div>
+        </GlassCard>
 
         {lastTurbidityResult && (
-          <div className="
-            rounded-xl border border-border-card bg-background-app p-3
-          ">
+          <GlassCard className="p-3" hover>
             <span className="
               block text-2xs font-semibold text-text-muted uppercase
             ">
@@ -64,12 +59,10 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             <strong className="mt-1 block text-title text-info">
               {lastTurbidityResult.turbidity.fnu.toFixed(2)}
             </strong>
-          </div>
+          </GlassCard>
         )}
 
-        <div className="
-          rounded-xl border border-border-card bg-background-app p-3
-        ">
+        <GlassCard className="p-3" hover>
           <span className="
             block text-2xs font-semibold text-text-muted uppercase
           ">
@@ -78,7 +71,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <strong className="mt-1 block text-title text-good">
             {Object.keys(lastPrediction.summary.species_counts).length}
           </strong>
-        </div>
+        </GlassCard>
       </div>
 
       {Object.entries(lastPrediction.summary.species_counts).length > 0 && (
@@ -95,8 +88,8 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
               const displayName = speciesInfo?.displayName || speciesId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
               return (
                 <div key={speciesId} className="
-                  flex items-center gap-1.5 rounded-[20px] border
-                  bg-background-app px-3 py-1.5 text-xs font-semibold
+                  glass-pill flex items-center gap-1.5 px-3 py-1.5 text-xs
+                  font-semibold
                 " style={{ borderColor: `${color}40` }}>
                   <div className="size-2 rounded-full" style={{ backgroundColor: color }} />
                   <span className="text-text-main">{displayName}</span>
@@ -110,12 +103,12 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
       {/* Disease Diagnosis Section */}
       {diagnosis && (
-        <div
+        <GlassCard
           className={`
-            mt-4 rounded-xl border p-3.5
-            ${diagnosis.error ? `border-critical bg-critical/8` : diagnosis.healthy ? `
-              border-good bg-good/8
-            ` : `border-warning bg-warning/8`}
+            mt-4
+            ${diagnosis.error ? 'border-l-4 border-l-critical' : diagnosis.healthy ? `
+              border-l-4 border-l-good
+            ` : `border-l-4 border-l-warning`}
           `}
         >
           <h4 className={`
@@ -172,7 +165,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
               {!diagnosis.healthy && diagnosis.treatment && (
                 <p className="
-                  m-0 rounded-md border-l-3 border-warning bg-background-app p-2
+                  m-0 rounded-md border-l-3 border-warning bg-white/20 p-2
                   text-xs leading-[1.4] text-text-muted
                 ">
                   <strong>Recommended Treatment:</strong> {diagnosis.treatment}
@@ -180,8 +173,8 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
               )}
             </>
           )}
-        </div>
+        </GlassCard>
       )}
-    </div>
+    </GlassCard>
   );
 };

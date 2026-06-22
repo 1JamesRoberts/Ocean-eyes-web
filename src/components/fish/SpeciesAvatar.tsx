@@ -29,7 +29,10 @@ export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
   if (!species || hasError) {
     return (
       <div
-        className={className}
+        className={`
+          ${className}
+          border border-white/20
+        `}
         style={{
           ...commonStyle,
           backgroundColor: getSpeciesColor(speciesId),

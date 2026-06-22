@@ -10,6 +10,7 @@ import { DonutChart } from '../../components/fish/DonutChart';
 import { FishThumbnail } from '../../components/fish/FishThumbnail';
 import { DetailChip } from '../../components/fish/DetailChip';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
+import { GlassCard, GlassButton, GlassIconButton, GlassModal } from '../../components/shared';
 import {
   getSpeciesById,
   checkTankCompatibility,
@@ -93,8 +94,7 @@ export const MyFishScreen: React.FC<{
       }
       `}>
         <form onSubmit={onAdd} className="
-          flex flex-col gap-3.5 rounded-[20px] border border-border-subtle
-          bg-surface-card p-6 shadow-card transition-smooth
+          flex flex-col gap-3.5 glass-card p-6 transition-smooth
         ">
           <h4 className="text-sm font-bold text-text-main">Add New Species Entry</h4>
           <div>
@@ -110,26 +110,14 @@ export const MyFishScreen: React.FC<{
             />
           </div>
           <div className="mt-1.5 flex gap-2.5">
-            <button className="
-              inline-flex flex-1 cursor-pointer items-center justify-center
-              gap-2 rounded-3xl border-none bg-primary-gradient px-5 py-2.5
-              font-main text-sm font-semibold text-text-inv shadow-primary-hover
-              transition-smooth
-              hover:bg-primary-hover-gradient
-              active:scale-[0.98]
-            " type="submit">
+            <GlassButton variant="primary" size="md" type="submit" className="
+              flex-1
+            ">
               Add Species
-            </button>
-            <button className="
-              inline-flex cursor-pointer items-center justify-center gap-2
-              rounded-3xl border border-border-card bg-surface-card px-3.5
-              py-2.5 font-main text-sm font-semibold text-text-main
-              transition-smooth
-              hover:border-text-muted hover:bg-surface-hover
-            " type="button"
-              onClick={onCloseAddForm}>
+            </GlassButton>
+            <GlassButton variant="outline" size="md" type="button" onClick={onCloseAddForm}>
               Cancel
-            </button>
+            </GlassButton>
           </div>
         </form>
       </div>
@@ -141,21 +129,15 @@ export const MyFishScreen: React.FC<{
       ">
         {/* Left Column — Chart & Stats */}
         <div className="flex flex-col gap-4">
-          <div className="
-            rounded-[20px] border border-border-subtle bg-surface-card p-5
-            shadow-card
-          ">
+          <GlassCard className="p-5">
             <div className="mb-4 flex items-center gap-2">
               <BarChart3 size={18} className="text-primary-dark" />
               <h3 className="text-base font-bold text-text-main">Species Distribution</h3>
             </div>
             <DonutChart speciesDistribution={speciesDistribution} />
-          </div>
+          </GlassCard>
 
-          <div className="
-            rounded-[20px] border border-border-subtle bg-surface-card p-5
-            shadow-card
-          ">
+          <GlassCard className="p-5">
             <div className="mb-4 flex items-center gap-2">
               <Fish size={18} className="text-primary-dark" />
               <h3 className="text-base font-bold text-text-main">Aquarium Overview</h3>
@@ -174,8 +156,9 @@ export const MyFishScreen: React.FC<{
                   { icon: <Fish size={14} />, color: 'var(--color-info)', bg: 'rgba(59, 130, 246, 0.08)', label: 'Species', value: stats.uniqueSpecies },
                   { icon: <Heart size={14} />, color: compatibilityColor, bg: `${compatibilityColor}14`, label: 'Compatibility', value: stats.overallCompatibility },
                 ].map((item, i) => (
-                  <div key={i} style={{ background: item.bg }} className="
-                    flex flex-col gap-1 rounded-xl p-3.5
+                  <div key={i} className="
+                    flex flex-col gap-1 rounded-xl border border-white/20
+                    bg-white/30 p-3.5
                   ">
                     <div className="flex items-center gap-1.5">
                       <span style={{ color: item.color }}>{item.icon}</span>
@@ -231,8 +214,9 @@ export const MyFishScreen: React.FC<{
                     conflict: stats.phResult.conflict,
                   },
                 ].map((item, i) => (
-                  <div key={i} style={{ background: item.bg }} className="
-                    flex flex-col gap-1 rounded-xl p-3.5
+                  <div key={i} className="
+                    flex flex-col gap-1 rounded-xl border border-white/20
+                    bg-white/30 p-3.5
                   ">
                     <div className="flex items-center gap-1.5">
                       <span style={{ color: item.color }}>{item.icon}</span>
@@ -255,21 +239,17 @@ export const MyFishScreen: React.FC<{
                 ))}
               </div>
             </div>
-          </div>
+          </GlassCard>
         </div>
 
         {/* Right Column — Fish Cards */}
         <div className="flex flex-col gap-3">
           {fishList.length === 0 && (
-            <div className="
-              flex flex-col items-center justify-center gap-3 rounded-[20px]
-              border border-border-subtle bg-surface-card p-10 text-text-muted
-              shadow-card
-            ">
+            <GlassCard className="p-10 text-center">
               <span className="text-5xl">🐟</span>
               <p className="text-base font-bold text-text-main">No fish in your inventory</p>
-              <p className="text-xs">Tap + to add your first species</p>
-            </div>
+              <p className="text-xs text-text-muted">Tap + to add your first species</p>
+            </GlassCard>
           )}
 
           {fishList.map(fish => {
@@ -287,10 +267,9 @@ export const MyFishScreen: React.FC<{
               : [];
 
             return (
-              <div key={fish.id} data-fish-card
+              <GlassCard key={fish.id} data-fish-card
                 className="
-                  flex cursor-pointer flex-col overflow-hidden rounded-[20px]
-                  border border-border-subtle bg-surface-card shadow-card
+                  flex cursor-pointer flex-col overflow-hidden p-0
                   transition-[box-shadow_0.25s_cubic-bezier(0.4,0,0.2,1)]
                   hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
                 "
@@ -323,7 +302,8 @@ export const MyFishScreen: React.FC<{
                     {isActive && (
                       <>
                         <div className="
-                          flex items-center rounded-xl bg-background-app p-0.5
+                          flex items-center rounded-xl border border-white/20
+                          bg-white/30 p-0.5
                         ">
                           <button className="
                             flex size-6 cursor-pointer items-center
@@ -341,13 +321,9 @@ export const MyFishScreen: React.FC<{
                           "
                             onClick={() => onIncrementCount(fish.id, fish.count)}>+</button>
                         </div>
-                        <button className="
-                          flex cursor-pointer border-none bg-transparent p-1
-                          text-text-muted transition-colors duration-200
-                          hover:text-critical
-                        " onClick={() => onRequestDelete(fish.id)}>
+                        <GlassIconButton size="sm" label="Delete fish" onClick={() => onRequestDelete(fish.id)}>
                           <Trash2 size={16} />
-                        </button>
+                        </GlassIconButton>
                       </>
                     )}
                   </div>
@@ -436,44 +412,23 @@ export const MyFishScreen: React.FC<{
                     </div>
                   </div>
                 </div>
-              </div>
+              </GlassCard>
             );
           })}
         </div>
       </div>
 
       {/* ─── Delete Confirmation ─── */}
-      {fishToDelete && (
-        <div className="modal-overlay" onClick={onCancelDelete}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3 className="mb-2 text-lg font-bold text-text-main">Delete Fish Entry</h3>
-            <p className="mb-6 text-sm text-text-muted">
-              Are you sure you want to delete this fish entry? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button className="
-                inline-flex cursor-pointer items-center justify-center gap-2
-                rounded-3xl border border-border-card bg-surface-card px-5
-                py-2.5 font-main text-sm font-semibold text-text-main
-                transition-smooth
-                hover:border-text-muted hover:bg-surface-hover
-              "
-                onClick={onCancelDelete}>Cancel</button>
-              <button className="
-                inline-flex cursor-pointer items-center justify-center gap-2
-                rounded-3xl border-none bg-critical px-5 py-2.5 font-main
-                text-sm font-semibold text-text-inv
-                shadow-[0_4px_12px_rgba(239,68,68,0.15)] transition-smooth
-                hover:opacity-90
-                active:scale-[0.98]
-              "
-                onClick={onConfirmDelete}>
-                Delete
-              </button>
-            </div>
-          </div>
+      <GlassModal isOpen={fishToDelete !== null} onClose={onCancelDelete}>
+        <h3 className="mb-2 text-lg font-bold text-text-main">Delete Fish Entry</h3>
+        <p className="mb-6 text-sm text-text-muted">
+          Are you sure you want to delete this fish entry? This action cannot be undone.
+        </p>
+        <div className="flex justify-end gap-3">
+          <GlassButton variant="outline" size="md" onClick={onCancelDelete}>Cancel</GlassButton>
+          <GlassButton variant="danger" size="md" onClick={onConfirmDelete}>Delete</GlassButton>
         </div>
-      )}
+      </GlassModal>
     </div>
   );
 };

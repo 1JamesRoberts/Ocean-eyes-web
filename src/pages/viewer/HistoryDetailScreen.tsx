@@ -1,6 +1,7 @@
 import React from 'react';
 import { useHistoryDetail } from '../../hooks/pages/useHistoryDetail';
 import { MiniClarityChart } from '../../components/analytics/MiniClarityChart';
+import { GlassCard, GlassBadge } from '../../components/shared';
 
 export const HistoryDetailScreen: React.FC = () => {
   const { readings, recentReadings, onBack } = useHistoryDetail();
@@ -30,18 +31,10 @@ export const HistoryDetailScreen: React.FC = () => {
       </div>
 
       {/* Main Clarity Area Chart */}
-      <div className="
-        mb-5 rounded-[20px] border border-border-subtle bg-surface-card p-5
-        shadow-card transition-smooth
-      ">
+      <GlassCard className="p-5">
         <h3 className="mb-4 flex items-center justify-between text-h3 font-bold">
           <span>Water Clarity Trend</span>
-          <span className="
-            rounded-[10px] bg-primary-light-gradient px-2 py-0.5 text-caption
-            font-semibold text-primary-dark
-          ">
-            Live Sync
-          </span>
+          <GlassBadge color="live">Live Sync</GlassBadge>
         </h3>
 
         <div className="w-full py-2.5">
@@ -56,7 +49,7 @@ export const HistoryDetailScreen: React.FC = () => {
           <span>RECENT SCANS</span>
           <span>TODAY</span>
         </div>
-      </div>
+      </GlassCard>
 
       {/* Diagnostic Logs */}
       <h3 className="mb-3 text-h3 font-bold text-text-main">Database Reading Log Entries</h3>
@@ -67,10 +60,8 @@ export const HistoryDetailScreen: React.FC = () => {
           const day = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 
           return (
-            <div key={reading.id} className="
-              flex items-center justify-between rounded-[20px] border
-              border-border-subtle bg-surface-card px-4 py-3 shadow-card
-              transition-smooth
+            <GlassCard key={reading.id} className="
+              flex items-center justify-between px-4 py-3
             ">
               <div>
                 <strong className="text-sm text-text-main">Clarity: {reading.clarity}/10</strong>
@@ -82,7 +73,7 @@ export const HistoryDetailScreen: React.FC = () => {
                 <span>pH {reading.ph}</span>
                 <span>{reading.temp}°C</span>
               </div>
-            </div>
+            </GlassCard>
           );
         })}
       </div>

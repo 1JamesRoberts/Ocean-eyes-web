@@ -66,9 +66,11 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
         />
         <Tooltip
           contentStyle={{
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 12,
+            background: 'rgba(255,255,255,0.7)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '1rem',
             color: 'var(--color-text-primary)',
             fontSize: 13,
           }}

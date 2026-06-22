@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSettings } from '../../hooks/pages/useSettings';
 import { ChevronRight } from 'lucide-react';
+import { GlassCard, GlassButton, GlassInput } from '../../components/shared';
 
 export const SettingsScreen: React.FC = () => {
   const {
@@ -31,31 +32,11 @@ export const SettingsScreen: React.FC = () => {
       {/* Header removed — moved to TopAppBar */}
 
       {/* Tank Identity */}
-      <div className="
-        mb-5 rounded-[20px] border border-border-subtle bg-surface-card p-5
-        shadow-card transition-smooth
-      ">
+      <GlassCard className="p-5">
         {editing ? (
           <form onSubmit={handleNameChange} className="flex gap-2.5">
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="
-                flex-1 rounded-[10px] border border-border-card bg-surface-card
-                px-3 py-2 font-main text-text-main outline-none
-              "
-            />
-            <button className="
-              inline-flex cursor-pointer items-center justify-center gap-2
-              rounded-3xl border-none bg-primary-gradient px-4 py-2 font-main
-              text-sm font-semibold text-text-inv shadow-primary-hover
-              transition-smooth
-              hover:bg-primary-hover-gradient
-              active:scale-[0.98]
-            " type="submit">
-              Save
-            </button>
+            <GlassInput id="tank-name" value={name} onChange={e => setName(e.target.value)} />
+            <GlassButton variant="primary" size="sm" type="submit">Save</GlassButton>
           </form>
         ) : (
           <div className="flex items-center justify-between">
@@ -67,17 +48,7 @@ export const SettingsScreen: React.FC = () => {
                 {activeTank?.name}
               </strong>
             </div>
-            <button
-              className="
-                inline-flex cursor-pointer items-center justify-center gap-2
-                rounded-xl border border-border-card bg-surface-card px-3 py-1.5
-                font-main text-xs font-semibold text-text-main transition-smooth
-                hover:border-text-muted hover:bg-surface-hover
-              "
-              onClick={onStartRename}
-            >
-              Rename
-            </button>
+            <GlassButton variant="outline" size="sm" onClick={onStartRename}>Rename</GlassButton>
           </div>
         )}
 
@@ -91,13 +62,10 @@ export const SettingsScreen: React.FC = () => {
             {activeTank?.id}
           </code>
         </div>
-      </div>
+      </GlassCard>
 
       {/* Menu Options */}
-      <div className="
-        mb-5 rounded-[20px] border border-border-subtle bg-surface-card px-4
-        py-1 shadow-card transition-smooth
-      ">
+      <GlassCard className="px-4 py-1">
         <div
           className="
             flex cursor-pointer items-center justify-between border-b
@@ -138,13 +106,10 @@ export const SettingsScreen: React.FC = () => {
           <span className="text-h3 font-semibold text-primary-dark">IoT Scanner Console</span>
           <ChevronRight size={18} className="text-primary-dark" />
         </div>
-      </div>
+      </GlassCard>
 
       {/* Safety Threshold Settings Slider equivalent */}
-      <div className="
-        mb-6 rounded-[20px] border border-border-subtle bg-surface-card p-5
-        shadow-card transition-smooth
-      ">
+      <GlassCard className="p-5">
         <h4 className="mb-4 text-sm font-bold text-text-main">Safety Boundaries & Notification Thresholds</h4>
 
         <div className="mb-4">
@@ -182,57 +147,27 @@ export const SettingsScreen: React.FC = () => {
             className="w-full accent-primary-dark"
           />
         </div>
-      </div>
+      </GlassCard>
 
       {/* Disconnect button with confirmation */}
       {showConfirmUnlink ? (
-        <div className="
-          flex flex-col gap-3 rounded-[20px] border border-critical
-          bg-critical/5 p-5 shadow-card transition-smooth
-        ">
+        <GlassCard className="border-critical/30 p-5">
           <strong className="text-sm text-critical">Are you sure you want to disconnect?</strong>
           <p className="m-0 text-xs leading-[140%] text-text-muted">
             This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
           </p>
           <div className="mt-1 flex gap-2.5">
-            <button
-              className="
-                inline-flex flex-1 cursor-pointer items-center justify-center
-                gap-2 rounded-[10px] border border-border-card bg-surface-card
-                p-2 font-main text-xs font-semibold text-text-main
-                transition-smooth
-                hover:border-text-muted hover:bg-surface-hover
-              "
-              onClick={onCancelUnlink}
-            >
-              Cancel
-            </button>
-            <button
-              className="
-                inline-flex flex-1 cursor-pointer items-center justify-center
-                gap-2 rounded-[10px] border-none bg-critical p-2 font-main
-                text-xs font-semibold text-text-inv transition-smooth
-                hover:opacity-90
-                active:scale-[0.98]
-              "
-              onClick={onConfirmUnlink}
-            >
-              Yes, Disconnect
-            </button>
+            <GlassButton variant="outline" size="sm" onClick={onCancelUnlink}>Cancel</GlassButton>
+            <GlassButton variant="danger" size="sm" onClick={onConfirmUnlink}>Yes, Disconnect</GlassButton>
           </div>
-        </div>
+        </GlassCard>
       ) : (
-        <button
-          className="
-            inline-flex w-full cursor-pointer items-center justify-center gap-2
-            rounded-3xl border border-critical/20 bg-surface-card px-5 py-3.5
-            font-main text-sm font-semibold text-critical transition-smooth
-            hover:bg-critical/5
-          "
-          onClick={onRequestUnlink}
-        >
+        <GlassButton variant="outline" className="
+          border-critical/20 text-critical
+          hover:bg-critical/5
+        " fullWidth onClick={onRequestUnlink}>
           Disconnect from Tank
-        </button>
+        </GlassButton>
       )}
     </div>
   );

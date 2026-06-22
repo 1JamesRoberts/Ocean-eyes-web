@@ -49,7 +49,7 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
   const areaPoints = `${points[0].x},${baselineY} ${polylinePoints} ${points[points.length - 1].x},${baselineY}`;
 
   return (
-    <div ref={containerRef} className="w-full">
+    <div ref={containerRef} className="w-full glass-panel">
       <svg width="100%" height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} className="
         block overflow-visible
       ">
