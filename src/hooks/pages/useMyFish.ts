@@ -17,13 +17,17 @@ interface SpeciesDisplay {
   imagePath: string | undefined;
 }
 
-export const useMyFish = () => {
+export const useMyFish = (external?: {
+  externalShowAddForm?: boolean;
+  onExternalToggleAddForm?: () => void;
+}) => {
   const { tankId } = useTank();
   const { fishList, addFish, removeFish, updateFishCount } = useFish(tankId);
 
   const [name, setName] = useState('');
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [internalShowAddForm, setInternalShowAddForm] = useState(false);
+  const showAddForm = external?.externalShowAddForm ?? internalShowAddForm;
   const [activeFishId, setActiveFishId] = useState<string | null>(null);
   const [fishToDelete, setFishToDelete] = useState<string | null>(null);
 
@@ -62,13 +66,23 @@ export const useMyFish = () => {
     };
   }, []);
 
-  const onToggleAddForm = useCallback(() => setShowAddForm((prev) => !prev), []);
+  const onToggleAddForm = useCallback(() => {
+    if (external?.onExternalToggleAddForm) {
+      external.onExternalToggleAddForm();
+    } else {
+      setInternalShowAddForm((prev) => !prev);
+    }
+  }, [external]);
 
   const onCloseAddForm = useCallback(() => {
-    setShowAddForm(false);
+    if (external?.onExternalToggleAddForm) {
+      external.onExternalToggleAddForm();
+    } else {
+      setInternalShowAddForm(false);
+    }
     setName('');
     setSelectedSpeciesId(null);
-  }, []);
+  }, [external]);
 
   const onSpeciesSelect = useCallback((species: SpeciesInfo | null, customName?: string) => {
     if (species) {
@@ -89,9 +103,13 @@ export const useMyFish = () => {
       addFish(name.trim(), imageUrl, 1);
       setName('');
       setSelectedSpeciesId(null);
-      setShowAddForm(false);
+      if (external?.onExternalToggleAddForm) {
+        external.onExternalToggleAddForm();
+      } else {
+        setInternalShowAddForm(false);
+      }
     },
-    [name, selectedSpeciesId, tankId, addFish]
+    [name, selectedSpeciesId, tankId, addFish, external]
   );
 
   const onToggleFish = useCallback((id: string) => {

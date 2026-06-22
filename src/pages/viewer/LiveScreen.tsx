@@ -88,17 +88,6 @@ export const LiveScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="
-        flex min-h-[75px] items-center justify-between border-b
-        border-border-card pb-3
-        max-xs:flex-col max-xs:items-start max-xs:gap-3
-      ">
-        <div>
-          <span className="text-xs font-semibold text-text-muted uppercase">Camera Monitor</span>
-          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Live Video Stream</h1>
-        </div>
-      </div>
-
       {!activeTank && (
         <div className="
           mb-5 flex items-center gap-2.5 rounded-xl border border-warning

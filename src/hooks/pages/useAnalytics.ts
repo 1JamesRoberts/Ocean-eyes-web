@@ -2,8 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useTank } from '../useTank';
 import { useReadings } from '../useReadings';
 import { useFish } from '../useFish';
-import { useDateRangeFromUrl } from '../useDateRangeFromUrl';
-import { useHistory } from '../useHistory';
+import { useAnalyticsControls } from '../../context/AnalyticsControlsContext';
 import { useNavigation } from '../../context/NavigationContext';
 import {
   resolveCropUrl,
@@ -18,8 +17,15 @@ export const useAnalytics = () => {
   const { tankId } = useTank();
   const { readings } = useReadings();
   const { fishList } = useFish(tankId);
-  const { range, setRange } = useDateRangeFromUrl();
-  const { detectionData, turbidityData, loading, error, refetch } = useHistory(range);
+  const {
+    range,
+    setRange,
+    loading,
+    error,
+    refetch,
+    detectionData,
+    turbidityData,
+  } = useAnalyticsControls();
 
   const detectionRecords = useMemo(() => detectionData?.records ?? [], [detectionData]);
   const turbidityRecords = useMemo(() => turbidityData?.records ?? [], [turbidityData]);

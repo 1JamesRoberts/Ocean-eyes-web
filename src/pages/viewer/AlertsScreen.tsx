@@ -26,17 +26,7 @@ export const AlertsScreen: React.FC = () => {
   // Alerts Log List
   return (
     <div className="flex flex-col gap-6">
-      <div className="
-        flex min-h-[75px] items-center justify-between border-b
-        border-border-card pb-3
-        max-xs:flex-col max-xs:items-start max-xs:gap-3
-      ">
-        <div>
-          <span className="
-            block text-xs font-semibold text-text-muted uppercase
-          ">Notifications</span>
-          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Safety Alerts</h1>
-        </div>
+      <div className="flex items-center justify-between">
         <button
           className="
             cursor-pointer border-none bg-transparent font-main text-sm

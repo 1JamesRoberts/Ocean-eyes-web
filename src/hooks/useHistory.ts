@@ -19,7 +19,10 @@ export interface UseHistoryViewModelResult {
   refetch: () => void;
 }
 
-export const useHistory = (range: DateRange): UseHistoryViewModelResult => {
+export const useHistory = (
+  range: DateRange,
+  enabled = true,
+): UseHistoryViewModelResult => {
   const [rawDetectionData, setRawDetectionData] = useState<HistoryDetectionResponse | null>(null);
   const [rawTurbidityData, setRawTurbidityData] = useState<HistoryTurbidityResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,6 +32,7 @@ export const useHistory = (range: DateRange): UseHistoryViewModelResult => {
   const { startDate, endDate } = range;
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
     const controller = new AbortController();
 
@@ -65,7 +69,7 @@ export const useHistory = (range: DateRange): UseHistoryViewModelResult => {
       cancelled = true;
       controller.abort();
     };
-  }, [startDate, endDate, refetchKey]);
+  }, [startDate, endDate, refetchKey, enabled]);
 
   const detectionData: HistoryDetectionResponse | null = useMemo(() => {
     if (!rawDetectionData) return null;

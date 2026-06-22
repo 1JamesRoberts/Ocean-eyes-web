@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMyFish } from '../../hooks/pages/useMyFish';
 import {
-  Plus, Trash2, Fish, Hash, BarChart3,
+  Trash2, Fish, Hash, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle, HelpCircle, Heart
 } from 'lucide-react';
@@ -48,7 +48,15 @@ const breedingLabel: Record<BreedingDifficulty, string> = {
   easy: 'Easy', medium: 'Medium', hard: 'Hard', no_record: 'No Record'
 };
 
-export const MyFishScreen: React.FC = () => {
+export const MyFishScreen: React.FC<{
+  showAddForm?: boolean;
+  onToggleAddForm?: () => void;
+}> = ({ showAddForm: externalShowAddForm, onToggleAddForm: externalToggleAddForm }) => {
+  const hookValues = useMyFish(
+    externalShowAddForm !== undefined
+      ? { externalShowAddForm, onExternalToggleAddForm: externalToggleAddForm }
+      : undefined
+  );
   const {
     fishList,
     stats,
@@ -58,7 +66,6 @@ export const MyFishScreen: React.FC = () => {
     activeFishId,
     fishToDelete,
     getSpeciesDisplay,
-    onToggleAddForm,
     onCloseAddForm,
     onSpeciesSelect,
     onAdd,
@@ -68,35 +75,12 @@ export const MyFishScreen: React.FC = () => {
     onRequestDelete,
     onCancelDelete,
     onConfirmDelete,
-  } = useMyFish();
+  } = hookValues;
 
   // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="
-        flex min-h-[75px] items-center justify-between border-b
-        border-border-card pb-3
-        max-xs:flex-col max-xs:items-start max-xs:gap-3
-      ">
-        <div>
-          <span className="
-            block text-xs font-semibold text-text-muted uppercase
-          ">
-            My Fish
-          </span>
-          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Fish Inventory</h1>
-        </div>
-        <button
-          aria-label={showAddForm ? 'Close' : 'Add fish'}
-          className="
-            cursor-pointer border-none bg-transparent p-1.5 text-primary-dark
-          "
-          onClick={onToggleAddForm}
-        >
-          <Plus size={24} />
-        </button>
-      </div>
 
       {/* ─── Add Form ─── */}
       <div className={`

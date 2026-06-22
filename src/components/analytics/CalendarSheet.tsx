@@ -97,7 +97,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 justify-center rounded-full border-none text-h3 font-medium
                 transition-smooth
                 ${selected
-                  ? `bg-primary-gradient text-text-inv shadow-primary-hover`
+                  ? `bg-primary-gradient text-text-inv`
                   : today
                     ? `
                       bg-transparent font-semibold text-primary-dark

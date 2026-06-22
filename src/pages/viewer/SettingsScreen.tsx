@@ -28,16 +28,7 @@ export const SettingsScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="
-        flex min-h-[75px] items-center justify-between border-b
-        border-border-card pb-3
-        max-xs:flex-col max-xs:items-start max-xs:gap-3
-      ">
-        <div>
-          <span className="text-xs font-semibold text-text-muted uppercase">Control Panel</span>
-          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Tank Settings</h1>
-        </div>
-      </div>
+      {/* Header removed — moved to TopAppBar */}
 
       {/* Tank Identity */}
       <div className="

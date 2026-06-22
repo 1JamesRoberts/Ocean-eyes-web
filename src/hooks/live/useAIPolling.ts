@@ -79,6 +79,15 @@ export const useAIPolling = ({
   const addAlertRef = useRef(addAlert);
   const writeReadingRef = useRef(writeReading);
   const updateDetectedCountRef = useRef(updateDetectedCount);
+  const activeTankRef = useRef(activeTank);
+  const liveStateRef = useRef(liveState);
+  const activeFeedRef = useRef(activeFeed);
+  const aiLoadingRef = useRef(aiLoading);
+
+  useEffect(() => { activeTankRef.current = activeTank; }, [activeTank]);
+  useEffect(() => { liveStateRef.current = liveState; }, [liveState]);
+  useEffect(() => { activeFeedRef.current = activeFeed; }, [activeFeed]);
+  useEffect(() => { aiLoadingRef.current = aiLoading; }, [aiLoading]);
 
   const toggleAI = useCallback(async () => {
     if (aiLoading || backendStatus === 'checking' || !isStreaming) return;
@@ -127,7 +136,7 @@ export const useAIPolling = ({
 
     const processFrame = async () => {
       if (!aiMountedRef.current) return;
-      if (!cameraFeedRef.current?.videoElement || aiLoading) return;
+      if (!cameraFeedRef.current?.videoElement || aiLoadingRef.current) return;
 
       const video = cameraFeedRef.current.videoElement;
       if (!isVideoReady(video)) {
@@ -164,14 +173,14 @@ export const useAIPolling = ({
           }
         }
 
-        if (activeTank && liveState) {
+        if (activeTankRef.current && liveStateRef.current) {
           const totalFish = result.summary.total_detections;
 
           recordFeedReading({
-            tankId: activeTank.id,
-            liveState,
-            activeFeed,
-            clarity: activeFeed.current_clarity ?? 0,
+            tankId: activeTankRef.current.id,
+            liveState: liveStateRef.current,
+            activeFeed: activeFeedRef.current,
+            clarity: activeFeedRef.current.current_clarity ?? 0,
             fishCount: totalFish,
             writeReading: writeReadingRef.current,
           });
@@ -214,7 +223,7 @@ export const useAIPolling = ({
         aiAbortControllerRef.current = null;
       }
     };
-  }, [isAIActive, isStreaming, backendStatus, activeFeed.mock_image, activeFeed.id, isWebcam]);
+  }, [isAIActive, isStreaming, backendStatus, activeFeed.mock_image, activeFeed.id, isWebcam, cameraFeedRef]);
 
   return {
     isAIActive,

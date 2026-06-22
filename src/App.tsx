@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NavigationProvider } from './context/NavigationContext';
 import { useNavigation } from './context/NavigationContext';
+import { AnalyticsControlsProvider } from './context/AnalyticsControlsContext';
 import { useTank } from './hooks/useTank';
 import { useAlerts } from './hooks/useAlerts';
 import { ViewerApp } from './pages/ViewerApp';
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
 
 const OceanEyesDashboard: React.FC = () => {
   const { activeTab, setActiveTab } = useNavigation();
+  const [showAddFishForm, setShowAddFishForm] = useState(false);
   const {
     tankId,
     activeTank,
@@ -225,20 +227,29 @@ const OceanEyesDashboard: React.FC = () => {
         })}
       </nav>
 
-      <TopAppBar activeTank={activeTank} />
+      <AnalyticsControlsProvider active={activeTab === 'analytics'}>
+        <TopAppBar
+          activeTank={activeTank}
+          activeTab={activeTab}
+          onToggleAddFish={() => setShowAddFishForm((v) => !v)}
+        />
 
-      {/* ─── Main Content Canvas ─── */}
-      <main className="
-        ml-0 flex flex-1 justify-center overflow-y-auto pt-20
-        md:ml-64
-      ">
-        <div className="
-          mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-6 p-6 pb-24
-          md:p-10 md:pb-12
+        {/* ─── Main Content Canvas ─── */}
+        <main className="
+          ml-0 flex flex-1 justify-center overflow-y-auto pt-20
+          md:ml-64
         ">
-          <ViewerApp />
-        </div>
-      </main>
+          <div className="
+            mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-6 p-6 pb-24
+            md:p-10 md:pb-12
+          ">
+            <ViewerApp
+              showAddFishForm={showAddFishForm}
+              onToggleAddFish={() => setShowAddFishForm((v) => !v)}
+            />
+          </div>
+        </main>
+      </AnalyticsControlsProvider>
 
       <AddTankModal
         show={showAddTankModal}

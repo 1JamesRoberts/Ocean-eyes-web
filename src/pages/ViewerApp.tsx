@@ -11,7 +11,12 @@ import { HistoryDetailScreen } from './viewer/HistoryDetailScreen';
 import { MyFishScreen } from './viewer/MyFishScreen';
 import { AnalyticsScreen } from './viewer/AnalyticsScreen';
 
-export const ViewerApp: React.FC = () => {
+interface ViewerAppProps {
+  showAddFishForm?: boolean;
+  onToggleAddFish?: () => void;
+}
+
+export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleAddFish }) => {
   const tankId = useTank().tankId;
   const { activeTab } = useNavigation();
 
@@ -28,7 +33,12 @@ export const ViewerApp: React.FC = () => {
       case 'history':
         return <HistoryDetailScreen />;
       case 'my_fish':
-        return <MyFishScreen />;
+        return (
+          <MyFishScreen
+            showAddForm={showAddFishForm}
+            onToggleAddForm={onToggleAddFish}
+          />
+        );
       case 'analytics':
         return <AnalyticsScreen />;
       default:

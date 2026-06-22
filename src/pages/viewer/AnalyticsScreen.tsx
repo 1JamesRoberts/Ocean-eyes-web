@@ -36,36 +36,25 @@ export const AnalyticsScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
+      {/* Mobile controls — desktop controls live in the top app bar */}
       <div className="
-        flex min-h-[75px] items-center justify-between border-b
-        border-border-card pb-3
-        max-xs:flex-col max-xs:items-start max-xs:gap-3
+        flex items-center justify-end gap-3
+        md:hidden
       ">
-        <div>
-          <span className="
-            block text-xs font-semibold text-text-muted uppercase
-          ">
-            AI Insights
-          </span>
-          <h1 className="mt-0.5 text-display font-extrabold text-text-main">Analytics</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <DateTimeRangePicker value={range} onChange={setRange} />
-          <button
-            className="
-              cursor-pointer rounded-lg border border-border-card bg-transparent
-              px-3 py-1.5 text-xs font-semibold text-text-muted
-              hover:bg-black/5
-            "
-            onClick={refetch}
-            disabled={loading}
-            title="Refresh data"
-            aria-label="Refresh analytics"
-          >
-            <RotateCcw size={14} />
-          </button>
-        </div>
+        <DateTimeRangePicker value={range} onChange={setRange} />
+        <button
+          className="
+            cursor-pointer rounded-lg border border-border-card bg-transparent
+            px-3 py-1.5 text-xs font-semibold text-text-muted
+            hover:bg-black/5
+          "
+          onClick={refetch}
+          disabled={loading}
+          title="Refresh data"
+          aria-label="Refresh analytics"
+        >
+          <RotateCcw size={14} />
+        </button>
       </div>
 
       {/* Error banner */}

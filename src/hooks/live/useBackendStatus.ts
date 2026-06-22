@@ -32,7 +32,7 @@ export const useBackendStatus = (isStreaming: boolean): UseBackendStatusViewMode
       setBackendStatus(ok ? 'online' : 'offline');
       return ok;
     },
-    [backendStatus]
+    []
   );
 
   return { backendStatus, checkBackend };
