@@ -25,7 +25,7 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
         <Camera size={36} className="text-[#2DD4BF]" />
       </div>
 
-      <h2 className="mb-2 text-[26px] font-extrabold text-[#F1F5F9]">Smart Tank Unit</h2>
+      <h2 className="mb-2 text-section font-extrabold text-[#F1F5F9]">Smart Tank Unit</h2>
       <p className="
         mb-8 max-w-[320px] text-[13px] leading-[145%] text-[#94A3B8]
       ">
@@ -37,7 +37,7 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
           className="
             inline-flex w-full cursor-pointer items-center justify-center gap-2
             rounded-xl border-none bg-primary-gradient px-6 py-3.5 font-main
-            text-[15px] font-semibold text-text-inv
+            text-h3 font-semibold text-text-inv
             shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
             hover:bg-primary-hover-gradient
             active:scale-[0.98]
@@ -51,7 +51,7 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
           className="
             inline-flex w-full cursor-pointer items-center justify-center gap-2
             rounded-xl border border-[#334155] bg-[#1E293B] px-6 py-3.5
-            font-main text-[15px] font-semibold text-[#E2E8F0] transition-smooth
+            font-main text-h3 font-semibold text-[#E2E8F0] transition-smooth
             hover:bg-[#334155]
             active:scale-[0.98]
           "

@@ -36,7 +36,7 @@ export const IoTMonitor: React.FC = () => {
       {/* Device Header Bar */}
       <div className="
         flex h-[42px] items-center justify-between border-b border-[#1e293b]
-        bg-[#090d11] px-4 text-[11px] font-semibold tracking-wider
+        bg-[#090d11] px-4 text-caption font-semibold tracking-wider
         text-[#94a3b8]
       ">
         <div className="flex items-center gap-1.5">

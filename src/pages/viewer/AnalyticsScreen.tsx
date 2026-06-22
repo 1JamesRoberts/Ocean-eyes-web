@@ -122,13 +122,14 @@ export const AnalyticsScreen: React.FC = () => {
         ">
           {/* Heatmap + Fish Count row (2:1 like dashboard-grid) */}
           <div className="
-            grid grid-cols-1 items-start gap-4
+            grid grid-cols-1 gap-4
             lg:col-span-2 lg:grid-cols-[2fr_1fr]
           ">
             {/* Spatial Detection Heatmap */}
             <div className="
-              flex flex-col gap-3 rounded-[20px] border border-border-subtle
-              bg-surface-card p-5 shadow-card transition-smooth
+              flex h-full flex-col gap-3 rounded-[20px] border
+              border-border-subtle bg-surface-card p-5 shadow-card
+              transition-smooth
             ">
               <SpatialDetectionHeatmap
                 records={detectionRecords}
@@ -141,16 +142,19 @@ export const AnalyticsScreen: React.FC = () => {
 
             {/* Fish Count Timeline */}
             <div className="
-              flex flex-col gap-3 rounded-[20px] border border-border-subtle
-              bg-surface-card p-5 shadow-card transition-smooth
+              flex h-full min-h-0 flex-col gap-2 overflow-hidden rounded-[20px]
+              border border-border-subtle bg-surface-card p-5 shadow-card
+              transition-smooth
             ">
-            <h3 className="m-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
-            <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
-            <div className="mt-2">
-              <h3 className="m-0 text-sm font-bold text-text-main">Mean Nearest-Neighbor Distance</h3>
+              <h3 className="m-0 shrink-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
+              <div className="min-h-0 flex-1">
+                <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
+              </div>
+              <h3 className="m-0 shrink-0 text-sm font-bold text-text-main">Mean Nearest-Neighbor Distance</h3>
+              <div className="min-h-0 flex-1">
+                <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
+              </div>
             </div>
-            <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
-          </div>
           </div>
 
           {/* Water Clarity Trend */}

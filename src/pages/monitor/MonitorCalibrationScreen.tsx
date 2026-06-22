@@ -41,12 +41,12 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
       </h3>
       {activeTank && (
         <span className="
-          mb-2 block text-center text-[11px] font-semibold text-primary-dark
+          mb-2 block text-center text-caption font-semibold text-primary-dark
         ">
           Calibrating: {activeTank.name}
         </span>
       )}
-      <p className="mb-4 text-center text-[11px] leading-[135%] text-[#64748B]">
+      <p className="mb-4 text-center text-caption leading-[135%] text-[#64748B]">
         Drag the dotted red line visually to match the physical water surface level in your tank.
       </p>
 
@@ -108,7 +108,7 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
         <div
           className="
             pointer-events-none absolute right-2.5 z-12 rounded-sm bg-critical
-            px-1.5 py-0.5 text-[9px] font-semibold text-white
+            px-1.5 py-0.5 text-3xs font-semibold text-white
           "
           style={{ top: `${lineY - 10}px` }}
         >
@@ -121,7 +121,7 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
           className="
             inline-flex flex-1 cursor-pointer items-center justify-center gap-2
             rounded-xl border-none bg-primary-gradient px-6 py-3 font-main
-            text-[15px] font-semibold text-text-inv
+            text-h3 font-semibold text-text-inv
             shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
             hover:bg-primary-hover-gradient
             active:scale-[0.98]

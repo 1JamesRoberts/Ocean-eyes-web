@@ -72,9 +72,9 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
   return (
     <div className="flex h-full flex-col bg-[#090D11] p-4 text-white">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-[11px] font-semibold text-[#94A3B8]">Active Stream Feed</span>
+        <span className="text-caption font-semibold text-[#94A3B8]">Active Stream Feed</span>
         {activeTank && (
-          <span className="text-[11px] font-semibold text-primary-dark">
+          <span className="text-caption font-semibold text-primary-dark">
             {activeTank.name}
           </span>
         )}
@@ -106,7 +106,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
             absolute bottom-[15%] left-[20%] animate-float-1 text-xs opacity-30
           ">🫧</div>
           <div className="
-            absolute right-[15%] bottom-[45%] animate-float-2 text-[10px]
+            absolute right-[15%] bottom-[45%] animate-float-2 text-2xs
             opacity-20
           ">🫧</div>
           <div className="
@@ -133,7 +133,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
 
         {/* Live scanner target graphics */}
         <div className="
-          absolute top-5 left-5 z-12 font-mono text-[9px] leading-[130%]
+          absolute top-5 left-5 z-12 font-mono text-3xs leading-[130%]
           text-[#34D399] [text-shadow:0_0_4px_rgba(52,211,153,0.4)]
         ">
           <span>CAM FEED: OK</span><br />
@@ -186,12 +186,12 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
       {/* Grid of monitored stats */}
       <div className="mb-4 grid grid-cols-2 gap-2.5">
         <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-2.5">
-          <span className="block text-[10px] text-[#64748B]">VISIBILITY COUNT</span>
+          <span className="block text-2xs text-[#64748B]">VISIBILITY COUNT</span>
           <strong className="text-base text-[#38BDF8]">{displayFish} fish detected</strong>
         </div>
 
         <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-2.5">
-          <span className="block text-[10px] text-[#64748B]">WATER CLARITY</span>
+          <span className="block text-2xs text-[#64748B]">WATER CLARITY</span>
           <strong className="text-base text-[#38BDF8]">{displayClarity.toFixed(2)} FNU</strong>
         </div>
       </div>
@@ -202,14 +202,14 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         p-3
       ">
         <span className="
-          mb-2 block text-[11px] font-semibold text-[#64748B] uppercase
+          mb-2 block text-caption font-semibold text-[#64748B] uppercase
         ">
           Aquarium Simulator Controls
         </span>
         <div className="grid grid-cols-2 gap-2">
           <button
             className="
-              cursor-pointer rounded-lg border-none px-2.5 py-2 text-[11px]
+              cursor-pointer rounded-lg border-none px-2.5 py-2 text-caption
               font-semibold text-white transition-colors
             "
             style={{ backgroundColor: hasClarityIssue ? 'var(--color-critical)' : '#1E293B' }}

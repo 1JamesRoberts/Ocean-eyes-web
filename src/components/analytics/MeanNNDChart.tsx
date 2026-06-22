@@ -38,11 +38,13 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
   }, [records, selectedSpecies]);
 
   if (data.length === 0) {
-    return <ChartEmptyState message="No detection data available" />;
+    return <ChartEmptyState message="No detection data available" className="
+      h-full
+    " />;
   }
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
+    <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="meanNNDGrad" x1="0" y1="0" x2="0" y2="1">

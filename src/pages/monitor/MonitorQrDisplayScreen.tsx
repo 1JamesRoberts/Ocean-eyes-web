@@ -39,7 +39,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
 
           <div className="mb-6 text-center">
             <span className="
-              block text-[11px] font-semibold text-[#64748B] uppercase
+              block text-caption font-semibold text-[#64748B] uppercase
             ">Manual Pairing ID</span>
             <div className="
               mt-1.5 flex items-center gap-2.5 rounded-[10px] border
@@ -49,7 +49,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
               <button
                 onClick={copyToClipboard}
                 className="
-                  cursor-pointer border-none bg-transparent text-[11px]
+                  cursor-pointer border-none bg-transparent text-caption
                   font-semibold text-primary-dark underline
                 "
               >
@@ -68,7 +68,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         className="
           inline-flex w-full max-w-[240px] cursor-pointer items-center
           justify-center gap-2 rounded-xl border-none bg-primary-gradient px-6
-          py-3 font-main text-[15px] font-semibold text-text-inv
+          py-3 font-main text-h3 font-semibold text-text-inv
           shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
           hover:bg-primary-hover-gradient
           active:scale-[0.98]
