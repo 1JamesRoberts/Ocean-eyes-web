@@ -13,8 +13,8 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
   if (activeAlerts.length === 0) {
     return (
       <section className="
-        flex flex-col items-center justify-center rounded-3xl border-2
-        border-dashed border-white/40 p-6 text-center glass-card
+        flex flex-col items-center justify-center glass-card border-2
+        border-dashed border-white/40 p-6 text-center
       ">
         <div className="
           mb-4 flex size-12 items-center justify-center rounded-full
@@ -31,7 +31,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
   }
 
   return (
-    <section className="rounded-3xl p-6 glass-card">
+    <section className="glass-card p-6">
       <h3 className="
         mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
         uppercase

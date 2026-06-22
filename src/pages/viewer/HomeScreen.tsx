@@ -27,9 +27,7 @@ export const HomeScreen: React.FC = () => {
   return (
     <div className="flex flex-col gap-6">
       {!hasReadingData ? (
-        <div className="
-          rounded-3xl p-10 text-center glass-card transition-smooth
-        ">
+        <div className="glass-card p-10 text-center transition-smooth">
           <span className="mb-3 block text-hero">🐠</span>
           <h3 className="mb-2 text-lg font-bold text-on-surface">
             Waiting for monitor data…

@@ -46,7 +46,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
   ];
 
   return (
-    <section className="rounded-3xl p-6 glass-card">
+    <section className="glass-card p-6">
       <h3 className="
         mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
         uppercase
@@ -59,14 +59,14 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
           <div
             key={param.label}
             className="
-              flex items-center gap-4 rounded-2xl border border-white/20
+              flex items-center gap-4 rounded-full border border-white/20
               bg-white/20 p-3 transition-colors
               hover:bg-white/40
             "
           >
             <div
               className={`
-                flex size-10 shrink-0 items-center justify-center rounded-xl
+                flex size-10 shrink-0 items-center justify-center rounded-full
                 ${param.colorClass}
               `}
             >

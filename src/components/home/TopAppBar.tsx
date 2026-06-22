@@ -16,10 +16,10 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank }) => {
       max-md:left-0 max-md:pl-6
     ">
       <div>
+        <p className="text-xs text-text-muted">Active Station: Deep Sea Station 01</p>
         <h2 className="text-xl font-semibold tracking-tight text-primary-dark">
           {activeTank?.name || 'Living Room Reef'}
         </h2>
-        <p className="text-xs text-text-muted">Active Station: Deep Sea Station 01</p>
       </div>
 
       <div className="flex items-center gap-5">

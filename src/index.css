@@ -157,7 +157,6 @@
   --animate-fade-in: fadeIn 0.2s ease-out;
   --animate-slide-up: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
   --animate-slide-down: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-  --animate-shimmer: shimmer 10s infinite linear;
 }
 
 @utility transition-smooth {
@@ -165,7 +164,7 @@
 }
 
 @utility liquid-bg {
-  background: linear-gradient(135deg, #f9f9f9 0%, #d4e6e5 100%);
+  background: linear-gradient(180deg, #f9f9f9 0%, #d4e6e5 100%);
 }
 
 @utility glass-card {
@@ -173,6 +172,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2rem;
   box-shadow: var(--shadow-glass), var(--shadow-card);
 }
 
@@ -181,6 +181,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 24px rgba(0, 67, 73, 0.08);
 }
 
 @utility glass-sidebar {
@@ -206,23 +207,6 @@
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-  }
-
-  .shimmer::after {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: -100%;
-    width: 300%;
-    height: 300%;
-    background: linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    animation: shimmer 10s infinite linear;
-    pointer-events: none;
   }
 
   .progress-ring-circle {
@@ -252,7 +236,7 @@
 
   body {
     font-family: var(--font-main);
-    background: linear-gradient(135deg, #f9f9f9 0%, #d4e6e5 100%);
+    background: linear-gradient(180deg, #f9f9f9 0%, #d4e6e5 100%);
     background-attachment: fixed;
     color: var(--color-text-primary);
     min-height: 100vh;
@@ -465,12 +449,3 @@
   }
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translate(-30%, -30%);
-  }
-
-  100% {
-    transform: translate(30%, 30%);
-  }
-}

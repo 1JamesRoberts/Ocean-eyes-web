@@ -232,20 +232,6 @@ const OceanEyesDashboard: React.FC = () => {
         onLinkTank={linkTank}
       />
 
-      {/* Ambient liquid background blobs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 opacity-20">
-        <div className="
-          absolute top-[-100px] left-[-100px] size-[500px] animate-pulse
-          rounded-full bg-secondary-container blur-[150px]
-        " />
-        <div
-          className="
-            absolute right-[-100px] bottom-[-200px] size-[600px] animate-pulse
-            rounded-full bg-primary-fixed-dim blur-[180px]
-          "
-          style={{ animationDelay: '2s' }}
-        />
-      </div>
     </div>
   );
 };

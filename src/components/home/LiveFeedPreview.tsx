@@ -32,7 +32,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 
   return (
     <section
-      className="cursor-pointer overflow-hidden rounded-3xl glass-card"
+      className="cursor-pointer overflow-hidden glass-card"
       onClick={onViewAdvanced}
     >
       <div className="

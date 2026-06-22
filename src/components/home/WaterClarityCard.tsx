@@ -9,7 +9,7 @@ interface WaterClarityCardProps {
 
 export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClarity, onClick }) => {
   return (
-    <section className="rounded-3xl p-6 glass-card">
+    <section className="glass-card p-6">
       <h3 className="
         mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
         uppercase

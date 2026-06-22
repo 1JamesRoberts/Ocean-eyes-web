@@ -8,34 +8,39 @@ interface HealthScoreCardProps {
 export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) => {
   const healthScore = calculateHealthScore(reading);
   const healthMessage = getHealthMessage(healthScore);
-  const radius = 56;
+  const strokeWidth = 10;
+  const radius = 54;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference * (1 - healthScore / 10);
 
   return (
-    <section className="
-      shimmer flex items-center gap-6 rounded-3xl p-6 glass-card
-    ">
+    <section className="shimmer flex items-center gap-6 glass-card p-6">
       <div className="
         relative flex size-32 shrink-0 items-center justify-center
       ">
         <svg className="progress-ring size-32" height="128" width="128">
+          <defs>
+            <linearGradient id="healthRingGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#004349" />
+              <stop offset="100%" stopColor="#196a59" />
+            </linearGradient>
+          </defs>
           <circle
             cx="64"
             cy="64"
             r={radius}
             className="text-surface-variant"
             stroke="currentColor"
-            strokeWidth="8"
+            strokeWidth={strokeWidth}
             fill="none"
           />
           <circle
             cx="64"
             cy="64"
             r={radius}
-            className="progress-ring-circle text-secondary"
-            stroke="currentColor"
-            strokeWidth="8"
+            className="progress-ring-circle"
+            stroke="url(#healthRingGradient)"
+            strokeWidth={strokeWidth}
             fill="none"
             strokeDasharray={circumference}
             strokeDashoffset={dashOffset}

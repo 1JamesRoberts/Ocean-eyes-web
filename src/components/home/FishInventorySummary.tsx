@@ -12,7 +12,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
   onManageFish
 }) => {
   return (
-    <section className="rounded-3xl p-6 glass-card">
+    <section className="glass-card p-6">
       <div className="mb-5 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-primary-dark">Top species detected</h3>
         <button
@@ -34,7 +34,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
             <div
               key={fish.id}
               className="
-                flex items-center justify-between rounded-2xl border
+                flex items-center justify-between rounded-full border
                 border-white/10 bg-white/30 p-4 transition-colors
                 hover:bg-white/50
               "
@@ -42,9 +42,9 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
               <div className="flex items-center gap-4">
                 <div className="
                   flex size-12 items-center justify-center overflow-hidden
-                  rounded-xl border border-white/30 bg-primary-container/20
+                  rounded-xl
                 ">
-                  <SpeciesAvatar speciesId={fish.speciesId} size={40} radius={8} objectFit="cover" />
+                  <SpeciesAvatar speciesId={fish.speciesId} size={40} radius={8} objectFit="contain" />
                 </div>
                 <div>
                   <p className="font-semibold text-primary-dark">{fish.name}</p>
