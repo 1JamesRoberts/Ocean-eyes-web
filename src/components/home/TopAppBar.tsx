@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Bell, Droplets, Plus, RotateCcw } from 'lucide-react';
 import { DateTimeRangePicker } from '../analytics/DateTimeRangePicker';
 import { useAnalyticsControls } from '../../context/AnalyticsControlsContext';
+import { useNavigation } from '../../context/NavigationContext';
 import type { TankBrief } from '../../types/aquarium';
 
 interface TopAppBarProps {
@@ -43,6 +44,7 @@ const AnalyticsCenterControls: React.FC = () => {
 
 export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onToggleAddFish }) => {
   const [searchValue, setSearchValue] = useState('');
+  const { setActiveTab } = useNavigation();
 
   const labels = activeTab ? TAB_LABELS[activeTab] : undefined;
 
@@ -111,9 +113,11 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
             <button
               type="button"
               className="
-                rounded-xl p-2 text-text-muted transition-opacity
-                hover:bg-white/20 hover:text-brand
+                flex items-center justify-center size-10 rounded-full
+                text-white transition-all
+                hover:opacity-90 hover:scale-105
               "
+              style={{ background: 'linear-gradient(135deg, #196a59, #004349)' }}
               aria-label="Add fish"
               onClick={onToggleAddFish}
             >
@@ -127,6 +131,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
               hover:bg-white/20 hover:text-brand
             "
             aria-label="Notifications"
+            onClick={() => setActiveTab('alerts')}
           >
             <Bell size={20} />
           </button>
