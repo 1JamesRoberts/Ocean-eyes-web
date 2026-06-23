@@ -101,7 +101,7 @@ export const LiveScreen: React.FC = () => {
       <div
         ref={viewportRef}
         className="
-          fs-reset shimmer mb-6 flex items-center justify-center rounded-[20px]
+          fs-reset shimmer flex items-center justify-center rounded-[20px]
           border border-[rgba(255,255,255,0.05)] bg-camera-bg shadow-premium
           max-sm:rounded-xl
         "

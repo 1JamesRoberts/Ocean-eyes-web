@@ -22,7 +22,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
   const diagnosisDetection = diagnosisSource.detections.find(d => d.diagnosis);
   const diagnosis = diagnosisDetection?.diagnosis;
   return (
-    <GlassCard className="mb-6 p-5">
+    <GlassCard className="p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="
           m-0 flex items-center gap-2 text-h3 font-bold text-text

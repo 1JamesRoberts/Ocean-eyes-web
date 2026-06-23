@@ -34,7 +34,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
 }) => {
   return (
     <div className="
-      mt-6 grid grid-cols-1 gap-6
+      grid grid-cols-1 gap-6
       md:grid-cols-2
     ">
       <div className="flex flex-col gap-3">

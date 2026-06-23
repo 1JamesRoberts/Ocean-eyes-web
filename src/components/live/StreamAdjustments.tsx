@@ -94,7 +94,6 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
       className={`
         flex flex-col
         ${isExpanded ? 'gap-5 p-6' : 'gap-0 px-6 py-4'}
-        mb-6
       `}
     >
       <div
