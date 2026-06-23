@@ -154,8 +154,6 @@
   --z-index-1000: 1000;
 
   /* ─── Animations ─── */
-  --animate-float-1: float1 4s ease-in-out infinite;
-  --animate-float-2: float2 5s ease-in-out infinite;
   --animate-scan: scan 4s linear infinite;
   --animate-pulse-recording: pulse-recording-border 1.5s infinite;
   --animate-pulse-ai: pulse-ai-border 2s infinite;
@@ -553,26 +551,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes float1 {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
-  }
-
-  50% {
-    transform: translateY(-12px) translateX(4px);
-  }
-}
-
-@keyframes float2 {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
-  }
-
-  50% {
-    transform: translateY(-16px) translateX(-6px);
   }
 }
 

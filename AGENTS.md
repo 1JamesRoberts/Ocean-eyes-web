@@ -50,7 +50,7 @@ Tailwind CSS v4 is the default and preferred styling system for all UI work. Use
 - Prefer theme tokens registered in `@theme` in `src/index.css` (e.g., `bg-surface-card`, `text-text-main`, `border-border-card`).
 - Use bracket syntax for legacy CSS custom properties: `bg-[var(--color-surface)]`, `text-[var(--color-text-primary)]`, `border-[var(--color-border)]`.
 - Custom shadow tokens must use inline `style={{ boxShadow: 'var(--shadow-card)' }}`.
-- Use `@theme` animation tokens: `animate-float-1`, `animate-float-2`, `animate-scan`, `animate-fade-in`, `animate-slide-up`.
+- Use `@theme` animation tokens: `animate-scan`, `animate-fade-in`, `animate-slide-up`.
 - CSS Modules are a last resort. If required, include `@reference "#tailwind";` at the top.
 - Run `npm run lint` after changing Tailwind classes.
 

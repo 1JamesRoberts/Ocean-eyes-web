@@ -30,7 +30,7 @@ export const RootGateOnboarding: React.FC = () => {
 
   return (
     <div className="flex h-full flex-col justify-center px-6 pt-15 pb-6">
-      <div className="mb-10 animate-float-1 text-center">
+      <div className="mb-10 text-center">
         <div className="
           mx-auto mb-4 flex size-[72px] items-center justify-center rounded-3xl
           border border-white/20 bg-primary-soft-gradient text-brand

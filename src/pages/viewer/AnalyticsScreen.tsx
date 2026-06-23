@@ -66,7 +66,7 @@ export const AnalyticsScreen: React.FC = () => {
           <div className="
             flex h-[240px] items-center justify-center text-sm text-text-muted
           ">
-            <Loader2 size={28} className="animate-float-1 text-info" />
+            <Loader2 size={28} className="text-info" />
             <span className="ml-2 text-sm text-text-muted">
               Loading analytics data...
             </span>

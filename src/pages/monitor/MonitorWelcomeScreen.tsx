@@ -17,7 +17,7 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
       text-center text-white
     ">
       <div className="
-        mb-6 flex size-20 animate-float-1 items-center justify-center
+        mb-6 flex size-20 items-center justify-center
         rounded-full border-[3px] border-[#0D9488]
         bg-[linear-gradient(135deg,#115E59_0%,#0F766E_100%)]
         shadow-[0_0_20px_rgba(13,148,136,0.4)]

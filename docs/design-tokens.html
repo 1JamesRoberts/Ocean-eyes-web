@@ -1196,16 +1196,6 @@
       </p>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;">
         <div class="keyframe-card">
-          <div class="kf-name">@keyframes float1</div>
-          <div class="kf-desc">Gentle floating translation (4s ease-in-out infinite)</div>
-          <div class="kf-anim-box" style="animation:float1Anim 4s ease-in-out infinite;"></div>
-        </div>
-        <div class="keyframe-card">
-          <div class="kf-name">@keyframes float2</div>
-          <div class="kf-desc">Gentle floating in opposite direction (5s ease-in-out infinite)</div>
-          <div class="kf-anim-box" style="animation:float2Anim 5s ease-in-out infinite;"></div>
-        </div>
-        <div class="keyframe-card">
           <div class="kf-name">@keyframes scan</div>
           <div class="kf-desc">Camera scanline sweep (4s linear infinite)</div>
           <div class="kf-anim-box" style="background:linear-gradient(180deg,rgba(45,212,191,0.25),transparent);animation:scanAnim 4s linear infinite;"></div>
@@ -1430,8 +1420,6 @@
 
   <!-- ─── Embedded Keyframes for demo ─── -->
   <style>
-    @keyframes float1Anim { 0%,100%{transform:translateY(0)translateX(0)} 50%{transform:translateY(-10px)translateX(3px)} }
-    @keyframes float2Anim { 0%,100%{transform:translateY(0)translateX(0)} 50%{transform:translateY(-12px)translateX(-5px)} }
     @keyframes scanAnim { 0%{transform:translateY(0)} 100%{transform:translateY(100px)} }
     @keyframes fadeInAnim { from{opacity:0} to{opacity:1} }
     @keyframes slideUpAnim { from{opacity:0;transform:translateY(15px)scale(0.95)} to{opacity:1;transform:translateY(0)scale(1)} }

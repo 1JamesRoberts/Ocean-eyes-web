@@ -102,14 +102,14 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         >
           {/* Bubbles */}
           <div className="
-            absolute bottom-[15%] left-[20%] animate-float-1 text-xs opacity-30
+            absolute bottom-[15%] left-[20%] text-xs opacity-30
           ">🫧</div>
           <div className="
-            absolute right-[15%] bottom-[45%] animate-float-2 text-2xs
+            absolute right-[15%] bottom-[45%] text-2xs
             opacity-20
           ">🫧</div>
           <div className="
-            absolute bottom-[70%] left-1/2 animate-float-1 text-sm opacity-40
+            absolute bottom-[70%] left-1/2 text-sm opacity-40
           ">🫧</div>
         </div>
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSettings } from '../../hooks/pages/useSettings';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ShieldCheck } from 'lucide-react';
 import { GlassCard, GlassButton, GlassInput } from '../../components/shared';
 
 export const SettingsScreen: React.FC = () => {
@@ -110,7 +110,7 @@ export const SettingsScreen: React.FC = () => {
 
       {/* Safety Threshold Settings Slider equivalent */}
       <GlassCard className="p-5">
-        <h4 className="mb-4 text-sm font-bold text-text">Safety Boundaries & Notification Thresholds</h4>
+        <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-text"><ShieldCheck size={16} className="text-brand" /> Safety Boundaries & Notification Thresholds</h4>
 
         <div className="mb-4">
           <div className="mb-1.5 flex justify-between text-sm">
