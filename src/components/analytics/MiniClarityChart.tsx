@@ -49,7 +49,7 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
   const areaPoints = `${points[0].x},${baselineY} ${polylinePoints} ${points[points.length - 1].x},${baselineY}`;
 
   return (
-    <div ref={containerRef} className="w-full glass-panel">
+    <div ref={containerRef} className="w-full">
       <svg width="100%" height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} className="
         block overflow-visible
       ">
@@ -60,10 +60,13 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
           </linearGradient>
         </defs>
 
-        {/* Grid lines */}
+        {/* Grid lines — matching Recharts CartesianGrid style */}
         <line x1={PADDING} y1={baselineY} x2={width - PADDING} y2={baselineY} stroke="var(--color-border)" strokeWidth="1" />
         <line x1={PADDING} y1={HEIGHT / 2} x2={width - PADDING} y2={HEIGHT / 2} stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="3 3" />
         <line x1={PADDING} y1={PADDING} x2={width - PADDING} y2={PADDING} stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="3 3" />
+        {points.map((p) => (
+          <line key={`vgrid-${p.x}`} x1={p.x} y1={PADDING} x2={p.x} y2={baselineY} stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="3 3" opacity="0.5" />
+        ))}
 
         {/* Filled area */}
         <polygon points={areaPoints} fill="url(#miniChartGrad)" />
