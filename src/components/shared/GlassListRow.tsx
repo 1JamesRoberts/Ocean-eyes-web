@@ -26,7 +26,7 @@ export const GlassListRow: React.FC<GlassListRowProps> = ({
     className={`
       flex items-center justify-between rounded-full border border-white/20
       bg-white/20 p-4 transition-colors
-      hover:bg-white/40
+      hover:bg-white/60
       ${onClick ? 'cursor-pointer' : ''}
       ${borderStyles[leftBorder]}
       ${className}

@@ -38,7 +38,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
       <div className="
         mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3
       ">
-        <div className="rounded-2xl bg-white/20 p-3 transition-smooth hover:bg-white/40 backdrop-blur-sm border border-white/20">
+        <div className="rounded-2xl bg-white/20 p-3 transition-smooth hover:bg-white/60 backdrop-blur-sm border border-white/20">
           <span className="
             block text-2xs font-semibold text-text-muted uppercase
           ">
@@ -50,7 +50,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
         </div>
 
         {lastTurbidityResult && (
-          <div className="rounded-2xl bg-white/20 p-3 transition-smooth hover:bg-white/40 backdrop-blur-sm border border-white/20">
+          <div className="rounded-2xl bg-white/20 p-3 transition-smooth hover:bg-white/60 backdrop-blur-sm border border-white/20">
             <span className="
               block text-2xs font-semibold text-text-muted uppercase
             ">
@@ -62,7 +62,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           </div>
         )}
 
-        <div className="rounded-2xl bg-white/20 p-3 transition-smooth hover:bg-white/40 backdrop-blur-sm border border-white/20">
+        <div className="rounded-2xl bg-white/20 p-3 transition-smooth hover:bg-white/60 backdrop-blur-sm border border-white/20">
           <span className="
             block text-2xs font-semibold text-text-muted uppercase
           ">

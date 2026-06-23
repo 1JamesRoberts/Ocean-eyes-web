@@ -22,7 +22,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
         className="
           flex w-full cursor-pointer items-center gap-4 rounded-2xl border
           border-white/20 bg-white/20 p-4 text-left transition-colors
-          hover:bg-white/40
+          hover:bg-white/60
         "
         onClick={onClick}
       >

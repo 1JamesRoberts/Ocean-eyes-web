@@ -59,9 +59,9 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
           <div
             key={param.label}
             className="
-              flex items-center gap-4 rounded-full border border-white/20
+              flex items-center gap-4 rounded-2xl border border-white/20
               bg-white/20 p-3 transition-colors
-              hover:bg-white/40
+              hover:bg-white/60
             "
           >
             <div

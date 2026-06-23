@@ -47,7 +47,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
             className={`
               w-full cursor-pointer rounded-2xl border border-white/20
               bg-white/20 p-4 text-left transition-colors
-              hover:bg-white/40
+              hover:bg-white/60
               ${alert.severity === 'critical'
                 ? `border-l-4 border-l-critical`
                 : `border-l-4 border-l-warning`
