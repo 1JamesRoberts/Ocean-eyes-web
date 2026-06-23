@@ -207,8 +207,8 @@ export const AnalyticsScreen: React.FC = () => {
                     <div
                       key={index}
                       className={`
-                        flex flex-col gap-2 rounded-xl border bg-surface
-                        p-3.5
+                        flex flex-col gap-2 rounded-xl border bg-white/20
+                        backdrop-blur-sm p-3.5
                         ${isErr ? `border-critical` : isHealthy ? `border-good` : `
                           border-warning
                         `}

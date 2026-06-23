@@ -58,8 +58,8 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           ) : (
             snapshots.map(snap => (
               <div key={snap.id} className="
-                flex overflow-hidden rounded-xl border border-border
-                bg-surface transition-smooth
+                flex overflow-hidden rounded-xl border border-white/20
+                bg-white/20 backdrop-blur-sm transition-smooth
                 hover:-translate-y-0.5 hover:shadow-card
               ">
                 <div className="
@@ -142,7 +142,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
             recordings.map(rec => (
               <div key={rec.id} className="
                 flex items-center justify-between rounded-xl border
-                border-border bg-surface p-[12px_16px]
+                border-white/20 bg-white/20 backdrop-blur-sm p-[12px_16px]
                 transition-smooth
                 hover:-translate-y-0.5 hover:shadow-card
               ">
