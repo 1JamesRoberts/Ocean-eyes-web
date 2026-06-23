@@ -39,7 +39,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
     ">
       <div className="flex flex-col gap-3">
         <div className="
-          flex items-center justify-between border-b border-border pb-2
+          flex items-center justify-between border-b border-brand pb-2
           text-h3 font-bold text-text
         ">
           <span className="flex items-center gap-1.5"><Camera size={16} /> Snapshots</span>
@@ -122,7 +122,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
 
       <div className="flex flex-col gap-3">
         <div className="
-          flex items-center justify-between border-b border-border pb-2
+          flex items-center justify-between border-b border-brand pb-2
           text-h3 font-bold text-text
         ">
           <span className="flex items-center gap-1.5"><Video size={16} /> Recordings</span>
