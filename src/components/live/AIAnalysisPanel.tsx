@@ -38,7 +38,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
       <div className="
         mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3
       ">
-        <GlassCard className="p-3" hover>
+        <div className="rounded-2xl bg-surface p-3 transition-smooth hover:bg-surface-hover">
           <span className="
             block text-2xs font-semibold text-text-muted uppercase
           ">
@@ -47,10 +47,10 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <strong className="mt-1 block text-title text-brand">
             {lastPrediction.summary.total_detections}
           </strong>
-        </GlassCard>
+        </div>
 
         {lastTurbidityResult && (
-          <GlassCard className="p-3" hover>
+          <div className="rounded-2xl bg-surface p-3 transition-smooth hover:bg-surface-hover">
             <span className="
               block text-2xs font-semibold text-text-muted uppercase
             ">
@@ -59,10 +59,10 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             <strong className="mt-1 block text-title text-info">
               {lastTurbidityResult.turbidity.fnu.toFixed(2)}
             </strong>
-          </GlassCard>
+          </div>
         )}
 
-        <GlassCard className="p-3" hover>
+        <div className="rounded-2xl bg-surface p-3 transition-smooth hover:bg-surface-hover">
           <span className="
             block text-2xs font-semibold text-text-muted uppercase
           ">
@@ -71,7 +71,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <strong className="mt-1 block text-title text-good">
             {Object.keys(lastPrediction.summary.species_counts).length}
           </strong>
-        </GlassCard>
+        </div>
       </div>
 
       {Object.entries(lastPrediction.summary.species_counts).length > 0 && (

@@ -119,7 +119,7 @@ export const AnalyticsScreen: React.FC = () => {
               <div className="min-h-0 flex-1">
                 <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
-              <h3 className="m-0 shrink-0 text-sm font-bold text-text">Mean Nearest-Neighbor Distance</h3>
+              <h3 className="m-0 shrink-0 text-sm font-bold text-text">Fish Spread Over Time</h3>
               <div className="min-h-0 flex-1">
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>

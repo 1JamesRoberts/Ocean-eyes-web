@@ -9,7 +9,7 @@ interface Props {
 
 const DEFAULT_HEIGHT = 140;
 const PADDING = 20;
-const MAX_VAL = 10;
+const MAX_VAL = 5;
 const MIN_VAL = 0;
 const DEFAULT_WIDTH = 600;
 

@@ -45,8 +45,8 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
       <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="fishCountGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-info)" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="var(--color-info)" stopOpacity={0} />
+            <stop offset="5%" stopColor="var(--color-brand-bright)" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="var(--color-brand-bright)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -77,12 +77,12 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
         <Area
           type="monotone"
           dataKey="count"
-          stroke="var(--color-info)"
+          stroke="var(--color-brand-bright)"
           strokeWidth={2}
           fill="url(#fishCountGrad)"
           animationDuration={500}
-          dot={{ r: 3, fill: 'var(--color-info)', strokeWidth: 0 }}
-          activeDot={{ r: 5, fill: 'var(--color-info)', stroke: 'var(--color-surface)', strokeWidth: 2 }}
+          dot={{ r: 3, fill: 'var(--color-brand-bright)', strokeWidth: 0 }}
+          activeDot={{ r: 5, fill: 'var(--color-brand-bright)', stroke: 'var(--color-surface)', strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>
