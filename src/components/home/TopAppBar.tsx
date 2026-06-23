@@ -48,8 +48,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
 
   return (
     <header className="
-      fixed inset-x-0 top-0 z-40 flex h-20 items-center justify-between px-6
-      pl-70 glass-header
+      fixed top-0 z-40 flex h-20 items-center justify-between px-6
+      left-64 right-0 glass-header
       max-md:left-0 max-md:pl-6
     ">
       <div>
@@ -87,7 +87,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
           md:block
         ">
           <span className="
-            absolute inset-y-0 left-3 flex items-center text-text-muted
+            absolute inset-y-0 left-3 z-10 flex items-center text-text-muted
+            pointer-events-none
           ">
             <Search size={18} />
           </span>

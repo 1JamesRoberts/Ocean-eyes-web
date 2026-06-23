@@ -95,8 +95,9 @@ const OceanEyesDashboard: React.FC = () => {
           {/* Sliding active indicator */}
           <div
             className="
-              pointer-events-none absolute inset-x-0 z-0 rounded-xl
-              bg-primary-soft-gradient transition-all duration-300 ease-out
+              pointer-events-none absolute inset-x-0 z-0 rounded-2xl
+              bg-primary-soft-gradient border border-brand-dim/50
+              transition-all duration-300 ease-out
             "
             style={{ top: indicatorStyle.top, height: indicatorStyle.height }}
           />
@@ -110,7 +111,7 @@ const OceanEyesDashboard: React.FC = () => {
                 ref={(el) => { buttonRefs.current[item.tab] = el; }}
                 className={`
                   relative z-10 flex w-full cursor-pointer items-center gap-3
-                  rounded-xl border-none bg-none px-4 py-3 text-left font-main
+                  rounded-2xl border-none bg-none px-4 py-3 text-left font-main
                   text-sm font-semibold transition-smooth
                   ${isActive
                     ? `text-brand`

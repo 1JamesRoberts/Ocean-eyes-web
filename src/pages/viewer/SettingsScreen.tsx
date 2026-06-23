@@ -126,7 +126,7 @@ export const SettingsScreen: React.FC = () => {
             onChange={(e) => onTurbidityChange(parseFloat(e.target.value))}
             onMouseUp={(e) => onTurbidityCommit(parseFloat((e.target as HTMLInputElement).value))}
             onTouchEnd={(e) => onTurbidityCommit(parseFloat((e.target as HTMLInputElement).value))}
-            className="w-full accent-primary-dark"
+            className="w-full accent-brand-bright"
           />
         </div>
 
@@ -144,7 +144,7 @@ export const SettingsScreen: React.FC = () => {
             onChange={(e) => onFishPctChange(parseInt(e.target.value))}
             onMouseUp={(e) => onFishPctCommit(parseInt((e.target as HTMLInputElement).value))}
             onTouchEnd={(e) => onFishPctCommit(parseInt((e.target as HTMLInputElement).value))}
-            className="w-full accent-primary-dark"
+            className="w-full accent-brand-bright"
           />
         </div>
       </GlassCard>

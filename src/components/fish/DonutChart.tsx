@@ -81,7 +81,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
             flex items-center gap-1.5 text-xs font-semibold
           ">
             <div
-              className="size-2.5 rounded-[3px]"
+              className="size-2.5 rounded-full"
               style={{ backgroundColor: species.color }}
             />
             <span className="text-text-muted">

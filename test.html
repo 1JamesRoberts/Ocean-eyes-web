@@ -1,0 +1,427 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>OceanEyes - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#b8cac9",
+                    "secondary": "#196a59",
+                    "on-surface-variant": "#3f484a",
+                    "on-tertiary-container": "#b9cbca",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#a6f1db",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#90d2da",
+                    "primary-fixed": "#abeef6",
+                    "on-secondary-fixed": "#002019",
+                    "surface-container": "#eeeeed",
+                    "tertiary-container": "#465656",
+                    "on-primary-fixed": "#002023",
+                    "on-surface": "#1a1c1c",
+                    "on-tertiary-fixed-variant": "#3a4a49",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#f9f9f9",
+                    "surface": "#f9f9f9",
+                    "inverse-on-surface": "#f1f1f0",
+                    "surface-variant": "#e2e2e2",
+                    "on-tertiary": "#ffffff",
+                    "background": "#f9f9f9",
+                    "outline-variant": "#bfc8c9",
+                    "secondary-container": "#a3eed8",
+                    "secondary-fixed-dim": "#8ad5bf",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#004f55",
+                    "outline": "#6f797a",
+                    "on-tertiary-fixed": "#0e1e1e",
+                    "on-secondary-fixed-variant": "#005142",
+                    "tertiary-fixed": "#d4e6e5",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e8e8e8",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#dadad9",
+                    "surface-container-highest": "#e2e2e2",
+                    "primary": "#004349",
+                    "primary-container": "#0d5c63",
+                    "inverse-surface": "#2f3131",
+                    "tertiary": "#2f3f3f",
+                    "primary-fixed-dim": "#8fd1d9",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#1f6e5d",
+                    "surface-container-low": "#f4f3f3",
+                    "on-background": "#1a1c1c",
+                    "inverse-primary": "#8fd1d9",
+                    "surface-tint": "#20686f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "48px",
+                    "margin-mobile": "20px",
+                    "margin-desktop": "64px",
+                    "stack-xs": "4px",
+                    "container-max": "1280px",
+                    "unit": "8px",
+                    "stack-sm": "12px",
+                    "stack-md": "24px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "label-md": ["Hanken Grotesk"],
+                    "title-lg": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "caption": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                    "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                    "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                    "caption": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.5), 
+                        inset -2px -2px 5px rgba(0, 67, 73, 0.05);
+        }
+        .liquid-bg {
+            background: linear-gradient(135deg, #f9f9f9 0%, #d4e6e5 100%);
+        }
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(
+                45deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.1) 50%,
+                rgba(255,255,255,0) 100%
+            );
+            animation: shimmer 10s infinite linear;
+            pointer-events: none;
+        }
+        @keyframes shimmer {
+            0% { transform: translate(-30%, -30%); }
+            100% { transform: translate(30%, 30%); }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="liquid-bg min-h-screen text-on-surface font-body-md overflow-x-hidden">
+<!-- Side Navigation Shell -->
+<aside class="flex flex-col h-full p-stack-md gap-stack-sm h-screen w-64 fixed left-0 top-0 bg-surface/40 backdrop-blur-xl border-r border-white/30 shadow-xl shadow-primary/10 z-50">
+<div class="mb-stack-lg">
+<h1 class="font-display-lg text-display-lg text-primary tracking-tight">OceanEyes</h1>
+<p class="text-on-surface-variant font-label-md opacity-70 px-1">Deep Sea Station 01</p>
+</div>
+<nav class="flex-grow space-y-2">
+<a class="flex items-center gap-3 p-3 text-primary font-bold bg-secondary-container/50 backdrop-blur-md rounded-xl transition-all scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:text-primary hover:bg-white/10 transition-all duration-300 rounded-xl" href="#">
+<span class="material-symbols-outlined">videocam</span>
+<span class="">Live Feed</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:text-primary hover:bg-white/10 transition-all duration-300 rounded-xl" href="#">
+<span class="material-symbols-outlined">set_meal</span>
+<span class="">Inventory</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:text-primary hover:bg-white/10 transition-all duration-300 rounded-xl" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="">Analytics</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:text-primary hover:bg-white/10 transition-all duration-300 rounded-xl" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="">Settings</span>
+</a>
+</nav>
+<div class="pt-stack-md space-y-2 border-t border-white/20">
+<button class="w-full flex items-center justify-center gap-2 p-3 bg-primary text-white rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">add</span>
+<span class="font-label-md">Add Tank</span>
+</button>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="">Support</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Top AppBar Shell -->
+<header class="fixed top-0 right-0 left-64 h-20 bg-surface/40 backdrop-blur-lg border-b border-white/30 flex justify-between items-center px-margin-desktop w-full z-40">
+<div>
+<h2 class="font-title-lg text-title-lg text-primary">Living Room Reef</h2>
+<p class="text-on-surface-variant text-caption">Active Station: Deep Sea Station 01</p>
+</div>
+<div class="flex items-center gap-stack-md">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="pl-10 pr-4 py-2 bg-white/40 border border-white/30 rounded-full focus:ring-2 ring-secondary-container outline-none transition-all w-64 backdrop-blur-sm" placeholder="Search analytics..." type="text">
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">water_drop</span>
+</button>
+</div>
+<div class="w-10 h-10 rounded-full bg-secondary-container border-2 border-white overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a marine biologist in a bright office, soft natural lighting, high-end photography style, ocean-themed decor in the blurred background, serene and authoritative mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2ZvBkW8tVXxKnZs2aQWYmk3Tpkbc7rJ8FLRGyfAanfKOCMcxIPXyvSWIkfizTP0aBLfK0psRW1fsnnlqvUvhGhMN7NFRRvvwWiJwOeqAuL0x3iixGzYWavqUbZv9dTOUeaP9TUld9wNF5b8pv0CPmlxk6gXL2jK0Lmxv58hqD2z8O2hbbdib0heovDAbYL537-9Pb4R3NJR7VHPrP_nH_-Gosha08BhezOiS7s-lx53D7cAbNJJHm6FdE6OR6Hxd5R8vxuSrE92I">
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 px-margin-desktop pb-stack-lg min-h-screen bg-surface-container-low">
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Left Column: Main Stats & Feed -->
+<div class="col-span-12 lg:col-span-8 space-y-gutter">
+<!-- Aquarium Health Index -->
+<section class="glass-card shimmer p-stack-md rounded-3xl flex items-center gap-stack-md" style="--mouse-x: 501px; --mouse-y: 137px;">
+<div class="relative w-32 h-32">
+<svg class="w-full h-full progress-ring" height="128" width="128">
+<circle class="text-surface-variant" cx="64" cy="64" fill="transparent" r="56" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-secondary progress-ring-circle" cx="64" cy="64" fill="transparent" r="56" stroke="currentColor" stroke-dasharray="351.85" stroke-dashoffset="7" stroke-linecap="round" stroke-width="8" style="stroke-dasharray: 351.858, 351.858; stroke-dashoffset: 7.03717;"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center h-full w-full">
+<span class="text-headline-md font-bold text-primary">9.8</span>
+<span class="text-caption text-on-surface-variant">Score</span>
+</div>
+</div>
+<div>
+<h3 class="font-title-lg text-primary">Aquarium Health Index</h3>
+<p class="text-on-surface-variant mt-1 leading-relaxed">
+                            All core parameters (clarity, temperature, pH, ammonia, nitrite) are in excellent safe bands. System is functioning optimally.
+                        </p>
+</div>
+</section>
+<!-- Live Feed Monitor -->
+<section class="glass-card rounded-3xl overflow-hidden" style="--mouse-x: 560px; --mouse-y: 321.3999938964844px;">
+<div class="p-4 border-b border-white/20 flex justify-between items-center bg-white/20">
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined">videocam</span>
+<span class="">Live Feed Monitor</span>
+</div>
+<div class="flex gap-2">
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-caption font-bold">Live</span>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-caption">1080p</span>
+</div>
+</div>
+<div class="relative group cursor-pointer aspect-video bg-black">
+<img class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" data-alt="A lush tropical freshwater aquarium with vibrant green plants, moss-covered driftwood, and crystal clear water. Schools of neon tetras and colorful discus fish swim gracefully through the aquatic landscape. Soft, dappled sunlight filters from above, creating a serene and immersive digital aquarium feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwwFfEfTgzQSvNfmle-ZxprX8ZGFXyQGcbebnvfZuscY-Epi_GwTocpqPazkGg_cq2c65Cn3O16jHKP8KJwpiVJ77vKeboqtPP-_mb7eaTVQ3tT6i9GduiCdWg1jIjmjk8Soso0MJKnDj2oSKTBOEYUhqtOR3I5Bz1eyVHhzl_y2-PH4f_k6O1D3mpw_k66ViIm7I_LA1nHjl6iWUbBRYcQpD7MtGPgCpuKi9iBFDpCrPvzWLeTJvEqc0IeKW3BW2HKMXko-v-OOQ">
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="bg-black/40 backdrop-blur-md text-white px-3 py-1 rounded-lg text-caption border border-white/20">11 fish</span>
+<span class="bg-black/40 backdrop-blur-md text-white px-3 py-1 rounded-lg text-caption border border-white/20">0.69 FNU</span>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="bg-white/20 backdrop-blur-xl p-4 rounded-full border border-white/30 text-white">
+<span class="material-symbols-outlined scale-150">fullscreen</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Top Species Detected -->
+<section class="glass-card rounded-3xl p-stack-md" style="--mouse-x: 534px; --mouse-y: 16.4124755859375px;">
+<div class="flex justify-between items-center mb-stack-md">
+<h3 class="font-title-lg text-primary">Top species detected</h3>
+<button class="text-secondary font-label-md hover:underline">Manage list</button>
+</div>
+<div class="space-y-4">
+<!-- Species Row 1 -->
+<div class="flex items-center justify-between p-4 bg-white/30 rounded-2xl hover:bg-white/50 transition-colors border border-white/10">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center overflow-hidden border border-white/30">
+<img class="w-full h-full object-cover" data-alt="Close up of a vibrant Neon Tetra fish with brilliant blue and red stripes swimming in clear water, high-detail macro photography, cinematic lighting, peaceful aquarium environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA79wcGnV-89qDOLX2PkTkN8lpkiU2jn2BqsgiXC7CcE3oRoVR59CZqAMVNUk7REwu35VC85wPcexI738jrNHTmcXSYxhAWcKmA69dw8S-Y99jmP8ajocoOfdjZM1rGZOpC2FucUbctdsKPnkQDHyzESOzEDuXXqQGpUsZvdrTdEKTXvCUqSV113rfOn79kxTSwoe3L9waN7dniurZQEUFuw8p3-HGzAMdi678aGrWdU0tu9Eav5NI-rSvxy2Z-wLjnOsXkBJ5CAMQ">
+</div>
+<div>
+<p class="font-bold text-primary">Neon tetra</p>
+<p class="text-caption text-on-surface-variant">Expected: 6 species limit</p>
+</div>
+</div>
+<span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-caption font-bold">0 / 6 detected</span>
+</div>
+<!-- Species Row 2 -->
+<div class="flex items-center justify-between p-4 bg-white/30 rounded-2xl hover:bg-white/50 transition-colors border border-white/10">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center overflow-hidden border border-white/30">
+<img class="w-full h-full object-cover" data-alt="Close up of a Dwarf Rasbora fish showing delicate orange and silver patterns, macro photography with soft focus background, elegant aquarium setup with fine-grained sand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgA-q5mjy-uEEWUcnsJkMb-zQifQesJ2pj4_oX7TwTrz4Ly3z50U7QbeVX2abAbwY9rStL5Aksm6DMhaEMHr8rt3zZ8-zrbqeyzhXrJ6nhGK2LB0Q_cLE-gU4bVoMqFSWGclrpLGiJYKP051lLPje5w2HIYZJhhQkX0HDgB7ekVLFBy7_uLalh1A86PPtZ8dmiJ3Y_TyuHJYSBZd3rFsUxcCp5zbKfCOpIYFnTNbCCriEPKpUQorNodHIUyJOIcy1BAN6AyT2Wwoo">
+</div>
+<div>
+<p class="font-bold text-primary">Dwarf rasbora</p>
+<p class="text-caption text-on-surface-variant">Expected: 4 species limit</p>
+</div>
+</div>
+<span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-caption font-bold">0 / 4 detected</span>
+</div>
+<!-- Species Row 3 -->
+<div class="flex items-center justify-between p-4 bg-white/30 rounded-2xl hover:bg-white/50 transition-colors border border-white/10">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center overflow-hidden border border-white/30">
+<img class="w-full h-full object-cover" data-alt="Magnificent blue and yellow Discus fish gliding through water, macro view of its circular body and intricate patterns, high-end commercial aquatic photography style, serene lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkjp7hq97l_0rZ4KoagWPlr9ZK7SiCJ7mlRSrqebZNSaYk-2fy2DE37Fvd8E9xbIwznGduBD8ZgKCZ8LliocDmGZFpB0CzxgcK8DgJ2yX7H2Gu-A4lJxQXbEYcJsCe6mo6sXQuBGlNtD2Ik0QHZe5UPAd6uSgnO5osuerLP10K2I4sf7bgIbbzdb5Cpp2a9Lgg7B-PjSqKUWvzet51kpn_flQpxNlvk23P4dN32jbA67p-4I5WMI3tws4JQ1nd0rtUr31o-eJ88iI">
+</div>
+<div>
+<p class="font-bold text-primary">Discus</p>
+<p class="text-caption text-on-surface-variant">Expected: 4 species limit</p>
+</div>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-caption font-bold">2 / 4 detected</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Parameters & Status -->
+<div class="col-span-12 lg:col-span-4 space-y-gutter">
+<!-- Water Clarity Card -->
+<section class="glass-card p-stack-md rounded-3xl" style="--mouse-x: 265.5999755859375px; --mouse-y: 161px;">
+<h3 class="font-label-md uppercase tracking-widest text-on-surface-variant mb-4 opacity-70">Water Clarity</h3>
+<div class="flex items-center gap-4 bg-white/20 p-4 rounded-2xl border border-white/20">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div>
+<p class="text-caption text-on-surface-variant">Clarity</p>
+<p class="text-title-lg font-bold text-primary">0.69 FNU</p>
+</div>
+</div>
+</section>
+<!-- Water Chemistry Parameters -->
+<section class="glass-card p-stack-md rounded-3xl" style="--mouse-x: 170.5999755859375px; --mouse-y: 300.79998779296875px;">
+<h3 class="font-label-md uppercase tracking-widest text-on-surface-variant mb-4 opacity-70">Water Chemistry Parameters</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-4 bg-white/20 p-3 rounded-2xl border border-white/20 hover:bg-white/40 transition-colors">
+<div class="w-10 h-10 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">science</span>
+</div>
+<div class="flex-grow">
+<p class="text-caption text-on-surface-variant">pH Value</p>
+<p class="font-bold text-primary">7.2 pH</p>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white/20 p-3 rounded-2xl border border-white/20 hover:bg-white/40 transition-colors">
+<div class="w-10 h-10 rounded-xl bg-orange-100/30 flex items-center justify-center text-orange-600">
+<span class="material-symbols-outlined text-[20px]">device_thermostat</span>
+</div>
+<div class="flex-grow">
+<p class="text-caption text-on-surface-variant">Temperature</p>
+<p class="font-bold text-primary">26.4°C</p>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white/20 p-3 rounded-2xl border border-white/20 hover:bg-white/40 transition-colors">
+<div class="w-10 h-10 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">bubble_chart</span>
+</div>
+<div class="flex-grow">
+<p class="text-caption text-on-surface-variant">Ammonia (NH₃)</p>
+<p class="font-bold text-primary">0.01 mg/L</p>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white/20 p-3 rounded-2xl border border-white/20 hover:bg-white/40 transition-colors">
+<div class="w-10 h-10 rounded-xl bg-purple-100/30 flex items-center justify-center text-purple-600">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+</div>
+<div class="flex-grow">
+<p class="text-caption text-on-surface-variant">Nitrite (NO₂⁻)</p>
+<p class="font-bold text-primary">0.05 mg/L</p>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white/20 p-3 rounded-2xl border border-white/20 hover:bg-white/40 transition-colors">
+<div class="w-10 h-10 rounded-xl bg-blue-100/30 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined text-[20px]">cloud</span>
+</div>
+<div class="flex-grow">
+<p class="text-caption text-on-surface-variant">CO₂</p>
+<p class="font-bold text-primary">15 mg/L</p>
+</div>
+</div>
+</div>
+</section>
+<!-- System Safety Status -->
+<section class="glass-card p-stack-md rounded-3xl flex flex-col items-center justify-center text-center border-dashed border-2 border-white/40" style="--mouse-x: 3.67498779296875px; --mouse-y: 53.20001220703125px;">
+<div class="w-12 h-12 bg-secondary/10 text-secondary rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[28px]">check_circle</span>
+</div>
+<h4 class="text-secondary font-bold text-body-lg">System Operating Safely</h4>
+<p class="text-caption text-on-surface-variant mt-2">No active safety alarms triggered.</p>
+</section>
+</div>
+</div>
+</main>
+<!-- Interactive Background Particles -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-20">
+<div class="absolute w-[500px] h-[500px] bg-secondary-container blur-[150px] top-[-100px] left-[-100px] animate-pulse"></div>
+<div class="absolute w-[600px] h-[600px] bg-primary-fixed-dim blur-[180px] bottom-[-200px] right-[-100px] animate-pulse" style="animation-delay: 2s;"></div>
+</div>
+<script>
+        // Simple animation for the progress ring
+        window.addEventListener('DOMContentLoaded', () => {
+            const circle = document.querySelector('.progress-ring-circle');
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            
+            // Set 9.8 score progress (98%)
+            const offset = circumference - (0.98 * circumference);
+            circle.style.strokeDashoffset = offset;
+        });
+
+        // Add subtle hover tracking effect for glass cards
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+
+
+
+
+</body></html>

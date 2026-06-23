@@ -151,7 +151,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
                     type="range" min={min} max={max} step="5"
                     value={filters[key]}
                     onChange={(e) => onFilterChange({ [key]: parseInt(e.target.value) })}
-                    className="flex-1 accent-primary-dark"
+                    className="flex-1 accent-brand-bright"
                   />
                   <button
                     onClick={() => onFilterChange({ [key]: key === 'temperature' || key === 'tint' ? 0 : 100 })}
