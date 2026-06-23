@@ -11,7 +11,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
     {
       label: 'pH Value',
       value: reading.ph === undefined ? '—' : `${reading.ph} pH`,
-      colorClass: 'text-secondary bg-secondary-container/30',
+      colorClass: 'text-brand-bright bg-brand-glow/30',
       icon: FlaskConical,
       isCritical: false
     },
@@ -25,7 +25,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
     {
       label: 'Ammonia (NH₃)',
       value: reading.ammonia === undefined ? '—' : `${reading.ammonia} ppm`,
-      colorClass: 'text-primary-dark bg-primary-dark/10',
+      colorClass: 'text-brand bg-brand/10',
       icon: Shield,
       isCritical: (reading.ammonia ?? 0) > 0
     },
@@ -48,7 +48,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
   return (
     <section className="glass-card p-6">
       <h3 className="
-        mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
+        mb-4 text-xs font-medium tracking-widest text-text-muted/70
         uppercase
       ">
         Water Chemistry Parameters
@@ -73,10 +73,10 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
               <param.icon size={18} />
             </div>
             <div className="flex-1">
-              <span className="block text-xs text-on-surface-variant">{param.label}</span>
+              <span className="block text-xs text-text-muted">{param.label}</span>
               <span className={`
                 text-base font-bold
-                ${param.isCritical ? `text-critical` : `text-primary-dark`}
+                ${param.isCritical ? `text-critical` : `text-brand`}
               `}>
                 {param.value}
               </span>

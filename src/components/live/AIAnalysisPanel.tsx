@@ -25,9 +25,9 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
     <GlassCard className="mb-6 p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="
-          m-0 flex items-center gap-2 text-h3 font-bold text-text-main
+          m-0 flex items-center gap-2 text-h3 font-bold text-text
         ">
-          <Brain size={18} className="text-primary-dark" />
+          <Brain size={18} className="text-brand" />
           AI Analysis Results
         </h3>
         <span className="text-caption font-semibold text-text-muted">
@@ -44,7 +44,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           ">
             Fish Detected
           </span>
-          <strong className="mt-1 block text-title text-primary-dark">
+          <strong className="mt-1 block text-title text-brand">
             {lastPrediction.summary.total_detections}
           </strong>
         </GlassCard>
@@ -92,7 +92,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                   font-semibold
                 " style={{ borderColor: `${color}40` }}>
                   <div className="size-2 rounded-full" style={{ backgroundColor: color }} />
-                  <span className="text-text-main">{displayName}</span>
+                  <span className="text-text">{displayName}</span>
                   <span className="text-text-muted">{count}</span>
                 </div>
               );
@@ -121,13 +121,13 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             🩺 Fish Health Diagnosis
           </h4>
           {diagnosis.error ? (
-            <p className="m-0 text-xs leading-[1.4] font-medium text-text-main">
+            <p className="m-0 text-xs leading-[1.4] font-medium text-text">
               <strong>Error:</strong> {diagnosis.error}
             </p>
           ) : (
             <>
               <div className="mb-2 text-sm">
-                <span className="font-bold text-text-main">Status: </span>
+                <span className="font-bold text-text">Status: </span>
                 <span className={`
                   font-extrabold
                   ${diagnosis.healthy ? `text-good` : `text-warning`}
@@ -159,7 +159,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                 />
               )}
 
-              <p className="m-0 mb-2 text-xs leading-[1.4] text-text-main">
+              <p className="m-0 mb-2 text-xs leading-[1.4] text-text">
                 <strong>Observation:</strong> {diagnosis.description}
               </p>
 

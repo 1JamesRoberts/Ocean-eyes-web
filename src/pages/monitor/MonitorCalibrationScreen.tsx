@@ -41,7 +41,7 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
       </h3>
       {activeTank && (
         <span className="
-          mb-2 block text-center text-caption font-semibold text-primary-dark
+          mb-2 block text-center text-caption font-semibold text-brand
         ">
           Calibrating: {activeTank.name}
         </span>
@@ -121,7 +121,7 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
           className="
             inline-flex flex-1 cursor-pointer items-center justify-center gap-2
             rounded-xl border-none bg-primary-gradient px-6 py-3 font-main
-            text-h3 font-semibold text-text-inv
+            text-h3 font-semibold text-text-inverse
             shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
             hover:bg-primary-hover-gradient
             active:scale-[0.98]

@@ -15,8 +15,8 @@ const colorStyles: Record<BadgeColor, string> = {
   warning: 'bg-warning/10 text-warning',
   critical: 'bg-critical/12 text-critical',
   info: 'bg-info/10 text-info',
-  neutral: 'bg-primary-dark/10 text-primary-dark',
-  live: 'bg-secondary/10 text-secondary',
+  neutral: 'bg-brand/10 text-brand',
+  live: 'bg-brand-bright/10 text-brand-bright',
 };
 
 export const GlassBadge: React.FC<GlassBadgeProps> = ({

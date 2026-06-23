@@ -102,7 +102,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <h3 className="
-          m-0 flex items-center gap-2 text-h3 font-bold text-text-main
+          m-0 flex items-center gap-2 text-h3 font-bold text-text
         ">
           <span className="flex items-center gap-1.5"><SlidersHorizontal size={16} /> Stream Image Adjustments</span>
           {!isExpanded && selectedPresetId !== 'normal' && (
@@ -122,7 +122,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
         ">
           <div className="flex flex-col gap-4">
             <h4 className="
-              m-0 border-b border-border-card pb-1.5 text-sm font-semibold
+              m-0 border-b border-border pb-1.5 text-sm font-semibold
               text-text-muted
             ">
               TUNING SLIDERS
@@ -137,8 +137,8 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
             ] as const).map(({ key, label, min, max }) => (
               <div key={key}>
                 <div className="mb-1 flex justify-between text-xs">
-                  <span className="font-semibold text-text-main">{label}</span>
-                  <span className="text-primary-dark">
+                  <span className="font-semibold text-text">{label}</span>
+                  <span className="text-brand">
                     {key === 'temperature'
                       ? filters.temperature > 0 ? `Warm (+${filters.temperature})` : filters.temperature < 0 ? `Cool (${filters.temperature})` : 'Neutral'
                       : key === 'tint'
@@ -169,7 +169,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
 
           <div className="flex flex-col gap-4">
             <h4 className="
-              m-0 border-b border-border-card pb-1.5 text-sm font-semibold
+              m-0 border-b border-border pb-1.5 text-sm font-semibold
               text-text-muted
             ">
               FILTER PRESETS

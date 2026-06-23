@@ -243,7 +243,7 @@ export const LiveScreen: React.FC = () => {
             <button className="
               inline-flex cursor-pointer items-center justify-center gap-2
               rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
-              text-h3 font-semibold text-text-inv shadow-primary-hover
+              text-h3 font-semibold text-text-inverse shadow-primary-hover
               transition-smooth
               hover:bg-primary-hover-gradient
               active:scale-[0.98]

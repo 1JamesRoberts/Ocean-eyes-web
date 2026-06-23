@@ -34,7 +34,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
         border-[rgba(255,255,255,0.1)] p-4
       ">
         <h3 className="m-0 flex items-center gap-2 text-h3 font-bold text-white">
-          <Fish size={18} className="text-primary-dark" />
+          <Fish size={18} className="text-brand" />
           <span>Fish Inventory</span>
         </h3>
         <button

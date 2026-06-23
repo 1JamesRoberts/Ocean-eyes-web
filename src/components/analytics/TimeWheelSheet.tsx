@@ -76,7 +76,7 @@ const WheelColumn: React.FC<WheelColumnProps> = ({ items, selected, onSelect }) 
                 flex h-[44px] w-full cursor-pointer items-center justify-center
                 border-none bg-transparent text-title font-normal
                 transition-colors
-                ${isSelected ? 'text-text-main' : 'text-text-muted/45'}
+                ${isSelected ? 'text-text' : 'text-text-muted/45'}
               `}
             >
               {String(item).padStart(2, '0')}
@@ -109,7 +109,7 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
         {/* Center highlight bar */}
         <div
           className="
-            pointer-events-none absolute inset-x-2 rounded-xl bg-surface-card
+            pointer-events-none absolute inset-x-2 rounded-xl bg-surface
           "
           style={{ top: SNAP_TOP, height: ITEM_HEIGHT }}
         />

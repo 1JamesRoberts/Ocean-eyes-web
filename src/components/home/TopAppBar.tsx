@@ -26,7 +26,7 @@ const AnalyticsCenterControls: React.FC = () => {
       <DateTimeRangePicker value={range} onChange={setRange} />
       <button
         className="
-          cursor-pointer rounded-lg border border-border-card bg-transparent
+          cursor-pointer rounded-lg border border-border bg-transparent
           px-3 py-1.5 text-xs font-semibold text-text-muted
           hover:bg-black/5
         "
@@ -57,14 +57,14 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
           <>
             <p className="text-xs text-text-muted">{labels.subtitle}</p>
             <h2 className="
-              text-xl font-semibold tracking-tight text-primary-dark
+              text-xl font-semibold tracking-tight text-brand
             ">{labels.title}</h2>
           </>
         ) : (
           <>
             <p className="text-xs text-text-muted">Active Station: Deep Sea Station 01</p>
             <h2 className="
-              text-xl font-semibold tracking-tight text-primary-dark
+              text-xl font-semibold tracking-tight text-brand
             ">
               {activeTank?.name || 'Living Room Reef'}
             </h2>
@@ -87,7 +87,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
           md:block
         ">
           <span className="
-            absolute inset-y-0 left-3 flex items-center text-on-surface-variant
+            absolute inset-y-0 left-3 flex items-center text-text-muted
           ">
             <Search size={18} />
           </span>
@@ -98,9 +98,9 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
             placeholder="Search analytics..."
             className="
               w-64 rounded-full border border-white/30 bg-white/40 py-2 pr-4
-              pl-10 text-sm text-on-surface backdrop-blur-sm transition-all
+              pl-10 text-sm text-text backdrop-blur-sm transition-all
               outline-none
-              focus:ring-2 focus:ring-secondary-container
+              focus:ring-2 focus:ring-brand-glow
             "
           />
         </div>
@@ -110,8 +110,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
             <button
               type="button"
               className="
-                rounded-xl p-2 text-on-surface-variant transition-opacity
-                hover:bg-white/20 hover:text-primary-dark
+                rounded-xl p-2 text-text-muted transition-opacity
+                hover:bg-white/20 hover:text-brand
               "
               aria-label="Add fish"
               onClick={onToggleAddFish}
@@ -122,8 +122,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
           <button
             type="button"
             className="
-              rounded-xl p-2 text-on-surface-variant transition-opacity
-              hover:bg-white/20 hover:text-primary-dark
+              rounded-xl p-2 text-text-muted transition-opacity
+              hover:bg-white/20 hover:text-brand
             "
             aria-label="Notifications"
           >
@@ -132,8 +132,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
           <button
             type="button"
             className="
-              rounded-xl p-2 text-on-surface-variant transition-opacity
-              hover:bg-white/20 hover:text-primary-dark
+              rounded-xl p-2 text-text-muted transition-opacity
+              hover:bg-white/20 hover:text-brand
             "
             aria-label="Water readings"
           >
@@ -143,8 +143,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ activeTank, activeTab, onT
 
         <div className="
           flex size-10 items-center justify-center overflow-hidden rounded-full
-          border-2 border-white bg-secondary-container text-sm font-bold
-          text-on-secondary-container shadow-sm
+          border-2 border-white bg-brand-glow text-sm font-bold
+          text-brand shadow-sm
         ">
           {activeTank?.name?.charAt(0).toUpperCase() || 'U'}
         </div>

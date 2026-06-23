@@ -33,7 +33,7 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({
       glass-icon-button
       ${sizeStyles[size]}
       ${active ? `
-        border-none bg-primary-gradient text-text-inv
+        border-none bg-primary-gradient text-text-inverse
         hover:bg-primary-hover-gradient
       ` : ''}
       ${className}

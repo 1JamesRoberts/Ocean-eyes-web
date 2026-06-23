@@ -11,7 +11,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
   return (
     <section className="glass-card p-6">
       <h3 className="
-        mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
+        mb-4 text-xs font-medium tracking-widest text-text-muted/70
         uppercase
       ">
         Water Clarity
@@ -28,13 +28,13 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
       >
         <div className="
           flex size-12 shrink-0 items-center justify-center rounded-full
-          bg-primary-dark/10 text-primary-dark
+          bg-brand/10 text-brand
         ">
           <span className="material-symbols-outlined">water_drop</span>
         </div>
         <div>
-          <span className="block text-xs text-on-surface-variant">Clarity</span>
-          <span className="text-xl font-bold text-primary-dark">
+          <span className="block text-xs text-text-muted">Clarity</span>
+          <span className="text-xl font-bold text-brand">
             {displayClarity.toFixed(2)} FNU
           </span>
         </div>

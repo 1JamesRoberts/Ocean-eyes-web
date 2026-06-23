@@ -39,8 +39,8 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
     ">
       <div className="flex flex-col gap-3">
         <div className="
-          flex items-center justify-between border-b border-border-card pb-2
-          text-h3 font-bold text-text-main
+          flex items-center justify-between border-b border-border pb-2
+          text-h3 font-bold text-text
         ">
           <span className="flex items-center gap-1.5"><Camera size={16} /> Snapshots</span>
           <span className="text-xs font-medium text-text-muted">{snapshots.length} saved</span>
@@ -49,7 +49,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           flex max-h-[380px] flex-col gap-3 overflow-y-auto pr-1
           [&::-webkit-scrollbar]:w-1.5
           [&::-webkit-scrollbar-thumb]:rounded-full
-          [&::-webkit-scrollbar-thumb]:bg-border-card
+          [&::-webkit-scrollbar-thumb]:bg-border
         ">
           {snapshots.length === 0 ? (
             <div className="p-5 text-center text-sm text-text-muted">
@@ -58,8 +58,8 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           ) : (
             snapshots.map(snap => (
               <div key={snap.id} className="
-                flex overflow-hidden rounded-xl border border-border-card
-                bg-surface-card transition-smooth
+                flex overflow-hidden rounded-xl border border-border
+                bg-surface transition-smooth
                 hover:-translate-y-0.5 hover:shadow-card
               ">
                 <div className="
@@ -72,7 +72,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                 </div>
                 <div className="flex flex-1 flex-col justify-between p-3">
                   <div>
-                    <span className="text-xs font-semibold text-text-main">{snap.timestamp}</span>
+                    <span className="text-xs font-semibold text-text">{snap.timestamp}</span>
                     <div className="mt-0.5 text-caption text-text-muted">
                       {snap.fishCount} fish · {snap.clarity.toFixed(2)} FNU
                     </div>
@@ -122,8 +122,8 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
 
       <div className="flex flex-col gap-3">
         <div className="
-          flex items-center justify-between border-b border-border-card pb-2
-          text-h3 font-bold text-text-main
+          flex items-center justify-between border-b border-border pb-2
+          text-h3 font-bold text-text
         ">
           <span className="flex items-center gap-1.5"><Video size={16} /> Recordings</span>
           <span className="text-xs font-medium text-text-muted">{recordings.length} saved</span>
@@ -132,7 +132,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           flex max-h-[380px] flex-col gap-3 overflow-y-auto pr-1
           [&::-webkit-scrollbar]:w-1.5
           [&::-webkit-scrollbar-thumb]:rounded-full
-          [&::-webkit-scrollbar-thumb]:bg-border-card
+          [&::-webkit-scrollbar-thumb]:bg-border
         ">
           {recordings.length === 0 ? (
             <div className="p-5 text-center text-sm text-text-muted">
@@ -142,12 +142,12 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
             recordings.map(rec => (
               <div key={rec.id} className="
                 flex items-center justify-between rounded-xl border
-                border-border-card bg-surface-card p-[12px_16px]
+                border-border bg-surface p-[12px_16px]
                 transition-smooth
                 hover:-translate-y-0.5 hover:shadow-card
               ">
                 <div>
-                  <span className="text-xs font-semibold text-text-main">{rec.timestamp}</span>
+                  <span className="text-xs font-semibold text-text">{rec.timestamp}</span>
                   <div className="mt-0.5 text-caption text-text-muted">
                     ⏱ {formatDuration(rec.duration)} · {rec.fishCount} fish · {rec.clarity.toFixed(2)} FNU
                   </div>

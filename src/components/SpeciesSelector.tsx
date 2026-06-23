@@ -127,7 +127,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
           onFocus={handleInputFocus}
           placeholder={selectedSpecies ? selectedSpecies.displayName : placeholder}
           className="
-            w-full rounded-lg border border-border-card bg-surface-card px-3
+            w-full rounded-lg border border-border bg-surface px-3
             py-2.5 pl-9 font-main text-sm outline-none
           "
         />
@@ -137,8 +137,8 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
         <div
           ref={dropdownRef}
           className="
-            max-h-[280px] overflow-y-auto rounded-lg border border-border-card
-            bg-surface-card shadow-[0_4px_12px_rgba(0,0,0,0.1)]
+            max-h-[280px] overflow-y-auto rounded-lg border border-border
+            bg-surface shadow-[0_4px_12px_rgba(0,0,0,0.1)]
           "
           style={dropdownStyle}
         >
@@ -150,7 +150,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 onClick={() => handleSelect(species)}
                 className="
                   flex w-full cursor-pointer items-center gap-2.5 border-none
-                  px-3 py-2 text-left font-main text-sm text-text-main
+                  px-3 py-2 text-left font-main text-sm text-text
                 "
                 style={{ background: selectedSpeciesId === species.id ? 'var(--color-primary-light)' : 'transparent' }}
                 onMouseEnter={e => {
@@ -170,7 +170,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                   <CreatureBadge type={species.creatureType} />
                 )}
                 {selectedSpeciesId === species.id && (
-                  <Check size={16} className="text-primary-dark" />
+                  <Check size={16} className="text-brand" />
                 )}
               </button>
             ))}
@@ -182,7 +182,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 className="
                   flex w-full cursor-pointer items-center gap-2.5 border-none
                   bg-transparent px-3 py-2 text-left font-main text-sm
-                  text-primary-dark italic
+                  text-brand italic
                 "
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-hover)'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -190,7 +190,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 <div
                   className="
                     flex size-8 shrink-0 items-center justify-center rounded-md
-                    bg-border-card text-caption font-bold text-text-muted
+                    bg-border text-caption font-bold text-text-muted
                   "
                 >
                   ??

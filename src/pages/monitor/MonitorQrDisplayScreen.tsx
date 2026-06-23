@@ -29,7 +29,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
           {/* Visual Scannable QR mock */}
           <div className="
             mb-5 flex flex-col items-center rounded-[20px] border
-            border-border-card bg-surface-card p-6
+            border-border bg-surface p-6
           ">
             <div className="qr-code-canvas" />
             <span className="mt-3 text-xs font-semibold text-[#64748B]">
@@ -50,7 +50,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
                 onClick={copyToClipboard}
                 className="
                   cursor-pointer border-none bg-transparent text-caption
-                  font-semibold text-primary-dark underline
+                  font-semibold text-brand underline
                 "
               >
                 {isCopied ? 'Copied!' : 'Copy'}
@@ -68,7 +68,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         className="
           inline-flex w-full max-w-[240px] cursor-pointer items-center
           justify-center gap-2 rounded-xl border-none bg-primary-gradient px-6
-          py-3 font-main text-h3 font-semibold text-text-inv
+          py-3 font-main text-h3 font-semibold text-text-inverse
           shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
           hover:bg-primary-hover-gradient
           active:scale-[0.98]

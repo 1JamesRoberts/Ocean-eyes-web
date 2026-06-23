@@ -40,7 +40,7 @@ export const IoTMonitor: React.FC = () => {
         text-[#94a3b8]
       ">
         <div className="flex items-center gap-1.5">
-          <Cpu size={12} className="animate-float-2 text-primary-dark" />
+          <Cpu size={12} className="animate-float-2 text-brand" />
           <span>OCEANEYES MONITOR v1.0.4</span>
         </div>
         <div className="flex items-center gap-2.5">

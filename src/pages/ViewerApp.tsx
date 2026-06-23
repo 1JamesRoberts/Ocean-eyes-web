@@ -51,7 +51,7 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
       {tankId === null && activeTab !== 'live' ? (
         <div className="
           mx-auto mt-10 max-w-[480px] rounded-[20px] border border-border-subtle
-          bg-surface-card p-10 shadow-card transition-smooth
+          bg-surface p-10 shadow-card transition-smooth
         ">
           <RootGateOnboarding />
         </div>

@@ -96,7 +96,7 @@ export const MyFishScreen: React.FC<{
         <form onSubmit={onAdd} className="
           flex flex-col gap-3.5 glass-card p-6 transition-smooth
         ">
-          <h4 className="text-sm font-bold text-text-main">Add New Species Entry</h4>
+          <h4 className="text-sm font-bold text-text">Add New Species Entry</h4>
           <div>
             <label className="
               mb-1 block text-caption font-semibold tracking-wider
@@ -131,16 +131,16 @@ export const MyFishScreen: React.FC<{
         <div className="flex flex-col gap-4">
           <GlassCard className="p-5">
             <div className="mb-4 flex items-center gap-2">
-              <BarChart3 size={18} className="text-primary-dark" />
-              <h3 className="text-base font-bold text-text-main">Species Distribution</h3>
+              <BarChart3 size={18} className="text-brand" />
+              <h3 className="text-base font-bold text-text">Species Distribution</h3>
             </div>
             <DonutChart speciesDistribution={speciesDistribution} />
           </GlassCard>
 
           <GlassCard className="p-5">
             <div className="mb-4 flex items-center gap-2">
-              <Fish size={18} className="text-primary-dark" />
-              <h3 className="text-base font-bold text-text-main">Aquarium Overview</h3>
+              <Fish size={18} className="text-brand" />
+              <h3 className="text-base font-bold text-text">Aquarium Overview</h3>
               <div className="ml-auto">
                 <DetectionVisibilityRing
                   detected={stats.totalDetected}
@@ -166,14 +166,14 @@ export const MyFishScreen: React.FC<{
                         text-caption font-bold tracking-wider uppercase
                       ">{item.label}</span>
                     </div>
-                    <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
+                    <span className="text-2xl font-extrabold text-text">{item.value}</span>
                   </div>
                 ));
               })()}
             </div>
 
             {/* ── Ideal Parameters ── */}
-            <div className="mt-4 border-t border-border-card pt-4">
+            <div className="mt-4 border-t border-border pt-4">
               <span className="
                 mb-3 block text-caption font-bold tracking-wider text-text-muted
                 uppercase
@@ -225,7 +225,7 @@ export const MyFishScreen: React.FC<{
                       ">{item.label}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-2xl font-extrabold text-text-main">{item.value}</span>
+                      <span className="text-2xl font-extrabold text-text">{item.value}</span>
                       {item.conflict && (
                         <span
                           className="mt-0.5 shrink-0"
@@ -247,7 +247,7 @@ export const MyFishScreen: React.FC<{
           {fishList.length === 0 && (
             <GlassCard className="p-10 text-center">
               <span className="text-5xl">🐟</span>
-              <p className="text-base font-bold text-text-main">No fish in your inventory</p>
+              <p className="text-base font-bold text-text">No fish in your inventory</p>
               <p className="text-xs text-text-muted">Tap + to add your first species</p>
             </GlassCard>
           )}
@@ -280,7 +280,7 @@ export const MyFishScreen: React.FC<{
                   <div className="flex flex-1 items-center gap-3">
                     <FishThumbnail imagePath={display.imagePath} initials={display.initials} color={display.color} />
                     <div className="flex-1">
-                      <span className="block text-base font-bold text-text-main">{display.name}</span>
+                      <span className="block text-base font-bold text-text">{display.name}</span>
                       {species?.scientificName && (
                         <span className="
                           mb-1 block text-xs font-medium text-text-muted italic
@@ -308,16 +308,16 @@ export const MyFishScreen: React.FC<{
                           <button className="
                             flex size-6 cursor-pointer items-center
                             justify-center border-none bg-transparent text-base
-                            font-extrabold text-text-main
+                            font-extrabold text-text
                           "
                             onClick={() => onDecrementCount(fish.id, fish.count)}>−</button>
                           <span className="
-                            w-6 text-center text-sm font-bold text-text-main
+                            w-6 text-center text-sm font-bold text-text
                           ">{fish.count}</span>
                           <button className="
                             flex size-6 cursor-pointer items-center
                             justify-center border-none bg-transparent text-base
-                            font-extrabold text-text-main
+                            font-extrabold text-text
                           "
                             onClick={() => onIncrementCount(fish.id, fish.count)}>+</button>
                         </div>
@@ -367,7 +367,7 @@ export const MyFishScreen: React.FC<{
                             <span className="
                               inline-block rounded-[20px]
                               bg-[rgba(13,148,136,0.08)] p-[4px_10px]
-                              text-caption font-semibold text-primary-dark
+                              text-caption font-semibold text-brand
                             ">{species.origin}</span>
                           )}
 
@@ -386,7 +386,7 @@ export const MyFishScreen: React.FC<{
                                 return (
                                   <div key={cr.speciesId} className="
                                     flex items-center gap-2 border-b
-                                    border-border-card py-1.5
+                                    border-border py-1.5
                                     last:border-b-0
                                   ">
                                     <div className="
@@ -394,7 +394,7 @@ export const MyFishScreen: React.FC<{
                                     " style={{ backgroundColor: color }} />
                                     <span className="
                                       flex-1 text-xs font-semibold
-                                      text-text-main
+                                      text-text
                                     ">{cr.speciesName}</span>
                                     <span className="text-caption font-bold" style={{ color }}>{cr.score}%</span>
                                   </div>
@@ -420,7 +420,7 @@ export const MyFishScreen: React.FC<{
 
       {/* ─── Delete Confirmation ─── */}
       <GlassModal isOpen={fishToDelete !== null} onClose={onCancelDelete}>
-        <h3 className="mb-2 text-lg font-bold text-text-main">Delete Fish Entry</h3>
+        <h3 className="mb-2 text-lg font-bold text-text">Delete Fish Entry</h3>
         <p className="mb-6 text-sm text-text-muted">
           Are you sure you want to delete this fish entry? This action cannot be undone.
         </p>

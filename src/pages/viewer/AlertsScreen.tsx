@@ -53,7 +53,7 @@ export const AlertsScreen: React.FC = () => {
             onClick={() => onSelectAlert(alert.id)}
           >
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-text-main">{alert.title}</h4>
+              <h4 className="text-sm font-bold text-text">{alert.title}</h4>
               <span className="text-caption text-text-muted">{alert.timeAgo}</span>
             </div>
             <p className="mt-1 truncate text-xs text-text-muted">

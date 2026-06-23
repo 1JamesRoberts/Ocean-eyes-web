@@ -16,7 +16,7 @@ export const DetailChip: React.FC<DetailChipProps> = ({
 }) => (
   <GlassBadge
     className={`
-      gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-text-main
+      gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-text
       ${colorClass || ''}
     `}
   >

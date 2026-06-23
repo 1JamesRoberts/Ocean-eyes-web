@@ -37,7 +37,7 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
           className="
             inline-flex w-full cursor-pointer items-center justify-center gap-2
             rounded-xl border-none bg-primary-gradient px-6 py-3.5 font-main
-            text-h3 font-semibold text-text-inv
+            text-h3 font-semibold text-text-inverse
             shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
             hover:bg-primary-hover-gradient
             active:scale-[0.98]

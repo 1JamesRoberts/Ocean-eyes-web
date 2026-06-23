@@ -33,12 +33,12 @@ export const RootGateOnboarding: React.FC = () => {
       <div className="mb-10 animate-float-1 text-center">
         <div className="
           mx-auto mb-4 flex size-[72px] items-center justify-center rounded-3xl
-          border border-white/20 bg-primary-light-gradient text-primary-dark
+          border border-white/20 bg-primary-soft-gradient text-brand
           shadow-[0_8px_24px_rgba(13,148,136,0.15)]
         ">
           <QrCode size={36} />
         </div>
-        <h2 className="mb-2 text-section font-extrabold text-text-main">Link Your Aquarium</h2>
+        <h2 className="mb-2 text-section font-extrabold text-text">Link Your Aquarium</h2>
         <p className="text-sm leading-[145%] text-text-muted">
           Scan the QR code displayed on your OceanEyes smart monitoring hardware unit or enter the code manually.
         </p>
@@ -61,7 +61,7 @@ export const RootGateOnboarding: React.FC = () => {
               type="button"
               className="
                 cursor-pointer border-none bg-transparent font-main
-                font-semibold text-primary-dark
+                font-semibold text-brand
               "
               onClick={() => setShowCreate(true)}
             >

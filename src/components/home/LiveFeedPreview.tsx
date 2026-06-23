@@ -39,19 +39,19 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
         flex items-center justify-between border-b border-white/20 bg-white/20
         p-4
       ">
-        <div className="flex items-center gap-2 font-semibold text-primary-dark">
+        <div className="flex items-center gap-2 font-semibold text-brand">
           <span className="material-symbols-outlined">videocam</span>
           <span>Live Feed Monitor</span>
         </div>
         <div className="flex gap-2">
           <span className="
-            rounded-full bg-secondary/10 px-3 py-1 text-xs font-bold
-            text-secondary
+            rounded-full bg-brand-bright/10 px-3 py-1 text-xs font-bold
+            text-brand-bright
           ">
             Live
           </span>
           <span className="
-            rounded-full bg-primary-dark/10 px-3 py-1 text-xs text-primary-dark
+            rounded-full bg-brand/10 px-3 py-1 text-xs text-brand
           ">
             1080p
           </span>
@@ -84,9 +84,9 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                   flex flex-col items-center justify-center gap-2 py-8
                 ">
                   <span className="
-                    material-symbols-outlined text-2xl text-on-surface-variant
+                    material-symbols-outlined text-2xl text-text-muted
                   ">videocam</span>
-                  <p className="text-xs text-on-surface-variant">Feed is idle. Connect stream to monitor.</p>
+                  <p className="text-xs text-text-muted">Feed is idle. Connect stream to monitor.</p>
                 </div>
               }
             />
@@ -130,17 +130,17 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
           <div className="p-3 text-center">
             <div className="mb-2 flex justify-center">
               <span className="
-                material-symbols-outlined text-2xl text-on-surface-variant
+                material-symbols-outlined text-2xl text-text-muted
               ">videocam</span>
             </div>
-            <p className="mb-2.5 text-xs text-on-surface-variant">
+            <p className="mb-2.5 text-xs text-text-muted">
               Feed is idle. Connect stream to monitor.
             </p>
             <button
               className="
                 mx-auto inline-flex cursor-pointer items-center justify-center
                 gap-2 rounded-3xl border-none bg-primary-gradient px-4 py-2
-                font-main text-xs font-semibold text-text-inv
+                font-main text-xs font-semibold text-text-inverse
                 shadow-primary-hover transition-smooth
                 hover:bg-primary-hover-gradient
                 active:scale-[0.98]

@@ -29,7 +29,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             cx="64"
             cy="64"
             r={radius}
-            className="text-surface-variant"
+            className="text-text-muted"
             stroke="currentColor"
             strokeWidth={strokeWidth}
             fill="none"
@@ -50,14 +50,14 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
         <div className="
           absolute inset-0 flex flex-col items-center justify-center
         ">
-          <span className="text-3xl font-bold text-primary-dark">{healthScore}</span>
-          <span className="text-xs font-medium text-on-surface-variant">Score</span>
+          <span className="text-3xl font-bold text-brand">{healthScore}</span>
+          <span className="text-xs font-medium text-text-muted">Score</span>
         </div>
       </div>
 
       <div className="flex-1">
-        <h3 className="text-xl font-semibold text-primary-dark">Aquarium Health Index</h3>
-        <p className="mt-1.5 text-sm/relaxed text-on-surface-variant">
+        <h3 className="text-xl font-semibold text-brand">Aquarium Health Index</h3>
+        <p className="mt-1.5 text-sm/relaxed text-text-muted">
           {healthMessage}
         </p>
       </div>

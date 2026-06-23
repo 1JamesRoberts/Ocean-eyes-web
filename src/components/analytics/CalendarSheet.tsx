@@ -39,7 +39,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className="text-lg font-bold text-text-main">
+          <span className="text-lg font-bold text-text">
             {format(viewMonth, 'MMMM yyyy')}
           </span>
           <ChevronDown size={16} className="text-text-muted" />
@@ -51,7 +51,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             className="
               cursor-pointer rounded-full border-none bg-transparent p-2
               text-text-muted transition-smooth
-              hover:bg-surface-hover hover:text-text-main
+              hover:bg-surface-hover hover:text-text
             "
             aria-label="Previous month"
           >
@@ -63,7 +63,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             className="
               cursor-pointer rounded-full border-none bg-transparent p-2
               text-text-muted transition-smooth
-              hover:bg-surface-hover hover:text-text-main
+              hover:bg-surface-hover hover:text-text
             "
             aria-label="Next month"
           >
@@ -97,15 +97,15 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 justify-center rounded-full border-none text-h3 font-medium
                 transition-smooth
                 ${selected
-                  ? `glass-button-primary bg-primary-gradient text-text-inv`
+                  ? `glass-button-primary bg-primary-gradient text-text-inverse`
                   : today
                     ? `
-                      bg-transparent font-semibold text-primary-dark
+                      bg-transparent font-semibold text-brand
                       hover:bg-white/30
                     `
                     : inMonth
                       ? `
-                        bg-transparent text-text-main
+                        bg-transparent text-text
                         hover:bg-white/30
                       `
                       : 'bg-transparent text-text-muted/40'
@@ -117,7 +117,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 <span
                   className="
                     absolute bottom-1.5 left-1/2 size-1 -translate-x-1/2
-                    rounded-full bg-primary-dark
+                    rounded-full bg-brand
                   "
                 />
               )}

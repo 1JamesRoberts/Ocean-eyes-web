@@ -14,12 +14,12 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
   return (
     <section className="glass-card p-6">
       <div className="mb-5 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-primary-dark">Top species detected</h3>
+        <h3 className="text-lg font-semibold text-brand">Top species detected</h3>
         <button
           onClick={onManageFish}
           className="
             cursor-pointer border-none bg-transparent font-main text-sm
-            font-semibold text-secondary transition-opacity
+            font-semibold text-brand-bright transition-opacity
             hover:opacity-80
           "
         >
@@ -47,8 +47,8 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                   <SpeciesAvatar speciesId={fish.speciesId} size={40} radius={8} objectFit="contain" />
                 </div>
                 <div>
-                  <p className="font-semibold text-primary-dark">{fish.name}</p>
-                  <p className="text-xs text-on-surface-variant">
+                  <p className="font-semibold text-brand">{fish.name}</p>
+                  <p className="text-xs text-text-muted">
                     Expected: {fish.count} species limit
                   </p>
                 </div>

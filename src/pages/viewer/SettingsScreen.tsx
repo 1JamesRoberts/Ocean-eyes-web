@@ -44,7 +44,7 @@ export const SettingsScreen: React.FC = () => {
               <span className="
                 text-caption font-semibold text-text-muted uppercase
               ">Tank Name</span>
-              <strong className="mt-0.5 block text-lg text-text-main">
+              <strong className="mt-0.5 block text-lg text-text">
                 {activeTank?.name}
               </strong>
             </div>
@@ -53,7 +53,7 @@ export const SettingsScreen: React.FC = () => {
         )}
 
         <div className="
-          mt-4 border-t border-border-card pt-4 text-xs text-text-muted
+          mt-4 border-t border-border pt-4 text-xs text-text-muted
         ">
           <span>Tank Reference Code: </span>
           <code className="
@@ -69,7 +69,7 @@ export const SettingsScreen: React.FC = () => {
         <div
           className="
             flex cursor-pointer items-center justify-between border-b
-            border-border-card py-4
+            border-border py-4
           "
           onClick={onNavigateToFish}
         >
@@ -80,7 +80,7 @@ export const SettingsScreen: React.FC = () => {
         <div
           className="
             flex cursor-pointer items-center justify-between border-b
-            border-border-card py-4
+            border-border py-4
           "
           onClick={onNavigateToHistory}
         >
@@ -91,7 +91,7 @@ export const SettingsScreen: React.FC = () => {
         <div
           className="
             flex cursor-pointer items-center justify-between border-b
-            border-border-card py-4
+            border-border py-4
           "
           onClick={onNavigateToAlerts}
         >
@@ -103,19 +103,19 @@ export const SettingsScreen: React.FC = () => {
           className="flex cursor-pointer items-center justify-between py-4"
           onClick={onNavigateToMonitor}
         >
-          <span className="text-h3 font-semibold text-primary-dark">IoT Scanner Console</span>
-          <ChevronRight size={18} className="text-primary-dark" />
+          <span className="text-h3 font-semibold text-brand">IoT Scanner Console</span>
+          <ChevronRight size={18} className="text-brand" />
         </div>
       </GlassCard>
 
       {/* Safety Threshold Settings Slider equivalent */}
       <GlassCard className="p-5">
-        <h4 className="mb-4 text-sm font-bold text-text-main">Safety Boundaries & Notification Thresholds</h4>
+        <h4 className="mb-4 text-sm font-bold text-text">Safety Boundaries & Notification Thresholds</h4>
 
         <div className="mb-4">
           <div className="mb-1.5 flex justify-between text-sm">
             <span className="text-text-muted">Maximum FNU Threshold</span>
-            <strong className="text-primary-dark">{maxTurbidity} FNU</strong>
+            <strong className="text-brand">{maxTurbidity} FNU</strong>
           </div>
           <input
             type="range"
@@ -133,7 +133,7 @@ export const SettingsScreen: React.FC = () => {
         <div>
           <div className="mb-1.5 flex justify-between text-sm">
             <span className="text-text-muted">Discrepancy Alarm Trigger</span>
-            <strong className="text-primary-dark">{fishChangePct}% visibility</strong>
+            <strong className="text-brand">{fishChangePct}% visibility</strong>
           </div>
           <input
             type="range"

@@ -79,7 +79,7 @@ export const AnalyticsScreen: React.FC = () => {
         <GlassCard className="px-6 py-12 text-center">
           <div className="flex flex-col items-center justify-center gap-2">
             <Calendar size={32} className="text-text-muted opacity-50" />
-            <span className="text-h3 font-semibold text-text-main">
+            <span className="text-h3 font-semibold text-text">
               No data for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}
             </span>
             <span className="text-sm text-text-muted">
@@ -115,11 +115,11 @@ export const AnalyticsScreen: React.FC = () => {
             <GlassCard className="
               flex h-full min-h-0 flex-col gap-2 overflow-hidden p-5
             ">
-              <h3 className="m-0 shrink-0 text-sm font-bold text-text-main">Fish Count Over Time</h3>
+              <h3 className="m-0 shrink-0 text-sm font-bold text-text">Fish Count Over Time</h3>
               <div className="min-h-0 flex-1">
                 <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
-              <h3 className="m-0 shrink-0 text-sm font-bold text-text-main">Mean Nearest-Neighbor Distance</h3>
+              <h3 className="m-0 shrink-0 text-sm font-bold text-text">Mean Nearest-Neighbor Distance</h3>
               <div className="min-h-0 flex-1">
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
@@ -139,7 +139,7 @@ export const AnalyticsScreen: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="m-0 text-sm font-bold text-text-main">Water Clarity Trend</h3>
+                <h3 className="m-0 text-sm font-bold text-text">Water Clarity Trend</h3>
                 <p className="m-0 text-xs text-text-muted">
                   {(readings.length > 0 ? readings.length : turbidityRecords.length) || 'No'} clarity readings
                 </p>
@@ -164,7 +164,7 @@ export const AnalyticsScreen: React.FC = () => {
           ">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="m-0 text-sm font-bold text-text-main">AI Health Diagnostics History</h3>
+                <h3 className="m-0 text-sm font-bold text-text">AI Health Diagnostics History</h3>
                 <p className="m-0 text-xs text-text-muted">
                   Disease diagnosis runs in this range
                 </p>
@@ -207,7 +207,7 @@ export const AnalyticsScreen: React.FC = () => {
                     <div
                       key={index}
                       className={`
-                        flex flex-col gap-2 rounded-xl border bg-surface-card
+                        flex flex-col gap-2 rounded-xl border bg-surface
                         p-3.5
                         ${isErr ? `border-critical` : isHealthy ? `border-good` : `
                           border-warning
@@ -218,7 +218,7 @@ export const AnalyticsScreen: React.FC = () => {
                         flex flex-wrap items-center justify-between gap-2
                       ">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-text-main">
+                          <span className="text-xs font-bold text-text">
                             {diag.species}
                           </span>
                           <span
@@ -268,13 +268,13 @@ export const AnalyticsScreen: React.FC = () => {
                           </p>
                         ) : (
                           <div className="flex min-w-0 flex-1 flex-col gap-1">
-                            <p className="m-0 text-xs text-text-main">
+                            <p className="m-0 text-xs text-text">
                               <strong>Observation:</strong> {diag.diagnosis.description}
                             </p>
                             {!isHealthy && diag.diagnosis.treatment && (
                               <p className="
                                 mt-1 rounded-md border-l-3 border-warning
-                                bg-background-app p-2 text-xs text-text-muted
+                                bg-bg p-2 text-xs text-text-muted
                               ">
                                 <strong>Recommended Treatment:</strong> {diag.diagnosis.treatment}
                               </p>

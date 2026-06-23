@@ -29,11 +29,11 @@ export const HomeScreen: React.FC = () => {
       {!hasReadingData ? (
         <div className="glass-card p-10 text-center transition-smooth">
           <span className="mb-3 block text-hero">🐠</span>
-          <h3 className="mb-2 text-lg font-bold text-on-surface">
+          <h3 className="mb-2 text-lg font-bold text-text">
             Waiting for monitor data…
           </h3>
           <p className="
-            mx-auto max-w-[420px] text-sm leading-[150%] text-on-surface-variant
+            mx-auto max-w-[420px] text-sm leading-[150%] text-text-muted
           ">
             The AI backend has not yet returned any readings for today. Make sure the OceanEyes inference service is running and has processed at least one frame.
           </p>

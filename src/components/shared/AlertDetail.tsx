@@ -14,18 +14,18 @@ interface AlertDetailProps {
 export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResolve }) => (
   <div className="flex flex-col gap-6">
     <div className="
-      flex min-h-[75px] items-center justify-between border-b border-border-card
+      flex min-h-[75px] items-center justify-between border-b border-border
       pb-3
       max-xs:flex-col max-xs:items-start max-xs:gap-3
     ">
       <div>
         <span className="block text-xs font-semibold text-text-muted uppercase">Alert Details</span>
-        <h1 className="mt-0.5 text-display font-extrabold text-text-main">Alert Diagnostics</h1>
+        <h1 className="mt-0.5 text-display font-extrabold text-text">Alert Diagnostics</h1>
       </div>
       <button
         className="
           cursor-pointer border-none bg-transparent font-main text-sm
-          font-semibold text-primary-dark
+          font-semibold text-brand
         "
         onClick={onBack}
       >
@@ -45,7 +45,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
         <h2 className="text-xl font-extrabold">{alert.title}</h2>
       </div>
       <p className="mt-1.5 text-xs text-text-muted">{alert.timeAgo}</p>
-      <p className="mt-4 text-sm leading-[150%] text-text-main">
+      <p className="mt-4 text-sm leading-[150%] text-text">
         {alert.message}
       </p>
     </GlassCard>
@@ -73,7 +73,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
 
     {/* Correction tip card */}
     <GlassCard className="mb-6 p-5">
-      <h4 className="mb-2 text-sm font-bold text-text-main">Action Plan & Tips</h4>
+      <h4 className="mb-2 text-sm font-bold text-text">Action Plan & Tips</h4>
       <p className="text-sm leading-[145%] text-text-muted">
         {alert.tip}
       </p>

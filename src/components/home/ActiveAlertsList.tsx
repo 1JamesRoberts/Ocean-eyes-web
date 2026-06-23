@@ -18,12 +18,12 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
       ">
         <div className="
           mb-4 flex size-12 items-center justify-center rounded-full
-          bg-secondary/10 text-secondary
+          bg-brand-bright/10 text-brand-bright
         ">
           <span className="material-symbols-outlined text-display">check_circle</span>
         </div>
-        <h4 className="text-lg font-bold text-secondary">System Operating Safely</h4>
-        <p className="mt-1 text-xs text-on-surface-variant">
+        <h4 className="text-lg font-bold text-brand-bright">System Operating Safely</h4>
+        <p className="mt-1 text-xs text-text-muted">
           No active safety alarms triggered.
         </p>
       </section>
@@ -33,7 +33,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
   return (
     <section className="glass-card p-6">
       <h3 className="
-        mb-4 text-xs font-medium tracking-widest text-on-surface-variant/70
+        mb-4 text-xs font-medium tracking-widest text-text-muted/70
         uppercase
       ">
         Active Safety Alerts
@@ -56,10 +56,10 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
             onClick={() => onSelectAlert(alert.id)}
           >
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-primary-dark">{alert.title}</h4>
-              <ChevronRight size={16} className="text-on-surface-variant" />
+              <h4 className="text-sm font-bold text-brand">{alert.title}</h4>
+              <ChevronRight size={16} className="text-text-muted" />
             </div>
-            <p className="mt-1 text-xs/relaxed text-on-surface-variant">
+            <p className="mt-1 text-xs/relaxed text-text-muted">
               {alert.message}
             </p>
           </button>

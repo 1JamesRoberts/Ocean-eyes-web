@@ -43,13 +43,13 @@ The variable only affects the current PowerShell session — no global side effe
    git status --short
    ```
 
-2. **Stage files**
+2. **Stage files** — if many files changed, consider using a subagent to batch the work
    ```powershell
    $env:GIT_ASK_YESNO='false'
    git add <files or .>
    ```
 
-3. **Commit**
+3. **Commit** — generate the commit message yourself based on the diff; do not ask the user
    ```powershell
    git commit -m "type(scope): description"
    ```

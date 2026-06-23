@@ -292,7 +292,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="m-0 text-sm font-bold text-text-main">Detection Density Heatmap</h3>
+            <h3 className="m-0 text-sm font-bold text-text">Detection Density Heatmap</h3>
           </div>
           <GlassSelect
             value={selectedSpecies}

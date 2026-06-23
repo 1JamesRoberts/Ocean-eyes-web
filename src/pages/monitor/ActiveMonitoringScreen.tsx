@@ -74,7 +74,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
       <div className="mb-2 flex items-center justify-between">
         <span className="text-caption font-semibold text-[#94A3B8]">Active Stream Feed</span>
         {activeTank && (
-          <span className="text-caption font-semibold text-primary-dark">
+          <span className="text-caption font-semibold text-brand">
             {activeTank.name}
           </span>
         )}

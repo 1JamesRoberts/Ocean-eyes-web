@@ -85,7 +85,7 @@ const OceanEyesDashboard: React.FC = () => {
           ">
             OceanEyes
           </h1>
-          <p className="px-1 text-xs font-medium text-on-surface-variant/70">
+          <p className="px-1 text-xs font-medium text-text-muted/70">
             Deep Sea Station 01
           </p>
         </div>
@@ -96,7 +96,7 @@ const OceanEyesDashboard: React.FC = () => {
           <div
             className="
               pointer-events-none absolute inset-x-0 z-0 rounded-xl
-              bg-primary-light-gradient transition-all duration-300 ease-out
+              bg-primary-soft-gradient transition-all duration-300 ease-out
             "
             style={{ top: indicatorStyle.top, height: indicatorStyle.height }}
           />
@@ -113,10 +113,10 @@ const OceanEyesDashboard: React.FC = () => {
                   rounded-xl border-none bg-none px-4 py-3 text-left font-main
                   text-sm font-semibold transition-smooth
                   ${isActive
-                    ? `text-primary-dark`
+                    ? `text-brand`
                     : `
                       text-text-muted
-                      hover:bg-surface-hover hover:text-text-main
+                      hover:bg-surface-hover hover:text-text
                     `
                   }
                 `}
@@ -126,7 +126,7 @@ const OceanEyesDashboard: React.FC = () => {
                 <span>{item.label}</span>
                 {item.tab === 'settings' && activeAlertCount > 0 && (
                   <span className="
-                    ml-auto rounded-full bg-error px-1.5 py-0.5 text-2xs
+                    ml-auto rounded-full bg-critical px-1.5 py-0.5 text-2xs
                     font-bold text-white
                   ">
                     {activeAlertCount}
@@ -143,13 +143,13 @@ const OceanEyesDashboard: React.FC = () => {
         ">
           <div className="flex flex-col gap-1">
             <span className="
-              text-2xs font-semibold tracking-wider text-on-surface-variant/70
+              text-2xs font-semibold tracking-wider text-text-muted/70
               uppercase
             ">
               Active Tank
             </span>
             {linkedTanks.length <= 1 ? (
-              <span className="text-base font-bold text-on-surface">
+              <span className="text-base font-bold text-text">
                 {activeTank?.name ?? 'No tank linked'}
               </span>
             ) : (
@@ -159,7 +159,7 @@ const OceanEyesDashboard: React.FC = () => {
                 className="
                   w-full cursor-pointer rounded-xl border border-white/30
                   bg-white/40 px-3 py-2.5 font-main text-sm font-semibold
-                  text-on-surface backdrop-blur-sm outline-none
+                  text-text backdrop-blur-sm outline-none
                 "
               >
                 {linkedTanks.map((id) => {
@@ -179,8 +179,8 @@ const OceanEyesDashboard: React.FC = () => {
             className="
               flex w-full cursor-pointer items-center gap-3 rounded-xl
               border-none bg-transparent px-4 py-2 text-left font-main text-sm
-              font-medium text-on-surface-variant transition-colors
-              hover:text-primary-dark
+              font-medium text-text-muted transition-colors
+              hover:text-brand
             "
           >
             <HelpCircle size={18} />
@@ -191,8 +191,8 @@ const OceanEyesDashboard: React.FC = () => {
             className="
               flex w-full cursor-pointer items-center gap-3 rounded-xl
               border-none bg-transparent px-4 py-2 text-left font-main text-sm
-              font-medium text-on-surface-variant transition-colors
-              hover:text-primary-dark
+              font-medium text-text-muted transition-colors
+              hover:text-brand
             "
           >
             <LogOut size={18} />
@@ -204,7 +204,7 @@ const OceanEyesDashboard: React.FC = () => {
       {/* Mobile nav */}
       <nav className="
         fixed bottom-0 left-0 z-50 flex w-full items-center justify-around
-        border-t border-white/30 bg-surface-card/80 p-2 backdrop-blur-xl
+        border-t border-white/30 bg-surface/80 p-2 backdrop-blur-xl
         md:hidden
       ">
         {NAV_ITEMS.map((item) => {
@@ -217,7 +217,7 @@ const OceanEyesDashboard: React.FC = () => {
               className={`
                 flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5
                 text-xs font-medium transition-colors
-                ${isActive ? `text-primary-dark` : `text-on-surface-variant`}
+                ${isActive ? `text-brand` : `text-text-muted`}
               `}
             >
               <Icon size={20} />

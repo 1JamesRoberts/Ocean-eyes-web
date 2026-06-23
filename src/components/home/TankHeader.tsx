@@ -40,7 +40,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
 
   return (
     <div className="
-      flex min-h-[75px] items-center justify-between border-b border-border-card
+      flex min-h-[75px] items-center justify-between border-b border-border
       pb-3
       max-xs:flex-col max-xs:items-start max-xs:gap-3
     ">
@@ -53,7 +53,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
               className="
                 flex cursor-pointer items-center gap-2 border-none
                 bg-transparent p-0 text-left font-main text-display
-                font-extrabold text-text-main outline-none
+                font-extrabold text-text outline-none
               "
             >
               <span>{currentTankName}</span>
@@ -72,8 +72,8 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
             {isOpen && (
               <div className="
                 absolute top-[calc(100%+8px)] left-0 z-1000 flex min-w-[220px]
-                flex-col gap-1 rounded-2xl border border-border-card
-                bg-surface-card p-1.5 shadow-card backdrop-blur-sm
+              flex-col gap-1 rounded-2xl border border-border
+              bg-surface p-1.5 shadow-card backdrop-blur-sm
               " style={{ boxShadow: 'var(--shadow-card), 0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}>
                 {tanks.filter(t => linkedTanks.includes(t.id)).map(t => (
                   <button
@@ -86,9 +86,9 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
                       w-full cursor-pointer rounded-[10px] border-none px-3
                       py-2.5 text-left font-main text-sm font-semibold
                       transition-colors
-                      hover:bg-background-app
-                      ${t.id === tankId ? `bg-info/8 text-primary-dark` : `
-                        bg-transparent text-text-main
+                      hover:bg-bg
+                      ${t.id === tankId ? `bg-info/8 text-brand` : `
+                        bg-transparent text-text
                       `}
                     `}
                   >
@@ -96,7 +96,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
                   </button>
                 ))}
 
-                <div className="my-1 h-px bg-border-card" />
+                <div className="my-1 h-px bg-border" />
 
                 <button
                   onClick={() => {
@@ -106,9 +106,9 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
                   className="
                     flex w-full cursor-pointer items-center gap-1.5
                     rounded-[10px] border-none bg-transparent px-3 py-2.5
-                    text-left font-main text-sm font-bold text-primary-dark
+                    text-left font-main text-sm font-bold text-brand
                   "
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-background)'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   <Plus size={14} />
@@ -120,19 +120,19 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
         ) : (
           <div className="flex items-center gap-3">
             <h1 className="
-              mt-0.5 inline-block text-display font-extrabold text-text-main
+              mt-0.5 inline-block text-display font-extrabold text-text
             ">{activeTank?.name || 'Living Room Reef'}</h1>
             <button
               className="
                 inline-flex cursor-pointer items-center gap-1 rounded-lg border
-                border-border-card bg-surface-card px-2 py-1 text-caption
-                font-semibold text-text-main transition-smooth
+              border-border bg-surface px-2 py-1 text-caption
+              font-semibold text-text transition-smooth
                 hover:border-text-muted hover:bg-surface-hover
               "
               onClick={onAddTank}
             >
-              <Plus size={10} className="text-primary-dark" />
-              <span className="text-primary-dark">Add Tank</span>
+              <Plus size={10} className="text-brand" />
+              <span className="text-brand">Add Tank</span>
             </button>
           </div>
         )}
@@ -149,7 +149,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
           <AlertTriangle size={24} />
           <span className="
             absolute top-0.5 right-0.5 size-2.5 rounded-full border-2
-            border-surface-card bg-critical
+              border-surface bg-critical
           " />
         </button>
       )}

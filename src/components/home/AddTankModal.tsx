@@ -48,7 +48,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
   return (
     <GlassModal isOpen={show} onClose={handleClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <h3 className="m-0 text-base font-bold text-primary-dark">Add Aquarium Tank</h3>
+        <h3 className="m-0 text-base font-bold text-brand">Add Aquarium Tank</h3>
 
         <div className="
           flex gap-0.5 rounded-[10px] border border-white/20 bg-white/20 p-0.5
@@ -60,8 +60,8 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
               flex-1 cursor-pointer rounded-lg border-none p-1.5 text-xs
               font-semibold transition-colors
               ${addMode === 'create'
-                ? 'bg-white/50 text-primary-dark'
-                : 'bg-transparent text-on-surface-variant'
+                ? 'bg-white/50 text-brand'
+                : 'bg-transparent text-text-muted'
               }
             `}
           >
@@ -74,8 +74,8 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
               flex-1 cursor-pointer rounded-lg border-none p-1.5 text-xs
               font-semibold transition-colors
               ${addMode === 'link'
-                ? 'bg-white/50 text-primary-dark'
-                : 'bg-transparent text-on-surface-variant'
+                ? 'bg-white/50 text-brand'
+                : 'bg-transparent text-text-muted'
               }
             `}
           >
@@ -97,7 +97,7 @@ export const AddTankModal: React.FC<AddTankModalProps> = ({
 
             <div>
               <label className="
-                mb-1.5 block text-caption font-semibold text-on-surface-variant
+                mb-1.5 block text-caption font-semibold text-text-muted
               ">
                 CAMERA SOURCE
               </label>

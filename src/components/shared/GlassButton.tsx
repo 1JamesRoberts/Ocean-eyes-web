@@ -29,9 +29,9 @@ const variantStyles: Record<GlassVariant, string> = {
   ghost: `
     inline-flex items-center justify-center gap-2 cursor-pointer
     border-none bg-transparent rounded-3xl
-    font-main text-sm font-semibold text-on-surface-variant
+    font-main text-sm font-semibold text-text-muted
     transition-smooth whitespace-nowrap
-    hover:text-primary-dark active:scale-[0.98]
+    hover:text-brand active:scale-[0.98]
   `,
 };
 
