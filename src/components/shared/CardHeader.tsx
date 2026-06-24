@@ -15,8 +15,8 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
 }) => (
   <div
     className={`
-      flex items-center justify-between border-b border-white/20 bg-white/20
-      px-4 py-3
+      flex min-h-[52px] items-center justify-between border-b border-white/20
+      bg-white/20 px-4 py-3
       ${className}
     `}
   >
@@ -24,6 +24,8 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
       <span className="material-symbols-outlined">{icon}</span>
       <span>{title}</span>
     </div>
-    {children}
+    <div className="flex items-center">
+      {children}
+    </div>
   </div>
 );

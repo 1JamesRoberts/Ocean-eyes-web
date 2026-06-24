@@ -14,7 +14,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
   return (
     <section className="glass-card p-6">
       <div className="mb-5 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-brand">Top species detected</h3>
+        <h3 className="text-base font-semibold text-brand">Top species detected</h3>
         <button
           onClick={onManageFish}
           className="
