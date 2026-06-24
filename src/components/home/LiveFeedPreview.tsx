@@ -1,8 +1,9 @@
-import React, { useRef, useState } from 'react';
-import { Maximize2 } from 'lucide-react';
-import { useLiveFeed } from '../../hooks/useLiveFeed';
-import { CameraFeed } from '../live/CameraFeed';
-import type { TankBrief } from '../../types/aquarium';
+import React, { useRef, useState } from "react";
+import { Maximize2 } from "lucide-react";
+import { useLiveFeed } from "../../hooks/useLiveFeed";
+import { CardHeader } from "../shared";
+import { CameraFeed } from "../live/CameraFeed";
+import type { TankBrief } from "../../types/aquarium";
 
 interface LiveFeedPreviewProps {
   activeTank: TankBrief | undefined;
@@ -17,9 +18,10 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   displayClarity,
   displayFishCount,
   onViewAdvanced,
-  onGoFullscreen
+  onGoFullscreen,
 }) => {
-  const { activeFeed, isWebcam, isStreaming, videoRef, startStream } = useLiveFeed(activeTank?.id ?? null);
+  const { activeFeed, isWebcam, isStreaming, videoRef, startStream } =
+    useLiveFeed(activeTank?.id ?? null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [isHoveringVideo, setIsHoveringVideo] = useState(false);
 
@@ -35,28 +37,25 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
       className="cursor-pointer overflow-hidden glass-card"
       onClick={onViewAdvanced}
     >
-      <div className="
-        flex items-center justify-between border-b border-white/20 bg-white/20
-        p-4
-      ">
-        <div className="flex items-center gap-2 font-semibold text-brand">
-          <span className="material-symbols-outlined">videocam</span>
-          <span>Live Feed Monitor</span>
-        </div>
+      <CardHeader icon="videocam" title="Live Feed Monitor">
         <div className="flex gap-2">
-          <span className="
+          <span
+            className="
             rounded-full bg-brand-bright/10 px-3 py-1 text-xs font-bold
             text-brand-bright
-          ">
+          "
+          >
             Live
           </span>
-          <span className="
+          <span
+            className="
             rounded-full bg-brand/10 px-3 py-1 text-xs text-brand
-          ">
+          "
+          >
             1080p
           </span>
         </div>
-      </div>
+      </CardHeader>
 
       <div
         ref={videoContainerRef}
@@ -80,32 +79,46 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                 group-hover:opacity-100
               "
               idlePlaceholder={
-                <div className="
+                <div
+                  className="
                   flex flex-col items-center justify-center gap-2 py-8
-                ">
-                  <span className="
+                "
+                >
+                  <span
+                    className="
                     material-symbols-outlined text-2xl text-text-muted
-                  ">videocam</span>
-                  <p className="text-xs text-text-muted">Feed is idle. Connect stream to monitor.</p>
+                  "
+                  >
+                    videocam
+                  </span>
+                  <p className="text-xs text-text-muted">
+                    Feed is idle. Connect stream to monitor.
+                  </p>
                 </div>
               }
             />
-            <div className="
+            <div
+              className="
               pointer-events-none absolute top-0 left-0 size-full
               overflow-hidden
-            " />
+            "
+            />
 
             <div className="absolute bottom-4 left-4 z-10 flex gap-2">
-              <div className="
+              <div
+                className="
                 rounded-lg border border-white/20 bg-black/40 px-3 py-1 text-xs
                 text-white backdrop-blur-md
-              ">
+              "
+              >
                 {displayFishCount} fish
               </div>
-              <div className="
+              <div
+                className="
                 rounded-lg border border-white/20 bg-black/40 px-3 py-1 text-xs
                 text-white backdrop-blur-md
-              ">
+              "
+              >
                 {displayClarity.toFixed(2)} FNU
               </div>
             </div>
@@ -117,10 +130,12 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                   justify-center bg-black/40 transition-opacity
                 "
               >
-                <div className="
+                <div
+                  className="
                   rounded-full border border-white/30 bg-white/20 p-4 text-white
                   backdrop-blur-xl
-                ">
+                "
+                >
                   <Maximize2 size={24} />
                 </div>
               </div>
@@ -129,9 +144,13 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
         ) : (
           <div className="p-3 text-center">
             <div className="mb-2 flex justify-center">
-              <span className="
+              <span
+                className="
                 material-symbols-outlined text-2xl text-text-muted
-              ">videocam</span>
+              "
+              >
+                videocam
+              </span>
             </div>
             <p className="mb-2.5 text-xs text-text-muted">
               Feed is idle. Connect stream to monitor.

@@ -101,15 +101,13 @@ export const AnalyticsScreen: React.FC = () => {
             lg:col-span-2 lg:grid-cols-[2fr_1fr]
           ">
             {/* Spatial Detection Heatmap */}
-            <GlassCard className="p-5">
-              <SpatialDetectionHeatmap
-                records={detectionRecords}
-                tankId={tankId}
-                inventorySpeciesIds={inventorySpeciesIds}
-                selectedSpecies={selectedSpecies}
-                onSelectedSpeciesChange={setSelectedSpecies}
-              />
-            </GlassCard>
+            <SpatialDetectionHeatmap
+              records={detectionRecords}
+              tankId={tankId}
+              inventorySpeciesIds={inventorySpeciesIds}
+              selectedSpecies={selectedSpecies}
+              onSelectedSpeciesChange={setSelectedSpecies}
+            />
 
             {/* Fish Count Timeline */}
             <GlassCard className="

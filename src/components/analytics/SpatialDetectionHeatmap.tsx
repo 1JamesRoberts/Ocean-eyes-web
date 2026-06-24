@@ -1,13 +1,13 @@
 // CCTV-style density heatmap overlaid on the aquarium camera frame.
 // Algorithm matches data_processing/test.py: density accumulation →
 // Gaussian blur → JET colourmap → alpha blend over camera background.
-import React, { useEffect, useMemo, useRef, useCallback } from 'react';
-import type { AIDetectionResult } from '../../types/aquarium';
-import { formatSpeciesName } from '../../utils/formatters';
-import { useLiveFeed } from '../../hooks/useLiveFeed';
-import { CameraFeed } from '../live/CameraFeed';
-import { GlassSelect } from '../shared';
-import { ChartEmptyState } from './ChartEmptyState';
+import React, { useEffect, useMemo, useRef, useCallback } from "react";
+import type { AIDetectionResult } from "../../types/aquarium";
+import { formatSpeciesName } from "../../utils/formatters";
+import { useLiveFeed } from "../../hooks/useLiveFeed";
+import { CameraFeed } from "../live/CameraFeed";
+import { CardHeader, GlassSelect } from "../shared";
+import { ChartEmptyState } from "./ChartEmptyState";
 
 interface Props {
   records: AIDetectionResult[];
@@ -135,10 +135,10 @@ function buildHeatmapOverlay(
   }
 
   // 4. Build overlay canvas
-  const overlay = document.createElement('canvas');
+  const overlay = document.createElement("canvas");
   overlay.width = renderW;
   overlay.height = renderH;
-  const ctx = overlay.getContext('2d')!;
+  const ctx = overlay.getContext("2d")!;
   const imageData = ctx.createImageData(renderW, renderH);
   const pixels = imageData.data;
 
@@ -161,7 +161,10 @@ function buildHeatmapOverlay(
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
-function debounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number) {
+function debounce<T extends (...args: Parameters<T>) => void>(
+  fn: T,
+  ms: number,
+) {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<T>) => {
     if (timeoutId !== null) clearTimeout(timeoutId);
@@ -173,13 +176,27 @@ function debounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number)
 }
 
 export const SpatialDetectionHeatmap = React.memo<Props>(
-  ({ records, tankId, inventorySpeciesIds, selectedSpecies, onSelectedSpeciesChange }) => {
-    const { activeFeed, isWebcam, isStreaming, videoRef } = useLiveFeed(tankId ?? null);
+  ({
+    records,
+    tankId,
+    inventorySpeciesIds,
+    selectedSpecies,
+    onSelectedSpeciesChange,
+  }) => {
+    const { activeFeed, isWebcam, isStreaming, videoRef } = useLiveFeed(
+      tankId ?? null,
+    );
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
-    const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
-    const [videoSize, setVideoSize] = React.useState<{ width: number; height: number } | null>(null);
+    const [containerSize, setContainerSize] = React.useState({
+      width: 0,
+      height: 0,
+    });
+    const [videoSize, setVideoSize] = React.useState<{
+      width: number;
+      height: number;
+    } | null>(null);
 
     // Flatten records into normalised center points
     const allCenters = useMemo(() => {
@@ -188,7 +205,11 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
         if (!r.detections) continue;
         for (const d of r.detections) {
           const [nx1, ny1, nx2, ny2] = d.bbox_normalized;
-          points.push({ nx: (nx1 + nx2) / 2, ny: (ny1 + ny2) / 2, species: d.species });
+          points.push({
+            nx: (nx1 + nx2) / 2,
+            ny: (ny1 + ny2) / 2,
+            species: d.species,
+          });
         }
       }
       return points;
@@ -198,14 +219,22 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     const speciesList = useMemo(
       () =>
         Array.from(new Set(allCenters.map((c) => c.species)))
-          .filter((s) => !inventorySpeciesIds || inventorySpeciesIds.size === 0 || inventorySpeciesIds.has(s))
+          .filter(
+            (s) =>
+              !inventorySpeciesIds ||
+              inventorySpeciesIds.size === 0 ||
+              inventorySpeciesIds.has(s),
+          )
           .sort(),
       [allCenters, inventorySpeciesIds],
     );
 
     // Filter centers by selected species
     const centers = useMemo(
-      () => (selectedSpecies === 'all' ? allCenters : allCenters.filter((c) => c.species === selectedSpecies)),
+      () =>
+        selectedSpecies === "all"
+          ? allCenters
+          : allCenters.filter((c) => c.species === selectedSpecies),
       [allCenters, selectedSpecies],
     );
 
@@ -251,13 +280,13 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       const texture = heatmapTextureRef.current;
       if (!canvas || !texture) {
         if (canvas) {
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext("2d");
           if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
         return;
       }
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -284,19 +313,13 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
 
     // ── Render ──
 
-    if (allCenters.length === 0) {
-      return <ChartEmptyState message="No detection data available" />;
-    }
-
     return (
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h3 className="m-0 text-sm font-bold text-text">Detection Density Heatmap</h3>
-          </div>
+      <section className="overflow-hidden glass-card">
+        <CardHeader icon="grid_on" title="Detection Density">
           <GlassSelect
             value={selectedSpecies}
             onChange={(e) => onSelectedSpeciesChange(e.target.value)}
+            className="!py-1 !px-3 text-xs"
           >
             <option value="all">All Species</option>
             {speciesList.map((s) => (
@@ -305,35 +328,42 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
               </option>
             ))}
           </GlassSelect>
-        </div>
+        </CardHeader>
 
-        <div
-          ref={containerRef}
-          className="shimmer w-full rounded-xl bg-camera-bg"
-          style={
-            videoSize
-              ? { aspectRatio: `${videoSize.width} / ${videoSize.height}` }
-              : undefined
-          }
-        >
-          <CameraFeed
-            feed={activeFeed}
-            isStreaming={isStreaming}
-            isWebcam={isWebcam}
-            videoRef={videoRef}
-            className="w-full"
-            onDimensions={(width, height) => {
-              if (width > 0 && height > 0) {
-                setVideoSize({ width, height });
-              }
-            }}
+        {allCenters.length === 0 ? (
+          <ChartEmptyState
+            message="No detection data available"
+            className="py-12"
           />
-          <canvas
-            ref={overlayCanvasRef}
-            className="pointer-events-none absolute inset-0 size-full"
-          />
-        </div>
-      </div>
+        ) : (
+          <div
+            ref={containerRef}
+            className="shimmer w-full bg-camera-bg"
+            style={
+              videoSize
+                ? { aspectRatio: `${videoSize.width} / ${videoSize.height}` }
+                : undefined
+            }
+          >
+            <CameraFeed
+              feed={activeFeed}
+              isStreaming={isStreaming}
+              isWebcam={isWebcam}
+              videoRef={videoRef}
+              className="w-full"
+              onDimensions={(width, height) => {
+                if (width > 0 && height > 0) {
+                  setVideoSize({ width, height });
+                }
+              }}
+            />
+            <canvas
+              ref={overlayCanvasRef}
+              className="pointer-events-none absolute inset-0 size-full"
+            />
+          </div>
+        )}
+      </section>
     );
   },
   (prevProps, nextProps) =>
