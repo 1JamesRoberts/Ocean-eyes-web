@@ -50,6 +50,10 @@
       --shadow-glass: inset 2px 2px 0px rgba(255, 255, 255, 0.5), inset -2px -2px 5px rgba(0, 67, 73, 0.05);
       --shadow-primary-glow: 0 4px 12px rgba(0, 67, 73, 0.2);
 
+      --focus-ring: 0 0 0 3px rgba(25, 106, 89, 0.25);
+      --focus-ring-offset: 0 0 0 3px rgba(25, 106, 89, 0.25);
+      --color-border-subtle: rgba(0, 67, 73, 0.12);
+
       --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       --transition-spring: color 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), background-color 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), border-color 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), opacity 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
 
@@ -259,14 +263,14 @@
       box-shadow:
         var(--shadow-glass),
         var(--shadow-card),
-        0 0 0 3px rgba(25, 106, 89, 0.25);
+        var(--focus-ring);
     }
     .setup-card.selected:focus-visible {
       box-shadow:
         var(--shadow-glass),
         0 0 0 1px rgba(25, 106, 89, 0.25),
         0 16px 40px rgba(0, 67, 73, 0.12),
-        0 0 0 3px rgba(25, 106, 89, 0.25);
+        var(--focus-ring);
     }
     .setup-card:hover .card-arrow,
     .setup-card.selected .card-arrow {
@@ -590,7 +594,7 @@
     .phone-bezel {
       width: 158px;
       height: 320px;
-      background: #1a1c1c;
+      background: var(--color-text);
       border-radius: 30px;
       padding: 6px;
       position: relative;
@@ -618,7 +622,7 @@
       top: 7px; left: 50%;
       transform: translateX(-50%);
       width: 58px; height: 16px;
-      background: #1a1c1c;
+      background: var(--color-text);
       border-radius: var(--glass-radius-pill);
       z-index: 2;
     }
@@ -640,6 +644,10 @@
     }
     .phone-statusbar .icon {
       width: 6px; height: 6px;
+    }
+    .phone-statusbar .battery {
+      font-size: 0.45rem;
+      letter-spacing: 0.04em;
     }
 
     /* Lock screen UI */
@@ -686,7 +694,7 @@
       background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border-radius: 8px;
+      border-radius: var(--glass-radius-inline);
       padding: 5px 7px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
@@ -701,8 +709,8 @@
     .phone-notif .line.full  { width: 90%; background: var(--color-brand); opacity: 0.3; }
 
     .phone-notif-play {
-      background: #1a1c1c;
-      border-radius: 8px;
+      background: var(--color-text);
+      border-radius: var(--glass-radius-inline);
       padding: 5px 7px;
       display: flex; align-items: center; gap: 5px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -857,7 +865,7 @@
       justify-content: center;
       min-width: 22px; height: 20px;
       padding: 0 5px;
-      border-radius: 5px;
+      border-radius: var(--glass-radius-inline);
       background: rgba(255, 255, 255, 0.6);
       border: 1px solid rgba(0, 67, 73, 0.15);
       box-shadow: 0 1px 0 rgba(0, 67, 73, 0.1);
@@ -867,7 +875,27 @@
       font-weight: 600;
     }
 
-    /* SVG icon styles */
+    /* Shared utility classes */
+        .section-label,
+    .form-label,
+    .fs-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-brand);
+    }
+    .form-label { color: var(--color-text); }
+    .title-md {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--color-brand);
+    }
+    .btn-icon { width: 16px; height: 16px; }
+    .btn svg, .btn-icon { width: 16px; height: 16px; }
+    .btn-block { width: 100%; }
+    .dot.brand-soft { background: var(--color-brand-soft); }
     .icon-svg { width: 100%; height: 100%; display: block; }
 
     /* ═══════════════════════════════════════════════
@@ -887,7 +915,7 @@
     .title-rule {
       width: 100%;
       height: 1px;
-      background: rgba(0, 67, 73, 0.14);
+      background: var(--color-border-subtle);
       margin: 1.5rem 0 2.5rem;
       border: none;
     }
@@ -922,7 +950,7 @@
       box-shadow: var(--shadow-primary-glow);
     }
     .btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-2px); }
-    .btn-primary:focus-visible { box-shadow: 0 0 0 3px rgba(25, 106, 89, 0.25); }
+    .btn-primary:focus-visible { box-shadow: var(--focus-ring); }
     .btn-outline {
       background: transparent;
       color: var(--color-brand);
@@ -933,15 +961,27 @@
       border-color: rgba(0, 67, 73, 0.4);
       transform: translateY(-2px);
     }
-    .btn-outline:focus-visible { box-shadow: 0 0 0 3px rgba(25, 106, 89, 0.2); }
+    .btn-outline:focus-visible { box-shadow: var(--focus-ring); }
+    .btn-text {
+      background: transparent;
+      color: var(--color-text-subtle);
+      border-bottom: 1px dashed rgba(0, 67, 73, 0.25);
+      border-radius: 0;
+      padding: 0.25rem 0;
+    }
+    .btn-text:hover {
+      color: var(--color-brand);
+      border-bottom-style: solid;
+    }
+    .btn-text:focus-visible { box-shadow: var(--focus-ring); }
 
     /* ═══════════════════════════════════════════════
        Step 1 — Account
        ═══════════════════════════════════════════════ */
-    .account-card {
+        .account-card {
       max-width: 440px;
       margin: 0 auto;
-      padding: 2.25rem;
+      padding: 2.5rem;
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
@@ -952,10 +992,6 @@
     }
 
     .account-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--color-brand);
       text-align: center;
     }
     .account-subtitle {
@@ -978,8 +1014,6 @@
       gap: 0.4rem;
     }
     .form-label {
-      font-size: 0.8rem;
-      font-weight: 600;
       color: var(--color-text);
     }
     .form-input {
@@ -1031,7 +1065,7 @@
     .password-toggle:focus-visible {
       outline: none;
       color: var(--color-brand);
-      box-shadow: 0 0 0 3px rgba(25, 106, 89, 0.2);
+      box-shadow: var(--focus-ring);
       border-radius: 4px;
     }
 
@@ -1087,7 +1121,7 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: rgba(0, 67, 73, 0.12);
+      background: var(--color-border-subtle);
     }
 
     .oauth-buttons {
@@ -1122,7 +1156,7 @@
     }
     .oauth-button:focus-visible {
       outline: none;
-      box-shadow: 0 0 0 3px rgba(25, 106, 89, 0.2);
+      box-shadow: var(--focus-ring);
     }
     .oauth-icon {
       width: 18px;
@@ -1139,10 +1173,14 @@
     /* ═══════════════════════════════════════════════
        Step 4 — Success screen
        ═══════════════════════════════════════════════ */
-    .success-screen {
+    .success-card {
       max-width: 640px;
       margin: 0 auto;
-      padding: 3rem 1.5rem;
+      padding: 0;
+      overflow: hidden;
+    }
+    .success-screen {
+      padding: 2.5rem 1.5rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1167,14 +1205,10 @@
     .success-icon svg {
       width: 40px;
       height: 40px;
-      color: #fff;
+      color: var(--color-text-inverse);
       stroke-width: 3;
     }
-    .success-screen h2 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      color: var(--color-brand);
+    .success-title {
       margin-bottom: 0.5rem;
     }
     .success-screen .success-desc {
@@ -1219,17 +1253,12 @@
     .feature-summary .fs-row + .fs-row {
       margin-top: 1rem;
       padding-top: 1rem;
-      border-top: 1px solid rgba(0, 67, 73, 0.08);
+      border-top: 1px solid var(--color-border-subtle);
     }
     .feature-summary .fs-col {
       flex: 1;
     }
     .feature-summary .fs-label {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--color-brand);
       margin-bottom: 0.6rem;
     }
     .feature-summary .fs-item {
@@ -1263,20 +1292,6 @@
       flex-direction: column;
       align-items: center;
       gap: 1rem;
-    }
-    .success-footer a {
-      color: var(--color-text-subtle);
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-decoration: none;
-      border-bottom: 1px dashed rgba(0, 67, 73, 0.25);
-      padding-bottom: 1px;
-      cursor: pointer;
-      transition: var(--transition-smooth);
-    }
-    .success-footer a:hover {
-      color: var(--color-brand);
-      border-bottom-style: solid;
     }
 
     /* ═══════════════════════════════════════════════
@@ -1484,7 +1499,7 @@
 
       <!-- ═══ Account Form Card ═══ -->
       <section class="account-card glass-card" aria-label="Account creation form">
-        <h2 class="account-title">Create your account</h2>
+        <h2 class="account-title title-md">Create your account</h2>
         <p class="account-subtitle">Start your aquarium monitoring journey</p>
 
         <form id="account-form" class="account-form">
@@ -1516,7 +1531,7 @@
 
           <button type="submit" class="btn btn-primary account-submit">
             Create account
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14M13 5l7 7-7 7"></path>
             </svg>
           </button>
@@ -1569,7 +1584,7 @@
       </div>
       <h1>Setup your tank</h1>
       <p class="subtitle">
-        Choose how <strong>OceanEyes</strong> observe your aquarium.<br>
+        Choose how OceanEyes observe your aquarium.
         You can switch sources anytime.
       </p>
       <div class="step-track" aria-label="Setup progress, step 2 of 4">
@@ -1589,7 +1604,7 @@
       <!-- ━━━ Card 1: Current camera ━━━ -->
       <article class="glass-card setup-card aquarium-card selected" role="button" tabindex="0" aria-label="Use your existing tank camera" aria-pressed="true">
         <div class="card-header">
-          <h2 class="card-title">Current camera</h2>
+          <h2 class="card-title title-md">Current camera</h2>
           <span class="card-arrow" aria-hidden="true">
             <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14M13 5l7 7-7 7"></path>
@@ -1690,7 +1705,7 @@
       <!-- ━━━ Card 2: Phone's camera ━━━ -->
       <article class="glass-card setup-card phone-card" role="button" tabindex="0" aria-label="Use your phone as the camera" aria-pressed="false">
         <div class="card-header">
-          <h2 class="card-title">Phone's camera</h2>
+          <h2 class="card-title title-md">Phone's camera</h2>
           <span class="card-arrow" aria-hidden="true">
             <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14M13 5l7 7-7 7"></path>
@@ -1715,7 +1730,7 @@
                   <svg class="icon" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.2">
                     <path d="M1 4 Q7 0 13 4 M3 6 Q7 3 11 6 M5 8 Q7 6 9 8"></path>
                   </svg>
-                  <span style="font-size:0.45rem;letter-spacing:0.04em;">100%</span>
+                  <span class="battery">100%</span>
                 </div>
               </div>
               <div class="phone-lock">
@@ -1773,7 +1788,7 @@
       <div class="step-actions">
         <button class="btn btn-primary" id="step-2-continue" type="button">
           Continue to camera position
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14M13 5l7 7-7 7"></path>
           </svg>
         </button>
@@ -1947,7 +1962,7 @@
       </header>
 
       <!-- ═══ Success Card ═══ -->
-      <section class="glass-card" style="max-width:640px;margin:0 auto;padding:0;overflow:hidden;">
+      <section class="glass-card success-card">
         <div class="success-screen">
 
           <!-- Checkmark icon -->
@@ -1958,7 +1973,7 @@
           </div>
 
           <!-- Title -->
-          <h2>Monitoring started</h2>
+          <h2 class="success-title title-md">Monitoring started</h2>
           <p class="success-desc">
             OceanEyes is now actively watching your tank. You can view live footage, stats, and alerts from the dashboard.
           </p>
@@ -2056,24 +2071,24 @@
                   water clarity
                 </div>
                 <div class="fs-item">
-                  <span class="dot" style="background:var(--color-brand-soft);"></span>
+                  <span class="dot brand-soft"></span>
                   pH, CO2
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- CTA -->
-          <button class="btn btn-primary" type="button" style="width:100%;">
-            Go to dashboard
-          </button>
-
         </div>
       </section>
 
       <!-- ═══ Footer ═══ -->
       <footer class="setup-footer success-footer">
-        <a id="step-4-back" tabindex="0">Back to camera position</a>
+        <div class="step-actions">
+          <button class="btn btn-text" id="step-4-back" type="button">Back to camera position</button>
+          <button class="btn btn-primary btn-block" type="button">
+            Go to dashboard
+          </button>
+        </div>
       </footer>
 
     </section>
