@@ -135,20 +135,19 @@ export const useAIPolling = ({
     aiMountedRef.current = true;
 
     const processFrame = async () => {
-      if (!aiMountedRef.current) return;
-      if (!cameraFeedRef.current?.videoElement || aiLoadingRef.current) return;
-
-      const video = cameraFeedRef.current.videoElement;
-      if (!isVideoReady(video)) {
-        return;
-      }
-
-      setAiLoading(true);
-      setAiError(null);
-      const controller = new AbortController();
-      aiAbortControllerRef.current = controller;
-
       try {
+        if (!aiMountedRef.current) return;
+        if (!cameraFeedRef.current?.videoElement || aiLoadingRef.current) return;
+
+        const video = cameraFeedRef.current.videoElement;
+        if (!isVideoReady(video)) {
+          return;
+        }
+
+        setAiLoading(true);
+        setAiError(null);
+        const controller = new AbortController();
+        aiAbortControllerRef.current = controller;
         const blob = await captureVideoFrame(video);
 
         const diagnose = shouldDiagnose();

@@ -148,7 +148,7 @@ export const AnalyticsScreen: React.FC = () => {
               records={turbidityRecords}
               readings={readings}
               emptyAction={
-                <GlassButton variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onViewHistory(); }}>
+                <GlassButton variant="outline" size="sm" onClick={() => onViewHistory()}>
                   View Clarity Analytics →
                 </GlassButton>
               }
