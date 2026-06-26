@@ -107,20 +107,35 @@ export const useAIAnalytics = ({
   const activeTankRef = useRef(activeTank);
   const liveStateRef = useRef(liveState);
   const saveLiveStateRef = useRef(saveLiveState);
+  const lastPredictionRef = useRef(lastPrediction);
+  const lastTurbidityResultRef = useRef(lastTurbidityResult);
 
   useEffect(() => { activeTankRef.current = activeTank; }, [activeTank]);
   useEffect(() => { liveStateRef.current = liveState; }, [liveState]);
   useEffect(() => { saveLiveStateRef.current = saveLiveState; }, [saveLiveState]);
+  useEffect(() => { lastPredictionRef.current = lastPrediction; }, [lastPrediction]);
+  useEffect(() => { lastTurbidityResultRef.current = lastTurbidityResult; }, [lastTurbidityResult]);
 
+  // Persist AI toggle state immediately
   useEffect(() => {
     if (!activeTankRef.current || !liveStateRef.current) return;
     saveLiveStateRef.current({
       ...liveStateRef.current,
       ai_active: isAIActive,
-      last_prediction: lastPrediction,
-      last_turbidity_result: lastTurbidityResult,
     });
-  }, [isAIActive, lastPrediction, lastTurbidityResult]);
+  }, [isAIActive]);
+
+  // Persist full prediction/turbidity results when stream stops
+  useEffect(() => {
+    if (isStreaming) return;
+    if (!activeTankRef.current || !liveStateRef.current) return;
+    saveLiveStateRef.current({
+      ...liveStateRef.current,
+      ai_active: isAIActive,
+      last_prediction: lastPredictionRef.current,
+      last_turbidity_result: lastTurbidityResultRef.current,
+    });
+  }, [isStreaming]);
 
   const { clarity: currentClarity, fishCount: currentFishCount } = selectActiveFeedMetrics(
     isStreaming ? liveState : null,

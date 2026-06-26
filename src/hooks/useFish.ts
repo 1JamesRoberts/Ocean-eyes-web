@@ -1,6 +1,7 @@
 import { useSyncExternalStore, useCallback } from 'react';
 import {
   getFish,
+  saveFish as saveFishToRepository,
   addFish as addFishToRepository,
   updateFishCount as updateFishCountInRepository,
   updateDetectedCount as updateDetectedCountInRepository,
@@ -46,11 +47,17 @@ export const useFish = (tankId: string | null) => {
     removeFishFromRepository(tankId, docId);
   };
 
+  const saveFish = (fish: FishEntry[]) => {
+    if (!tankId) return;
+    saveFishToRepository(tankId, fish);
+  };
+
   return {
     fishList,
     addFish,
     updateFishCount,
     updateDetectedCount,
     removeFish,
+    saveFish,
   };
 };

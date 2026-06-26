@@ -366,8 +366,4 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       </section>
     );
   },
-  (prevProps, nextProps) =>
-    prevProps.tankId === nextProps.tankId &&
-    prevProps.records === nextProps.records &&
-    prevProps.selectedSpecies === nextProps.selectedSpecies,
 );

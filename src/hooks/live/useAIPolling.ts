@@ -64,7 +64,7 @@ export const useAIPolling = ({
 }: UseAIPollingViewModelOptions): UseAIPollingViewModelResult => {
   const { addAlert } = useAlerts();
   const { writeReading } = useReadings();
-  const { fishList, updateDetectedCount } = useFish(tankId);
+  const { fishList, saveFish } = useFish(tankId);
 
   const [isAIActive, setIsAIActive] = useState(() => liveState?.ai_active ?? false);
   const [lastPrediction, setLastPrediction] = useState<AIDetectionResult | null>(
@@ -78,7 +78,7 @@ export const useAIPolling = ({
   const fishListRef = useRef(fishList);
   const addAlertRef = useRef(addAlert);
   const writeReadingRef = useRef(writeReading);
-  const updateDetectedCountRef = useRef(updateDetectedCount);
+  const saveFishRef = useRef(saveFish);
   const activeTankRef = useRef(activeTank);
   const liveStateRef = useRef(liveState);
   const activeFeedRef = useRef(activeFeed);
@@ -117,7 +117,14 @@ export const useAIPolling = ({
   useEffect(() => { fishListRef.current = fishList; }, [fishList]);
   useEffect(() => { addAlertRef.current = addAlert; }, [addAlert]);
   useEffect(() => { writeReadingRef.current = writeReading; }, [writeReading]);
-  useEffect(() => { updateDetectedCountRef.current = updateDetectedCount; }, [updateDetectedCount]);
+  useEffect(() => { saveFishRef.current = saveFish; }, [saveFish]);
+
+  // Reset AI active state when stream stops
+  useEffect(() => {
+    if (!isStreaming) {
+      setIsAIActive(false);
+    }
+  }, [isStreaming]);
 
   useEffect(() => {
     if (!isAIActive || !isStreaming || backendStatus !== 'online') {
@@ -184,15 +191,13 @@ export const useAIPolling = ({
             writeReading: writeReadingRef.current,
           });
 
-          fishListRef.current.forEach((fish) => {
-            updateDetectedCountRef.current(fish.id, 0);
-          });
-          Object.entries(result.summary.species_counts).forEach(([speciesId, count]) => {
-            const fishEntry = fishListRef.current.find((f) => f.speciesId === speciesId);
-            if (fishEntry) {
-              updateDetectedCountRef.current(fishEntry.id, count);
-            }
-          });
+          const countsBySpecies = Object.entries(result.summary.species_counts);
+          const countMap = new Map(countsBySpecies);
+          const nextFish = fishListRef.current.map((f) => ({
+            ...f,
+            detected: countMap.get(f.speciesId) ?? 0,
+          }));
+          saveFishRef.current(nextFish);
         }
       } catch (err) {
         if (!aiMountedRef.current) return;
