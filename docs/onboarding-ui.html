@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Onboarding prototype — OceanEyes</title>
-  <!-- Changelog: Aligned hard-coded values with src/index.css design tokens via a :root custom-property block; upgraded the step indicator to a labeled progress track; normalized the two setup-card chrome elements (header, description, arrow, meta tags, hover); added a default-selected state, focus rings, and keyboard affordance; restored the aquarium HUD and phone signal-line markup; fixed the phone lock-screen time to match the status bar (9:41). All illustration values (fish, plants, bubbles, substrate, etc.) remain literal. Added Step 1 "Account" screen with centered glass account card, email/password form, password visibility toggle, remember-me row, OAuth divider, Google/Apple social buttons, support footer, and step-advance wiring. Added Step 3 "Choose camera position" screen with front-facing and side-mounted camera placement options, equal-width two-column layout with a vertical divider, title rule, step navigation, and scoped camera-position styles. Added Step 4 success screen with centered glass card, checkmark icon, aquarium illustration, feature-summary, "Go to dashboard" CTA, and "Back to camera position" footer link. -->
+  <!-- Changelog: Aligned hard-coded values with src/index.css design tokens via a :root custom-property block; upgraded the step indicator to a labeled progress track; normalized the two setup-card chrome elements (header, description, arrow, meta tags, hover); added a default-selected state, focus rings, and keyboard affordance; restored the aquarium HUD and phone signal-line markup; fixed the phone lock-screen time to match the status bar (9:41). All illustration values (fish, plants, bubbles, substrate, etc.) remain literal. Added Step 1 "Account" screen with centered glass account card, email/password form, password visibility toggle, remember-me row, OAuth divider, Google/Apple social buttons, support footer, and step-advance wiring. Added Step 3 "Choose camera position" screen with front-facing and side-mounted camera placement options, equal-width two-column layout with a vertical divider, title rule, step navigation, and scoped camera-position styles. Added Step 4 success screen with centered glass card, checkmark icon, aquarium illustration, feature-summary, "Go to dashboard" CTA, and "Back to camera position" footer link. Fixed step-indicator connecting lines so they align with the step dots (previously floated at the vertical center because the track used align-items: center against the taller labeled nodes). Restored top spacing on the Step 4 success footer and constrained it to the success card width so the "Go to dashboard" CTA no longer spans the full container width. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -175,7 +175,7 @@
     /* Step indicator — labeled progress track */
         .step-track {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       gap: 0.35rem;
       margin-top: var(--space-lg);
@@ -210,6 +210,7 @@
     }
     .step-line {
       width: 40px; height: 2px;
+      margin-top: 4px;
       border-radius: var(--glass-radius-pill);
       background: rgba(0, 67, 73, 0.12);
       transition: var(--transition-smooth);
@@ -1387,7 +1388,10 @@
     }
 
     .success-footer {
-      margin-top: 0;
+      max-width: 640px;
+      margin-top: var(--space-lg);
+      margin-left: auto;
+      margin-right: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
