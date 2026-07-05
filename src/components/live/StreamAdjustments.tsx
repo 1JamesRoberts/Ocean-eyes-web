@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Plus, SlidersHorizontal } from 'lucide-react';
 import { GlassCard, GlassButton, GlassBadge, GlassInput } from '../shared';
 import type { CameraFilters, FilterPreset } from '../../types/aquarium';
@@ -6,6 +6,9 @@ import type { CameraFilters, FilterPreset } from '../../types/aquarium';
 interface StreamAdjustmentsProps {
   filters: CameraFilters;
   onFilterChange: (filters: Partial<CameraFilters>) => void;
+  filterPresets?: FilterPreset[];
+  onSavePreset?: (preset: FilterPreset) => void;
+  onDeletePreset?: (id: string) => void;
 }
 
 const DEFAULT_PRESETS: FilterPreset[] = [
@@ -37,11 +40,14 @@ const DEFAULT_PRESETS: FilterPreset[] = [
 
 export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
   filters,
-  onFilterChange
+  onFilterChange,
+  filterPresets: externalFilterPresets,
+  onSavePreset: externalOnSavePreset,
+  onDeletePreset: externalOnDeletePreset,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedPresetId, setSelectedPresetId] = useState<string>('normal');
-  const [customPresets, setCustomPresets] = useState<FilterPreset[]>(() => {
+  const [internalCustomPresets, setInternalCustomPresets] = useState<FilterPreset[]>(() => {
     try {
       const saved = localStorage.getItem('oceaneyes_camera_presets');
       return saved ? (JSON.parse(saved) as FilterPreset[]) : [];
@@ -51,6 +57,18 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
   });
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [newPresetName, setNewPresetName] = useState('');
+
+  const customPresets = externalFilterPresets ?? internalCustomPresets;
+  const isControlled = externalFilterPresets !== undefined;
+
+  const setCustomPresets = useCallback((updater: FilterPreset[] | ((prev: FilterPreset[]) => FilterPreset[])) => {
+    if (isControlled) return;
+    setInternalCustomPresets((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      localStorage.setItem('oceaneyes_camera_presets', JSON.stringify(next));
+      return next;
+    });
+  }, [isControlled]);
 
   const applyPreset = (preset: FilterPreset) => {
     setSelectedPresetId(preset.id);
@@ -69,9 +87,11 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
       filters: { ...filters }
     };
 
-    const updated = [...customPresets, newPreset];
-    setCustomPresets(updated);
-    localStorage.setItem('oceaneyes_camera_presets', JSON.stringify(updated));
+    if (externalOnSavePreset) {
+      externalOnSavePreset(newPreset);
+    } else {
+      setCustomPresets((prev) => [...prev, newPreset]);
+    }
     setSelectedPresetId(presetId);
     setNewPresetName('');
     setShowSaveInput(false);
@@ -79,9 +99,11 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
 
   const handleDeletePreset = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = customPresets.filter(p => p.id !== id);
-    setCustomPresets(updated);
-    localStorage.setItem('oceaneyes_camera_presets', JSON.stringify(updated));
+    if (externalOnDeletePreset) {
+      externalOnDeletePreset(id);
+    } else {
+      setCustomPresets((prev) => prev.filter(p => p.id !== id));
+    }
     if (selectedPresetId === id) {
       applyPreset(DEFAULT_PRESETS[0]);
     }

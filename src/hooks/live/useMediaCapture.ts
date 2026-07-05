@@ -43,6 +43,8 @@ interface UseMediaCaptureViewModelResult {
   toggleRecording: (currentFishCount: number, currentClarity: number) => void;
   downloadRecording: (rec: RecordingEntry) => void;
   deleteRecording: (id: string) => void;
+  clearSnapshots: () => void;
+  clearRecordings: () => void;
 }
 
 const SNAPSHOT_CANVAS_WIDTH = 640;
@@ -225,6 +227,14 @@ Diagnostics:
     setRecordings((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
+  const clearSnapshots = useCallback(() => {
+    setSnapshots([]);
+  }, []);
+
+  const clearRecordings = useCallback(() => {
+    setRecordings([]);
+  }, []);
+
   return {
     snapshots,
     recordings,
@@ -237,5 +247,7 @@ Diagnostics:
     toggleRecording,
     downloadRecording,
     deleteRecording,
+    clearSnapshots,
+    clearRecordings,
   };
 };

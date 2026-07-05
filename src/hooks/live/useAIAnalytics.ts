@@ -12,6 +12,7 @@ import { useBackendStatus, type BackendStatus } from './useBackendStatus';
 import { useAIPolling } from './useAIPolling';
 import { useTurbidityMeasurement } from './useTurbidityMeasurement';
 import { useManualDiagnosis } from './useManualDiagnosis';
+import { useLivePreferences } from '../useLivePreferences';
 
 export interface UseAIAnalyticsViewModelOptions {
   cameraFeedRef: React.RefObject<CameraFeedHandle | null>;
@@ -53,6 +54,7 @@ export const useAIAnalytics = ({
   saveLiveState,
   tankId,
 }: UseAIAnalyticsViewModelOptions): UseAIAnalyticsViewModelResult => {
+  const { preferences } = useLivePreferences(tankId);
   const { backendStatus, checkBackend } = useBackendStatus(isStreaming);
   const {
     isAIActive,
@@ -72,6 +74,7 @@ export const useAIAnalytics = ({
     backendStatus,
     checkBackend,
     tankId,
+    aiPreferences: preferences.ai,
   });
 
   const {
@@ -124,6 +127,21 @@ export const useAIAnalytics = ({
       ai_active: isAIActive,
     });
   }, [isAIActive]);
+
+  // Auto-start AI when stream connects if preference is enabled.
+  const autoStartTriggeredRef = useRef(false);
+  useEffect(() => {
+    if (!isStreaming || !preferences.ai.autoStart || isAIActive || aiLoading || backendStatus !== 'online') return;
+    if (autoStartTriggeredRef.current) return;
+    autoStartTriggeredRef.current = true;
+    toggleAI();
+  }, [isStreaming, preferences.ai.autoStart, isAIActive, aiLoading, backendStatus, toggleAI]);
+
+  useEffect(() => {
+    if (!isStreaming) {
+      autoStartTriggeredRef.current = false;
+    }
+  }, [isStreaming]);
 
   // Persist full prediction/turbidity results when stream stops
   useEffect(() => {

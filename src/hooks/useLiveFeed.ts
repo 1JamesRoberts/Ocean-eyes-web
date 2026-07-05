@@ -5,7 +5,8 @@ import {
   updateCalibration as updateCalibrationInRepository,
   subscribeLiveState,
 } from '../models/repositories/storageBase';
-import type { CameraFeedConfig, LiveState } from '../types/aquarium';
+import { useLivePreferences } from './useLivePreferences';
+import type { CameraFeedConfig, CameraSourcePreference, LiveState } from '../types/aquarium';
 
 export interface UseLiveFeedViewModelResult {
   liveState: LiveState | null;
@@ -30,7 +31,15 @@ const DEFAULT_FEED: CameraFeedConfig = {
   mock_image: ''
 };
 
+const buildStreamUrl = (source: CameraSourcePreference): string => {
+  if (source.type === 'mock') return 'mock:/mock_camera_main.png';
+  if (source.deviceId && source.deviceId !== 'default') return `webcam:${source.deviceId}`;
+  return 'webcam:default';
+};
+
 export const useLiveFeed = (tankId: string | null): UseLiveFeedViewModelResult => {
+  const { preferences } = useLivePreferences(tankId);
+
   const subscribeLiveStateCallback = useCallback(
     (callback: () => void) => {
       if (!tankId) return () => {};
@@ -53,6 +62,7 @@ export const useLiveFeed = (tankId: string | null): UseLiveFeedViewModelResult =
   const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const preferenceAppliedRef = useRef(false);
 
   const saveLiveState = useCallback((state: LiveState) => {
     if (tankId) {
@@ -67,6 +77,36 @@ export const useLiveFeed = (tankId: string | null): UseLiveFeedViewModelResult =
       updateCalibrationInRepository(tankId, activeFeedId, waterLineY);
     }
   }, [tankId]);
+
+  // Apply preferred camera source to the live-state feed when idle.
+  useEffect(() => {
+    if (!liveState || isStreaming || preferenceAppliedRef.current) return;
+    const preferredUrl = buildStreamUrl(preferences.cameraSource);
+    const currentUrl = liveState.feeds[0]?.stream_url;
+    if (currentUrl === preferredUrl) {
+      preferenceAppliedRef.current = true;
+      return;
+    }
+
+    const nextFeed: CameraFeedConfig = {
+      ...(liveState.feeds[0] || DEFAULT_FEED),
+      stream_url: preferredUrl,
+      mock_image: preferredUrl.startsWith('mock:') ? '/mock_camera_main.png' : '',
+      name: preferences.cameraSource.type === 'mock' ? 'Demo Feed' : (preferences.cameraSource.label || 'Local Webcam'),
+    };
+
+    saveLiveState({
+      ...liveState,
+      stream_url: preferredUrl,
+      feeds: [nextFeed],
+    });
+    preferenceAppliedRef.current = true;
+  }, [liveState, isStreaming, preferences.cameraSource, saveLiveState]);
+
+  // Reset the applied flag when the camera source preference changes.
+  useEffect(() => {
+    preferenceAppliedRef.current = false;
+  }, [preferences.cameraSource]);
 
   // Webcam acquisition
   useEffect(() => {
@@ -101,24 +141,25 @@ export const useLiveFeed = (tankId: string | null): UseLiveFeedViewModelResult =
 
   const startStream = useCallback(() => {
     if (!liveState) return;
-    const feed = liveState.feeds[0];
-    if (!feed) return;
+    const preferredUrl = buildStreamUrl(preferences.cameraSource);
+    const feed = liveState.feeds[0] || { ...DEFAULT_FEED, stream_url: preferredUrl };
     const updatedFeed = {
       ...feed,
+      stream_url: preferredUrl,
       is_live: true,
       started_at: feed.started_at || new Date().toISOString()
     };
     saveLiveState({
       ...liveState,
       is_live: true,
-      stream_url: updatedFeed.stream_url,
+      stream_url: preferredUrl,
       started_at: updatedFeed.started_at,
       last_ping_at: new Date().toISOString(),
       current_clarity: updatedFeed.current_clarity,
       current_fish_count: updatedFeed.current_fish_count,
       feeds: [updatedFeed]
     });
-  }, [liveState, saveLiveState]);
+  }, [liveState, preferences.cameraSource, saveLiveState]);
 
   return {
     liveState,

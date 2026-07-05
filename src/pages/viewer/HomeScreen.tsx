@@ -47,11 +47,6 @@ export const HomeScreen: React.FC = () => {
             hero
           />
 
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-brand">Dashboard</h2>
-            <div className="h-2 w-12 rounded-full bg-text-muted/30" />
-          </div>
-
           <HealthScoreCard
             reading={{
               ph: latestReading.ph,

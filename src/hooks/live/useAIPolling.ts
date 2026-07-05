@@ -6,7 +6,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react';
-import type { CameraFeedConfig, LiveState, TankBrief, AIDetectionResult } from '../../types/aquarium';
+import type { CameraFeedConfig, LiveState, TankBrief, AIDetectionResult, AIPreferences } from '../../types/aquarium';
 import type { CameraFeedHandle } from '../../components/live/CameraFeed';
 import { sendFrameForDetection } from '../../models/api/aiApi';
 import {
@@ -39,6 +39,7 @@ export interface UseAIPollingViewModelOptions {
   backendStatus: BackendStatus;
   checkBackend: (signal?: AbortSignal) => Promise<boolean>;
   tankId: string | null;
+  aiPreferences?: AIPreferences;
 }
 
 export interface UseAIPollingViewModelResult {
@@ -61,6 +62,7 @@ export const useAIPolling = ({
   backendStatus,
   checkBackend,
   tankId,
+  aiPreferences,
 }: UseAIPollingViewModelOptions): UseAIPollingViewModelResult => {
   const { addAlert } = useAlerts();
   const { writeReading } = useReadings();
@@ -83,7 +85,17 @@ export const useAIPolling = ({
   const liveStateRef = useRef(liveState);
   const activeFeedRef = useRef(activeFeed);
   const aiLoadingRef = useRef(aiLoading);
+  const aiPreferencesRef = useRef(aiPreferences);
 
+  const preferences = aiPreferences ?? {
+    pollingIntervalMs: AI_POLL_INTERVAL_MS,
+    detectionConfidenceThreshold: DETECTION_CONFIDENCE,
+    speciesConfidenceThreshold: DETECTION_CONFIDENCE,
+    diagnosisMinConfidence: DIAGNOSIS_MIN_CONF,
+    autoStart: false,
+  };
+
+  useEffect(() => { aiPreferencesRef.current = aiPreferences; }, [aiPreferences]);
   useEffect(() => { activeTankRef.current = activeTank; }, [activeTank]);
   useEffect(() => { liveStateRef.current = liveState; }, [liveState]);
   useEffect(() => { activeFeedRef.current = activeFeed; }, [activeFeed]);
@@ -161,9 +173,9 @@ export const useAIPolling = ({
 
         const result = await sendFrameForDetection(
           blob,
-          DETECTION_CONFIDENCE,
+          preferences.detectionConfidenceThreshold,
           diagnose,
-          DIAGNOSIS_MIN_CONF,
+          preferences.diagnosisMinConfidence,
           controller.signal
         );
 
@@ -209,7 +221,7 @@ export const useAIPolling = ({
         }
         aiAbortControllerRef.current = null;
         if (aiMountedRef.current) {
-          aiTimeoutRef.current = setTimeout(processFrame, AI_POLL_INTERVAL_MS);
+          aiTimeoutRef.current = setTimeout(processFrame, preferences.pollingIntervalMs);
         }
       }
     };

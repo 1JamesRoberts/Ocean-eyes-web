@@ -4,7 +4,6 @@ import { useNavigation } from '../context/NavigationContext';
 import { useTank } from '../hooks/useTank';
 import { RootGateOnboarding } from './viewer/RootGateOnboarding';
 import { HomeScreen } from './viewer/HomeScreen';
-import { LiveScreen } from './viewer/LiveScreen';
 import { SettingsScreen } from './viewer/SettingsScreen';
 import { AlertsScreen } from './viewer/AlertsScreen';
 import { HistoryDetailScreen } from './viewer/HistoryDetailScreen';
@@ -24,8 +23,6 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
     switch (activeTab) {
       case 'home':
         return <HomeScreen />;
-      case 'live':
-        return <LiveScreen />;
       case 'settings':
         return <SettingsScreen />;
       case 'alerts':
@@ -48,7 +45,7 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
 
   return (
     <div className="flex w-full flex-1 flex-col">
-      {tankId === null && activeTab !== 'live' ? (
+      {tankId === null ? (
         <div className="
           rounded-[20px] border border-border-subtle
           bg-surface p-6 shadow-card transition-smooth

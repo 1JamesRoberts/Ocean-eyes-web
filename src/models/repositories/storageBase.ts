@@ -2,6 +2,7 @@
 import type {
   AlertItem,
   FishEntry,
+  LivePreferences,
   LiveState,
   ReadingItem,
   TankBrief,
@@ -33,6 +34,7 @@ export const STORAGE_KEYS = {
   readings: 'readings',
   alerts: 'alerts',
   liveState: (tankId: string) => `live_state_${tankId}`,
+  livePreferences: (tankId: string) => `live_preferences_${tankId}`,
   linkedTanks: 'user_tanks',
   lastTankId: 'oceaneyes_last_tank_id',
   schemaVersion: 'oceaneyes_schema_version',
@@ -147,6 +149,28 @@ export const getDefaultLiveState = (): LiveState => ({
       mock_image: '',
     },
   ],
+});
+
+export const DEFAULT_CAMERA_FILTERS: import('../../types/aquarium').CameraFilters = {
+  contrast: 100,
+  brightness: 100,
+  saturation: 100,
+  temperature: 0,
+  tint: 0,
+};
+
+export const getDefaultLivePreferences = (): LivePreferences => ({
+  cameraSource: { type: 'webcam', deviceId: 'default', label: 'Default Webcam' },
+  defaultFilters: DEFAULT_CAMERA_FILTERS,
+  filterPresets: [],
+  ai: {
+    pollingIntervalMs: 10000,
+    detectionConfidenceThreshold: 0.35,
+    speciesConfidenceThreshold: 0.35,
+    diagnosisMinConfidence: 0.6,
+    autoStart: false,
+  },
+  autoConnect: false,
 });
 
 // ---------------------------------------------------------------------------
@@ -595,4 +619,23 @@ export const updateCalibration = (
 
 export const subscribeLiveState = (tankId: string, callback: () => void) =>
   subscribeToDb(STORAGE_KEYS.liveState(tankId), callback);
+
+// ===========================================================================
+// Live preferences repository
+// ===========================================================================
+
+export const getLivePreferences = (tankId: string): LivePreferences => {
+  const key = STORAGE_KEYS.livePreferences(tankId);
+  return getSnapshot<LivePreferences>(key, getDefaultLivePreferences());
+};
+
+export const saveLivePreferences = (tankId: string, preferences: LivePreferences) => {
+  const key = STORAGE_KEYS.livePreferences(tankId);
+  const result = safeSetItem(key, JSON.stringify(preferences));
+  if (result.success) notifyUpdate(key);
+  return result;
+};
+
+export const subscribeLivePreferences = (tankId: string, callback: () => void) =>
+  subscribeToDb(STORAGE_KEYS.livePreferences(tankId), callback);
 

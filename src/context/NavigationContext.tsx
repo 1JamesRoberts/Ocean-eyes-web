@@ -1,15 +1,13 @@
 // src/context/NavigationContext.tsx - Global navigation & tab state
 import React, { createContext, useContext, useState } from 'react';
 
-export type ViewerTab = 'home' | 'live' | 'settings' | 'alerts' | 'history' | 'my_fish' | 'monitor' | 'analytics';
+export type ViewerTab = 'home' | 'settings' | 'alerts' | 'history' | 'my_fish' | 'monitor' | 'analytics';
 
 interface NavigationContextType {
   activeTab: ViewerTab;
   setActiveTab: (tab: ViewerTab) => void;
   selectedAlertId: string | null;
   setSelectedAlertId: (id: string | null) => void;
-  autoFullscreen: boolean;
-  setAutoFullscreen: (value: boolean) => void;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
@@ -17,7 +15,6 @@ const NavigationContext = createContext<NavigationContextType | undefined>(undef
 export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<ViewerTab>('home');
   const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
-  const [autoFullscreen, setAutoFullscreen] = useState<boolean>(false);
 
   return (
     <NavigationContext.Provider
@@ -26,8 +23,6 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setActiveTab,
         selectedAlertId,
         setSelectedAlertId,
-        autoFullscreen,
-        setAutoFullscreen,
       }}
     >
       {children}

@@ -148,6 +148,28 @@ export interface FilterPreset {
   filters: CameraFilters;
 }
 
+export interface CameraSourcePreference {
+  type: 'webcam' | 'mock';
+  deviceId?: string;
+  label?: string;
+}
+
+export interface AIPreferences {
+  pollingIntervalMs: number;
+  detectionConfidenceThreshold: number;
+  speciesConfidenceThreshold: number;
+  diagnosisMinConfidence: number;
+  autoStart: boolean;
+}
+
+export interface LivePreferences {
+  cameraSource: CameraSourcePreference;
+  defaultFilters: CameraFilters;
+  filterPresets: FilterPreset[];
+  ai: AIPreferences;
+  autoConnect: boolean;
+}
+
 // ─── AI Inference Types ─────────────────────────────────────────────────────
 
 export interface FishDiagnosis {

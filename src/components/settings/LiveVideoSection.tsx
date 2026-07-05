@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useTank } from '../../hooks/useTank';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
+import { useLivePreferences } from '../../hooks/useLivePreferences';
 import { useFish } from '../../hooks/useFish';
 import { useFullscreen } from '../../hooks/live/useFullscreen';
 import { useViewportSize } from '../../hooks/live/useViewportSize';
@@ -10,18 +11,31 @@ import { useAIAnalytics } from '../../hooks/live/useAIAnalytics';
 
 import { Video } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
-import { AIBoundingBoxes } from '../../components/live/AIBoundingBoxes';
-import { CameraControls } from '../../components/live/CameraControls';
-import { CameraFeed } from '../../components/live/CameraFeed';
-import type { CameraFeedHandle } from '../../components/live/CameraFeed';
-import { FullscreenInventory } from '../../components/live/FullscreenInventory';
-import { SnapshotGallery } from '../../components/live/SnapshotGallery';
-import { StreamAdjustments } from '../../components/live/StreamAdjustments';
-import { AIAnalysisPanel } from '../../components/live/AIAnalysisPanel';
-import { VideoDecorations } from '../../components/live/VideoDecorations';
+import { AIBoundingBoxes } from '../live/AIBoundingBoxes';
+import { CameraControls } from '../live/CameraControls';
+import { CameraFeed } from '../live/CameraFeed';
+import type { CameraFeedHandle } from '../live/CameraFeed';
+import { FullscreenInventory } from '../live/FullscreenInventory';
+import { SnapshotGallery } from '../live/SnapshotGallery';
+import { StreamAdjustments } from '../live/StreamAdjustments';
+import { AIAnalysisPanel } from '../live/AIAnalysisPanel';
+import { VideoDecorations } from '../live/VideoDecorations';
+import { GlassButton } from '../shared';
 
-export const LiveScreen: React.FC = () => {
-  const { activeTank, tankId } = useTank();
+interface LiveVideoSectionProps {
+  tankId?: string | null;
+  showStreamAdjustments?: boolean;
+  showSnapshotGallery?: boolean;
+}
+
+export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
+  tankId: propTankId,
+  showStreamAdjustments = true,
+  showSnapshotGallery = true,
+}) => {
+  const { activeTank, tankId: activeTankId } = useTank();
+  const tankId = propTankId ?? activeTankId;
+  const { preferences, addFilterPreset, removeFilterPreset } = useLivePreferences(tankId);
   const {
     liveState,
     saveLiveState,
@@ -39,7 +53,7 @@ export const LiveScreen: React.FC = () => {
 
   const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSize();
 
-  const { filters, temperatureOverlay, tintOverlay, handleFilterChange } = useCameraFilters();
+  const { filters, temperatureOverlay, tintOverlay, handleFilterChange, saveAsDefault } = useCameraFilters({ tankId });
 
   const {
     snapshots,
@@ -264,24 +278,36 @@ export const LiveScreen: React.FC = () => {
             lastManualDiagnosis={lastManualDiagnosis}
           />
 
-          <StreamAdjustments
-            filters={filters}
-            onFilterChange={handleFilterChange}
-          />
+          {showStreamAdjustments && (
+            <StreamAdjustments
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              filterPresets={preferences.filterPresets}
+              onSavePreset={addFilterPreset}
+              onDeletePreset={removeFilterPreset}
+            />
+          )}
 
-
+          {showStreamAdjustments && (
+            <div className="flex justify-end">
+              <GlassButton variant="outline" size="sm" onClick={saveAsDefault}>
+                Save Current Filters as Default
+              </GlassButton>
+            </div>
+          )}
         </>
       )}
 
-      <SnapshotGallery
-        snapshots={snapshots}
-        recordings={recordings}
-        onDownloadSnapshot={downloadSnapshot}
-        onDeleteSnapshot={deleteSnapshot}
-        onDownloadRecording={downloadRecording}
-        onDeleteRecording={deleteRecording}
-      />
-      
+      {showSnapshotGallery && (
+        <SnapshotGallery
+          snapshots={snapshots}
+          recordings={recordings}
+          onDownloadSnapshot={downloadSnapshot}
+          onDeleteSnapshot={deleteSnapshot}
+          onDownloadRecording={downloadRecording}
+          onDeleteRecording={deleteRecording}
+        />
+      )}
     </div>
   );
 };

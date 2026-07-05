@@ -25,11 +25,10 @@ export const useHome = () => {
   const hasReadingData = latestReading !== undefined;
 
   const onGoLive = useCallback(() => {
-    navigation.setAutoFullscreen(true);
-    navigation.setActiveTab('live');
+    navigation.setActiveTab('settings');
   }, [navigation]);
   const onViewAdvanced = useCallback(
-    () => navigation.setActiveTab('live'),
+    () => navigation.setActiveTab('settings'),
     [navigation]
   );
   const onManageFish = useCallback(

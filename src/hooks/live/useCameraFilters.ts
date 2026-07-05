@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useLivePreferences } from '../useLivePreferences';
 import type { CameraFilters } from '../../types/aquarium';
 import {
   buildCanvasFilterString,
@@ -8,13 +9,9 @@ import {
   getTintOpacity,
 } from '../../models/services/cameraFilterModel';
 
-const DEFAULT_FILTERS: CameraFilters = {
-  contrast: 100,
-  brightness: 100,
-  saturation: 100,
-  temperature: 0,
-  tint: 0,
-};
+export interface UseCameraFiltersViewModelOptions {
+  tankId?: string | null;
+}
 
 export interface UseCameraFiltersViewModelResult {
   filters: CameraFilters;
@@ -22,14 +19,20 @@ export interface UseCameraFiltersViewModelResult {
   temperatureOverlay: { backgroundColor: string; opacity: number } | null;
   tintOverlay: { backgroundColor: string; opacity: number } | null;
   handleFilterChange: (partial: Partial<CameraFilters>) => void;
+  saveAsDefault: () => void;
 }
 
-export const useCameraFilters = (): UseCameraFiltersViewModelResult => {
-  const [filters, setFilters] = useState<CameraFilters>(DEFAULT_FILTERS);
+export const useCameraFilters = (options: UseCameraFiltersViewModelOptions = {}): UseCameraFiltersViewModelResult => {
+  const { preferences, updateDefaultFilters } = useLivePreferences(options.tankId ?? null);
+  const [filters, setFilters] = useState<CameraFilters>(preferences.defaultFilters);
 
   const handleFilterChange = useCallback((partial: Partial<CameraFilters>) => {
     setFilters((prev) => ({ ...prev, ...partial }));
   }, []);
+
+  const saveAsDefault = useCallback(() => {
+    updateDefaultFilters(filters);
+  }, [filters, updateDefaultFilters]);
 
   const filterStyle = useMemo(() => buildCanvasFilterString(filters), [filters]);
 
@@ -55,5 +58,6 @@ export const useCameraFilters = (): UseCameraFiltersViewModelResult => {
     temperatureOverlay,
     tintOverlay,
     handleFilterChange,
+    saveAsDefault,
   };
 };
