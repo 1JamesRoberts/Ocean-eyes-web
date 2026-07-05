@@ -9,3 +9,6 @@ export { GlassModal } from "./GlassModal";
 export { GlassListRow } from "./GlassListRow";
 export { DashboardCard } from "./DashboardCard";
 export { AlertDetail } from "./AlertDetail";
+export { PhoneFrame } from "./PhoneFrame";
+export { StatusBar } from "./StatusBar";
+export { PillNavigation } from "./PillNavigation";

@@ -9,29 +9,33 @@ interface WaterChemistryGridProps {
 export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading }) => {
   const parameters = [
     {
-      label: 'pH Value',
-      value: reading.ph === undefined ? '—' : `${reading.ph} pH`,
+      label: 'pH',
+      value: reading.ph === undefined ? '—' : `${reading.ph}`,
+      unit: 'pH',
       colorClass: 'text-brand-bright bg-brand-glow/30',
       icon: FlaskConical,
       isCritical: false
     },
     {
-      label: 'Temperature',
-      value: reading.temp === undefined ? '—' : `${reading.temp}°C`,
+      label: 'Temp',
+      value: reading.temp === undefined ? '—' : `${reading.temp}`,
+      unit: '°C',
       colorClass: 'text-orange-600 bg-orange-100/30',
       icon: Thermometer,
       isCritical: false
     },
     {
-      label: 'Ammonia (NH₃)',
-      value: reading.ammonia === undefined ? '—' : `${reading.ammonia} ppm`,
+      label: 'NH₃',
+      value: reading.ammonia === undefined ? '—' : `${reading.ammonia}`,
+      unit: 'ppm',
       colorClass: 'text-brand bg-brand/10',
       icon: Shield,
       isCritical: (reading.ammonia ?? 0) > 0
     },
     {
-      label: 'Nitrite (NO₂⁻)',
-      value: reading.nitrite === undefined ? '—' : `${reading.nitrite} ppm`,
+      label: 'NO₂',
+      value: reading.nitrite === undefined ? '—' : `${reading.nitrite}`,
+      unit: 'ppm',
       colorClass: 'text-purple-600 bg-purple-100/30',
       icon: Zap,
       isCritical: (reading.nitrite ?? 0) > 0.2
@@ -39,6 +43,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
     {
       label: 'CO₂',
       value: '—',
+      unit: '',
       colorClass: 'text-blue-600 bg-blue-100/30',
       icon: Cloud,
       isCritical: false
@@ -46,45 +51,32 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
   ];
 
   return (
-    <section className="glass-card p-6">
-      <h3 className="
-        mb-4 text-xs font-medium tracking-widest text-text-muted/70
-        uppercase
-      ">
-        Water Chemistry Parameters
-      </h3>
-
-      <div className="space-y-3">
-        {parameters.map(param => (
+    <div className="grid grid-cols-5 gap-2">
+      {parameters.map(param => (
+        <div
+          key={param.label}
+          className="flex flex-col items-center gap-1.5 rounded-2xl border border-white/20 bg-white/20 p-2 text-center transition-colors hover:bg-white/60"
+        >
           <div
-            key={param.label}
-            className="
-              flex items-center gap-4 rounded-2xl border border-white/20
-              bg-white/20 p-3 transition-colors
-              hover:bg-white/60
-            "
+            className={`
+              flex size-8 shrink-0 items-center justify-center rounded-full
+              ${param.colorClass}
+            `}
           >
-            <div
-              className={`
-                flex size-10 shrink-0 items-center justify-center rounded-full
-                ${param.colorClass}
-              `}
-            >
-              <param.icon size={18} />
-            </div>
-            <div className="flex-1">
-              <span className="block text-xs text-text-muted">{param.label}</span>
-              <span className={`
-                text-base font-bold
-                ${param.isCritical ? `text-critical` : `text-brand`}
-              `}>
-                {param.value}
-              </span>
-            </div>
+            <param.icon size={14} />
           </div>
-        ))}
-      </div>
-    </section>
+          <div>
+            <span className={`
+              block text-sm font-bold leading-tight
+              ${param.isCritical ? `text-critical` : `text-brand`}
+            `}>
+              {param.value}
+            </span>
+            <span className="block text-[9px] text-text-muted">{param.unit}</span>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 });
 

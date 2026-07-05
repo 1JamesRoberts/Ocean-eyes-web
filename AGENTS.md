@@ -1,5 +1,7 @@
 # Project Overview
 
+## The current branch is for Mobile webapp prototype
+
 OceanEyes is a React + TypeScript dashboard for real-time AI aquarium monitoring. It combines computer vision (fish detection, species classification, turbidity) with water chemistry telemetry. The current state is still prototype.
 
 ## Tech Stack

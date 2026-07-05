@@ -29,8 +29,6 @@ export const SettingsScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header removed — moved to TopAppBar */}
-
       {/* Tank Identity */}
       <GlassCard className="p-5">
         {editing ? (

@@ -8,17 +8,15 @@ interface HealthScoreCardProps {
 export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) => {
   const healthScore = calculateHealthScore(reading);
   const healthMessage = getHealthMessage(healthScore);
-  const strokeWidth = 10;
-  const radius = 54;
+  const strokeWidth = 8;
+  const radius = 48;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference * (1 - healthScore / 10);
 
   return (
-    <section className="shimmer flex items-center gap-6 glass-card p-6">
-      <div className="
-        relative flex size-32 shrink-0 items-center justify-center
-      ">
-        <svg className="progress-ring size-32" height="128" width="128">
+    <section className="shimmer flex items-center gap-5 glass-card p-5">
+      <div className="relative flex size-28 shrink-0 items-center justify-center">
+        <svg className="size-28" height="112" width="112" viewBox="0 0 112 112">
           <defs>
             <linearGradient id="healthRingGradient" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#004349" />
@@ -26,17 +24,17 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             </linearGradient>
           </defs>
           <circle
-            cx="64"
-            cy="64"
+            cx="56"
+            cy="56"
             r={radius}
-            className="text-text-muted"
+            className="text-text-muted/20"
             stroke="currentColor"
             strokeWidth={strokeWidth}
             fill="none"
           />
           <circle
-            cx="64"
-            cy="64"
+            cx="56"
+            cy="56"
             r={radius}
             className="progress-ring-circle"
             stroke="url(#healthRingGradient)"
@@ -47,18 +45,17 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             strokeLinecap="round"
           />
         </svg>
-        <div className="
-          absolute inset-0 flex flex-col items-center justify-center
-        ">
-          <span className="text-3xl font-bold text-brand">{healthScore}</span>
-          <span className="text-xs font-medium text-text-muted">Score</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-bold text-brand">{healthScore}</span>
+          <span className="text-[10px] font-medium text-text-muted">Score</span>
         </div>
       </div>
 
       <div className="flex-1">
-        <h3 className="text-xl font-semibold text-brand">Aquarium Health Index</h3>
-        <p className="mt-1.5 text-sm/relaxed text-text-muted">
-          {healthMessage}
+        <span className="block text-xs text-text-muted">Aquarium Health Index</span>
+        <h3 className="text-2xl font-bold text-brand">{healthMessage}</h3>
+        <p className="mt-0.5 text-xs text-text-muted">
+          All parameters are in safe bands. System is optimal.
         </p>
       </div>
     </section>

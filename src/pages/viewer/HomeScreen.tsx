@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHome } from '../../hooks/pages/useHome';
-import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { LiveFeedPreview } from '../../components/home/LiveFeedPreview';
+import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
 import { WaterClarityCard } from '../../components/home/WaterClarityCard';
 import { WaterChemistryGrid } from '../../components/home/WaterChemistryGrid';
@@ -25,66 +25,75 @@ export const HomeScreen: React.FC = () => {
   } = useHome();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {!hasReadingData ? (
-        <div className="glass-card p-10 text-center transition-smooth">
-          <span className="mb-3 block text-hero">🐠</span>
-          <h3 className="mb-2 text-lg font-bold text-text">
+        <div className="glass-card p-6 text-center transition-smooth">
+          <span className="mb-3 block text-4xl">🐠</span>
+          <h3 className="mb-2 text-base font-bold text-text">
             Waiting for monitor data…
           </h3>
-          <p className="
-            mx-auto max-w-[420px] text-sm leading-[150%] text-text-muted
-          ">
-            The AI backend has not yet returned any readings for today. Make sure the OceanEyes inference service is running and has processed at least one frame.
+          <p className="mx-auto text-xs leading-relaxed text-text-muted">
+            The AI backend has not yet returned any readings. Make sure the OceanEyes inference service is running and has processed at least one frame.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-12 gap-6">
-          <div className="
-            col-span-12 flex flex-col gap-6
-            lg:col-span-8
-          ">
-            <HealthScoreCard
-              reading={{
-                ph: latestReading.ph,
-                clarity: displayClarity,
-                ammonia: latestReading.ammonia,
-                nitrite: latestReading.nitrite
-              }}
-            />
+        <>
+          <LiveFeedPreview
+            activeTank={activeTank}
+            displayClarity={displayClarity}
+            displayFishCount={displayFishCount}
+            onViewAdvanced={onViewAdvanced}
+            onGoFullscreen={onGoLive}
+            hero
+          />
 
-            <LiveFeedPreview
-              activeTank={activeTank}
-              displayClarity={displayClarity}
-              displayFishCount={displayFishCount}
-              onViewAdvanced={onViewAdvanced}
-              onGoFullscreen={onGoLive}
-            />
-
-            <FishInventorySummary
-              fishList={fishList}
-              onManageFish={onManageFish}
-            />
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-brand">Dashboard</h2>
+            <div className="h-2 w-12 rounded-full bg-text-muted/30" />
           </div>
 
-          <div className="
-            col-span-12 flex flex-col gap-6
-            lg:col-span-4
-          ">
-            <WaterClarityCard
-              displayClarity={displayClarity}
-              readings={readings}
-              onClick={onViewHistory}
-            />
+          <HealthScoreCard
+            reading={{
+              ph: latestReading.ph,
+              clarity: displayClarity,
+              ammonia: latestReading.ammonia,
+              nitrite: latestReading.nitrite
+            }}
+          />
 
-            <WaterChemistryGrid reading={latestReading} />
+          <FishInventorySummary
+            fishList={fishList}
+            onManageFish={onManageFish}
+          />
 
-            <ActiveAlertsList
-              alerts={alerts}
-              onSelectAlert={onSelectAlert}
-            />
+          <div className="glass-card p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-xs font-medium tracking-widest text-text-muted/70 uppercase">
+                Water Parameters
+              </h3>
+              <button
+                onClick={onViewHistory}
+                className="cursor-pointer border-none bg-transparent font-main text-xs font-semibold text-brand-bright transition-opacity hover:opacity-80"
+              >
+                Manage list
+              </button>
+            </div>
+            <div className="space-y-3">
+              <WaterClarityCard
+                displayClarity={displayClarity}
+                readings={readings}
+                onClick={onViewHistory}
+                compact
+              />
+              <WaterChemistryGrid reading={latestReading} />
+            </div>
           </div>
-        </div>
+
+          <ActiveAlertsList
+            alerts={alerts}
+            onSelectAlert={onSelectAlert}
+          />
+        </>
       )}
     </div>
   );

@@ -11,6 +11,7 @@ interface LiveFeedPreviewProps {
   displayFishCount: number;
   onViewAdvanced: () => void;
   onGoFullscreen?: () => void;
+  hero?: boolean;
 }
 
 export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
@@ -19,6 +20,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   displayFishCount,
   onViewAdvanced,
   onGoFullscreen,
+  hero = false,
 }) => {
   const { activeFeed, isWebcam, isStreaming, videoRef, startStream } =
     useLiveFeed(activeTank?.id ?? null);
@@ -31,6 +33,31 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
       onGoFullscreen();
     }
   };
+
+  if (hero) {
+    return (
+      <section
+        className="relative -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)] cursor-pointer overflow-hidden"
+        onClick={onViewAdvanced}
+      >
+        <img
+          src="/mock_camera_main.png"
+          alt="Aquarium"
+          className="absolute inset-0 h-[108.75%] w-[105.13%] -left-[2.37%] -top-[4.97%] object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+
+        <div className="absolute bottom-3 left-4 z-10 flex gap-2">
+          <span className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+            Live
+          </span>
+          <span className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] text-white backdrop-blur-md">
+            {displayFishCount} fish
+          </span>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -60,7 +87,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
       <div
         ref={videoContainerRef}
         className="
-          fs-reset shimmer flex aspect-video w-full cursor-pointer items-center
+          fs-reset shimmer relative flex aspect-video w-full cursor-pointer items-center
           justify-center bg-black
         "
         onClick={handleVideoClick}

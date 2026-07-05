@@ -5,9 +5,30 @@ interface WaterClarityCardProps {
   displayClarity: number;
   readings: ReadingItem[];
   onClick: () => void;
+  compact?: boolean;
 }
 
-export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClarity, onClick }) => {
+export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClarity, onClick, compact = false }) => {
+  if (compact) {
+    return (
+      <button
+        type="button"
+        className="flex w-full cursor-pointer items-center gap-4 rounded-2xl border border-white/20 bg-white/20 p-3 text-left transition-colors hover:bg-white/60"
+        onClick={onClick}
+      >
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
+          <span className="material-symbols-outlined text-base">water_drop</span>
+        </div>
+        <div className="flex-1">
+          <span className="block text-[10px] text-text-muted">Clarity</span>
+          <span className="text-lg font-bold text-brand">
+            {displayClarity.toFixed(2)} FNU
+          </span>
+        </div>
+      </button>
+    );
+  }
+
   return (
     <section className="glass-card p-6">
       <h3 className="
