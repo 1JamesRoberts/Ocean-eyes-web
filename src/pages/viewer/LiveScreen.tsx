@@ -101,9 +101,9 @@ export const LiveScreen: React.FC = () => {
       <div
         ref={viewportRef}
         className="
-          fs-reset shimmer flex items-center justify-center rounded-[20px]
-          border border-[rgba(255,255,255,0.05)] bg-camera-bg shadow-premium
-          max-sm:rounded-xl
+          fs-reset sticky top-0 z-20 relative -mx-4 -mt-4 h-[221px]
+          w-[calc(100%+2rem)] overflow-hidden bg-black
+          flex items-center justify-center
         "
       >
         {isStreaming ? (
@@ -113,7 +113,7 @@ export const LiveScreen: React.FC = () => {
               ${flashActive ? 'flash-active' : ''}
             `} />
 
-            <div ref={imageContainerRef} className="shimmer w-full">
+            <div ref={imageContainerRef} className="shimmer relative h-full w-full">
               <CameraFeed
                 ref={cameraFeedRef}
                 feed={activeFeed}
@@ -122,6 +122,8 @@ export const LiveScreen: React.FC = () => {
                 videoRef={videoRef}
                 filters={filters}
                 onDimensions={handleDimensions}
+                className="h-full w-full"
+                videoClassName="h-full w-full object-cover"
               >
                 {temperatureOverlay && (
                   <div

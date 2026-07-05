@@ -18,8 +18,15 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
   const dims = lastPrediction.image_dimensions;
   const iw = imageNaturalSize.width || dims?.width || cw || 1;
   const ih = imageNaturalSize.height || dims?.height || ch;
-  const renderedWidth = cw;
-  const renderedHeight = cw * (ih / iw);
+
+  // object-fit: cover scaling — the video fills the container, cropping overflow
+  const scaleX = cw / iw;
+  const scaleY = ch / ih;
+  const scale = Math.max(scaleX, scaleY);
+  const displayedWidth = iw * scale;
+  const displayedHeight = ih * scale;
+  const offsetX = (cw - displayedWidth) / 2;
+  const offsetY = (ch - displayedHeight) / 2;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-15">
@@ -28,10 +35,10 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
         const speciesInfo = getSpeciesById(det.species);
         const boxColor = speciesInfo?.color || '#3B82F6';
 
-        const left = nx1 * renderedWidth;
-        const top = ny1 * renderedHeight;
-        const width = (nx2 - nx1) * renderedWidth;
-        const height = (ny2 - ny1) * renderedHeight;
+        const left = offsetX + nx1 * displayedWidth;
+        const top = offsetY + ny1 * displayedHeight;
+        const width = (nx2 - nx1) * displayedWidth;
+        const height = (ny2 - ny1) * displayedHeight;
 
         const fontSize = Math.max(10, Math.min(22, width * 0.12));
         return (
