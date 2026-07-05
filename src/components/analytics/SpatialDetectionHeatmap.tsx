@@ -6,8 +6,7 @@ import type { AIDetectionResult } from "../../types/aquarium";
 import { formatSpeciesName } from "../../utils/formatters";
 import { useLiveFeed } from "../../hooks/useLiveFeed";
 import { CameraFeed } from "../live/CameraFeed";
-import { CardHeader, GlassSelect } from "../shared";
-import { ChartEmptyState } from "./ChartEmptyState";
+import { GlassSelect } from "../shared";
 
 interface Props {
   records: AIDetectionResult[];
@@ -193,10 +192,6 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
       width: 0,
       height: 0,
     });
-    const [videoSize, setVideoSize] = React.useState<{
-      width: number;
-      height: number;
-    } | null>(null);
 
     // Flatten records into normalised center points
     const allCenters = useMemo(() => {
@@ -314,55 +309,39 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     // ── Render ──
 
     return (
-      <section className="overflow-hidden glass-card">
-        <CardHeader icon="grid_on" title="Detection Density">
-          <GlassSelect
-            value={selectedSpecies}
-            onChange={(e) => onSelectedSpeciesChange(e.target.value)}
-            className="!py-1 !px-3 text-xs"
-          >
-            <option value="all">All Species</option>
-            {speciesList.map((s) => (
-              <option key={s} value={s}>
-                {formatSpeciesName(s)}
-              </option>
-            ))}
-          </GlassSelect>
-        </CardHeader>
-
-        {allCenters.length === 0 ? (
-          <ChartEmptyState
-            message="No detection data available"
-            className="py-12"
+      <section className="sticky top-0 z-20 relative -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)] cursor-pointer overflow-hidden bg-black">
+        <div
+          ref={containerRef}
+          className="shimmer relative h-full w-full bg-camera-bg"
+        >
+          <CameraFeed
+            feed={activeFeed}
+            isStreaming={isStreaming}
+            isWebcam={isWebcam}
+            videoRef={videoRef}
+            className="h-full w-full"
+            videoClassName="h-full w-full object-cover"
           />
-        ) : (
-          <div
-            ref={containerRef}
-            className="shimmer w-full bg-camera-bg"
-            style={
-              videoSize
-                ? { aspectRatio: `${videoSize.width} / ${videoSize.height}` }
-                : undefined
-            }
-          >
-            <CameraFeed
-              feed={activeFeed}
-              isStreaming={isStreaming}
-              isWebcam={isWebcam}
-              videoRef={videoRef}
-              className="w-full"
-              onDimensions={(width, height) => {
-                if (width > 0 && height > 0) {
-                  setVideoSize({ width, height });
-                }
-              }}
-            />
-            <canvas
-              ref={overlayCanvasRef}
-              className="pointer-events-none absolute inset-0 size-full"
-            />
+          <canvas
+            ref={overlayCanvasRef}
+            className="pointer-events-none absolute inset-0 size-full"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+          <div className="absolute bottom-3 left-4 z-10">
+            <GlassSelect
+              value={selectedSpecies}
+              onChange={(e) => onSelectedSpeciesChange(e.target.value)}
+              className="!rounded-full !border-white/20 !bg-black/40 !px-2.5 !py-1 text-[10px] font-semibold text-white !backdrop-blur-md"
+            >
+              <option value="all">All Species</option>
+              {speciesList.map((s) => (
+                <option key={s} value={s}>
+                  {formatSpeciesName(s)}
+                </option>
+              ))}
+            </GlassSelect>
           </div>
-        )}
+        </div>
       </section>
     );
   },

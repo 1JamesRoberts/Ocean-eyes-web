@@ -37,17 +37,6 @@ export const AnalyticsScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Mobile controls — desktop controls live in the top app bar */}
-      <div className="
-        flex items-center justify-end gap-3
-        md:hidden
-      ">
-        <DateTimeRangePicker value={range} onChange={setRange} />
-        <GlassIconButton size="sm" onClick={refetch} label="Refresh">
-          <RotateCcw size={14} />
-        </GlassIconButton>
-      </div>
-
       {/* Error banner */}
       {error && (
         <GlassCard className="border-critical bg-critical/10 p-3">
@@ -91,27 +80,34 @@ export const AnalyticsScreen: React.FC = () => {
 
       {/* Charts grid */}
       {!loading && !error && hasAnyData && (
-        <div className="
-          grid grid-cols-1 gap-4
-          lg:grid-cols-2
-        ">
-          {/* Heatmap + Fish Count row (2:1 like dashboard-grid) */}
-          <div className="
-            grid grid-cols-1 gap-4 min-h-[420px]
-            lg:col-span-2 lg:grid-cols-[2fr_1fr]
-          ">
-            {/* Spatial Detection Heatmap */}
-            <SpatialDetectionHeatmap
-              records={detectionRecords}
-              tankId={tankId}
-              inventorySpeciesIds={inventorySpeciesIds}
-              selectedSpecies={selectedSpecies}
-              onSelectedSpeciesChange={setSelectedSpecies}
-            />
+        <>
+          <SpatialDetectionHeatmap
+            records={detectionRecords}
+            tankId={tankId}
+            inventorySpeciesIds={inventorySpeciesIds}
+            selectedSpecies={selectedSpecies}
+            onSelectedSpeciesChange={setSelectedSpecies}
+          />
 
+          {/* Mobile controls — desktop controls live in the top app bar */}
+          <div className="
+            flex items-center justify-end gap-3
+            md:hidden
+          ">
+            <DateTimeRangePicker value={range} onChange={setRange} />
+            <GlassIconButton size="sm" onClick={refetch} label="Refresh">
+              <RotateCcw size={14} />
+            </GlassIconButton>
+          </div>
+
+          <div className="
+            grid grid-cols-1 gap-4
+            lg:grid-cols-2
+          ">
             {/* Fish Count Timeline */}
             <GlassCard className="
               flex min-h-0 flex-col gap-3 overflow-hidden p-5
+              lg:col-span-2
             ">
               <h3 className="m-0 shrink-0 text-sm font-bold text-text">Fish Count Over Time</h3>
               <div className="min-h-0 flex-1">
@@ -122,9 +118,8 @@ export const AnalyticsScreen: React.FC = () => {
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
             </GlassCard>
-          </div>
 
-          {/* Water Clarity Trend */}
+            {/* Water Clarity Trend */}
           <GlassCard
             className="
               cursor-pointer p-5
@@ -287,7 +282,8 @@ export const AnalyticsScreen: React.FC = () => {
             )}
           </GlassCard>
         </div>
-      )}
+      </>
+    )}
     </div>
   );
 };
