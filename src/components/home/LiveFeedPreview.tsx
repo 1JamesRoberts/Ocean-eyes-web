@@ -37,24 +37,61 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   if (hero) {
     return (
       <section
-        className="relative -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)] cursor-pointer overflow-hidden"
+        className="sticky top-0 z-20 relative -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)] cursor-pointer overflow-hidden bg-black"
         onClick={onViewAdvanced}
       >
-        <img
-          src="/mock_camera_main.png"
-          alt="Aquarium"
-          className="absolute inset-0 h-[108.75%] w-[105.13%] -left-[2.37%] -top-[4.97%] object-cover"
+        <CameraFeed
+          feed={activeFeed}
+          isStreaming={isStreaming}
+          isWebcam={isWebcam}
+          videoRef={videoRef}
+          className="h-full w-full"
+          videoClassName="h-full w-full object-cover"
+          idlePlaceholder={
+            <div className="flex h-full flex-col items-center justify-center gap-2">
+              <span
+                className="
+                material-symbols-outlined text-2xl text-text-muted
+              "
+              >
+                videocam
+              </span>
+              <p className="text-xs text-text-muted">
+                Feed is idle. Connect stream to monitor.
+              </p>
+              <button
+                className="
+                  mx-auto mt-2 inline-flex cursor-pointer items-center justify-center
+                  gap-2 rounded-3xl border-none bg-primary-gradient px-4 py-2
+                  font-main text-xs font-semibold text-text-inverse
+                  shadow-primary-hover transition-smooth
+                  hover:bg-primary-hover-gradient
+                  active:scale-[0.98]
+                "
+                onClick={(e) => {
+                  e.stopPropagation();
+                  startStream();
+                }}
+              >
+                Connect Stream
+              </button>
+            </div>
+          }
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
 
-        <div className="absolute bottom-3 left-4 z-10 flex gap-2">
-          <span className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
-            Live
-          </span>
-          <span className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] text-white backdrop-blur-md">
-            {displayFishCount} fish
-          </span>
-        </div>
+        {isStreaming && (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+            <div className="absolute bottom-3 left-4 z-10 flex gap-2">
+              <span className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+                Live
+              </span>
+              <span className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] text-white backdrop-blur-md">
+                {displayFishCount} fish
+              </span>
+            </div>
+          </>
+        )}
       </section>
     );
   }

@@ -48,6 +48,24 @@ async function fetchHistory<T>(
   return handleResponse<T>(res);
 }
 
+interface AvailableDetectionDatesResponse {
+  dates: string[];
+  latest: string | null;
+}
+
+/**
+ * Fetch the list of dates with detection history and the latest available date.
+ */
+export async function fetchAvailableDetectionDates(
+  signal?: AbortSignal
+): Promise<AvailableDetectionDatesResponse> {
+  const res = await fetch(`${AI_API_URL}/history/available-dates`, {
+    method: 'GET',
+    signal,
+  });
+  return handleResponse<AvailableDetectionDatesResponse>(res);
+}
+
 /**
  * Check if the AI backend is available and models are loaded.
  */

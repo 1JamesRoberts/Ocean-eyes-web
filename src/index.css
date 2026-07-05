@@ -638,6 +638,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 11px 15px 0;
+  background: #ffffff;
 }
 
 .status-bar-notch {

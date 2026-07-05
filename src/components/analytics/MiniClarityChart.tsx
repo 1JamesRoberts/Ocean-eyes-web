@@ -42,7 +42,13 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
     });
   }, [readings, width, HEIGHT]);
 
-  if (points.length === 0) return null;
+  if (points.length === 0) {
+    return (
+      <div className="flex h-[140px] min-h-[120px] items-center justify-center text-sm text-text-muted">
+        No water clarity readings available
+      </div>
+    );
+  }
 
   const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(' ');
   const baselineY = HEIGHT - PADDING;

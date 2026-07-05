@@ -41,16 +41,26 @@ function buildUrlParam(dateString: string, timeString: string): string {
   return `${dateString}T${timeString}`;
 }
 
+export interface UseDateRangeFromUrlOptions {
+  defaultRange?: DateRange;
+}
+
 export interface UseDateRangeViewModelResult {
   range: DateRange;
   setRange: (range: DateRange) => void;
   resetToToday: () => void;
 }
 
-export const useDateRangeFromUrl = (): UseDateRangeViewModelResult => {
+export const useDateRangeFromUrl = ({
+  defaultRange,
+}: UseDateRangeFromUrlOptions = {}): UseDateRangeViewModelResult => {
   const [range, setLocalRange] = useState<DateRange>(() => {
-    if (typeof window === 'undefined') return getDefaultRange();
-    return buildRangeFromUrl(new URLSearchParams(window.location.search));
+    if (typeof window === 'undefined') return defaultRange ?? getDefaultRange();
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has(URL_START_KEY) || searchParams.has(URL_END_KEY)) {
+      return buildRangeFromUrl(searchParams);
+    }
+    return defaultRange ?? getDefaultRange();
   });
 
   const updateUrl = useCallback((next: DateRange) => {

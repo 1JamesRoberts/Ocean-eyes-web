@@ -1,6 +1,7 @@
 // formatters.ts - Shared formatting utilities for AI analytics components
 
-import { format, isValid, parse, parseISO } from 'date-fns';
+import { parse, format } from 'date-fns';
+import { parseUTCDate, toISODateUTC, formatUTCDate, combineDateTimeUTC } from './dateUtc';
 
 /**
  * Format an ISO timestamp into a short time string (HH:MM).
@@ -17,9 +18,8 @@ export function formatTimeShort(isoTimestamp: string): string {
  * Example: "2026-06-18" → "18 Jun 2026"
  */
 export function formatDateForDisplay(dateString: string): string {
-  const parsed = parseISO(dateString);
-  if (!isValid(parsed)) return dateString;
-  return format(parsed, 'dd MMM yyyy');
+  const parsed = parseUTCDate(dateString);
+  return formatUTCDate(parsed, 'dd MMM yyyy');
 }
 
 /**
@@ -28,22 +28,22 @@ export function formatDateForDisplay(dateString: string): string {
  */
 export function formatTimeForDisplay(timeString: string): string {
   const parsed = parse(timeString, 'HH:mm', new Date());
-  if (!isValid(parsed)) return timeString;
+  if (!isValidDate(parsed)) return timeString;
   return format(parsed, 'h:mm aa');
 }
 
 /**
- * Combine a YYYY-MM-DD date string and an HH:mm time string into a Date object.
+ * Combine a YYYY-MM-DD date string and an HH:mm time string into a UTC Date.
  */
 export function combineDateTime(dateString: string, timeString: string): Date {
-  return parse(`${dateString} ${timeString}`, 'yyyy-MM-dd HH:mm', new Date());
+  return combineDateTimeUTC(dateString, timeString);
 }
 
 /**
- * Convert a Date object to YYYY-MM-DD.
+ * Convert a Date object to YYYY-MM-DD (UTC).
  */
 export function toISODate(date: Date): string {
-  return format(date, 'yyyy-MM-dd');
+  return toISODateUTC(date);
 }
 
 /**
@@ -71,10 +71,11 @@ export function formatSpeciesName(speciesId: string): string {
  * Get today's date as YYYY-MM-DD in UTC.
  */
 export function todayUTC(): string {
-  const now = new Date();
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
-    .toISOString()
-    .split('T')[0];
+  return toISODateUTC(new Date());
+}
+
+function isValidDate(date: Date): boolean {
+  return !Number.isNaN(date.getTime());
 }
 
 /**

@@ -2,18 +2,18 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import {
-  addMonths,
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
-  format,
-  isSameDay,
-  isSameMonth,
-  isToday,
-  startOfMonth,
-  startOfWeek,
-  subMonths,
-} from 'date-fns';
+  addUTCMonths,
+  eachDayOfUTCInterval,
+  endOfUTCMonth,
+  endOfUTCWeek,
+  formatUTCDate,
+  isSameUTCDay,
+  isSameUTCMonth,
+  isTodayUTC,
+  startOfUTCMonth,
+  startOfUTCWeek,
+  subUTCMonths,
+} from '../../utils/dateUtc';
 
 interface CalendarSheetProps {
   selectedDate: Date;
@@ -26,12 +26,12 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
   selectedDate,
   onSelect,
 }) => {
-  const [viewMonth, setViewMonth] = useState(startOfMonth(selectedDate));
+  const [viewMonth, setViewMonth] = useState(startOfUTCMonth(selectedDate));
 
   const days = useMemo(() => {
-    const start = startOfWeek(startOfMonth(viewMonth));
-    const end = endOfWeek(endOfMonth(viewMonth));
-    return eachDayOfInterval({ start, end });
+    const start = startOfUTCWeek(startOfUTCMonth(viewMonth));
+    const end = endOfUTCWeek(endOfUTCMonth(viewMonth));
+    return eachDayOfUTCInterval(start, end);
   }, [viewMonth]);
 
   return (
@@ -40,14 +40,14 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
           <span className="text-lg font-bold text-text">
-            {format(viewMonth, 'MMMM yyyy')}
+            {formatUTCDate(viewMonth, 'MMMM yyyy')}
           </span>
           <ChevronDown size={16} className="text-text-muted" />
         </div>
         <div className="flex items-center gap-1">
           <button
             type="button"
-            onClick={() => setViewMonth((m) => subMonths(m, 1))}
+            onClick={() => setViewMonth((m) => subUTCMonths(m, 1))}
             className="
               cursor-pointer rounded-full border-none bg-transparent p-2
               text-text-muted transition-smooth
@@ -59,7 +59,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setViewMonth((m) => addMonths(m, 1))}
+            onClick={() => setViewMonth((m) => addUTCMonths(m, 1))}
             className="
               cursor-pointer rounded-full border-none bg-transparent p-2
               text-text-muted transition-smooth
@@ -84,9 +84,9 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
       {/* Day grid */}
       <div className="grid grid-cols-7 gap-y-1 text-center">
         {days.map((day) => {
-          const selected = isSameDay(day, selectedDate);
-          const today = isToday(day);
-          const inMonth = isSameMonth(day, viewMonth);
+          const selected = isSameUTCDay(day, selectedDate);
+          const today = isTodayUTC(day);
+          const inMonth = isSameUTCMonth(day, viewMonth);
           return (
             <button
               key={day.toISOString()}
@@ -112,7 +112,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 }
               `}
             >
-              {format(day, 'd')}
+              {formatUTCDate(day, 'd')}
               {today && !selected && (
                 <span
                   className="

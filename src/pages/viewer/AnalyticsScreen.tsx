@@ -97,7 +97,7 @@ export const AnalyticsScreen: React.FC = () => {
         ">
           {/* Heatmap + Fish Count row (2:1 like dashboard-grid) */}
           <div className="
-            grid grid-cols-1 gap-4
+            grid grid-cols-1 gap-4 min-h-[420px]
             lg:col-span-2 lg:grid-cols-[2fr_1fr]
           ">
             {/* Spatial Detection Heatmap */}
@@ -111,7 +111,7 @@ export const AnalyticsScreen: React.FC = () => {
 
             {/* Fish Count Timeline */}
             <GlassCard className="
-              flex h-full min-h-0 flex-col gap-2 overflow-hidden p-5
+              flex min-h-0 flex-col gap-3 overflow-hidden p-5
             ">
               <h3 className="m-0 shrink-0 text-sm font-bold text-text">Fish Count Over Time</h3>
               <div className="min-h-0 flex-1">

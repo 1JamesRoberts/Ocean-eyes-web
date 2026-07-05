@@ -16,6 +16,7 @@ export const ChartEmptyState = React.memo<Props>(({ message, hint, action, class
   return (
     <div className={`
       ${layout}
+      min-h-[120px]
       ${className || 'h-[240px]'}
     `}>
       <span>{message}</span>

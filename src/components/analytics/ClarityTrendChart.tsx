@@ -33,6 +33,16 @@ export const ClarityTrendChart: React.FC<Props> = ({ records, readings, emptyAct
   const hasReadingsClarity = readings && readings.length > 0 && readings.some((r) => r.clarity != null);
 
   if (hasReadingsClarity) {
+    const readingHistory = [...readings].reverse().slice(-7);
+    if (readingHistory.length === 0) {
+      return (
+        <ChartEmptyState
+          message="No water clarity history for this date."
+          hint="Water clarity is only recorded when the turbidity-specific endpoint is used."
+          action={emptyAction}
+        />
+      );
+    }
     return <MiniClarityChart readings={readings} />;
   }
 

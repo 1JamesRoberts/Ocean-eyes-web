@@ -346,6 +346,23 @@ def _iterate_date_range(start_date_str: str, end_date_str: str) -> List[str]:
     return dates
 
 
+def _available_history_dates(output_dir: Path) -> List[str]:
+    """Return sorted list of YYYY-MM-DD dates that have history JSONL files."""
+    dates: List[str] = []
+    if not output_dir.exists() or not output_dir.is_dir():
+        return dates
+    for entry in output_dir.iterdir():
+        if not entry.is_file() or entry.suffix != ".jsonl":
+            continue
+        name = entry.stem
+        try:
+            _validate_date(name)
+            dates.append(name)
+        except ValueError:
+            continue
+    return sorted(dates)
+
+
 def _derive_image_dimensions(record: dict) -> dict | None:
     """Derive image dimensions from a detection record's bbox + bbox_normalized.
 
@@ -458,6 +475,14 @@ async def history_detections(
         return {"date": date_str, "count": len(records), "records": records[:limit]}
     except ValueError as e:
         return JSONResponse(status_code=400, content={"error": str(e)})
+
+
+@app.get("/history/available-dates")
+async def history_available_dates():
+    """Return sorted list of dates with detection history and the latest one."""
+    dates = _available_history_dates(DETECTION_OUTPUT_DIR)
+    latest = dates[-1] if dates else None
+    return {"dates": dates, "latest": latest}
 
 
 @app.get("/history/turbidity")

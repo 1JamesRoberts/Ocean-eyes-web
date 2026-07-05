@@ -123,11 +123,8 @@ export const MyFishScreen: React.FC<{
       </div>
 
       {/* ─── Layout ─── */}
-      <div className="
-        grid grid-cols-1 gap-6
-        md:grid-cols-[2fr_3fr]
-      ">
-        {/* Left Column — Chart & Stats */}
+      <div className="flex flex-col gap-6">
+        {/* Chart & Stats */}
         <div className="flex flex-col gap-4">
           <GlassCard className="p-5">
             <div className="mb-4 flex items-center gap-2">
@@ -148,7 +145,7 @@ export const MyFishScreen: React.FC<{
                 />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 xs:grid-cols-3">
               {(() => {
                 const compatibilityColor = getCompatibilityColor(getCompatibilityLevel(stats.overallCompatibility));
                 return [
@@ -157,13 +154,14 @@ export const MyFishScreen: React.FC<{
                   { icon: <Heart size={14} />, color: compatibilityColor, bg: `${compatibilityColor}14`, label: 'Compatibility', value: stats.overallCompatibility },
                 ].map((item, i) => (
                   <div key={i} className="
-                    flex flex-col gap-1 rounded-xl border border-white/20
-                    bg-white/30 p-3.5
+                    flex min-w-0 flex-col gap-1 rounded-xl border border-white/20
+                    bg-white/30 p-3.5 max-xs:p-3
                   ">
                     <div className="flex items-center gap-1.5">
                       <span style={{ color: item.color }}>{item.icon}</span>
                       <span style={{ color: item.color }} className="
                         text-caption font-bold tracking-wider uppercase
+                        truncate
                       ">{item.label}</span>
                     </div>
                     <span className="text-2xl font-extrabold text-text">{item.value}</span>
@@ -181,8 +179,8 @@ export const MyFishScreen: React.FC<{
                 Ideal Parameters
               </span>
               <div className="
-                grid grid-cols-1 gap-3
-                sm:grid-cols-3
+                grid grid-cols-2 gap-3
+                xs:grid-cols-3
               ">
                 {[
                   {
@@ -215,13 +213,14 @@ export const MyFishScreen: React.FC<{
                   },
                 ].map((item, i) => (
                   <div key={i} className="
-                    flex flex-col gap-1 rounded-xl border border-white/20
-                    bg-white/30 p-3.5
+                    flex min-w-0 flex-col gap-1 rounded-xl border border-white/20
+                    bg-white/30 p-3.5 max-xs:p-3
                   ">
                     <div className="flex items-center gap-1.5">
                       <span style={{ color: item.color }}>{item.icon}</span>
                       <span style={{ color: item.color }} className="
                         text-caption font-bold tracking-wider uppercase
+                        truncate
                       ">{item.label}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -277,13 +276,13 @@ export const MyFishScreen: React.FC<{
               >
                 {/* Main row — always visible */}
                 <div className="flex items-center justify-between p-3">
-                  <div className="flex flex-1 items-center gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
                     <FishThumbnail imagePath={display.imagePath} initials={display.initials} color={display.color} />
-                    <div className="flex-1">
-                      <span className="block text-base font-bold text-text">{display.name}</span>
+                    <div className="min-w-0 flex-1">
+                      <span className="block truncate text-base font-bold text-text">{display.name}</span>
                       {species?.scientificName && (
                         <span className="
-                          mb-1 block text-xs font-medium text-text-muted italic
+                          mb-1 block truncate text-xs font-medium text-text-muted italic
                         ">{species.scientificName}</span>
                       )}
                       <span className="mt-0.5 block text-xs text-text-muted">
@@ -292,7 +291,7 @@ export const MyFishScreen: React.FC<{
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3.5" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center gap-2 max-xs:gap-1.5" onClick={e => e.stopPropagation()}>
                     {/* Visibility ring */}
                     <DetectionVisibilityRing
                       detected={fish.detected}

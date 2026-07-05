@@ -15,12 +15,13 @@ interface CameraFeedProps {
   onDimensions?: (width: number, height: number) => void;
   children?: React.ReactNode;
   className?: string;
+  videoClassName?: string;
   style?: React.CSSProperties;
   idlePlaceholder?: React.ReactNode;
 }
 
 export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
-  ({ isStreaming, videoRef, filters, onDimensions, children, className = '', style, idlePlaceholder }, forwardedRef) => {
+  ({ isStreaming, videoRef, filters, onDimensions, children, className = '', videoClassName = '', style, idlePlaceholder }, forwardedRef) => {
     useImperativeHandle(forwardedRef, () => ({
       videoElement: videoRef.current,
     }));
@@ -51,7 +52,7 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
             playsInline
             muted
             onLoadedMetadata={handleVideoLoaded}
-            className="block h-auto w-full"
+            className={`block h-auto w-full ${videoClassName}`}
             style={filterStyle ? { filter: filterStyle } : undefined}
           />
 

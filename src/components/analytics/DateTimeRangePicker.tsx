@@ -2,13 +2,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, CalendarDays } from 'lucide-react';
-import { parseISO } from 'date-fns';
 import type { DateRange } from '../../types/aquarium';
 import {
   formatDateForDisplay,
   formatTimeForDisplay,
   toISODate,
 } from '../../utils/formatters';
+import { parseUTCDate } from '../../utils/dateUtc';
 import { CalendarSheet } from './CalendarSheet';
 import { DateTimePill } from './DateTimePill';
 import { TimeWheelSheet } from './TimeWheelSheet';
@@ -55,7 +55,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         : activeField === 'endDate' || activeField === 'endTime'
           ? value.endDate
           : value.startDate;
-    return parseISO(dateStr);
+    return parseUTCDate(dateStr);
   }, [activeField, value]);
 
   const selectedTimeForWheel = useMemo(() => {
