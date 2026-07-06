@@ -15,7 +15,9 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
 
   return (
     <section className="shimmer flex items-center gap-5 glass-card p-5">
-      <div className="relative flex size-28 shrink-0 items-center justify-center">
+      <div className="
+        relative flex size-28 shrink-0 items-center justify-center
+      ">
         <svg className="size-28" height="112" width="112" viewBox="0 0 112 112">
           <defs>
             <linearGradient id="healthRingGradient" x1="0" y1="0" x2="1" y2="1">
@@ -45,9 +47,11 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             strokeLinecap="round"
           />
         </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="
+          absolute inset-0 flex flex-col items-center justify-center
+        ">
           <span className="text-2xl font-bold text-brand">{healthScore}</span>
-          <span className="text-[10px] font-medium text-text-muted">Score</span>
+          <span className="text-2xs font-medium text-text-muted">Score</span>
         </div>
       </div>
 

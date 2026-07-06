@@ -37,7 +37,10 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   if (hero) {
     return (
       <section
-        className="sticky top-0 z-20 relative -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)] cursor-pointer overflow-hidden bg-black"
+        className="
+          sticky top-0 z-20 -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)]
+          cursor-pointer overflow-hidden bg-black
+        "
         onClick={onViewAdvanced}
       >
         <CameraFeed
@@ -45,14 +48,14 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
           isStreaming={isStreaming}
           isWebcam={isWebcam}
           videoRef={videoRef}
-          className="h-full w-full"
+          className="size-full"
           videoClassName="h-full w-full object-cover"
           idlePlaceholder={
-            <div className="flex h-full flex-col items-center justify-center gap-2">
+            <div className="
+              flex h-full flex-col items-center justify-center gap-2
+            ">
               <span
-                className="
-                material-symbols-outlined text-2xl text-text-muted
-              "
+                className="material-symbols-outlined text-2xl text-text-muted"
               >
                 videocam
               </span>
@@ -61,10 +64,10 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               </p>
               <button
                 className="
-                  mx-auto mt-2 inline-flex cursor-pointer items-center justify-center
-                  gap-2 rounded-3xl border-none bg-primary-gradient px-4 py-2
-                  font-main text-xs font-semibold text-text-inverse
-                  shadow-primary-hover transition-smooth
+                  mx-auto mt-2 inline-flex cursor-pointer items-center
+                  justify-center gap-2 rounded-3xl border-none
+                  bg-primary-gradient px-4 py-2 font-main text-xs font-semibold
+                  text-text-inverse shadow-primary-hover transition-smooth
                   hover:bg-primary-hover-gradient
                   active:scale-[0.98]
                 "
@@ -81,12 +84,21 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 
         {isStreaming && (
           <>
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+            <div className="
+              absolute inset-0 bg-linear-to-b from-black/20 via-transparent
+              to-transparent
+            " />
             <div className="absolute bottom-3 left-4 z-10 flex gap-2">
-              <span className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+              <span className="
+                rounded-full border border-white/20 bg-black/40 px-2.5 py-1
+                text-2xs font-semibold text-white backdrop-blur-md
+              ">
                 Live
               </span>
-              <span className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] text-white backdrop-blur-md">
+              <span className="
+                rounded-full border border-white/20 bg-black/40 px-2.5 py-1
+                text-2xs text-white backdrop-blur-md
+              ">
                 {displayFishCount} fish
               </span>
             </div>
@@ -105,16 +117,14 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
         <div className="flex gap-2">
           <span
             className="
-            rounded-full bg-brand-bright/10 px-3 py-1 text-xs font-bold
-            text-brand-bright
-          "
+              rounded-full bg-brand-bright/10 px-3 py-1 text-xs font-bold
+              text-brand-bright
+            "
           >
             Live
           </span>
           <span
-            className="
-            rounded-full bg-brand/10 px-3 py-1 text-xs text-brand
-          "
+            className="rounded-full bg-brand/10 px-3 py-1 text-xs text-brand"
           >
             1080p
           </span>
@@ -124,8 +134,8 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
       <div
         ref={videoContainerRef}
         className="
-          fs-reset shimmer relative flex aspect-video w-full cursor-pointer items-center
-          justify-center bg-black
+          fs-reset shimmer relative flex aspect-video w-full cursor-pointer
+          items-center justify-center bg-black
         "
         onClick={handleVideoClick}
         onMouseEnter={() => setIsHoveringVideo(true)}
@@ -145,13 +155,13 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               idlePlaceholder={
                 <div
                   className="
-                  flex flex-col items-center justify-center gap-2 py-8
-                "
+                    flex flex-col items-center justify-center gap-2 py-8
+                  "
                 >
                   <span
                     className="
-                    material-symbols-outlined text-2xl text-text-muted
-                  "
+                      material-symbols-outlined text-2xl text-text-muted
+                    "
                   >
                     videocam
                   </span>
@@ -163,25 +173,25 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             />
             <div
               className="
-              pointer-events-none absolute top-0 left-0 size-full
-              overflow-hidden
-            "
+                pointer-events-none absolute top-0 left-0 size-full
+                overflow-hidden
+              "
             />
 
             <div className="absolute bottom-4 left-4 z-10 flex gap-2">
               <div
                 className="
-                rounded-lg border border-white/20 bg-black/40 px-3 py-1 text-xs
-                text-white backdrop-blur-md
-              "
+                  rounded-lg border border-white/20 bg-black/40 px-3 py-1
+                  text-xs text-white backdrop-blur-md
+                "
               >
                 {displayFishCount} fish
               </div>
               <div
                 className="
-                rounded-lg border border-white/20 bg-black/40 px-3 py-1 text-xs
-                text-white backdrop-blur-md
-              "
+                  rounded-lg border border-white/20 bg-black/40 px-3 py-1
+                  text-xs text-white backdrop-blur-md
+                "
               >
                 {displayClarity.toFixed(2)} FNU
               </div>
@@ -196,9 +206,9 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               >
                 <div
                   className="
-                  rounded-full border border-white/30 bg-white/20 p-4 text-white
-                  backdrop-blur-xl
-                "
+                    rounded-full border border-white/30 bg-white/20 p-4
+                    text-white backdrop-blur-xl
+                  "
                 >
                   <Maximize2 size={24} />
                 </div>
@@ -209,9 +219,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
           <div className="p-3 text-center">
             <div className="mb-2 flex justify-center">
               <span
-                className="
-                material-symbols-outlined text-2xl text-text-muted
-              "
+                className="material-symbols-outlined text-2xl text-text-muted"
               >
                 videocam
               </span>

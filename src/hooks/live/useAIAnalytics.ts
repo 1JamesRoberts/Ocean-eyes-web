@@ -141,7 +141,7 @@ export const useAIAnalytics = ({
     if (!isStreaming) {
       autoStartTriggeredRef.current = false;
     }
-  }, [isStreaming]);
+  }, [isStreaming, isAIActive]);
 
   // Persist full prediction/turbidity results when stream stops
   useEffect(() => {
@@ -153,7 +153,7 @@ export const useAIAnalytics = ({
       last_prediction: lastPredictionRef.current,
       last_turbidity_result: lastTurbidityResultRef.current,
     });
-  }, [isStreaming]);
+  }, [isStreaming, isAIActive]);
 
   const { clarity: currentClarity, fishCount: currentFishCount } = selectActiveFeedMetrics(
     isStreaming ? liveState : null,

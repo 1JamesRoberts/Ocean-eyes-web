@@ -115,9 +115,9 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
       <div
         ref={viewportRef}
         className="
-          fs-reset sticky top-0 z-20 relative -mx-4 -mt-4 h-[221px]
-          w-[calc(100%+2rem)] overflow-hidden bg-black
-          flex items-center justify-center
+          fs-reset sticky top-0 z-20 -mx-4 -mt-4 flex h-[221px]
+          w-[calc(100%+2rem)] items-center justify-center overflow-hidden
+          bg-black
         "
       >
         {isStreaming ? (
@@ -127,7 +127,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
               ${flashActive ? 'flash-active' : ''}
             `} />
 
-            <div ref={imageContainerRef} className="shimmer relative h-full w-full">
+            <div ref={imageContainerRef} className="shimmer relative size-full">
               <CameraFeed
                 ref={cameraFeedRef}
                 feed={activeFeed}
@@ -136,7 +136,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
                 videoRef={videoRef}
                 filters={filters}
                 onDimensions={handleDimensions}
-                className="h-full w-full"
+                className="size-full"
                 videoClassName="h-full w-full object-cover"
               >
                 {temperatureOverlay && (

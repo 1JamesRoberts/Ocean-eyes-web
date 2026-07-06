@@ -33,8 +33,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
   return (
     <section className="glass-card p-6">
       <h3 className="
-        mb-4 text-xs font-medium tracking-widest text-text-muted/70
-        uppercase
+        mb-4 text-xs font-medium tracking-widest text-text-muted/70 uppercase
       ">
         Active Safety Alerts
       </h3>

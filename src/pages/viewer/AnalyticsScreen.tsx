@@ -200,8 +200,8 @@ export const AnalyticsScreen: React.FC = () => {
                     <div
                       key={index}
                       className={`
-                        flex flex-col gap-2 rounded-xl border bg-white/20
-                        backdrop-blur-sm p-3.5
+                        flex flex-col gap-2 rounded-xl border bg-white/20 p-3.5
+                        backdrop-blur-sm
                         ${isErr ? `border-critical` : isHealthy ? `border-good` : `
                           border-warning
                         `}
@@ -266,8 +266,8 @@ export const AnalyticsScreen: React.FC = () => {
                             </p>
                             {!isHealthy && diag.diagnosis.treatment && (
                               <p className="
-                                mt-1 rounded-md border-l-3 border-warning
-                                bg-bg p-2 text-xs text-text-muted
+                                mt-1 rounded-md border-l-3 border-warning bg-bg
+                                p-2 text-xs text-text-muted
                               ">
                                 <strong>Recommended Treatment:</strong> {diag.diagnosis.treatment}
                               </p>

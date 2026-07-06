@@ -101,23 +101,17 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
           }}
         >
           {/* Bubbles */}
-          <div className="
-            absolute bottom-[15%] left-[20%] text-xs opacity-30
-          ">🫧</div>
-          <div className="
-            absolute right-[15%] bottom-[45%] text-2xs
-            opacity-20
-          ">🫧</div>
-          <div className="
-            absolute bottom-[70%] left-1/2 text-sm opacity-40
-          ">🫧</div>
+          <div className="absolute bottom-[15%] left-[20%] text-xs opacity-30">🫧</div>
+          <div className="absolute right-[15%] bottom-[45%] text-2xs opacity-20">🫧</div>
+          <div className="absolute bottom-[70%] left-1/2 text-sm opacity-40">🫧</div>
         </div>
 
         {/* Sand/Substrate Bed */}
         <div
           className="
             pointer-events-none absolute bottom-0 left-0 z-2 h-5 w-full border-t
-            border-[#334155] bg-[linear-gradient(0deg,#0F172A_0%,#1E293B_100%)]
+            border-monitor-border
+            bg-[linear-gradient(0deg,#0F172A_0%,#1E293B_100%)]
           "
         />
 
@@ -229,7 +223,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
       <button
         className="
           inline-flex w-full cursor-pointer items-center justify-center gap-2
-          rounded-xl border border-[#334155] bg-transparent px-5 py-2.5
+          rounded-xl border border-monitor-border bg-transparent px-5 py-2.5
           font-main text-[13px] font-semibold text-[#94A3B8] transition-smooth
           hover:bg-[rgba(255,255,255,0.05)]
         "

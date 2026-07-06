@@ -40,8 +40,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
 
   return (
     <div className="
-      flex min-h-[75px] items-center justify-between border-b border-border
-      pb-3
+      flex min-h-[75px] items-center justify-between border-b border-border pb-3
       max-xs:flex-col max-xs:items-start max-xs:gap-3
     ">
       <div>
@@ -72,8 +71,8 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
             {isOpen && (
               <div className="
                 absolute top-[calc(100%+8px)] left-0 z-1000 flex min-w-[220px]
-              flex-col gap-1 rounded-2xl border border-border
-              bg-surface p-1.5 shadow-card backdrop-blur-sm
+                flex-col gap-1 rounded-2xl border border-border bg-surface p-1.5
+                shadow-card backdrop-blur-sm
               " style={{ boxShadow: 'var(--shadow-card), 0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}>
                 {tanks.filter(t => linkedTanks.includes(t.id)).map(t => (
                   <button
@@ -125,8 +124,8 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
             <button
               className="
                 inline-flex cursor-pointer items-center gap-1 rounded-lg border
-              border-border bg-surface px-2 py-1 text-caption
-              font-semibold text-text transition-smooth
+                border-border bg-surface px-2 py-1 text-caption font-semibold
+                text-text transition-smooth
                 hover:border-text-muted hover:bg-surface-hover
               "
               onClick={onAddTank}
@@ -149,7 +148,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
           <AlertTriangle size={24} />
           <span className="
             absolute top-0.5 right-0.5 size-2.5 rounded-full border-2
-              border-surface bg-critical
+            border-surface bg-critical
           " />
         </button>
       )}

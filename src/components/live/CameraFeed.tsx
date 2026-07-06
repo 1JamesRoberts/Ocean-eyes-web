@@ -52,7 +52,10 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
             playsInline
             muted
             onLoadedMetadata={handleVideoLoaded}
-            className={`block h-auto w-full ${videoClassName}`}
+            className={`
+              block h-auto w-full
+              ${videoClassName}
+            `}
             style={filterStyle ? { filter: filterStyle } : undefined}
           />
 

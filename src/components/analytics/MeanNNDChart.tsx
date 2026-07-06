@@ -38,7 +38,9 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
   }, [records, selectedSpecies]);
 
   if (data.length === 0) {
-    return <ChartEmptyState message="No detection data available" className="h-full min-h-[120px]" />;
+    return <ChartEmptyState message="No detection data available" className="
+      h-full min-h-[120px]
+    " />;
   }
 
   return (

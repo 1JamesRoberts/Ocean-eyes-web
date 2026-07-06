@@ -309,29 +309,38 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     // ── Render ──
 
     return (
-      <section className="sticky top-0 z-20 relative -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)] cursor-pointer overflow-hidden bg-black">
+      <section className="
+        sticky top-0 z-20 -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)]
+        cursor-pointer overflow-hidden bg-black
+      ">
         <div
           ref={containerRef}
-          className="shimmer relative h-full w-full bg-camera-bg"
+          className="shimmer relative size-full bg-camera-bg"
         >
           <CameraFeed
             feed={activeFeed}
             isStreaming={isStreaming}
             isWebcam={isWebcam}
             videoRef={videoRef}
-            className="h-full w-full"
+            className="size-full"
             videoClassName="h-full w-full object-cover"
           />
           <canvas
             ref={overlayCanvasRef}
             className="pointer-events-none absolute inset-0 size-full"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+          <div className="
+            absolute inset-0 bg-linear-to-b from-black/20 via-transparent
+            to-transparent
+          " />
           <div className="absolute bottom-3 left-4 z-10">
             <GlassSelect
               value={selectedSpecies}
               onChange={(e) => onSelectedSpeciesChange(e.target.value)}
-              className="!rounded-full !border-white/20 !bg-black/40 !px-2.5 !py-1 text-[10px] font-semibold text-white !backdrop-blur-md"
+              className="
+                rounded-full! border-white/20! bg-black/40! px-2.5! py-1!
+                text-2xs font-semibold text-white backdrop-blur-md!
+              "
             >
               <option value="all">All Species</option>
               {speciesList.map((s) => (

@@ -17,7 +17,9 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FishSymbol size={18} className="text-brand" />
-          <h3 className="text-xs font-medium tracking-widest text-text-muted/70 uppercase">
+          <h3 className="
+            text-xs font-medium tracking-widest text-text-muted/70 uppercase
+          ">
             Fish Inventory
           </h3>
         </div>
@@ -35,7 +37,10 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
 
       <div className="space-y-2">
         {fishList.length === 0 ? (
-          <div className="rounded-2xl border border-white/20 bg-white/20 p-4 text-center text-xs text-text-muted">
+          <div className="
+            rounded-2xl border border-white/20 bg-white/20 p-4 text-center
+            text-xs text-text-muted
+          ">
             No fish added yet.
           </div>
         ) : (
@@ -59,13 +64,13 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-brand">{fish.name}</p>
-                    <p className="text-[10px] text-text-muted">
+                    <p className="text-2xs text-text-muted">
                       {fish.detected} / {fish.count} detected
                     </p>
                   </div>
                 </div>
                 <span
-                  className="rounded-full px-2.5 py-1 text-[10px] font-bold"
+                  className="rounded-full px-2.5 py-1 text-2xs font-bold"
                   style={{
                     backgroundColor: isComplete ? 'rgba(25, 106, 89, 0.12)' : 'rgba(186, 26, 26, 0.12)',
                     color: isComplete ? 'var(--color-good)' : 'var(--color-critical)'

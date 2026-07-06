@@ -31,7 +31,7 @@ export const AlertsScreen: React.FC = () => {
         <button
           className="
             cursor-pointer border-none bg-transparent font-main text-sm
-            font-semibold text-primary-dark
+            font-semibold text-brand
           "
           onClick={onBack}
         >

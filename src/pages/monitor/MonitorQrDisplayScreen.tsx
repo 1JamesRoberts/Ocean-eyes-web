@@ -28,8 +28,8 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         <>
           {/* Visual Scannable QR mock */}
           <div className="
-            mb-5 flex flex-col items-center rounded-[20px] border
-            border-border bg-surface p-6
+            mb-5 flex flex-col items-center rounded-[20px] border border-border
+            bg-surface p-6
           ">
             <div className="qr-code-canvas" />
             <span className="mt-3 text-xs font-semibold text-[#64748B]">

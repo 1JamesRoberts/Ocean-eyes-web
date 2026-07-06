@@ -47,8 +47,8 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
     <div className="flex w-full flex-1 flex-col">
       {tankId === null ? (
         <div className="
-          rounded-[20px] border border-border-subtle
-          bg-surface p-6 shadow-card transition-smooth
+          rounded-[20px] border border-border-subtle bg-surface p-6 shadow-card
+          transition-smooth
         ">
           <RootGateOnboarding />
         </div>

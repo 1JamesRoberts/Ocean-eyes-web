@@ -39,8 +39,8 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
     ">
       <div className="flex flex-col gap-3">
         <div className="
-          flex items-center justify-between border-b border-brand pb-2
-          text-h3 font-bold text-text
+          flex items-center justify-between border-b border-brand pb-2 text-h3
+          font-bold text-text
         ">
           <span className="flex items-center gap-1.5"><Camera size={16} /> Snapshots</span>
           <span className="text-xs font-medium text-text-muted">{snapshots.length} saved</span>
@@ -64,7 +64,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
               ">
                 <div className="
                   relative flex w-[110px] shrink-0 items-center justify-center
-                  bg-[#020617]
+                  bg-camera-bg
                 ">
                   <img src={snap.imageUrl} alt="Snapshot" className="
                     size-full object-cover
@@ -85,7 +85,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                         bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
                         transition-smooth
                         hover:not-disabled:-translate-y-0.5
-                        hover:not-disabled:border-primary-dark/50
+                        hover:not-disabled:border-brand/50
                         hover:not-disabled:bg-primary-gradient
                         active:not-disabled:translate-y-0
                         disabled:cursor-not-allowed disabled:opacity-40
@@ -102,7 +102,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                         bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
                         transition-smooth
                         hover:not-disabled:-translate-y-0.5
-                        hover:not-disabled:border-primary-dark/50
+                        hover:not-disabled:border-brand/50
                         hover:not-disabled:bg-primary-gradient
                         active:not-disabled:translate-y-0
                         disabled:cursor-not-allowed disabled:opacity-40
@@ -122,8 +122,8 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
 
       <div className="flex flex-col gap-3">
         <div className="
-          flex items-center justify-between border-b border-brand pb-2
-          text-h3 font-bold text-text
+          flex items-center justify-between border-b border-brand pb-2 text-h3
+          font-bold text-text
         ">
           <span className="flex items-center gap-1.5"><Video size={16} /> Recordings</span>
           <span className="text-xs font-medium text-text-muted">{recordings.length} saved</span>
@@ -142,7 +142,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
             recordings.map(rec => (
               <div key={rec.id} className="
                 flex items-center justify-between rounded-xl border
-                border-white/20 bg-white/20 backdrop-blur-sm p-[12px_16px]
+                border-white/20 bg-white/20 p-[12px_16px] backdrop-blur-sm
                 transition-smooth
                 hover:-translate-y-0.5 hover:shadow-card
               ">
@@ -160,7 +160,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                       bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
                       transition-smooth
                       hover:not-disabled:-translate-y-0.5
-                      hover:not-disabled:border-primary-dark/50
+                      hover:not-disabled:border-brand/50
                       hover:not-disabled:bg-primary-gradient
                       active:not-disabled:translate-y-0
                       disabled:cursor-not-allowed disabled:opacity-40
@@ -177,7 +177,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                       bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
                       transition-smooth
                       hover:not-disabled:-translate-y-0.5
-                      hover:not-disabled:border-primary-dark/50
+                      hover:not-disabled:border-brand/50
                       hover:not-disabled:bg-primary-gradient
                       active:not-disabled:translate-y-0
                       disabled:cursor-not-allowed disabled:opacity-40

@@ -27,7 +27,7 @@ export const HomeScreen: React.FC = () => {
           <h3 className="mb-2 text-base font-bold text-text">
             Waiting for monitor data…
           </h3>
-          <p className="mx-auto text-xs leading-relaxed text-text-muted">
+          <p className="mx-auto text-xs/relaxed text-text-muted">
             The AI backend has not yet returned any readings. Make sure the OceanEyes inference service is running and has processed at least one frame.
           </p>
         </div>
@@ -51,12 +51,18 @@ export const HomeScreen: React.FC = () => {
 
           <div className="glass-card p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-xs font-medium tracking-widest text-text-muted/70 uppercase">
+              <h3 className="
+                text-xs font-medium tracking-widest text-text-muted/70 uppercase
+              ">
                 Water Parameters
               </h3>
               <button
                 onClick={onViewHistory}
-                className="cursor-pointer border-none bg-transparent font-main text-xs font-semibold text-brand-bright transition-opacity hover:opacity-80"
+                className="
+                  cursor-pointer border-none bg-transparent font-main text-xs
+                  font-semibold text-brand-bright transition-opacity
+                  hover:opacity-80
+                "
               >
                 Manage list
               </button>

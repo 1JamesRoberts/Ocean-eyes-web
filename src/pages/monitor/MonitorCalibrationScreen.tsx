@@ -82,7 +82,8 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
         <div
           className="
             pointer-events-none absolute bottom-0 left-0 z-2 h-6 w-full border-t
-            border-[#334155] bg-[linear-gradient(0deg,#0F172A_0%,#1E293B_100%)]
+            border-monitor-border
+            bg-[linear-gradient(0deg,#0F172A_0%,#1E293B_100%)]
           "
         />
 
@@ -135,7 +136,7 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
         <button
           className="
             inline-flex cursor-pointer items-center justify-center gap-2
-            rounded-xl border border-[#334155] bg-transparent px-4 py-3
+            rounded-xl border border-monitor-border bg-transparent px-4 py-3
             font-main text-[14px] font-semibold text-[#94A3B8] transition-smooth
             hover:bg-[rgba(255,255,255,0.05)]
           "

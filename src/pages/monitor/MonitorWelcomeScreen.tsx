@@ -17,9 +17,8 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
       text-center text-white
     ">
       <div className="
-        mb-6 flex size-20 items-center justify-center
-        rounded-full border-[3px] border-[#0D9488]
-        bg-[linear-gradient(135deg,#115E59_0%,#0F766E_100%)]
+        mb-6 flex size-20 items-center justify-center rounded-full border-[3px]
+        border-[#0D9488] bg-[linear-gradient(135deg,#115E59_0%,#0F766E_100%)]
         shadow-[0_0_20px_rgba(13,148,136,0.4)]
       ">
         <Camera size={36} className="text-[#2DD4BF]" />
@@ -50,9 +49,9 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
         <button
           className="
             inline-flex w-full cursor-pointer items-center justify-center gap-2
-            rounded-xl border border-[#334155] bg-[#1E293B] px-6 py-3.5
+            rounded-xl border border-monitor-border bg-[#1E293B] px-6 py-3.5
             font-main text-h3 font-semibold text-[#E2E8F0] transition-smooth
-            hover:bg-[#334155]
+            hover:bg-monitor-border
             active:scale-[0.98]
           "
           onClick={() => onNavigate('qr')}
@@ -63,7 +62,7 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
         <button
           className="
             inline-flex w-full cursor-pointer items-center justify-center gap-2
-            rounded-xl border border-[#334155] bg-transparent px-5 py-3
+            rounded-xl border border-monitor-border bg-transparent px-5 py-3
             font-main text-[14px] font-semibold text-[#E2E8F0] transition-smooth
             hover:bg-[rgba(255,255,255,0.05)]
           "

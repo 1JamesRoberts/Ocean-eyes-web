@@ -72,7 +72,10 @@ const DetectionVisibilityRing: React.FC<DetectionVisibilityRingProps> = ({
         </div>
       </div>
       {showLabel && (
-        <span className="min-w-[36px] text-sm font-bold max-xs:min-w-0 max-xs:text-xs" style={{ color }}>
+        <span className="
+          min-w-[36px] text-sm font-bold
+          max-xs:min-w-0 max-xs:text-xs
+        " style={{ color }}>
           {pct}%
         </span>
       )}

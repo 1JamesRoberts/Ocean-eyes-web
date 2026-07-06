@@ -31,7 +31,10 @@ export const PillNavigation: React.FC = () => {
             key={item.tab}
             type="button"
             onClick={() => setActiveTab(item.tab)}
-            className={`pill-nav-item ${isActive ? 'pill-nav-active' : ''}`}
+            className={`
+              pill-nav-item
+              ${isActive ? 'pill-nav-active' : ''}
+            `}
             aria-current={isActive ? 'page' : undefined}
           >
             <span className="pill-nav-icon">

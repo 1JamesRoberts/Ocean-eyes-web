@@ -127,8 +127,8 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
           onFocus={handleInputFocus}
           placeholder={selectedSpecies ? selectedSpecies.displayName : placeholder}
           className="
-            w-full rounded-lg border border-border bg-surface px-3
-            py-2.5 pl-9 font-main text-sm outline-none
+            w-full rounded-lg border border-border bg-surface px-3 py-2.5 pl-9
+            font-main text-sm outline-none
           "
         />
       </div>

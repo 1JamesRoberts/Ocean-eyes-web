@@ -55,7 +55,11 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
       {parameters.map(param => (
         <div
           key={param.label}
-          className="flex flex-col items-center gap-1.5 rounded-2xl border border-white/20 bg-white/20 p-2 text-center transition-colors hover:bg-white/60"
+          className="
+            flex flex-col items-center gap-1.5 rounded-2xl border
+            border-white/20 bg-white/20 p-2 text-center transition-colors
+            hover:bg-white/60
+          "
         >
           <div
             className={`
@@ -67,12 +71,12 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
           </div>
           <div>
             <span className={`
-              block text-sm font-bold leading-tight
+              block text-sm/tight font-bold
               ${param.isCritical ? `text-critical` : `text-brand`}
             `}>
               {param.value}
             </span>
-            <span className="block text-[9px] text-text-muted">{param.unit}</span>
+            <span className="block text-3xs text-text-muted">{param.unit}</span>
           </div>
         </div>
       ))}

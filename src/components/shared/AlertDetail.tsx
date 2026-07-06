@@ -14,8 +14,7 @@ interface AlertDetailProps {
 export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResolve }) => (
   <div className="flex flex-col gap-6">
     <div className="
-      flex min-h-[75px] items-center justify-between border-b border-border
-      pb-3
+      flex min-h-[75px] items-center justify-between border-b border-border pb-3
       max-xs:flex-col max-xs:items-start max-xs:gap-3
     ">
       <div>
