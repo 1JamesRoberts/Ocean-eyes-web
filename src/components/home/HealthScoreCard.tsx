@@ -57,7 +57,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
 
       <div className="flex-1">
         <span className="block text-xs text-text-muted">Aquarium Health Index</span>
-        <h3 className="text-2xl font-bold text-brand">{healthMessage}</h3>
+        <h3 className="text-2xl font-bold text-brand text-pretty">{healthMessage}</h3>
         <p className="mt-0.5 text-xs text-text-muted">
           All parameters are in safe bands. System is optimal.
         </p>

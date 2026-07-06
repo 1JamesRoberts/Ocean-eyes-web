@@ -42,7 +42,7 @@ export function getHealthColor(score: number): string {
 
 export function getHealthMessage(score: number): string {
   if (score >= 8) {
-    return 'All parameters are in safe bands. System is optimal.';
+    return 'All parameters are in safe bands. System\u00A0is\u00A0optimal.';
   }
   if (score >= 6) {
     return 'Mild parameter fluctuations detected. Observe filters and run water test diagnostics closely.';
