@@ -307,10 +307,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     // ── Render ──
 
     return (
-      <section className="
-        sticky top-0 z-20 -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)]
-        cursor-pointer overflow-hidden bg-black
-      ">
+      <div className="size-full bg-black">
         <div
           ref={containerRef}
           className="shimmer relative size-full bg-camera-bg"
@@ -349,7 +346,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
             </GlassSelect>
           </div>
         </div>
-      </section>
+      </div>
     );
   },
 );

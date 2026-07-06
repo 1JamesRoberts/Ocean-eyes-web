@@ -1,19 +1,15 @@
 // App.tsx - Phone-aspect OceanEyes dashboard coordinator
 import React, { useState } from 'react';
-import { NavigationProvider, useNavigation, type ViewerTab } from './context/NavigationContext';
+import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import { LiveFeedProvider } from './context/LiveFeedContext';
 import { AnalyticsControlsProvider } from './context/AnalyticsControlsContext';
 import { PhoneFrame, StatusBar, PillNavigation } from './components/shared';
 import { ViewerApp } from './pages/ViewerApp';
 import { AddTankModal } from './components/home/AddTankModal';
-import { HeroLiveFeedSection } from './components/home/HeroLiveFeedSection';
 import { useTank } from './hooks/useTank';
-
-const HERO_TABS = new Set<ViewerTab>(['home', 'my_fish']);
 
 const OceanEyesDashboard: React.FC = () => {
   const { activeTab } = useNavigation();
-  const [showAddFishForm, setShowAddFishForm] = useState(false);
   const [showAddTankModal, setShowAddTankModal] = useState(false);
   const {
     tankId,
@@ -21,7 +17,7 @@ const OceanEyesDashboard: React.FC = () => {
     linkTank,
   } = useTank();
 
-  const showHero = HERO_TABS.has(activeTab);
+  const [showAddFishForm, setShowAddFishForm] = useState(false);
 
   return (
     <PhoneFrame>
@@ -31,7 +27,6 @@ const OceanEyesDashboard: React.FC = () => {
         <main className="flex flex-1 flex-col gap-4 p-4 pb-28">
           <LiveFeedProvider tankId={tankId}>
             <AnalyticsControlsProvider active={activeTab === 'analytics'}>
-              <HeroLiveFeedSection className={showHero ? 'block' : 'hidden'} />
               <ViewerApp
                 showAddFishForm={showAddFishForm}
                 onToggleAddFish={() => setShowAddFishForm((v) => !v)}

@@ -20,6 +20,11 @@ export interface UseLiveFeedViewModelResult {
  * All shared state is owned by `LiveFeedProvider` so the `MediaStream` survives
  * tab switches. This hook only adds the local `videoRef` and binds the
  * provider's `webcamStream` to it.
+ *
+ * **Multiple consumers supported**: several components (e.g. a hero video and a
+ * heatmap overlay) can call this hook simultaneously within the same
+ * `LiveFeedProvider`. Each gets its own `videoRef`; they all share the same
+ * underlying `MediaStream` without conflict.
  */
 export const useLiveFeed = (): UseLiveFeedViewModelResult => {
   const {

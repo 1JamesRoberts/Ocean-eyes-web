@@ -1,41 +1,40 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React from 'react';
 import { Calendar, RotateCcw, Loader2, ArrowRight, Trash2 } from 'lucide-react';
-import { useAnalytics } from '../../hooks/pages/useAnalytics';
+import type { useAnalytics } from '../../hooks/pages/useAnalytics';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
-import { SpatialDetectionHeatmap } from '../../components/analytics/SpatialDetectionHeatmap';
 import { GlassCard, GlassButton, GlassIconButton } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
 
-export const AnalyticsScreen: React.FC = () => {
-  const {
-    tankId,
-    range,
-    setRange,
-    readings,
-    detectionRecords,
-    turbidityRecords,
-    diagnoses,
-    inventorySpeciesIds,
-    selectedSpecies,
-    setSelectedSpecies,
-    hasAnyData,
-    loading,
-    error,
-    refetch,
-    confirmClear,
-    isClearing,
-    onStartClear,
-    onCancelClear,
-    onConfirmClear,
-    onViewHistory,
-    resolveCropUrl,
-    isFallback,
-  } = useAnalytics();
+type AnalyticsScreenProps = ReturnType<typeof useAnalytics>;
 
+export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
+  tankId: _tankId,
+  range,
+  setRange,
+  readings,
+  detectionRecords,
+  turbidityRecords,
+  diagnoses,
+  inventorySpeciesIds: _inventorySpeciesIds,
+  selectedSpecies,
+  setSelectedSpecies: _setSelectedSpecies,
+  hasAnyData,
+  loading,
+  error,
+  refetch,
+  confirmClear,
+  isClearing,
+  onStartClear,
+  onCancelClear,
+  onConfirmClear,
+  onViewHistory,
+  resolveCropUrl,
+  isFallback,
+}) => {
   return (
     <div className="flex flex-col gap-6">
       {/* Error banner */}
@@ -82,14 +81,6 @@ export const AnalyticsScreen: React.FC = () => {
       {/* Charts grid */}
       {!loading && !error && hasAnyData && (
         <>
-          <SpatialDetectionHeatmap
-            records={detectionRecords}
-            tankId={tankId}
-            inventorySpeciesIds={inventorySpeciesIds}
-            selectedSpecies={selectedSpecies}
-            onSelectedSpeciesChange={setSelectedSpecies}
-          />
-
           {/* Mobile controls — desktop controls live in the top app bar */}
           <div className="
             flex items-center justify-end gap-3

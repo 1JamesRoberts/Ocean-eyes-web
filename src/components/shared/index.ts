@@ -12,3 +12,4 @@ export { AlertDetail } from "./AlertDetail";
 export { PhoneFrame } from "./PhoneFrame";
 export { StatusBar } from "./StatusBar";
 export { PillNavigation } from "./PillNavigation";
+export { ScreenWithHeroVideo } from "./ScreenWithHeroVideo";

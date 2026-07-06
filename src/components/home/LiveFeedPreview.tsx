@@ -3,6 +3,7 @@ import { Maximize2 } from "lucide-react";
 import { useLiveFeed } from "../../hooks/useLiveFeed";
 import { CardHeader } from "../shared";
 import { CameraFeed } from "../live/CameraFeed";
+import { HeroBadges } from "./HeroBadges";
 import type { TankBrief } from "../../types/aquarium";
 
 interface LiveFeedPreviewProps {
@@ -86,26 +87,10 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
           />
 
           {isStreaming && (
-            <>
-              <div className="
-                absolute inset-0 bg-linear-to-b from-black/20 via-transparent
-                to-transparent
-              " />
-              <div className="absolute bottom-3 left-4 z-10 flex gap-2">
-                <span className="
-                  rounded-full border border-white/20 bg-black/40 px-2.5 py-1
-                  text-2xs font-semibold text-white backdrop-blur-md
-                ">
-                  Live
-                </span>
-                <span className="
-                  rounded-full border border-white/20 bg-black/40 px-2.5 py-1
-                  text-2xs text-white backdrop-blur-md
-                ">
-                  {displayFishCount} fish
-                </span>
-              </div>
-            </>
+            <HeroBadges
+              displayClarity={displayClarity}
+              displayFishCount={displayFishCount}
+            />
           )}
       </section>
     );

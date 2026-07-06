@@ -2,13 +2,7 @@ import React from 'react';
 import { useHeroLiveFeed } from '../../hooks/useHeroLiveFeed';
 import { LiveFeedPreview } from './LiveFeedPreview';
 
-interface HeroLiveFeedSectionProps {
-  className?: string;
-}
-
-export const HeroLiveFeedSection: React.FC<HeroLiveFeedSectionProps> = ({
-  className,
-}) => {
+export const HeroLiveFeedSection: React.FC = () => {
   const {
     activeTank,
     displayClarity,
@@ -25,7 +19,6 @@ export const HeroLiveFeedSection: React.FC<HeroLiveFeedSectionProps> = ({
       onViewAdvanced={onViewAdvanced}
       onGoFullscreen={onGoLive}
       hero
-      className={className}
     />
   );
 };
