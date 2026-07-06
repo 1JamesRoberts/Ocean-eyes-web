@@ -18,7 +18,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
   children,
 }) => {
   return (
-    <div className="flex w-full flex-1 flex-col">
+    <div className="flex w-full flex-1 flex-col gap-4">
       <section
         className={`
           sticky top-0 z-20 -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)]

@@ -13,7 +13,6 @@ interface LiveFeedPreviewProps {
   onViewAdvanced: () => void;
   onGoFullscreen?: () => void;
   hero?: boolean;
-  className?: string;
 }
 
 export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
@@ -22,7 +21,6 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   onViewAdvanced,
   onGoFullscreen,
   hero = false,
-  className = '',
 }) => {
   const { activeFeed, isWebcam, isStreaming, videoRef, startStream } =
     useLiveFeed();
@@ -38,14 +36,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 
   if (hero) {
     return (
-      <section
-        className={`
-          sticky top-0 z-20 -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)]
-          cursor-pointer overflow-hidden bg-black
-          ${className}
-        `}
-        onClick={onViewAdvanced}
-      >
+      <div className="relative size-full cursor-pointer" onClick={onViewAdvanced}>
           <CameraFeed
             feed={activeFeed}
             isStreaming={isStreaming}
@@ -92,7 +83,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               displayFishCount={displayFishCount}
             />
           )}
-      </section>
+      </div>
     );
   }
 
