@@ -31,11 +31,7 @@ const OceanEyesDashboard: React.FC = () => {
         <main className="flex flex-1 flex-col gap-4 p-4 pb-28">
           <LiveFeedProvider tankId={tankId}>
             <AnalyticsControlsProvider active={activeTab === 'analytics'}>
-              <div
-                className={showHero ? 'block' : 'hidden'}
-              >
-                <HeroLiveFeedSection />
-              </div>
+              <HeroLiveFeedSection className={showHero ? 'block' : 'hidden'} />
               <ViewerApp
                 showAddFishForm={showAddFishForm}
                 onToggleAddFish={() => setShowAddFishForm((v) => !v)}

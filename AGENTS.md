@@ -23,3 +23,5 @@ The app use MVVM (Model-View-ViewModel) architecture
 - **UI** (`src/components/`, `src/pages/`) — JSX, Tailwind classes, and event wiring.
 
 Tailwind CSS v4 is the default and preferred styling system for all UI work. Avoid writing custom CSS except for values that cannot be expressed with utilities.
+
+## run ``npm run lint`` only if necessary
