@@ -44,7 +44,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
     isStreaming,
     videoRef,
     startStream
-  } = useLiveFeed(tankId);
+  } = useLiveFeed();
   const { fishList } = useFish(tankId);
 
   const cameraFeedRef = useRef<CameraFeedHandle>(null);

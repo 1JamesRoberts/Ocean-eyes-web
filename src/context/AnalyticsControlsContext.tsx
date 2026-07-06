@@ -18,6 +18,7 @@ interface AnalyticsControlsContextValue {
   refetch: () => void;
   detectionData: HistoryDetectionResponse | null;
   turbidityData: HistoryTurbidityResponse | null;
+  isFallback: boolean;
 }
 
 const AnalyticsControlsContext = createContext<AnalyticsControlsContextValue | null>(null);
@@ -46,7 +47,7 @@ export const AnalyticsControlsProvider: React.FC<AnalyticsControlsProviderProps>
   active,
   children,
 }) => {
-  const { latestDate, loading: latestDateLoading, error: latestDateError } = useLatestDetectionDate(active);
+  const { latestDate, loading: latestDateLoading, error: latestDateError, isFallback: latestDateIsFallback } = useLatestDetectionDate(true);
   const hasUrlParams = hasUrlRangeParams();
   const initialDateRef = useRef<string | null>(null);
 
@@ -69,7 +70,14 @@ export const AnalyticsControlsProvider: React.FC<AnalyticsControlsProviderProps>
     }
   }, [latestDate, hasUrlParams, setRange]);
 
-  const { loading, error, refetch, detectionData, turbidityData } = useHistory(range, active && !latestDateLoading);
+  const {
+    loading,
+    error,
+    refetch,
+    detectionData,
+    turbidityData,
+    isFallback: historyIsFallback,
+  } = useHistory(range, active && !latestDateLoading);
 
   useEffect(() => {
     if (!active || !latestDate || hasUrlParams) return;
@@ -82,11 +90,12 @@ export const AnalyticsControlsProvider: React.FC<AnalyticsControlsProviderProps>
   }, [active, latestDate, hasUrlParams, latestDateLoading, loading, detectionData, turbidityData, range, setRange]);
 
   const combinedLoading = loading || latestDateLoading;
-  const combinedError = error || latestDateError;
+  const isFallback = latestDateIsFallback || historyIsFallback;
+  const combinedError = isFallback ? null : error || latestDateError;
 
   return (
     <AnalyticsControlsContext.Provider
-      value={{ range, setRange, loading: combinedLoading, error: combinedError, refetch, detectionData, turbidityData }}
+      value={{ range, setRange, loading: combinedLoading, error: combinedError, refetch, detectionData, turbidityData, isFallback }}
     >
       {children}
     </AnalyticsControlsContext.Provider>

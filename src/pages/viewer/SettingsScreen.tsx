@@ -162,7 +162,7 @@ export const SettingsScreen: React.FC = () => {
         </div>
 
         <div>
-          <h5 className="mb-2 text-xs font-semibold text-text-muted uppercase">Saved Presets</h5>
+          <h5 className="mb-2 text-xs font-semibold uppercase text-text-muted">Saved Presets</h5>
           {preferences.filterPresets.length === 0 ? (
             <p className="text-sm text-text-muted">No custom presets saved.</p>
           ) : (
@@ -170,18 +170,12 @@ export const SettingsScreen: React.FC = () => {
               {preferences.filterPresets.map((preset) => (
                 <div
                   key={preset.id}
-                  className="
-                    flex items-center gap-2 rounded-full bg-surface px-3 py-1.5
-                    text-xs text-text
-                  "
+                  className="flex items-center gap-2 rounded-full bg-surface px-3 py-1.5 text-xs text-text"
                 >
                   <span>{preset.name}</span>
                   <button
                     onClick={() => onDeleteFilterPreset(preset.id)}
-                    className="
-                      cursor-pointer border-none bg-transparent p-0
-                      text-critical
-                    "
+                    className="cursor-pointer border-none bg-transparent p-0 text-critical"
                     title="Delete preset"
                   >
                     <Trash2 size={12} />
@@ -208,15 +202,13 @@ export const SettingsScreen: React.FC = () => {
           <button
             onClick={() => onAutoConnectChange(!preferences.autoConnect)}
             className={`
-              relative inline-flex h-6 w-11 cursor-pointer rounded-full
-              border-none transition-colors
+              relative inline-flex h-6 w-11 cursor-pointer rounded-full border-none transition-colors
               ${preferences.autoConnect ? 'bg-brand' : 'bg-surface'}
             `}
           >
             <span
               className={`
-                absolute top-1 left-1 inline-block size-4 rounded-full bg-white
-                transition-transform
+                absolute top-1 left-1 inline-block h-4 w-4 rounded-full bg-white transition-transform
                 ${preferences.autoConnect ? 'translate-x-5' : 'translate-x-0'}
               `}
             />
@@ -302,9 +294,7 @@ export const SettingsScreen: React.FC = () => {
           <FolderOpen size={16} className="text-brand" /> Media Storage
         </h4>
 
-        <div className="
-          mb-4 flex items-center justify-between rounded-lg bg-surface p-3
-        ">
+        <div className="mb-4 flex items-center justify-between rounded-lg bg-surface p-3">
           <div className="flex items-center gap-3">
             <Video size={18} className="text-text-muted" />
             <div>
@@ -323,9 +313,7 @@ export const SettingsScreen: React.FC = () => {
           </GlassButton>
         </div>
 
-        <div className="
-          flex items-center justify-between rounded-lg bg-surface p-3
-        ">
+        <div className="flex items-center justify-between rounded-lg bg-surface p-3">
           <div className="flex items-center gap-3">
             <Video size={18} className="text-text-muted" />
             <div>
@@ -424,9 +412,7 @@ export const SettingsScreen: React.FC = () => {
 
       {/* Safety Threshold Settings Slider equivalent */}
       <GlassCard className="p-5">
-        <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-text"><ShieldCheck size={16} className="
-          text-brand
-        " /> Safety Boundaries & Notification Thresholds</h4>
+        <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-text"><ShieldCheck size={16} className="text-brand" /> Safety Boundaries & Notification Thresholds</h4>
 
         <div className="mb-4">
           <div className="mb-1.5 flex justify-between text-sm">

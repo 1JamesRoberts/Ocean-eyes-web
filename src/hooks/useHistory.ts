@@ -8,6 +8,7 @@ import {
   fetchTurbidityHistory,
   fetchTurbidityHistoryRange,
 } from '../models/api/aiApi';
+import { isNetworkError } from '../models/api/errorHelpers';
 import { recordInRange } from '../models/services/inferenceHelpers';
 import { HISTORY_DEFAULT_LIMIT } from '../utils/constants';
 
@@ -17,6 +18,7 @@ export interface UseHistoryViewModelResult {
   loading: boolean;
   error: string | null;
   refetch: () => void;
+  isFallback: boolean;
 }
 
 export const useHistory = (
@@ -27,6 +29,7 @@ export const useHistory = (
   const [rawTurbidityData, setRawTurbidityData] = useState<HistoryTurbidityResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isFallback, setIsFallback] = useState(false);
   const [refetchKey, setRefetchKey] = useState(0);
 
   const { startDate, endDate } = range;
@@ -39,6 +42,7 @@ export const useHistory = (
     (async () => {
       setLoading(true);
       setError(null);
+      setIsFallback(false);
       try {
         const [det, turb] =
           startDate === endDate
@@ -57,7 +61,13 @@ export const useHistory = (
       } catch (err) {
         if (cancelled) return;
         if (err instanceof Error && err.name === 'AbortError') return;
-        setError(err instanceof Error ? err.message : 'Failed to fetch history');
+        if (isNetworkError(err)) {
+          setRawDetectionData({ date: range.startDate, count: 0, records: [] });
+          setRawTurbidityData({ date: range.startDate, count: 0, records: [] });
+          setIsFallback(true);
+        } else {
+          setError(err instanceof Error ? err.message : 'Failed to fetch history');
+        }
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -69,7 +79,7 @@ export const useHistory = (
       cancelled = true;
       controller.abort();
     };
-  }, [startDate, endDate, refetchKey, enabled]);
+  }, [startDate, endDate, refetchKey, enabled, range]);
 
   const detectionData: HistoryDetectionResponse | null = useMemo(() => {
     if (!rawDetectionData) return null;
@@ -87,5 +97,5 @@ export const useHistory = (
     setRefetchKey((k) => k + 1);
   }, []);
 
-  return { detectionData, turbidityData, loading, error, refetch };
+  return { detectionData, turbidityData, loading, error, refetch, isFallback };
 };

@@ -141,11 +141,15 @@ export const useAIAnalytics = ({
     if (!isStreaming) {
       autoStartTriggeredRef.current = false;
     }
-  }, [isStreaming, isAIActive]);
+  }, [isStreaming]);
 
   // Persist full prediction/turbidity results when stream stops
+  const wasStreamingRef = useRef(isStreaming);
   useEffect(() => {
-    if (isStreaming) return;
+    const wasStreaming = wasStreamingRef.current;
+    wasStreamingRef.current = isStreaming;
+
+    if (isStreaming || !wasStreaming) return;
     if (!activeTankRef.current || !liveStateRef.current) return;
     saveLiveStateRef.current({
       ...liveStateRef.current,

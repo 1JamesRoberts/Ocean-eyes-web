@@ -5,7 +5,6 @@ import {
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle, HelpCircle, Heart
 } from 'lucide-react';
-import { HeroLiveFeedSection } from '../../components/home/HeroLiveFeedSection';
 import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
 import { DonutChart } from '../../components/fish/DonutChart';
 import { FishThumbnail } from '../../components/fish/FishThumbnail';
@@ -83,8 +82,6 @@ export const MyFishScreen: React.FC<{
 
   return (
     <div className="flex flex-col">
-      <HeroLiveFeedSection />
-
       {/* ─── Add Form ─── */}
       <div className={`
         shimmer z-50 origin-top -translate-y-3

@@ -33,6 +33,7 @@ export const AnalyticsScreen: React.FC = () => {
     onConfirmClear,
     onViewHistory,
     resolveCropUrl,
+    isFallback,
   } = useAnalytics();
 
   return (
@@ -162,7 +163,7 @@ export const AnalyticsScreen: React.FC = () => {
                   Disease diagnosis runs in this range
                 </p>
               </div>
-              {diagnoses.length > 0 && !confirmClear && (
+              {diagnoses.length > 0 && !confirmClear && !isFallback && (
                 <GlassButton variant="outline" size="sm" className="
                   border-critical text-critical
                   hover:bg-critical/10

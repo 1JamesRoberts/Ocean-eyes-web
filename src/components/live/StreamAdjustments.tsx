@@ -122,7 +122,9 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
         className="flex cursor-pointer items-center justify-between select-none"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <h3 className="m-0 flex items-center gap-2 text-h3 font-bold text-text">
+        <h3 className="
+          m-0 flex items-center gap-2 text-h3 font-bold text-text
+        ">
           <span className="flex items-center gap-1.5"><SlidersHorizontal size={16} /> Stream Image Adjustments</span>
           {!isExpanded && selectedPresetId !== 'normal' && (
             <GlassBadge color="info" className="ml-2">

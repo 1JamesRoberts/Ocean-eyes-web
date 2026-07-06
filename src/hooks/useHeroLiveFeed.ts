@@ -16,9 +16,9 @@ export interface UseHeroLiveFeedResult {
 
 export function useHeroLiveFeed(): UseHeroLiveFeedResult {
   const navigation = useNavigation();
-  const { activeTank, tankId } = useTank();
+  const { activeTank } = useTank();
   const { readings } = useReadings();
-  const { liveState, activeFeed } = useLiveFeed(tankId);
+  const { liveState, activeFeed } = useLiveFeed();
 
   const latestReading = useMemo(() => readings[0], [readings]);
 
@@ -27,12 +27,7 @@ export function useHeroLiveFeed(): UseHeroLiveFeedResult {
     [liveState, activeFeed, latestReading]
   );
 
-  const onViewAdvanced = useCallback(
-    () => navigation.setActiveTab('settings'),
-    [navigation]
-  );
-
-  const onGoLive = useCallback(
+  const onGoToSettings = useCallback(
     () => navigation.setActiveTab('settings'),
     [navigation]
   );
@@ -41,7 +36,7 @@ export function useHeroLiveFeed(): UseHeroLiveFeedResult {
     activeTank,
     displayClarity,
     displayFishCount,
-    onViewAdvanced,
-    onGoLive,
+    onViewAdvanced: onGoToSettings,
+    onGoLive: onGoToSettings,
   };
 }

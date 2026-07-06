@@ -14,7 +14,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
   const { readings, writeReading } = useReadings();
   const { fishList } = useFish(tankId);
   const { alerts, addAlert } = useAlerts();
-  const { liveState } = useLiveFeed(tankId);
+  const { liveState } = useLiveFeed();
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
   const activeFeedCalibration = liveState?.feeds.find(f => f.id === liveState?.selected_feed_id)?.calibration;
   const [hasClarityIssue, setHasClarityIssue] = useState(false);

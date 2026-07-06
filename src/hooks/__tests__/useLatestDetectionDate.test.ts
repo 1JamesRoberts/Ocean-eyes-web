@@ -7,11 +7,12 @@ const mockFetch = vi.fn();
 (globalThis as unknown as { fetch: typeof mockFetch }).fetch = mockFetch;
 
 describe('useLatestDetectionDate', () => {
-  it('returns null, loading=true, and error when disabled', () => {
+  it('returns null, loading=false, and error when disabled', () => {
     const { result } = renderHook(() => useLatestDetectionDate(false));
     expect(result.current.latestDate).toBeNull();
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
+    expect(result.current.isFallback).toBe(false);
   });
 
   it('fetches and returns the latest date', async () => {
@@ -24,13 +25,24 @@ describe('useLatestDetectionDate', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.latestDate).toBe('2026-07-03');
     expect(result.current.error).toBeNull();
+    expect(result.current.isFallback).toBe(false);
   });
 
-  it('returns error on failed fetch', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network error'));
+  it('falls back to today on network error', async () => {
+    mockFetch.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    const { result } = renderHook(() => useLatestDetectionDate(true));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.latestDate).not.toBeNull();
+    expect(result.current.error).toBeNull();
+    expect(result.current.isFallback).toBe(true);
+  });
+
+  it('returns error on non-network fetch failure', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('Unexpected parser failure'));
     const { result } = renderHook(() => useLatestDetectionDate(true));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.latestDate).toBeNull();
-    expect(result.current.error).toBe('Network error');
+    expect(result.current.error).toBe('Unexpected parser failure');
+    expect(result.current.isFallback).toBe(false);
   });
 });

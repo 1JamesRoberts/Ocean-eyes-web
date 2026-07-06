@@ -177,14 +177,12 @@ function debounce<T extends (...args: Parameters<T>) => void>(
 export const SpatialDetectionHeatmap = React.memo<Props>(
   ({
     records,
-    tankId,
+    tankId: _tankId,
     inventorySpeciesIds,
     selectedSpecies,
     onSelectedSpeciesChange,
   }) => {
-    const { activeFeed, isWebcam, isStreaming, videoRef } = useLiveFeed(
-      tankId ?? null,
-    );
+    const { activeFeed, isWebcam, isStreaming, videoRef } = useLiveFeed();
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);

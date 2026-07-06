@@ -25,6 +25,7 @@ export const useAnalytics = () => {
     refetch,
     detectionData,
     turbidityData,
+    isFallback,
   } = useAnalyticsControls();
 
   const detectionRecords = useMemo(() => detectionData?.records ?? [], [detectionData]);
@@ -107,5 +108,6 @@ export const useAnalytics = () => {
     onConfirmClear,
     onViewHistory,
     resolveCropUrl,
+    isFallback,
   };
 };

@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   type Dispatch,
   type SetStateAction,
 } from 'react';
@@ -87,18 +88,17 @@ export const useAIPolling = ({
   const aiLoadingRef = useRef(aiLoading);
   const aiPreferencesRef = useRef(aiPreferences);
 
-  const preferences = aiPreferences ?? {
-    pollingIntervalMs: AI_POLL_INTERVAL_MS,
-    detectionConfidenceThreshold: DETECTION_CONFIDENCE,
-    speciesConfidenceThreshold: DETECTION_CONFIDENCE,
-    diagnosisMinConfidence: DIAGNOSIS_MIN_CONF,
-    autoStart: false,
-  };
-  const {
-    pollingIntervalMs,
-    detectionConfidenceThreshold,
-    diagnosisMinConfidence,
-  } = preferences;
+  const preferences = useMemo(
+    () =>
+      aiPreferences ?? {
+        pollingIntervalMs: AI_POLL_INTERVAL_MS,
+        detectionConfidenceThreshold: DETECTION_CONFIDENCE,
+        speciesConfidenceThreshold: DETECTION_CONFIDENCE,
+        diagnosisMinConfidence: DIAGNOSIS_MIN_CONF,
+        autoStart: false,
+      },
+    [aiPreferences]
+  );
 
   useEffect(() => { aiPreferencesRef.current = aiPreferences; }, [aiPreferences]);
   useEffect(() => { activeTankRef.current = activeTank; }, [activeTank]);
@@ -136,14 +136,6 @@ export const useAIPolling = ({
   useEffect(() => { writeReadingRef.current = writeReading; }, [writeReading]);
   useEffect(() => { saveFishRef.current = saveFish; }, [saveFish]);
 
-  // Reset AI active state when stream stops
-  useEffect(() => {
-    if (!isStreaming) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsAIActive(false);
-    }
-  }, [isStreaming]);
-
   useEffect(() => {
     if (!isAIActive || !isStreaming || backendStatus !== 'online') {
       if (aiTimeoutRef.current) {
@@ -179,9 +171,9 @@ export const useAIPolling = ({
 
         const result = await sendFrameForDetection(
           blob,
-          detectionConfidenceThreshold,
+          preferences.detectionConfidenceThreshold,
           diagnose,
-          diagnosisMinConfidence,
+          preferences.diagnosisMinConfidence,
           controller.signal
         );
 
@@ -227,7 +219,7 @@ export const useAIPolling = ({
         }
         aiAbortControllerRef.current = null;
         if (aiMountedRef.current) {
-          aiTimeoutRef.current = setTimeout(processFrame, pollingIntervalMs);
+          aiTimeoutRef.current = setTimeout(processFrame, preferences.pollingIntervalMs);
         }
       }
     };
@@ -245,7 +237,16 @@ export const useAIPolling = ({
         aiAbortControllerRef.current = null;
       }
     };
-  }, [isAIActive, isStreaming, backendStatus, activeFeed.mock_image, activeFeed.id, isWebcam, cameraFeedRef, pollingIntervalMs, detectionConfidenceThreshold, diagnosisMinConfidence]);
+  }, [
+    isAIActive,
+    isStreaming,
+    backendStatus,
+    activeFeed.mock_image,
+    activeFeed.id,
+    isWebcam,
+    cameraFeedRef,
+    preferences,
+  ]);
 
   return {
     isAIActive,

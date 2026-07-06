@@ -9,7 +9,7 @@ interface ScreenProps {
 export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
   const { activeTank: contextActiveTank, tanks } = useTank();
   const activeTank = contextActiveTank || (tanks.length > 0 ? tanks[0] : null);
-  const { liveState, updateCalibration } = useLiveFeed(activeTank?.id ?? null);
+  const { liveState, updateCalibration } = useLiveFeed();
   const activeFeedCalibration = liveState?.feeds.find(f => f.id === liveState?.selected_feed_id)?.calibration;
   const [lineY, setLineY] = useState(activeFeedCalibration?.water_line_y || 120);
   const [isSaved, setIsSaved] = useState(false);

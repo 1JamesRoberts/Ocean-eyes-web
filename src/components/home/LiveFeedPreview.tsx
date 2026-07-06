@@ -6,7 +6,7 @@ import { CameraFeed } from "../live/CameraFeed";
 import type { TankBrief } from "../../types/aquarium";
 
 interface LiveFeedPreviewProps {
-  activeTank: TankBrief | undefined;
+  activeTank?: TankBrief | undefined;
   displayClarity: number;
   displayFishCount: number;
   onViewAdvanced: () => void;
@@ -15,7 +15,6 @@ interface LiveFeedPreviewProps {
 }
 
 export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
-  activeTank,
   displayClarity,
   displayFishCount,
   onViewAdvanced,
@@ -23,7 +22,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   hero = false,
 }) => {
   const { activeFeed, isWebcam, isStreaming, videoRef, startStream } =
-    useLiveFeed(activeTank?.id ?? null);
+    useLiveFeed();
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [isHoveringVideo, setIsHoveringVideo] = useState(false);
 
@@ -36,75 +35,79 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
 
   if (hero) {
     return (
-      <section
-        className="
-          sticky top-0 z-20 -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)]
-          cursor-pointer overflow-hidden bg-black
-        "
-        onClick={onViewAdvanced}
-      >
-        <CameraFeed
-          feed={activeFeed}
-          isStreaming={isStreaming}
-          isWebcam={isWebcam}
-          videoRef={videoRef}
-          className="size-full"
-          videoClassName="h-full w-full object-cover"
-          idlePlaceholder={
-            <div className="
-              flex h-full flex-col items-center justify-center gap-2
-            ">
-              <span
-                className="material-symbols-outlined text-2xl text-text-muted"
-              >
-                videocam
-              </span>
-              <p className="text-xs text-text-muted">
-                Feed is idle. Connect stream to monitor.
-              </p>
-              <button
-                className="
-                  mx-auto mt-2 inline-flex cursor-pointer items-center
-                  justify-center gap-2 rounded-3xl border-none
-                  bg-primary-gradient px-4 py-2 font-main text-xs font-semibold
-                  text-text-inverse shadow-primary-hover transition-smooth
-                  hover:bg-primary-hover-gradient
-                  active:scale-[0.98]
-                "
-                onClick={(e) => {
-                  e.stopPropagation();
-                  startStream();
-                }}
-              >
-                Connect Stream
-              </button>
-            </div>
-          }
-        />
+      <>
+        <section
+          className="
+            sticky top-0 z-20 -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)]
+            cursor-pointer overflow-hidden bg-black
+          "
+          onClick={onViewAdvanced}
+        >
+          <CameraFeed
+            feed={activeFeed}
+            isStreaming={isStreaming}
+            isWebcam={isWebcam}
+            videoRef={videoRef}
+            className="size-full"
+            videoClassName="h-full w-full object-cover"
+            idlePlaceholder={
+              <div className="
+                flex h-full flex-col items-center justify-center gap-2
+              ">
+                <span
+                  className="material-symbols-outlined text-2xl text-text-muted"
+                >
+                  videocam
+                </span>
+                <p className="text-xs text-text-muted">
+                  Feed is idle. Connect stream to monitor.
+                </p>
+                <button
+                  className="
+                    mx-auto mt-2 inline-flex cursor-pointer items-center
+                    justify-center gap-2 rounded-3xl border-none
+                    bg-primary-gradient px-4 py-2 font-main text-xs
+                    font-semibold text-text-inverse shadow-primary-hover
+                    transition-smooth
+                    hover:bg-primary-hover-gradient
+                    active:scale-[0.98]
+                  "
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    startStream();
+                  }}
+                >
+                  Connect Stream
+                </button>
+              </div>
+            }
+          />
 
-        {isStreaming && (
-          <>
-            <div className="
-              absolute inset-0 bg-linear-to-b from-black/20 via-transparent
-              to-transparent
-            " />
-            <div className="absolute bottom-3 left-4 z-10 flex gap-2">
-              <span className="
-                rounded-full border border-white/20 bg-black/40 px-2.5 py-1
-                text-2xs font-semibold text-white backdrop-blur-md
-              ">
-                Live
-              </span>
-              <span className="
-                rounded-full border border-white/20 bg-black/40 px-2.5 py-1
-                text-2xs text-white backdrop-blur-md
-              ">
-                {displayFishCount} fish
-              </span>
-            </div>
-          </>
-        )}
-      </section>
+          {isStreaming && (
+            <>
+              <div className="
+                absolute inset-0 bg-linear-to-b from-black/20 via-transparent
+                to-transparent
+              " />
+              <div className="absolute bottom-3 left-4 z-10 flex gap-2">
+                <span className="
+                  rounded-full border border-white/20 bg-black/40 px-2.5 py-1
+                  text-2xs font-semibold text-white backdrop-blur-md
+                ">
+                  Live
+                </span>
+                <span className="
+                  rounded-full border border-white/20 bg-black/40 px-2.5 py-1
+                  text-2xs text-white backdrop-blur-md
+                ">
+                  {displayFishCount} fish
+                </span>
+              </div>
+            </>
+          )}
+        </section>
+
+      </>
     );
   }
 
