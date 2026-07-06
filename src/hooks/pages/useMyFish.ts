@@ -1,7 +1,11 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTank } from '../useTank';
 import { useFish } from '../useFish';
+import { useReadings } from '../useReadings';
+import { useLiveFeed } from '../useLiveFeed';
+import { useNavigation } from '../../context/NavigationContext';
 import { analyzeFishTank, type FishTankAnalysis } from '../../models/services/speciesService';
+import { selectActiveFeedMetrics } from '../../models/services/inferenceHelpers';
 import {
   getSpeciesById,
   getSpeciesColor,
@@ -21,8 +25,18 @@ export const useMyFish = (external?: {
   externalShowAddForm?: boolean;
   onExternalToggleAddForm?: () => void;
 }) => {
-  const { tankId } = useTank();
+  const navigation = useNavigation();
+  const { activeTank, tankId } = useTank();
   const { fishList, addFish, removeFish, updateFishCount } = useFish(tankId);
+  const { readings } = useReadings();
+  const { liveState, activeFeed } = useLiveFeed(tankId);
+
+  const latestReading = useMemo(() => readings[0], [readings]);
+
+  const { clarity: displayClarity, fishCount: displayFishCount } = useMemo(
+    () => selectActiveFeedMetrics(liveState, activeFeed, latestReading),
+    [liveState, activeFeed, latestReading]
+  );
 
   const [name, setName] = useState('');
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string | null>(null);
@@ -65,6 +79,11 @@ export const useMyFish = (external?: {
       imagePath: undefined,
     };
   }, []);
+
+  const onViewAdvanced = useCallback(
+    () => navigation.setActiveTab('settings'),
+    [navigation]
+  );
 
   const onToggleAddForm = useCallback(() => {
     if (external?.onExternalToggleAddForm) {
@@ -136,9 +155,12 @@ export const useMyFish = (external?: {
   }, [fishToDelete, removeFish]);
 
   return {
+    activeTank,
     fishList,
     stats,
     speciesDistribution,
+    displayClarity,
+    displayFishCount,
     name,
     setName,
     selectedSpeciesId,
@@ -149,6 +171,7 @@ export const useMyFish = (external?: {
     getSpeciesDisplay,
     onToggleAddForm,
     onCloseAddForm,
+    onViewAdvanced,
     onSpeciesSelect,
     onAdd,
     onToggleFish,
