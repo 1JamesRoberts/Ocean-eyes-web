@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHome } from '../../hooks/pages/useHome';
-import { LiveFeedPreview } from '../../components/home/LiveFeedPreview';
+import { HeroLiveFeedSection } from '../../components/home/HeroLiveFeedSection';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
 import { WaterClarityCard } from '../../components/home/WaterClarityCard';
@@ -9,16 +9,11 @@ import { ActiveAlertsList } from '../../components/home/ActiveAlertsList';
 
 export const HomeScreen: React.FC = () => {
   const {
-    activeTank,
     fishList,
     latestReading,
-    displayClarity,
-    displayFishCount,
     hasReadingData,
     readings,
     alerts,
-    onGoLive,
-    onViewAdvanced,
     onManageFish,
     onViewHistory,
     onSelectAlert,
@@ -38,19 +33,12 @@ export const HomeScreen: React.FC = () => {
         </div>
       ) : (
         <>
-          <LiveFeedPreview
-            activeTank={activeTank}
-            displayClarity={displayClarity}
-            displayFishCount={displayFishCount}
-            onViewAdvanced={onViewAdvanced}
-            onGoFullscreen={onGoLive}
-            hero
-          />
+          <HeroLiveFeedSection />
 
           <HealthScoreCard
             reading={{
               ph: latestReading.ph,
-              clarity: displayClarity,
+              clarity: latestReading.clarity,
               ammonia: latestReading.ammonia,
               nitrite: latestReading.nitrite
             }}
@@ -75,7 +63,7 @@ export const HomeScreen: React.FC = () => {
             </div>
             <div className="space-y-3">
               <WaterClarityCard
-                displayClarity={displayClarity}
+                displayClarity={latestReading.clarity}
                 readings={readings}
                 onClick={onViewHistory}
                 compact

@@ -5,7 +5,7 @@ import {
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle, HelpCircle, Heart
 } from 'lucide-react';
-import { LiveFeedPreview } from '../../components/home/LiveFeedPreview';
+import { HeroLiveFeedSection } from '../../components/home/HeroLiveFeedSection';
 import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
 import { DonutChart } from '../../components/fish/DonutChart';
 import { FishThumbnail } from '../../components/fish/FishThumbnail';
@@ -60,18 +60,14 @@ export const MyFishScreen: React.FC<{
       : undefined
   );
   const {
-    activeTank,
     fishList,
     stats,
     speciesDistribution,
-    displayClarity,
-    displayFishCount,
     selectedSpeciesId,
     showAddForm,
     activeFishId,
     fishToDelete,
     getSpeciesDisplay,
-    onViewAdvanced,
     onCloseAddForm,
     onSpeciesSelect,
     onAdd,
@@ -87,14 +83,7 @@ export const MyFishScreen: React.FC<{
 
   return (
     <div className="flex flex-col">
-      <LiveFeedPreview
-        activeTank={activeTank}
-        displayClarity={displayClarity}
-        displayFishCount={displayFishCount}
-        onViewAdvanced={onViewAdvanced}
-        onGoFullscreen={onViewAdvanced}
-        hero
-      />
+      <HeroLiveFeedSection />
 
       {/* ─── Add Form ─── */}
       <div className={`
