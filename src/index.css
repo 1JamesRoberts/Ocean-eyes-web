@@ -613,7 +613,7 @@
   overflow-x: hidden;
   position: relative;
   z-index: 10;
-  padding-top: 63px;
+  padding-top: 54px;
 }
 
 .phone-content::-webkit-scrollbar {
@@ -631,14 +631,14 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 63px;
+  height: 54px;
   z-index: 50;
   pointer-events: none;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   padding: 11px 15px 0;
-  background: #ffffff;
+  background: #4a4a4a;
 }
 
 .status-bar-notch {
@@ -663,7 +663,7 @@
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', system-ui, sans-serif;
   font-size: 17px;
   font-weight: 600;
-  color: #000000;
+  color: #ffffff;
   line-height: 22px;
   letter-spacing: -0.8px;
 }
@@ -678,7 +678,7 @@
 }
 
 .status-bar-icon {
-  color: #000000;
+  color: #ffffff;
 }
 
 .status-bar-battery {
@@ -691,7 +691,7 @@
 }
 
 .status-bar-battery-icon {
-  color: #000000;
+  color: #ffffff;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -705,7 +705,7 @@
   width: 19px;
   height: 9px;
   border-radius: 1px;
-  background: #000000;
+  background: #ffffff;
 }
 
 /* ─── Phone Background Gradient ─── */
