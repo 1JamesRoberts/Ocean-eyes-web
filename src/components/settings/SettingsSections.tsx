@@ -5,7 +5,6 @@ import {
   Camera,
   ChevronDown,
   ChevronRight,
-  Clock,
   Fish,
   FolderOpen,
   Monitor,
@@ -537,45 +536,10 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
   </GlassCard>
 );
 
-interface SettingsMenuCardProps {
-  onNavigateToFish: () => void;
-  onNavigateToHistory: () => void;
-  onNavigateToAlerts: () => void;
-}
-
-export const SettingsMenuCard: React.FC<SettingsMenuCardProps> = ({
-  onNavigateToFish,
-  onNavigateToHistory,
-  onNavigateToAlerts,
-}) => {
-  const rows = [
-    { label: 'Manage Fish Inventory', detail: 'Species list and visibility', icon: Fish, onClick: onNavigateToFish },
-    { label: 'Water Clarity Reports', detail: 'Historical trend review', icon: Clock, onClick: onNavigateToHistory },
-    { label: 'Safety Alert Logs', detail: 'Warnings and event history', icon: Bell, onClick: onNavigateToAlerts },
-  ];
-
-  return (
-    <GlassCard className="p-5">
-      <SettingsCardTitle icon={ChevronRight} eyebrow="Shortcuts" title="Account Actions" />
-      <div className="flex flex-col gap-3">
-        {rows.map((row) => (
-          <SettingsPanelRow
-            key={row.label}
-            icon={row.icon}
-            title={row.label}
-            detail={row.detail}
-            onClick={row.onClick}
-            action={<ChevronRight size={18} className="text-text-muted" />}
-          />
-        ))}
-      </div>
-    </GlassCard>
-  );
-};
-
 interface SafetyThresholdsCardProps {
   maxTurbidity: number;
   fishChangePct: number;
+  onNavigateToAlerts: () => void;
   onTurbidityChange: (value: number) => void;
   onTurbidityCommit: (value: number) => void;
   onFishPctChange: (value: number) => void;
@@ -585,6 +549,7 @@ interface SafetyThresholdsCardProps {
 export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
   maxTurbidity,
   fishChangePct,
+  onNavigateToAlerts,
   onTurbidityChange,
   onTurbidityCommit,
   onFishPctChange,
@@ -594,7 +559,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
 
   return (
     <GlassCard className="p-5">
-      <SettingsCardTitle icon={ShieldCheck} eyebrow="Safety" title="Notification Thresholds" />
+      <SettingsCardTitle icon={ShieldCheck} eyebrow="Safety" title="Alerts & Thresholds" />
       <div className="flex flex-col gap-3">
         <SettingsPanelRow
           icon={Bell}
@@ -627,6 +592,13 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
             />
           </>
         )}
+        <SettingsPanelRow
+          icon={Bell}
+          title="Safety Alert Logs"
+          detail="Warnings and event history"
+          onClick={onNavigateToAlerts}
+          action={<ChevronRight size={18} className="text-text-muted" />}
+        />
       </div>
       <SettingsDisclosureButton
         expanded={expanded}

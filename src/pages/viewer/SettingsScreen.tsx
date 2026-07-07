@@ -3,7 +3,6 @@ import { useSettings } from '../../hooks/pages/useSettings';
 import {
   AquariumPanelCard,
   SafetyThresholdsCard,
-  SettingsMenuCard,
 } from '../../components/settings/SettingsSections';
 
 export const SettingsScreen: React.FC = () => {
@@ -25,15 +24,10 @@ export const SettingsScreen: React.FC = () => {
         onConfirmUnlink={settings.onConfirmUnlink}
       />
 
-      <SettingsMenuCard
-        onNavigateToFish={settings.onNavigateToFish}
-        onNavigateToHistory={settings.onNavigateToHistory}
-        onNavigateToAlerts={settings.onNavigateToAlerts}
-      />
-
       <SafetyThresholdsCard
         maxTurbidity={settings.maxTurbidity}
         fishChangePct={settings.fishChangePct}
+        onNavigateToAlerts={settings.onNavigateToAlerts}
         onTurbidityChange={settings.onTurbidityChange}
         onTurbidityCommit={settings.onTurbidityCommit}
         onFishPctChange={settings.onFishPctChange}
