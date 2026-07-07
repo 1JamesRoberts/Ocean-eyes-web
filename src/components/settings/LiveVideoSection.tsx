@@ -28,6 +28,82 @@ interface LiveVideoSectionProps {
   showSnapshotGallery?: boolean;
 }
 
+interface AIStatusBadgeProps {
+  aiLoading: boolean;
+  aiError: string | null;
+  detectionCount: number;
+}
+
+const AIStatusBadge: React.FC<AIStatusBadgeProps> = ({
+  aiLoading,
+  aiError,
+  detectionCount,
+}) => (
+  <div
+    className="
+      absolute top-3 left-1/2 z-16 flex -translate-x-1/2
+      items-center gap-1.5 rounded-[20px] bg-[rgba(15,23,42,0.85)]
+      px-3 py-1.5 text-caption font-semibold text-white
+    "
+  >
+    <div
+      className="size-2 rounded-full"
+      style={{
+        backgroundColor: aiLoading ? 'var(--color-warning)' : aiError ? 'var(--color-critical)' : 'var(--color-good)',
+        animation: aiLoading ? 'pulse 1.5s infinite' : 'none',
+      }}
+    />
+    <span>
+      {aiLoading ? 'AI Analyzing...' : aiError ? `AI Error: ${aiError}` : `AI Active · ${detectionCount} fish detected`}
+    </span>
+  </div>
+);
+
+const TurbidityErrorBadge: React.FC<{ error: string }> = ({ error }) => (
+  <div className="
+    absolute top-11 left-1/2 z-16 flex -translate-x-1/2 items-center
+    gap-1.5 rounded-[20px] border border-critical
+    bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-caption font-semibold
+    text-white
+  ">
+    <div className="size-2 rounded-full bg-critical" />
+    <span>{`Turbidity Error: ${error}`}</span>
+  </div>
+);
+
+const RecordingBadge: React.FC<{ recordingSeconds: number }> = ({ recordingSeconds }) => (
+  <div className="
+    absolute top-4 left-1/2 z-10 flex -translate-x-1/2 items-center
+    gap-1.5 rounded-[20px] border border-[rgba(255,255,255,0.08)]
+    bg-[rgba(239,68,68,0.85)] px-3 py-1.5 text-xs font-semibold
+    text-white backdrop-blur-md
+  ">
+    <div className="size-2 animate-recording-blink rounded-full bg-critical" />
+    <span>REC {formatDuration(recordingSeconds)}</span>
+  </div>
+);
+
+const IdleStreamPrompt: React.FC<{ onStartStream: () => void }> = ({ onStartStream }) => (
+  <div className="p-10 text-center">
+    <div className="mb-3 flex justify-center">
+      <Video size={32} className="text-text-muted" />
+    </div>
+    <p className="mb-4 text-sm text-text-muted">
+      Feed is idle. Connect stream to monitor.
+    </p>
+    <button className="
+      inline-flex cursor-pointer items-center justify-center gap-2
+      rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
+      text-h3 font-semibold text-text-inverse shadow-primary-hover
+      transition-smooth
+      hover:bg-primary-hover-gradient
+      active:scale-[0.98]
+    " onClick={onStartStream}>
+      Connect Stream
+    </button>
+  </div>
+);
+
 export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   tankId: propTankId,
   showStreamAdjustments = true,
@@ -174,50 +250,19 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
             )}
 
             {isAIActive && (
-              <div
-                className="
-                  absolute top-3 left-1/2 z-16 flex -translate-x-1/2
-                  items-center gap-1.5 rounded-[20px] bg-[rgba(15,23,42,0.85)]
-                  px-3 py-1.5 text-caption font-semibold text-white
-                "
-              >
-                <div
-                  className="size-2 rounded-full"
-                  style={{
-                    backgroundColor: aiLoading ? 'var(--color-warning)' : aiError ? 'var(--color-critical)' : 'var(--color-good)',
-                    animation: aiLoading ? 'pulse 1.5s infinite' : 'none'
-                  }}
-                />
-                <span>
-                  {aiLoading ? 'AI Analyzing...' : aiError ? `AI Error: ${aiError}` : `AI Active · ${lastPrediction?.summary.total_detections || 0} fish detected`}
-                </span>
-              </div>
+              <AIStatusBadge
+                aiLoading={aiLoading}
+                aiError={aiError}
+                detectionCount={lastPrediction?.summary.total_detections || 0}
+              />
             )}
 
             {turbidityError && (
-              <div className="
-                absolute top-11 left-1/2 z-16 flex -translate-x-1/2 items-center
-                gap-1.5 rounded-[20px] border border-critical
-                bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-caption font-semibold
-                text-white
-              ">
-                <div className="size-2 rounded-full bg-critical" />
-                <span>{`Turbidity Error: ${turbidityError}`}</span>
-              </div>
+              <TurbidityErrorBadge error={turbidityError} />
             )}
 
             {isRecording && (
-              <div className="
-                absolute top-4 left-1/2 z-10 flex -translate-x-1/2 items-center
-                gap-1.5 rounded-[20px] border border-[rgba(255,255,255,0.08)]
-                bg-[rgba(239,68,68,0.85)] px-3 py-1.5 text-xs font-semibold
-                text-white backdrop-blur-md
-              ">
-                <div className="
-                  size-2 animate-recording-blink rounded-full bg-critical
-                " />
-                <span>REC {formatDuration(recordingSeconds)}</span>
-              </div>
+              <RecordingBadge recordingSeconds={recordingSeconds} />
             )}
 
             <CameraControls
@@ -249,24 +294,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
             )}
           </>
         ) : (
-          <div className="p-10 text-center">
-            <div className="mb-3 flex justify-center">
-              <Video size={32} className="text-text-muted" />
-            </div>
-            <p className="mb-4 text-sm text-text-muted">
-              Feed is idle. Connect stream to monitor.
-            </p>
-            <button className="
-              inline-flex cursor-pointer items-center justify-center gap-2
-              rounded-3xl border-none bg-primary-gradient px-6 py-3 font-main
-              text-h3 font-semibold text-text-inverse shadow-primary-hover
-              transition-smooth
-              hover:bg-primary-hover-gradient
-              active:scale-[0.98]
-            " onClick={startStream}>
-              Connect Stream
-            </button>
-          </div>
+          <IdleStreamPrompt onStartStream={startStream} />
         )}
       </div>
 

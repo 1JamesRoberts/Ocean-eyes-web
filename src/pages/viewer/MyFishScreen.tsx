@@ -49,6 +49,151 @@ const breedingLabel: Record<BreedingDifficulty, string> = {
   easy: 'Easy', medium: 'Medium', hard: 'Hard', no_record: 'No Record'
 };
 
+interface OverviewMetricTileProps {
+  icon: React.ReactNode;
+  color: string;
+  label: string;
+  value: React.ReactNode;
+  conflict?: boolean;
+}
+
+const OverviewMetricTile: React.FC<OverviewMetricTileProps> = ({
+  icon,
+  color,
+  label,
+  value,
+  conflict = false,
+}) => (
+  <div className="
+    flex min-w-0 flex-col gap-1 rounded-xl border
+    border-white/20 bg-white/30 p-3.5
+    max-xs:p-3
+  ">
+    <div className="flex items-center gap-1.5">
+      <span style={{ color }}>{icon}</span>
+      <span style={{ color }} className="
+        truncate text-caption font-bold tracking-wider uppercase
+      ">{label}</span>
+    </div>
+    <div className="flex items-center gap-1.5">
+      <span className="text-2xl font-extrabold text-text">{value}</span>
+      {conflict && (
+        <span
+          className="mt-0.5 shrink-0"
+          title="Species have conflicting requirements - showing the full range"
+        >
+          <AlertTriangle size={14} className="text-critical" />
+        </span>
+      )}
+    </div>
+  </div>
+);
+
+interface FishCountStepperProps {
+  count: number;
+  onDecrement: () => void;
+  onIncrement: () => void;
+}
+
+const FishCountStepper: React.FC<FishCountStepperProps> = ({
+  count,
+  onDecrement,
+  onIncrement,
+}) => (
+  <div className="flex items-center rounded-xl border border-white/20 bg-white/30 p-0.5">
+    <button
+      className="
+        flex size-6 cursor-pointer items-center justify-center border-none
+        bg-transparent text-base font-extrabold text-text
+      "
+      onClick={onDecrement}
+    >
+      -
+    </button>
+    <span className="w-6 text-center text-sm font-bold text-text">{count}</span>
+    <button
+      className="
+        flex size-6 cursor-pointer items-center justify-center border-none
+        bg-transparent text-base font-extrabold text-text
+      "
+      onClick={onIncrement}
+    >
+      +
+    </button>
+  </div>
+);
+
+interface DeleteFishModalProps {
+  isOpen: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
+const DeleteFishModal: React.FC<DeleteFishModalProps> = ({
+  isOpen,
+  onCancel,
+  onConfirm,
+}) => (
+  <GlassModal isOpen={isOpen} onClose={onCancel}>
+    <h3 className="mb-2 text-lg font-bold text-text">Delete Fish Entry</h3>
+    <p className="mb-6 text-sm text-text-muted">
+      Are you sure you want to delete this fish entry? This action cannot be undone.
+    </p>
+    <div className="flex justify-end gap-3">
+      <GlassButton variant="outline" size="md" onClick={onCancel}>Cancel</GlassButton>
+      <GlassButton variant="danger" size="md" onClick={onConfirm}>Delete</GlassButton>
+    </div>
+  </GlassModal>
+);
+
+interface AddSpeciesFormProps {
+  show: boolean;
+  selectedSpeciesId: string | null;
+  fishList: { speciesId: string }[];
+  onSpeciesSelect: (species: SpeciesInfo | null, customName?: string) => void;
+  onAdd: (event: React.FormEvent) => void;
+  onClose: () => void;
+}
+
+const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
+  show,
+  selectedSpeciesId,
+  fishList,
+  onSpeciesSelect,
+  onAdd,
+  onClose,
+}) => (
+  <div className={`
+    shimmer z-50 origin-top -translate-y-3
+    transition-[max-height_0.4s_cubic-bezier(0.4,0,0.2,1),opacity_0.3s_ease,transform_0.4s_cubic-bezier(0.4,0,0.2,1),margin_0.4s_ease]
+    ${show ? 'mb-5 max-h-[500px] translate-y-0 opacity-100' : 'pointer-events-none max-h-0 opacity-0'}
+  `}>
+    <form onSubmit={onAdd} className="flex flex-col gap-3.5 glass-card p-6 transition-smooth">
+      <h4 className="text-sm font-bold text-text">Add New Species Entry</h4>
+      <div>
+        <label className="
+          mb-1 block text-caption font-semibold tracking-wider
+          text-text-muted uppercase
+        ">SPECIES</label>
+        <SpeciesSelector
+          selectedSpeciesId={selectedSpeciesId}
+          onSelect={onSpeciesSelect}
+          placeholder="Search or select a species..."
+          excludeSpeciesIds={fishList.map((fish) => fish.speciesId)}
+        />
+      </div>
+      <div className="mt-1.5 flex gap-2.5">
+        <GlassButton variant="primary" size="md" type="submit" className="flex-1">
+          Add Species
+        </GlassButton>
+        <GlassButton variant="outline" size="md" type="button" onClick={onClose}>
+          Cancel
+        </GlassButton>
+      </div>
+    </form>
+  </div>
+);
+
 export const MyFishScreen: React.FC<{
   showAddForm?: boolean;
   onToggleAddForm?: () => void;
@@ -82,44 +227,14 @@ export const MyFishScreen: React.FC<{
 
   return (
     <div className="flex flex-col">
-      {/* ─── Add Form ─── */}
-      <div className={`
-        shimmer z-50 origin-top -translate-y-3
-        transition-[max-height_0.4s_cubic-bezier(0.4,0,0.2,1),opacity_0.3s_ease,transform_0.4s_cubic-bezier(0.4,0,0.2,1),margin_0.4s_ease]
-        ${
-        showAddForm ? 'mb-5 max-h-[500px] translate-y-0 opacity-100' : `
-          pointer-events-none max-h-0 opacity-0
-        `
-      }
-      `}>
-        <form onSubmit={onAdd} className="
-          flex flex-col gap-3.5 glass-card p-6 transition-smooth
-        ">
-          <h4 className="text-sm font-bold text-text">Add New Species Entry</h4>
-          <div>
-            <label className="
-              mb-1 block text-caption font-semibold tracking-wider
-              text-text-muted uppercase
-            ">SPECIES</label>
-            <SpeciesSelector
-              selectedSpeciesId={selectedSpeciesId}
-              onSelect={onSpeciesSelect}
-              placeholder="Search or select a species..."
-              excludeSpeciesIds={fishList.map(f => f.speciesId)}
-            />
-          </div>
-          <div className="mt-1.5 flex gap-2.5">
-            <GlassButton variant="primary" size="md" type="submit" className="
-              flex-1
-            ">
-              Add Species
-            </GlassButton>
-            <GlassButton variant="outline" size="md" type="button" onClick={onCloseAddForm}>
-              Cancel
-            </GlassButton>
-          </div>
-        </form>
-      </div>
+      <AddSpeciesForm
+        show={showAddForm}
+        selectedSpeciesId={selectedSpeciesId}
+        fishList={fishList}
+        onSpeciesSelect={onSpeciesSelect}
+        onAdd={onAdd}
+        onClose={onCloseAddForm}
+      />
 
       {/* ─── Layout ─── */}
       <div className="flex flex-col gap-6">
@@ -148,28 +263,18 @@ export const MyFishScreen: React.FC<{
               grid grid-cols-2 gap-3
               xs:grid-cols-3
             ">
-              {(() => {
-                const compatibilityColor = getCompatibilityColor(getCompatibilityLevel(stats.overallCompatibility));
-                return [
-                  { icon: <Hash size={14} />, color: 'var(--color-primary-dark)', bg: 'var(--color-primary-light)', label: 'Total Fish', value: stats.totalFish },
-                  { icon: <Fish size={14} />, color: 'var(--color-info)', bg: 'rgba(59, 130, 246, 0.08)', label: 'Species', value: stats.uniqueSpecies },
-                  { icon: <Heart size={14} />, color: compatibilityColor, bg: `${compatibilityColor}14`, label: 'Compatibility', value: stats.overallCompatibility },
-                ].map((item, i) => (
-                  <div key={i} className="
-                    flex min-w-0 flex-col gap-1 rounded-xl border
-                    border-white/20 bg-white/30 p-3.5
-                    max-xs:p-3
-                  ">
-                    <div className="flex items-center gap-1.5">
-                      <span style={{ color: item.color }}>{item.icon}</span>
-                      <span style={{ color: item.color }} className="
-                        truncate text-caption font-bold tracking-wider uppercase
-                      ">{item.label}</span>
-                    </div>
-                    <span className="text-2xl font-extrabold text-text">{item.value}</span>
-                  </div>
-                ));
-              })()}
+              {[
+                { icon: <Hash size={14} />, color: 'var(--color-primary-dark)', label: 'Total Fish', value: stats.totalFish },
+                { icon: <Fish size={14} />, color: 'var(--color-info)', label: 'Species', value: stats.uniqueSpecies },
+                {
+                  icon: <Heart size={14} />,
+                  color: getCompatibilityColor(getCompatibilityLevel(stats.overallCompatibility)),
+                  label: 'Compatibility',
+                  value: stats.overallCompatibility,
+                },
+              ].map((item) => (
+                <OverviewMetricTile key={item.label} {...item} />
+              ))}
             </div>
 
             {/* ── Ideal Parameters ── */}
@@ -188,55 +293,29 @@ export const MyFishScreen: React.FC<{
                   {
                     icon: <Maximize2 size={14} />,
                     color: 'var(--color-primary-dark)',
-                    bg: 'var(--color-primary-light)',
                     label: 'Tank Size',
-                    value: stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '\u2014',
-                    conflict: false,
+                    value: stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '-',
                   },
                   {
                     icon: <Thermometer size={14} />,
                     color: 'var(--color-warning)',
-                    bg: 'rgba(245, 158, 11, 0.08)',
                     label: 'Temperature',
                     value: stats.tempResult.range != null
-                      ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '\u00b0C')
-                      : '\u2014',
+                      ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '°C')
+                      : '-',
                     conflict: stats.tempResult.conflict,
                   },
                   {
                     icon: <Droplets size={14} />,
                     color: 'rgba(147, 112, 219, 1)',
-                    bg: 'rgba(147, 112, 219, 0.08)',
                     label: 'pH',
                     value: stats.phResult.range != null
                       ? formatRange(stats.phResult.range[0], stats.phResult.range[1], '', 1)
-                      : '\u2014',
+                      : '-',
                     conflict: stats.phResult.conflict,
                   },
-                ].map((item, i) => (
-                  <div key={i} className="
-                    flex min-w-0 flex-col gap-1 rounded-xl border
-                    border-white/20 bg-white/30 p-3.5
-                    max-xs:p-3
-                  ">
-                    <div className="flex items-center gap-1.5">
-                      <span style={{ color: item.color }}>{item.icon}</span>
-                      <span style={{ color: item.color }} className="
-                        truncate text-caption font-bold tracking-wider uppercase
-                      ">{item.label}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-2xl font-extrabold text-text">{item.value}</span>
-                      {item.conflict && (
-                        <span
-                          className="mt-0.5 shrink-0"
-                          title="Species have conflicting requirements \u2014 showing the full range"
-                        >
-                          <AlertTriangle size={14} className="text-critical" />
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                ].map((item) => (
+                  <OverviewMetricTile key={item.label} {...item} />
                 ))}
               </div>
             </div>
@@ -308,26 +387,11 @@ export const MyFishScreen: React.FC<{
 
                     {isActive && (
                       <>
-                        <div className="
-                          flex items-center rounded-xl border border-white/20
-                          bg-white/30 p-0.5
-                        ">
-                          <button className="
-                            flex size-6 cursor-pointer items-center
-                            justify-center border-none bg-transparent text-base
-                            font-extrabold text-text
-                          "
-                            onClick={() => onDecrementCount(fish.id, fish.count)}>−</button>
-                          <span className="
-                            w-6 text-center text-sm font-bold text-text
-                          ">{fish.count}</span>
-                          <button className="
-                            flex size-6 cursor-pointer items-center
-                            justify-center border-none bg-transparent text-base
-                            font-extrabold text-text
-                          "
-                            onClick={() => onIncrementCount(fish.id, fish.count)}>+</button>
-                        </div>
+                        <FishCountStepper
+                          count={fish.count}
+                          onDecrement={() => onDecrementCount(fish.id, fish.count)}
+                          onIncrement={() => onIncrementCount(fish.id, fish.count)}
+                        />
                         <GlassIconButton size="sm" label="Delete fish" onClick={() => onRequestDelete(fish.id)}>
                           <Trash2 size={16} />
                         </GlassIconButton>
@@ -424,17 +488,11 @@ export const MyFishScreen: React.FC<{
         </div>
       </div>
 
-      {/* ─── Delete Confirmation ─── */}
-      <GlassModal isOpen={fishToDelete !== null} onClose={onCancelDelete}>
-        <h3 className="mb-2 text-lg font-bold text-text">Delete Fish Entry</h3>
-        <p className="mb-6 text-sm text-text-muted">
-          Are you sure you want to delete this fish entry? This action cannot be undone.
-        </p>
-        <div className="flex justify-end gap-3">
-          <GlassButton variant="outline" size="md" onClick={onCancelDelete}>Cancel</GlassButton>
-          <GlassButton variant="danger" size="md" onClick={onConfirmDelete}>Delete</GlassButton>
-        </div>
-      </GlassModal>
+      <DeleteFishModal
+        isOpen={fishToDelete !== null}
+        onCancel={onCancelDelete}
+        onConfirm={onConfirmDelete}
+      />
     </div>
   );
 };

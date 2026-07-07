@@ -10,6 +10,83 @@ import { GlassCard, GlassButton, GlassIconButton } from '../../components/shared
 import { formatDateForDisplay } from '../../utils/formatters';
 
 type AnalyticsScreenProps = ReturnType<typeof useAnalytics>;
+type DiagnosisRecord = AnalyticsScreenProps['diagnoses'][number];
+
+interface DiagnosisRecordCardProps {
+  diagnosis: DiagnosisRecord;
+  resolveCropUrl: (url?: string) => string | undefined;
+}
+
+const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
+  diagnosis,
+  resolveCropUrl,
+}) => {
+  const isErr = !!diagnosis.diagnosis.error;
+  const isHealthy = diagnosis.diagnosis.healthy;
+
+  return (
+    <div
+      className={`
+        flex flex-col gap-2 rounded-xl border bg-white/20 p-3.5
+        backdrop-blur-sm
+        ${isErr ? 'border-critical' : isHealthy ? 'border-good' : 'border-warning'}
+      `}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-text">{diagnosis.species}</span>
+          <span
+            className={`
+              rounded-xl px-2 py-0.5 text-caption font-bold
+              ${isErr ? 'bg-critical/12 text-critical' : isHealthy ? 'bg-good/12 text-good' : 'bg-warning/12 text-warning'}
+            `}
+          >
+            {isErr ? 'Error' : isHealthy ? 'Healthy' : `Disease: ${diagnosis.diagnosis.disease}`}
+          </span>
+          {!isErr && (
+            <span className="text-caption font-semibold text-text-muted">
+              {Math.round(diagnosis.diagnosis.confidence * 100)}% confidence
+            </span>
+          )}
+        </div>
+        <span className="text-caption font-semibold text-text-muted">
+          {new Date(diagnosis.timestamp).toLocaleTimeString()}
+        </span>
+      </div>
+
+      <div className="flex flex-row items-start gap-3">
+        {diagnosis.cropUrl && (
+          <img
+            src={resolveCropUrl(diagnosis.cropUrl)}
+            alt={`Crop of ${diagnosis.species} sent to LLM`}
+            className="block max-h-[110px] w-40 shrink-0 rounded-sm object-contain"
+            style={{ imageRendering: 'pixelated' }}
+            onError={(event) => {
+              event.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
+
+        {isErr ? (
+          <p className="m-0 flex-1 text-xs text-text-muted">
+            <strong>Configuration Error:</strong> {diagnosis.diagnosis.error}
+          </p>
+        ) : (
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <p className="m-0 text-xs text-text">
+              <strong>Observation:</strong> {diagnosis.diagnosis.description}
+            </p>
+            {!isHealthy && diagnosis.diagnosis.treatment && (
+              <p className="mt-1 rounded-md border-l-3 border-warning bg-bg p-2 text-xs text-text-muted">
+                <strong>Recommended Treatment:</strong> {diagnosis.diagnosis.treatment}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   tankId: _tankId,
@@ -184,92 +261,13 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
               </div>
             ) : (
               <div className="mt-2 flex flex-col gap-3">
-                {diagnoses.map((diag, index) => {
-                  const isErr = !!diag.diagnosis.error;
-                  const isHealthy = diag.diagnosis.healthy;
-                  
-                  return (
-                    <div
-                      key={index}
-                      className={`
-                        flex flex-col gap-2 rounded-xl border bg-white/20 p-3.5
-                        backdrop-blur-sm
-                        ${isErr ? `border-critical` : isHealthy ? `border-good` : `
-                          border-warning
-                        `}
-                      `}
-                    >
-                      <div className="
-                        flex flex-wrap items-center justify-between gap-2
-                      ">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-text">
-                            {diag.species}
-                          </span>
-                          <span
-                            className={`
-                              rounded-xl px-2 py-0.5 text-caption font-bold
-                              ${isErr ? `bg-critical/12 text-critical` : isHealthy ? `
-                                bg-good/12 text-good
-                              ` : `bg-warning/12 text-warning`}
-                            `}
-                          >
-                            {isErr ? 'Error' : isHealthy ? 'Healthy' : `Disease: ${diag.diagnosis.disease}`}
-                          </span>
-                          {!isErr && (
-                            <span className="
-                              text-caption font-semibold text-text-muted
-                            ">
-                              {Math.round(diag.diagnosis.confidence * 100)}% confidence
-                            </span>
-                          )}
-                        </div>
-                        <span className="
-                          text-caption font-semibold text-text-muted
-                        ">
-                          {new Date(diag.timestamp).toLocaleTimeString()}
-                        </span>
-                      </div>
-                      
-                      <div className="flex flex-row items-start gap-3">
-                        {diag.cropUrl && (
-                          <img
-                            src={resolveCropUrl(diag.cropUrl)}
-                            alt={`Crop of ${diag.species} sent to LLM`}
-                            className="
-                              block max-h-[110px] w-40 shrink-0 rounded-sm
-                              object-contain
-                            "
-                            style={{ imageRendering: 'pixelated' }}
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        )}
-
-                        {isErr ? (
-                          <p className="m-0 flex-1 text-xs text-text-muted">
-                            <strong>Configuration Error:</strong> {diag.diagnosis.error}
-                          </p>
-                        ) : (
-                          <div className="flex min-w-0 flex-1 flex-col gap-1">
-                            <p className="m-0 text-xs text-text">
-                              <strong>Observation:</strong> {diag.diagnosis.description}
-                            </p>
-                            {!isHealthy && diag.diagnosis.treatment && (
-                              <p className="
-                                mt-1 rounded-md border-l-3 border-warning bg-bg
-                                p-2 text-xs text-text-muted
-                              ">
-                                <strong>Recommended Treatment:</strong> {diag.diagnosis.treatment}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                {diagnoses.map((diagnosis, index) => (
+                  <DiagnosisRecordCard
+                    key={index}
+                    diagnosis={diagnosis}
+                    resolveCropUrl={resolveCropUrl}
+                  />
+                ))}
               </div>
             )}
           </GlassCard>
