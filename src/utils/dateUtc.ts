@@ -142,14 +142,6 @@ export function isTodayUTC(date: Date): boolean {
 }
 
 /**
- * Return the current UTC date as YYYY-MM-DD.
- */
-export function todayUTC(): string {
-  const now = new Date();
-  return toISODateUTC(now);
-}
-
-/**
  * Combine a YYYY-MM-DD date string and an HH:mm time string into a UTC Date.
  */
 export function combineDateTimeUTC(dateString: string, timeString: string): Date {

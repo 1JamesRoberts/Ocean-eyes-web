@@ -5,17 +5,11 @@ import { LiveFeedProvider } from './context/LiveFeedContext';
 import { AnalyticsControlsProvider } from './context/AnalyticsControlsContext';
 import { PhoneFrame, StatusBar, PillNavigation } from './components/shared';
 import { ViewerApp } from './pages/ViewerApp';
-import { AddTankModal } from './components/home/AddTankModal';
 import { useTank } from './hooks/useTank';
 
 const OceanEyesDashboard: React.FC = () => {
   const { activeTab } = useNavigation();
-  const [showAddTankModal, setShowAddTankModal] = useState(false);
-  const {
-    tankId,
-    createAndLinkTank,
-    linkTank,
-  } = useTank();
+  const { tankId } = useTank();
 
   const [showAddFishForm, setShowAddFishForm] = useState(false);
 
@@ -37,15 +31,6 @@ const OceanEyesDashboard: React.FC = () => {
       </div>
 
       <PillNavigation />
-
-      <AddTankModal
-        show={showAddTankModal}
-        onClose={() => setShowAddTankModal(false)}
-        onCreateTank={async (name, cameraSource) => {
-          await createAndLinkTank(name, cameraSource);
-        }}
-        onLinkTank={linkTank}
-      />
     </PhoneFrame>
   );
 };

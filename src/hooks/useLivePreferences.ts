@@ -1,6 +1,5 @@
 import { useSyncExternalStore, useCallback } from 'react';
 import {
-  DEMO_TANK_ID,
   getLivePreferences,
   saveLivePreferences,
   subscribeLivePreferences,
@@ -107,6 +106,3 @@ export const useLivePreferences = (tankId: string | null) => {
     resetToDefaults,
   };
 };
-
-// Convenience hook for the single demo tank
-export const useActiveLivePreferences = () => useLivePreferences(DEMO_TANK_ID);
