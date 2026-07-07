@@ -68,20 +68,6 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           </div>
         )}
 
-        <div className="
-          rounded-2xl border border-white/20 bg-white/20 p-3 backdrop-blur-sm
-          transition-smooth
-          hover:bg-white/60
-        ">
-          <span className="
-            block text-2xs font-semibold text-text-muted uppercase
-          ">
-            Species Found
-          </span>
-          <strong className="mt-1 block text-title text-good">
-            {Object.keys(lastPrediction.summary.species_counts).length}
-          </strong>
-        </div>
       </div>
 
       {Object.entries(lastPrediction.summary.species_counts).length > 0 && (

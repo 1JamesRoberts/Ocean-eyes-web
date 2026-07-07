@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Bell,
   Brain,
-  Camera,
   ChevronDown,
   ChevronRight,
   Fish,
@@ -18,11 +17,10 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { GlassButton, GlassCard, GlassInput, GlassSelect } from '../shared';
+import { GlassButton, GlassCard, GlassInput } from '../shared';
 import type {
   AIPreferences,
   CameraFilters,
-  CameraSourcePreference,
   FilterPreset,
   LivePreferences,
   TankBrief,
@@ -203,63 +201,6 @@ export const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
         className="w-full accent-brand-bright"
       />
     </div>
-  );
-};
-
-interface CameraSourceCardProps {
-  devices: MediaDeviceInfo[];
-  cameraPermissionState: 'prompt' | 'granted' | 'denied' | 'unknown';
-  preferences: LivePreferences;
-  onCameraSourceChange: (cameraSource: CameraSourcePreference) => void;
-}
-
-export const CameraSourceCard: React.FC<CameraSourceCardProps> = ({
-  devices,
-  cameraPermissionState,
-  preferences,
-  onCameraSourceChange,
-}) => {
-  const cameraSourceValue =
-    preferences.cameraSource.type === 'mock' ? 'mock' : preferences.cameraSource.deviceId || 'default';
-
-  const handleCameraSourceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    if (value === 'mock') {
-      onCameraSourceChange({ type: 'mock', label: 'Mock Feed' });
-      return;
-    }
-
-    const device = devices.find((item) => item.deviceId === value);
-    onCameraSourceChange({
-      type: 'webcam',
-      deviceId: value,
-      label: device?.label || 'Webcam',
-    });
-  };
-
-  return (
-    <GlassCard className="p-5">
-      <SettingsCardTitle icon={Camera} eyebrow="Live feed" title="Camera Source" />
-      <GlassSelect
-        id="camera-source"
-        label="Input"
-        value={cameraSourceValue}
-        onChange={handleCameraSourceChange}
-      >
-        <option value="default">Default Webcam</option>
-        {devices.map((device) => (
-          <option key={device.deviceId} value={device.deviceId}>
-            {device.label || `Camera ${device.deviceId.slice(0, 8)}`}
-          </option>
-        ))}
-        <option value="mock">Mock / Demo Feed</option>
-      </GlassSelect>
-      {cameraPermissionState === 'denied' && (
-        <p className="mt-2 text-xs text-critical">
-          Camera permission is denied. Enable it in your browser settings to use a real webcam.
-        </p>
-      )}
-    </GlassCard>
   );
 };
 

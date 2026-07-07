@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useTank } from '../useTank';
 import { useLivePreferences } from '../useLivePreferences';
 import { useNavigation } from '../../context/NavigationContext';
-import type { CameraSourcePreference, AIPreferences } from '../../types/aquarium';
+import type { AIPreferences } from '../../types/aquarium';
 import { SNAPSHOTS_STORAGE_KEY, RECORDINGS_STORAGE_KEY } from '../../utils/constants';
 
 export const useSettings = () => {
@@ -20,7 +20,6 @@ export const useSettings = () => {
 
   const {
     preferences,
-    updateCameraSource,
     updateAIPreferences,
     updateAutoConnect,
   } = useLivePreferences(activeTank?.id ?? null);
@@ -128,11 +127,6 @@ export const useSettings = () => {
     setShowConfirmUnlink(false);
   }, [unlinkTank]);
 
-  const onCameraSourceChange = useCallback(
-    (cameraSource: CameraSourcePreference) => updateCameraSource(cameraSource),
-    [updateCameraSource]
-  );
-
   const onAIPreferenceChange = useCallback(
     (patch: Partial<AIPreferences>) => {
       const next = { ...preferences.ai, ...patch };
@@ -189,7 +183,6 @@ export const useSettings = () => {
     onRequestUnlink,
     onCancelUnlink,
     onConfirmUnlink,
-    onCameraSourceChange,
     onAIPreferenceChange,
     onAIPreferenceCommit,
     onAutoConnectChange,

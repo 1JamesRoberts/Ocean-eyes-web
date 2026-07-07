@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import { useTank } from '../../hooks/useTank';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
-import { useLivePreferences } from '../../hooks/useLivePreferences';
 import { useFish } from '../../hooks/useFish';
 import { useFullscreen } from '../../hooks/live/useFullscreen';
 import { useViewportSize } from '../../hooks/live/useViewportSize';
@@ -111,7 +110,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
 }) => {
   const { activeTank, tankId: activeTankId } = useTank();
   const tankId = propTankId ?? activeTankId;
-  const { preferences, addFilterPreset, removeFilterPreset } = useLivePreferences(tankId);
   const {
     liveState,
     saveLiveState,
@@ -310,9 +308,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
             <StreamAdjustments
               filters={filters}
               onFilterChange={handleFilterChange}
-              filterPresets={preferences.filterPresets}
-              onSavePreset={addFilterPreset}
-              onDeletePreset={removeFilterPreset}
             />
           )}
 
