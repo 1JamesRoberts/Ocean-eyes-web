@@ -442,6 +442,12 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
 }) => (
   <GlassCard className="p-5">
     <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Identity" />
+    <div className="mb-3 rounded-2xl border border-white/25 bg-white/25 p-3 text-xs text-text-muted">
+      <span>Tank Reference Code: </span>
+      <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
+        {activeTank?.id}
+      </code>
+    </div>
     {editing ? (
       <form onSubmit={handleNameChange} className="flex items-end gap-2.5">
         <GlassInput
@@ -467,13 +473,6 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
         )}
       />
     )}
-
-    <div className="mt-3 rounded-2xl border border-white/25 bg-white/25 p-3 text-xs text-text-muted">
-      <span>Tank Reference Code: </span>
-      <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
-        {activeTank?.id}
-      </code>
-    </div>
   </GlassCard>
 );
 
@@ -607,6 +606,12 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
 }) => (
   <GlassCard className="p-5">
     <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Management" />
+    <div className="mb-3 rounded-2xl border border-white/25 bg-white/25 p-3 text-xs text-text-muted">
+      <span>Tank Reference Code: </span>
+      <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
+        {activeTank?.id}
+      </code>
+    </div>
 
     <div className="flex flex-col gap-3">
       {editing ? (
@@ -644,13 +649,6 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
         highlight
         action={<ChevronRight size={18} className="text-brand" />}
       />
-
-      <div className="rounded-2xl border border-white/25 bg-white/25 p-3 text-xs text-text-muted">
-        <span>Tank Reference Code: </span>
-        <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
-          {activeTank?.id}
-        </code>
-      </div>
 
       {showConfirmUnlink ? (
         <div className="rounded-2xl border border-critical/20 bg-critical/8 p-3">
