@@ -521,9 +521,9 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
                 </span>
               </span>
             </span>
-            <ChevronDown
+            <ChevronRight
               size={18}
-              className={`shrink-0 text-brand transition-transform ${expanded ? 'rotate-180' : ''}`}
+              className={`shrink-0 text-brand transition-transform ${expanded ? 'rotate-90' : ''}`}
             />
           </button>
 
