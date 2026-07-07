@@ -5,8 +5,6 @@ interface ScreenWithHeroVideoProps {
   hero: React.ReactNode;
   /** When false the hero is visually hidden but stays mounted to preserve the `MediaStream`. Default `true`. */
   showHero?: boolean;
-  /** Optional absolutely-positioned overlay rendered on top of the hero (e.g. `<HeroBadges />`). */
-  heroOverlay?: React.ReactNode;
   /** Screen-specific content rendered below the hero. */
   children: React.ReactNode;
 }
@@ -14,7 +12,6 @@ interface ScreenWithHeroVideoProps {
 export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
   hero,
   showHero = true,
-  heroOverlay,
   children,
 }) => {
   return (
@@ -27,7 +24,6 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
         `}
       >
         {hero}
-        {heroOverlay}
       </section>
       {children}
     </div>

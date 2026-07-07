@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useHome } from '../../hooks/pages/useHome';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
@@ -54,9 +55,10 @@ export const HomeScreen: React.FC = () => {
               </h3>
               <button
                 onClick={onViewHistory}
-                className="cursor-pointer border-none bg-transparent font-main text-xs font-semibold text-brand-bright transition-opacity hover:opacity-80"
+                aria-label="View water parameter history"
+                className="cursor-pointer border-none bg-transparent p-0 transition-opacity hover:opacity-80"
               >
-                Manage list
+                <ChevronRight size={18} className="text-brand" />
               </button>
             </div>
             <div className="space-y-3">

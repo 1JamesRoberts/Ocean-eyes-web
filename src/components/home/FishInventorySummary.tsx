@@ -1,5 +1,5 @@
 import React from 'react';
-import { FishSymbol } from 'lucide-react';
+import { FishSymbol, ChevronRight } from 'lucide-react';
 import { SpeciesAvatar } from '../fish/SpeciesAvatar';
 import type { FishEntry } from '../../types/aquarium';
 
@@ -25,13 +25,13 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
         </div>
         <button
           onClick={onManageFish}
+          aria-label="Manage fish list"
           className="
-            cursor-pointer border-none bg-transparent font-main text-xs
-            font-semibold text-brand-bright transition-opacity
+            cursor-pointer border-none bg-transparent p-0 transition-opacity
             hover:opacity-80
           "
         >
-          Manage list
+          <ChevronRight size={18} className="text-brand" />
         </button>
       </div>
 

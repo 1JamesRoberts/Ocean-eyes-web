@@ -61,7 +61,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
             hover:bg-white/60
           "
         >
-          <div className={`${param.colorClass} flex shrink-0 items-center justify-center`}>
+          <div className={`${param.colorClass} flex h-5 w-5 shrink-0 items-center justify-center rounded-full`}>
             <param.icon size={14} />
           </div>
           <div>

@@ -2,7 +2,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
+import { useHeroLiveFeed } from '../../hooks/useHeroLiveFeed';
 import { CameraFeed } from '../live/CameraFeed';
+import { HeroBadges } from '../home/HeroBadges';
 import { GlassSelect } from '../shared';
 import { buildHeatmapOverlay, debounce, type HeatmapCenter } from './heatmapOverlay';
 
@@ -25,6 +27,7 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     onSelectedSpeciesChange,
   }) => {
     const { activeFeed, isWebcam, isStreaming, videoRef } = useLiveFeed();
+    const { displayClarity, displayFishCount } = useHeroLiveFeed();
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
@@ -148,7 +151,12 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
             ref={overlayCanvasRef}
             className="pointer-events-none absolute inset-0 size-full"
           />
-          <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-transparent" />
+          {isStreaming && (
+            <HeroBadges
+              displayClarity={displayClarity}
+              displayFishCount={displayFishCount}
+            />
+          )}
           <div className="absolute bottom-3 left-4 z-10">
             <GlassSelect
               value={selectedSpecies}

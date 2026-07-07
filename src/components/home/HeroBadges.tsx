@@ -7,7 +7,8 @@ interface HeroBadgesProps {
 
 /**
  * Absolute-positioned "Live" + fish-count pills for hero video sections.
- * Rendered inside `ScreenWithHeroVideo`'s `heroOverlay` slot.
+ * Owned by the Dashboard (home) screen and consumed by other hero surfaces
+ * such as the Analytics heatmap.
  */
 export const HeroBadges: React.FC<HeroBadgesProps> = ({
   displayClarity: _displayClarity,
@@ -24,16 +25,16 @@ export const HeroBadges: React.FC<HeroBadgesProps> = ({
       <div className="absolute bottom-3 left-4 z-10 flex gap-2">
         <span
           className="
-            rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-2xs
-            font-semibold text-white backdrop-blur-md
+            rounded-full bg-black/40 px-2.5 py-1 text-2xs font-semibold
+            text-white backdrop-blur-md
           "
         >
           Live
         </span>
         <span
           className="
-            rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-2xs
-            text-white backdrop-blur-md
+            rounded-full bg-black/40 px-2.5 py-1 text-2xs text-white
+            backdrop-blur-md
           "
         >
           {displayFishCount} fish

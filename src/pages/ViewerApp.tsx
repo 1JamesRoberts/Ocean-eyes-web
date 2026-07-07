@@ -3,10 +3,8 @@ import React, { useMemo } from 'react';
 import { useNavigation, type ViewerTab } from '../context/NavigationContext';
 import { useTank } from '../hooks/useTank';
 import { useAnalytics } from '../hooks/pages/useAnalytics';
-import { useHeroLiveFeed } from '../hooks/useHeroLiveFeed';
 import { ScreenWithHeroVideo } from '../components/shared';
 import { HeroLiveFeedSection } from '../components/home/HeroLiveFeedSection';
-import { HeroBadges } from '../components/home/HeroBadges';
 import { SpatialDetectionHeatmap } from '../components/analytics/SpatialDetectionHeatmap';
 import { RootGateOnboarding } from './viewer/RootGateOnboarding';
 import { HomeScreen } from './viewer/HomeScreen';
@@ -31,7 +29,6 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
 
   // Hoisted once so the hero and AnalyticsScreen share the same selectedSpecies state
   const analyticsData = useAnalytics();
-  const { displayClarity, displayFishCount } = useHeroLiveFeed();
 
   const showHero = SCREENS_WITH_HERO.includes(activeTab);
 
@@ -58,15 +55,8 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
     ],
   );
 
-  // Memoize the hero badges overlay for the analytics heatmap hero
-  const analyticsHeroOverlay = useMemo(
-    () => <HeroBadges displayClarity={displayClarity} displayFishCount={displayFishCount} />,
-    [displayClarity, displayFishCount],
-  );
-
   const renderActiveScreen = () => {
     const hero = activeTab === 'analytics' ? analyticsHero : defaultHero;
-    const heroOverlay = activeTab === 'analytics' ? analyticsHeroOverlay : undefined;
 
     switch (activeTab) {
       case 'home':
@@ -102,7 +92,7 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
         );
       case 'analytics':
         return (
-          <ScreenWithHeroVideo hero={hero} showHero={showHero} heroOverlay={heroOverlay}>
+          <ScreenWithHeroVideo hero={hero} showHero={showHero}>
             <AnalyticsScreen {...analyticsData} />
           </ScreenWithHeroVideo>
         );

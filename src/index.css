@@ -762,7 +762,7 @@
 }
 
 .pill-nav-active {
-  background: linear-gradient(to right, #d0fffa 0%, rgba(255, 255, 255, 0) 66.346%);
+  background: linear-gradient(to right, #d0fffa 0%, #ffffff 140%);
   border: 0.5px solid var(--color-brand-bright);
   color: var(--color-brand);
 }
