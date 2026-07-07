@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
-import { GlassSelect } from '../shared';
 import { buildHeatmapOverlay, debounce, type HeatmapCenter } from './heatmapOverlay';
 
 interface SpatialDetectionHeatmapOverlayProps {
@@ -135,19 +134,26 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
           className="absolute inset-0 z-1 size-full"
         />
         <div className="pointer-events-auto absolute right-4 bottom-3 z-20">
-          <GlassSelect
-            value={selectedSpecies}
-            onClick={(event) => event.stopPropagation()}
-            onChange={(event) => onSelectedSpeciesChange(event.target.value)}
-            className="rounded-full! border-white/20! bg-black/40! px-2.5! py-1! text-2xs font-semibold text-white backdrop-blur-md!"
-          >
-            <option value="all">All Species</option>
-            {speciesList.map((species) => (
-              <option key={species} value={species}>
-                {formatSpeciesName(species)}
-              </option>
-            ))}
-          </GlassSelect>
+          <label className="relative inline-flex cursor-pointer items-center rounded-full bg-black/40 px-2.5 py-1 text-2xs text-white backdrop-blur-md">
+            <span className="pointer-events-none">
+              {selectedSpecies === 'all'
+                ? 'All Species'
+                : formatSpeciesName(selectedSpecies)}
+            </span>
+            <select
+              value={selectedSpecies}
+              onClick={(event) => event.stopPropagation()}
+              onChange={(event) => onSelectedSpeciesChange(event.target.value)}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+            >
+              <option value="all">All Species</option>
+              {speciesList.map((species) => (
+                <option key={species} value={species}>
+                  {formatSpeciesName(species)}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
     );
