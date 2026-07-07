@@ -1,7 +1,6 @@
 import React from 'react';
 import { useSettings } from '../../hooks/pages/useSettings';
 import {
-  AIPreferencesCard,
   AquariumPanelCard,
   SafetyThresholdsCard,
 } from '../../components/settings/SettingsSections';
@@ -33,9 +32,6 @@ export const SettingsScreen: React.FC = () => {
         onTurbidityCommit={settings.onTurbidityCommit}
         onFishPctChange={settings.onFishPctChange}
         onFishPctCommit={settings.onFishPctCommit}
-      />
-
-      <AIPreferencesCard
         preferences={settings.preferences}
         onAutoConnectChange={settings.onAutoConnectChange}
         onAIPreferenceChange={settings.onAIPreferenceChange}

@@ -60,7 +60,7 @@ describe('healthService', () => {
 
   describe('getHealthMessage', () => {
     it('returns optimal message for high scores', () => {
-      expect(getHealthMessage(8.5)).toContain('excellent');
+      expect(getHealthMessage(8.5)).toBe('System is optimal.');
     });
 
     it('returns caution message for medium scores', () => {

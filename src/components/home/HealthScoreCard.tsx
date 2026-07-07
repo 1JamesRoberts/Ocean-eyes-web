@@ -8,6 +8,10 @@ interface HealthScoreCardProps {
 export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) => {
   const healthScore = calculateHealthScore(reading);
   const healthMessage = getHealthMessage(healthScore);
+  const isHealthy = healthScore >= 8;
+  const healthDetails = isHealthy
+    ? 'All parameters are in safe bands. System is optimal.'
+    : healthMessage;
   const strokeWidth = 8;
   const radius = 48;
   const circumference = 2 * Math.PI * radius;
@@ -57,10 +61,10 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
 
       <div className="flex-1">
         <span className="block text-xs text-text-muted">Aquarium Health Index</span>
-        <h3 className="text-2xl font-bold text-brand text-pretty">{healthMessage}</h3>
-        <p className="mt-0.5 text-xs text-text-muted">
-          All parameters are in safe bands. System is optimal.
-        </p>
+        <h3 className="whitespace-nowrap text-[17px] font-bold leading-tight text-brand sm:text-2xl">
+          {healthMessage}
+        </h3>
+        <p className="mt-0.5 text-xs text-text-muted">{healthDetails}</p>
       </div>
     </section>
   );
