@@ -1,16 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
-import { useLiveFeed } from '../../hooks/useLiveFeed';
-import { useHeroLiveFeed } from '../../hooks/useHeroLiveFeed';
-import { CameraFeed } from '../live/CameraFeed';
-import { HeroBadges } from '../home/HeroBadges';
 import { GlassSelect } from '../shared';
 import { buildHeatmapOverlay, debounce, type HeatmapCenter } from './heatmapOverlay';
 
-interface Props {
+interface SpatialDetectionHeatmapOverlayProps {
   records: AIDetectionResult[];
-  tankId?: string | null;
   inventorySpeciesIds?: Set<string>;
   selectedSpecies: string;
   onSelectedSpeciesChange: (species: string) => void;
@@ -18,16 +13,13 @@ interface Props {
 
 const MAX_RENDER_WIDTH = 800;
 
-export const SpatialDetectionHeatmap = React.memo<Props>(
+export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmapOverlayProps>(
   ({
     records,
-    tankId: _tankId,
     inventorySpeciesIds,
     selectedSpecies,
     onSelectedSpeciesChange,
   }) => {
-    const { activeFeed, isWebcam, isStreaming, videoRef } = useLiveFeed();
-    const { displayClarity, displayFishCount } = useHeroLiveFeed();
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
     const heatmapTextureRef = useRef<HTMLCanvasElement | null>(null);
@@ -137,40 +129,25 @@ export const SpatialDetectionHeatmap = React.memo<Props>(
     }, [centers, containerSize, drawOverlay]);
 
     return (
-      <div className="size-full bg-black">
-        <div ref={containerRef} className="shimmer relative size-full bg-camera-bg">
-          <CameraFeed
-            feed={activeFeed}
-            isStreaming={isStreaming}
-            isWebcam={isWebcam}
-            videoRef={videoRef}
-            className="size-full"
-            videoClassName="h-full w-full object-cover"
-          />
-          <canvas
-            ref={overlayCanvasRef}
-            className="pointer-events-none absolute inset-0 size-full"
-          />
-          {isStreaming && (
-            <HeroBadges
-              displayClarity={displayClarity}
-              displayFishCount={displayFishCount}
-            />
-          )}
-          <div className="absolute bottom-3 left-4 z-10">
-            <GlassSelect
-              value={selectedSpecies}
-              onChange={(event) => onSelectedSpeciesChange(event.target.value)}
-              className="rounded-full! border-white/20! bg-black/40! px-2.5! py-1! text-2xs font-semibold text-white backdrop-blur-md!"
-            >
-              <option value="all">All Species</option>
-              {speciesList.map((species) => (
-                <option key={species} value={species}>
-                  {formatSpeciesName(species)}
-                </option>
-              ))}
-            </GlassSelect>
-          </div>
+      <div ref={containerRef} className="pointer-events-none absolute inset-0 size-full">
+        <canvas
+          ref={overlayCanvasRef}
+          className="absolute inset-0 z-1 size-full"
+        />
+        <div className="pointer-events-auto absolute right-4 bottom-3 z-20">
+          <GlassSelect
+            value={selectedSpecies}
+            onClick={(event) => event.stopPropagation()}
+            onChange={(event) => onSelectedSpeciesChange(event.target.value)}
+            className="rounded-full! border-white/20! bg-black/40! px-2.5! py-1! text-2xs font-semibold text-white backdrop-blur-md!"
+          >
+            <option value="all">All Species</option>
+            {speciesList.map((species) => (
+              <option key={species} value={species}>
+                {formatSpeciesName(species)}
+              </option>
+            ))}
+          </GlassSelect>
         </div>
       </div>
     );

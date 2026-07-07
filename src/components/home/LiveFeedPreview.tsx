@@ -12,6 +12,7 @@ interface LiveFeedPreviewProps {
   displayFishCount: number;
   onViewAdvanced: () => void;
   onGoFullscreen?: () => void;
+  overlay?: React.ReactNode;
   hero?: boolean;
 }
 
@@ -20,6 +21,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   displayFishCount,
   onViewAdvanced,
   onGoFullscreen,
+  overlay,
   hero = false,
 }) => {
   const { activeFeed, isWebcam, isStreaming, videoRef, startStream } =
@@ -83,6 +85,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               displayFishCount={displayFishCount}
             />
           )}
+          {overlay}
       </div>
     );
   }

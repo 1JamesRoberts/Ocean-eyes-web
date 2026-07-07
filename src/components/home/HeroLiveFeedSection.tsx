@@ -2,7 +2,11 @@ import React from 'react';
 import { useHeroLiveFeed } from '../../hooks/useHeroLiveFeed';
 import { LiveFeedPreview } from './LiveFeedPreview';
 
-export const HeroLiveFeedSection: React.FC = () => {
+interface HeroLiveFeedSectionProps {
+  overlay?: React.ReactNode;
+}
+
+export const HeroLiveFeedSection: React.FC<HeroLiveFeedSectionProps> = ({ overlay }) => {
   const {
     activeTank,
     displayClarity,
@@ -18,6 +22,7 @@ export const HeroLiveFeedSection: React.FC = () => {
       displayFishCount={displayFishCount}
       onViewAdvanced={onViewAdvanced}
       onGoFullscreen={onGoLive}
+      overlay={overlay}
       hero
     />
   );

@@ -5,7 +5,7 @@ import { useTank } from '../hooks/useTank';
 import { useAnalytics } from '../hooks/pages/useAnalytics';
 import { ScreenWithHeroVideo } from '../components/shared';
 import { HeroLiveFeedSection } from '../components/home/HeroLiveFeedSection';
-import { SpatialDetectionHeatmap } from '../components/analytics/SpatialDetectionHeatmap';
+import { SpatialDetectionHeatmapOverlay } from '../components/analytics/SpatialDetectionHeatmapOverlay';
 import { RootGateOnboarding } from './viewer/RootGateOnboarding';
 import { HomeScreen } from './viewer/HomeScreen';
 import { SettingsScreen } from './viewer/SettingsScreen';
@@ -15,8 +15,7 @@ import { HistoryDetailScreen } from './viewer/HistoryDetailScreen';
 import { MyFishScreen } from './viewer/MyFishScreen';
 import { AnalyticsScreen } from './viewer/AnalyticsScreen';
 
-// Account and Live own their own surfaces, so the shared hero stays off those tabs.
-const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'my_fish', 'analytics'];
+const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'live', 'my_fish', 'analytics', 'alerts', 'history'];
 
 interface ViewerAppProps {
   showAddFishForm?: boolean;
@@ -32,76 +31,54 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
 
   const showHero = SCREENS_WITH_HERO.includes(activeTab);
 
-  // Memoize the default hero (used by home, my_fish, alerts, history)
-  const defaultHero = useMemo(() => <HeroLiveFeedSection />, []);
-
-  // Memoize the analytics hero — heatmap video + species filter
-  const analyticsHero = useMemo(
-    () => (
-      <SpatialDetectionHeatmap
-        records={analyticsData.detectionRecords}
-        tankId={analyticsData.tankId}
-        inventorySpeciesIds={analyticsData.inventorySpeciesIds}
-        selectedSpecies={analyticsData.selectedSpecies}
-        onSelectedSpeciesChange={analyticsData.setSelectedSpecies}
-      />
-    ),
+  const analyticsHeroOverlay = useMemo(
+    () =>
+      activeTab === 'analytics' ? (
+        <SpatialDetectionHeatmapOverlay
+          records={analyticsData.detectionRecords}
+          inventorySpeciesIds={analyticsData.inventorySpeciesIds}
+          selectedSpecies={analyticsData.selectedSpecies}
+          onSelectedSpeciesChange={analyticsData.setSelectedSpecies}
+        />
+      ) : null,
     [
+      activeTab,
       analyticsData.detectionRecords,
-      analyticsData.tankId,
       analyticsData.inventorySpeciesIds,
       analyticsData.selectedSpecies,
       analyticsData.setSelectedSpecies,
     ],
   );
 
-  const renderActiveScreen = () => {
-    const hero = activeTab === 'analytics' ? analyticsHero : defaultHero;
+  // Mounted once above routed screens so the top video element survives every tab switch.
+  const defaultHero = useMemo(
+    () => <HeroLiveFeedSection overlay={analyticsHeroOverlay} />,
+    [analyticsHeroOverlay],
+  );
 
+  const renderActiveScreen = () => {
     switch (activeTab) {
       case 'home':
-        return (
-          <ScreenWithHeroVideo hero={hero} showHero={showHero}>
-            <HomeScreen />
-          </ScreenWithHeroVideo>
-        );
+        return <HomeScreen />;
       case 'settings':
         return <SettingsScreen />;
       case 'live':
         return <LiveTuningScreen />;
       case 'alerts':
-        return (
-          <ScreenWithHeroVideo hero={hero} showHero={showHero}>
-            <AlertsScreen />
-          </ScreenWithHeroVideo>
-        );
+        return <AlertsScreen />;
       case 'history':
-        return (
-          <ScreenWithHeroVideo hero={hero} showHero={showHero}>
-            <HistoryDetailScreen />
-          </ScreenWithHeroVideo>
-        );
+        return <HistoryDetailScreen />;
       case 'my_fish':
         return (
-          <ScreenWithHeroVideo hero={hero} showHero={showHero}>
-            <MyFishScreen
-              showAddForm={showAddFishForm}
-              onToggleAddForm={onToggleAddFish}
-            />
-          </ScreenWithHeroVideo>
+          <MyFishScreen
+            showAddForm={showAddFishForm}
+            onToggleAddForm={onToggleAddFish}
+          />
         );
       case 'analytics':
-        return (
-          <ScreenWithHeroVideo hero={hero} showHero={showHero}>
-            <AnalyticsScreen {...analyticsData} />
-          </ScreenWithHeroVideo>
-        );
+        return <AnalyticsScreen {...analyticsData} />;
       default:
-        return (
-          <ScreenWithHeroVideo hero={hero} showHero={showHero}>
-            <HomeScreen />
-          </ScreenWithHeroVideo>
-        );
+        return <HomeScreen />;
     }
   };
 
@@ -116,7 +93,9 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
         </div>
       ) : (
         <div className="flex flex-1 flex-col">
-          {renderActiveScreen()}
+          <ScreenWithHeroVideo hero={defaultHero} showHero={showHero}>
+            {renderActiveScreen()}
+          </ScreenWithHeroVideo>
         </div>
       )}
     </div>

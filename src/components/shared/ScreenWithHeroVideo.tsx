@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ScreenWithHeroVideoProps {
-  /** Hero content rendered inside the sticky section (typically `HeroLiveFeedSection` or `SpatialDetectionHeatmap`). */
+  /** Hero content rendered inside the sticky section. */
   hero: React.ReactNode;
   /** When false the hero is visually hidden but stays mounted to preserve the `MediaStream`. Default `true`. */
   showHero?: boolean;
