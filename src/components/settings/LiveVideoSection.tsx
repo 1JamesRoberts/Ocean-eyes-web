@@ -19,7 +19,6 @@ import { SnapshotGallery } from '../live/SnapshotGallery';
 import { StreamAdjustments } from '../live/StreamAdjustments';
 import { AIAnalysisPanel } from '../live/AIAnalysisPanel';
 import { VideoDecorations } from '../live/VideoDecorations';
-import { GlassButton } from '../shared';
 
 interface LiveVideoSectionProps {
   tankId?: string | null;
@@ -127,7 +126,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
 
   const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSize();
 
-  const { filters, temperatureOverlay, tintOverlay, handleFilterChange, saveAsDefault } = useCameraFilters({ tankId });
+  const { filters, temperatureOverlay, tintOverlay, handleFilterChange } = useCameraFilters({ tankId });
 
   const {
     snapshots,
@@ -311,13 +310,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
             />
           )}
 
-          {showStreamAdjustments && (
-            <div className="flex justify-end">
-              <GlassButton variant="outline" size="sm" onClick={saveAsDefault}>
-                Save Current Filters as Default
-              </GlassButton>
-            </div>
-          )}
         </>
       )}
 

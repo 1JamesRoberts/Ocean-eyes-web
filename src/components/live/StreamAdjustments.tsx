@@ -38,13 +38,6 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
       {isExpanded && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4">
-            <h4 className="
-              m-0 border-b border-border pb-1.5 text-sm font-semibold
-              text-text-muted
-            ">
-              TUNING SLIDERS
-            </h4>
-
             {([
               { key: 'contrast' as const, label: 'Contrast', min: 50, max: 150 },
               { key: 'brightness' as const, label: 'Brightness', min: 70, max: 130 },
@@ -77,7 +70,6 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
                       text-text-muted
                     "
                   >
-                    Reset
                   </button>
                 </div>
               </div>
