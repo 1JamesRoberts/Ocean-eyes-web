@@ -159,6 +159,7 @@ interface SettingsRangeControlProps {
   max: number | string;
   step: number | string;
   parser?: RangeParser;
+  variant?: 'panel' | 'inline';
   onChange: (value: number) => void;
   onCommit: (value: number) => void;
 }
@@ -176,6 +177,7 @@ export const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
   max,
   step,
   parser = 'int',
+  variant = 'panel',
   onChange,
   onCommit,
 }) => {
@@ -184,10 +186,10 @@ export const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
   };
 
   return (
-    <div className="rounded-2xl border border-white/25 bg-white/25 p-3">
-      <div className="mb-1.5 flex justify-between text-sm">
-        <span className="font-medium text-text-muted">{label}</span>
-        <strong className="text-brand">{displayValue}</strong>
+    <div className={variant === 'panel' ? 'rounded-2xl border border-white/25 bg-white/25 p-3' : ''}>
+      <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
+        <span className="min-w-0 font-medium text-text-muted">{label}</span>
+        <strong className="shrink-0 text-brand">{displayValue}</strong>
       </div>
       <input
         type="range"
@@ -501,37 +503,58 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
     <GlassCard className="p-5">
       <SettingsCardTitle icon={ShieldCheck} eyebrow="Safety" title="Alerts & Thresholds" />
       <div className="flex flex-col gap-3">
-        <SettingsPanelRow
-          icon={Bell}
-          title="Alert sensitivity"
-          detail={`${maxTurbidity} FNU turbidity max, ${fishChangePct}% fish visibility change`}
-          highlight
-        />
-        {expanded && (
-          <>
-            <SettingsRangeControl
-              label="Maximum FNU Threshold"
-              value={maxTurbidity}
-              displayValue={`${maxTurbidity} FNU`}
-              min="1.0"
-              max="10.0"
-              step="0.5"
-              parser="float"
-              onChange={onTurbidityChange}
-              onCommit={onTurbidityCommit}
+        <div className="rounded-2xl border border-white/25 bg-white/25 p-3">
+          <button
+            type="button"
+            onClick={() => setExpanded((current) => !current)}
+            aria-expanded={expanded}
+            className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent p-0 text-left"
+          >
+            <span className="flex min-w-0 items-center gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-2xl bg-white/40 text-text-muted">
+                <Bell size={17} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-text">Alert sensitivity</span>
+                <span className="mt-0.5 block text-xs leading-snug text-text-muted">
+                  {maxTurbidity} FNU turbidity max, {fishChangePct}% fish visibility change
+                </span>
+              </span>
+            </span>
+            <ChevronDown
+              size={18}
+              className={`shrink-0 text-brand transition-transform ${expanded ? 'rotate-180' : ''}`}
             />
-            <SettingsRangeControl
-              label="Discrepancy Alarm Trigger"
-              value={fishChangePct}
-              displayValue={`${fishChangePct}% visibility`}
-              min="20"
-              max="80"
-              step="10"
-              onChange={onFishPctChange}
-              onCommit={onFishPctCommit}
-            />
-          </>
-        )}
+          </button>
+
+          {expanded && (
+            <div className="mt-4 flex flex-col gap-4">
+              <SettingsRangeControl
+                label="Maximum FNU Threshold"
+                value={maxTurbidity}
+                displayValue={`${maxTurbidity} FNU`}
+                min="1.0"
+                max="10.0"
+                step="0.5"
+                parser="float"
+                variant="inline"
+                onChange={onTurbidityChange}
+                onCommit={onTurbidityCommit}
+              />
+              <SettingsRangeControl
+                label="Discrepancy Alarm Trigger"
+                value={fishChangePct}
+                displayValue={`${fishChangePct}% visibility`}
+                min="20"
+                max="80"
+                step="10"
+                variant="inline"
+                onChange={onFishPctChange}
+                onCommit={onFishPctCommit}
+              />
+            </div>
+          )}
+        </div>
         <SettingsPanelRow
           icon={Bell}
           title="Safety Alert Logs"
@@ -540,11 +563,6 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
           action={<ChevronRight size={18} className="text-text-muted" />}
         />
       </div>
-      <SettingsDisclosureButton
-        expanded={expanded}
-        onClick={() => setExpanded((current) => !current)}
-        label={expanded ? 'Hide thresholds' : 'Adjust thresholds'}
-      />
     </GlassCard>
   );
 };
