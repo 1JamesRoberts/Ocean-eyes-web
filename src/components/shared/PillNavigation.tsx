@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Fish, BarChart3, User } from 'lucide-react';
+import { Home, Fish, BarChart3, User, Video } from 'lucide-react';
 import { useNavigation, type ViewerTab } from '../../context/NavigationContext';
 import { useAlerts } from '../../hooks/useAlerts';
 
@@ -11,6 +11,7 @@ interface PillNavItem {
 
 const PILL_ITEMS: PillNavItem[] = [
   { tab: 'home', icon: Home, label: 'Dashboard' },
+  { tab: 'live', icon: Video, label: 'Live' },
   { tab: 'my_fish', icon: Fish, label: 'My Fish' },
   { tab: 'analytics', icon: BarChart3, label: 'Analytics' },
   { tab: 'settings', icon: User, label: 'Account' },

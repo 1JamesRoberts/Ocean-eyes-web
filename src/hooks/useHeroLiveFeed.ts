@@ -27,8 +27,8 @@ export function useHeroLiveFeed(): UseHeroLiveFeedResult {
     [liveState, activeFeed, latestReading]
   );
 
-  const onGoToSettings = useCallback(
-    () => navigation.setActiveTab('settings'),
+  const onGoToLive = useCallback(
+    () => navigation.setActiveTab('live'),
     [navigation]
   );
 
@@ -36,7 +36,7 @@ export function useHeroLiveFeed(): UseHeroLiveFeedResult {
     activeTank,
     displayClarity,
     displayFishCount,
-    onViewAdvanced: onGoToSettings,
-    onGoLive: onGoToSettings,
+    onViewAdvanced: onGoToLive,
+    onGoLive: onGoToLive,
   };
 }

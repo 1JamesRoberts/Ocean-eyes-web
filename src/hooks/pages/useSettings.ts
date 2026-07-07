@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useTank } from '../useTank';
 import { useLivePreferences } from '../useLivePreferences';
 import { useNavigation } from '../../context/NavigationContext';
-import type { CameraFilters, CameraSourcePreference, FilterPreset, AIPreferences } from '../../types/aquarium';
+import type { CameraSourcePreference, AIPreferences } from '../../types/aquarium';
 import { SNAPSHOTS_STORAGE_KEY, RECORDINGS_STORAGE_KEY } from '../../utils/constants';
 
 export const useSettings = () => {
@@ -21,12 +21,8 @@ export const useSettings = () => {
   const {
     preferences,
     updateCameraSource,
-    updateDefaultFilters,
-    addFilterPreset,
-    removeFilterPreset,
     updateAIPreferences,
     updateAutoConnect,
-    resetToDefaults,
   } = useLivePreferences(activeTank?.id ?? null);
 
   const [mediaCounts, setMediaCounts] = useState(() => ({
@@ -137,21 +133,6 @@ export const useSettings = () => {
     [updateCameraSource]
   );
 
-  const onDefaultFiltersChange = useCallback(
-    (filters: CameraFilters) => updateDefaultFilters(filters),
-    [updateDefaultFilters]
-  );
-
-  const onSaveFilterPreset = useCallback(
-    (preset: FilterPreset) => addFilterPreset(preset),
-    [addFilterPreset]
-  );
-
-  const onDeleteFilterPreset = useCallback(
-    (id: string) => removeFilterPreset(id),
-    [removeFilterPreset]
-  );
-
   const onAIPreferenceChange = useCallback(
     (patch: Partial<AIPreferences>) => {
       const next = { ...preferences.ai, ...patch };
@@ -209,9 +190,6 @@ export const useSettings = () => {
     onCancelUnlink,
     onConfirmUnlink,
     onCameraSourceChange,
-    onDefaultFiltersChange,
-    onSaveFilterPreset,
-    onDeleteFilterPreset,
     onAIPreferenceChange,
     onAIPreferenceCommit,
     onAutoConnectChange,
@@ -219,7 +197,6 @@ export const useSettings = () => {
     mediaCounts,
     clearSnapshots,
     clearRecordings,
-    resetToDefaults,
     onNavigateToFish,
     onNavigateToHistory,
     onNavigateToAlerts,

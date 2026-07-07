@@ -11,14 +11,13 @@ import { SpatialDetectionHeatmap } from '../components/analytics/SpatialDetectio
 import { RootGateOnboarding } from './viewer/RootGateOnboarding';
 import { HomeScreen } from './viewer/HomeScreen';
 import { SettingsScreen } from './viewer/SettingsScreen';
+import { LiveTuningScreen } from './viewer/LiveTuningScreen';
 import { AlertsScreen } from './viewer/AlertsScreen';
 import { HistoryDetailScreen } from './viewer/HistoryDetailScreen';
 import { MyFishScreen } from './viewer/MyFishScreen';
 import { AnalyticsScreen } from './viewer/AnalyticsScreen';
 
-// Account is intentionally excluded — SettingsScreen already contains its own
-// rich LiveVideoSection (with AI controls, filters, snapshot gallery), and
-// stacking the shared hero above it would produce a duplicate video.
+// Account and Live own their own surfaces, so the shared hero stays off those tabs.
 const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'my_fish', 'analytics'];
 
 interface ViewerAppProps {
@@ -77,8 +76,9 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
           </ScreenWithHeroVideo>
         );
       case 'settings':
-        // SettingsScreen owns its own rich LiveVideoSection — no shared hero
         return <SettingsScreen />;
+      case 'live':
+        return <LiveTuningScreen />;
       case 'alerts':
         return (
           <ScreenWithHeroVideo hero={hero} showHero={showHero}>

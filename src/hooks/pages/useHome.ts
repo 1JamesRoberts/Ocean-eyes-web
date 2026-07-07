@@ -25,10 +25,10 @@ export const useHome = () => {
   const hasReadingData = latestReading !== undefined;
 
   const onGoLive = useCallback(() => {
-    navigation.setActiveTab('settings');
+    navigation.setActiveTab('live');
   }, [navigation]);
   const onViewAdvanced = useCallback(
-    () => navigation.setActiveTab('settings'),
+    () => navigation.setActiveTab('live'),
     [navigation]
   );
   const onManageFish = useCallback(

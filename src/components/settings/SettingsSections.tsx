@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
+  Bell,
   Brain,
   Camera,
+  ChevronDown,
   ChevronRight,
+  Clock,
+  Fish,
   FolderOpen,
+  Monitor,
+  Pencil,
   RotateCcw,
+  Save,
   ShieldCheck,
   SlidersHorizontal,
   Trash2,
   Video,
+  X,
+  type LucideIcon,
 } from 'lucide-react';
 import { GlassButton, GlassCard, GlassInput, GlassSelect } from '../shared';
 import type {
@@ -21,6 +30,129 @@ import type {
 } from '../../types/aquarium';
 
 type RangeParser = 'int' | 'float' | 'percent';
+
+interface SettingsCardTitleProps {
+  icon: LucideIcon;
+  title: string;
+  eyebrow?: string;
+  action?: React.ReactNode;
+}
+
+const SettingsCardTitle: React.FC<SettingsCardTitleProps> = ({
+  icon: Icon,
+  title,
+  eyebrow,
+  action,
+}) => (
+  <div className="mb-4 flex items-start justify-between gap-3">
+    <div className="flex min-w-0 items-center gap-3">
+      <span className="grid size-9 shrink-0 place-items-center rounded-2xl border border-brand/10 bg-brand/8 text-brand">
+        <Icon size={17} />
+      </span>
+      <div className="min-w-0">
+        {eyebrow && (
+          <span className="block text-2xs font-bold tracking-widest text-text-subtle uppercase">
+            {eyebrow}
+          </span>
+        )}
+        <h4 className="text-sm font-bold text-text">{title}</h4>
+      </div>
+    </div>
+    {action && <div className="shrink-0">{action}</div>}
+  </div>
+);
+
+interface SettingsPanelRowProps {
+  icon?: LucideIcon;
+  title: React.ReactNode;
+  detail?: React.ReactNode;
+  action?: React.ReactNode;
+  onClick?: () => void;
+  highlight?: boolean;
+  danger?: boolean;
+}
+
+const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
+  icon: Icon,
+  title,
+  detail,
+  action,
+  onClick,
+  highlight = false,
+  danger = false,
+}) => {
+  const className = `
+    flex w-full items-center justify-between gap-3 rounded-2xl border border-white/25
+    bg-white/25 p-3 text-left transition-smooth
+    ${onClick ? 'cursor-pointer hover:bg-white/55 active:scale-[0.99]' : ''}
+    ${highlight ? 'border-brand/20 bg-brand/8' : ''}
+    ${danger ? 'border-critical/20 bg-critical/8' : ''}
+  `;
+  const content = (
+    <>
+      <span className="flex min-w-0 items-center gap-3">
+        {Icon && (
+          <span
+            className={`
+              grid size-9 shrink-0 place-items-center rounded-2xl
+              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'bg-brand/10 text-brand' : 'bg-white/40 text-text-muted'}
+            `}
+          >
+            <Icon size={17} />
+          </span>
+        )}
+        <span className="min-w-0">
+          <span className={`block text-sm font-semibold ${danger ? 'text-critical' : highlight ? 'text-brand' : 'text-text'}`}>
+            {title}
+          </span>
+          {detail && (
+            <span className="mt-0.5 block text-xs leading-snug text-text-muted">{detail}</span>
+          )}
+        </span>
+      </span>
+      {action && <span className="shrink-0">{action}</span>}
+    </>
+  );
+
+  return onClick ? (
+    <button
+      type="button"
+      onClick={onClick}
+      className={className}
+    >
+      {content}
+    </button>
+  ) : (
+    <div className={className}>
+      {content}
+    </div>
+  );
+};
+
+interface SettingsDisclosureButtonProps {
+  expanded: boolean;
+  onClick: () => void;
+  label: string;
+}
+
+const SettingsDisclosureButton: React.FC<SettingsDisclosureButtonProps> = ({
+  expanded,
+  onClick,
+  label,
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/20 px-3 py-2.5 text-xs font-bold text-text-muted transition-smooth hover:bg-white/45"
+    aria-expanded={expanded}
+  >
+    {label}
+    <ChevronDown
+      size={15}
+      className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
+    />
+  </button>
+);
 
 interface SettingsRangeControlProps {
   label: string;
@@ -55,9 +187,9 @@ export const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
   };
 
   return (
-    <div className="mb-4 last:mb-0">
+    <div className="rounded-2xl border border-white/25 bg-white/25 p-3">
       <div className="mb-1.5 flex justify-between text-sm">
-        <span className="text-text-muted">{label}</span>
+        <span className="font-medium text-text-muted">{label}</span>
         <strong className="text-brand">{displayValue}</strong>
       </div>
       <input
@@ -108,9 +240,7 @@ export const CameraSourceCard: React.FC<CameraSourceCardProps> = ({
 
   return (
     <GlassCard className="p-5">
-      <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-text">
-        <Camera size={16} className="text-brand" /> Camera Source
-      </h4>
+      <SettingsCardTitle icon={Camera} eyebrow="Live feed" title="Camera Source" />
       <GlassSelect
         id="camera-source"
         label="Input"
@@ -147,6 +277,7 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
   onDeleteFilterPreset,
   resetToDefaults,
 }) => {
+  const [expanded, setExpanded] = useState(false);
   const metrics = [
     { label: 'Contrast', value: `${defaultFilters.contrast}%` },
     { label: 'Brightness', value: `${defaultFilters.brightness}%` },
@@ -157,53 +288,63 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
 
   return (
     <GlassCard className="p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <h4 className="flex items-center gap-2 text-sm font-bold text-text">
-          <SlidersHorizontal size={16} className="text-brand" /> Camera Filters
-        </h4>
-        <GlassButton variant="outline" size="sm" onClick={resetToDefaults}>
-          <RotateCcw size={12} />
-          Reset All Defaults
-        </GlassButton>
-      </div>
+      <SettingsCardTitle
+        icon={SlidersHorizontal}
+        eyebrow="Image tuning"
+        title="Camera Filters"
+        action={(
+          <GlassButton variant="outline" size="sm" onClick={resetToDefaults} className="px-2.5">
+            <RotateCcw size={12} />
+            Reset
+          </GlassButton>
+        )}
+      />
 
-      <div className="mb-4 grid grid-cols-2 gap-3 text-sm">
+      <div className="grid grid-cols-2 gap-2.5 text-sm">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-lg bg-surface p-2.5">
-            <span className="block text-xs text-text-muted">{metric.label}</span>
+          <div key={metric.label} className="rounded-2xl border border-white/25 bg-white/25 p-3">
+            <span className="block text-xs font-medium text-text-muted">{metric.label}</span>
             <strong className="text-text">{metric.value}</strong>
           </div>
         ))}
       </div>
 
-      <div>
-        <h5 className="mb-2 text-xs font-semibold uppercase text-text-muted">Saved Presets</h5>
-        {filterPresets.length === 0 ? (
-          <p className="text-sm text-text-muted">No custom presets saved.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {filterPresets.map((preset) => (
-              <div
-                key={preset.id}
-                className="flex items-center gap-2 rounded-full bg-surface px-3 py-1.5 text-xs text-text"
-              >
-                <span>{preset.name}</span>
-                <button
-                  onClick={() => onDeleteFilterPreset(preset.id)}
-                  className="cursor-pointer border-none bg-transparent p-0 text-critical"
-                  title="Delete preset"
+      {expanded && (
+        <div className="mt-4">
+          <h5 className="mb-2 text-2xs font-bold tracking-widest text-text-subtle uppercase">Saved Presets</h5>
+          {filterPresets.length === 0 ? (
+            <p className="text-sm text-text-muted">No custom presets saved.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {filterPresets.map((preset) => (
+                <div
+                  key={preset.id}
+                  className="flex items-center gap-2 rounded-full bg-surface px-3 py-1.5 text-xs text-text"
                 >
-                  <Trash2 size={12} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+                  <span>{preset.name}</span>
+                  <button
+                    onClick={() => onDeleteFilterPreset(preset.id)}
+                    className="cursor-pointer border-none bg-transparent p-0 text-critical"
+                    title="Delete preset"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-      <p className="mt-3 text-xs text-text-muted">
-        Adjust filters in the live preview above, then save the current look as a preset or as the default filter.
-      </p>
+          <p className="mt-3 text-xs leading-relaxed text-text-muted">
+            Adjust filters in the live preview above, then save the current look as a preset or as the default filter.
+          </p>
+        </div>
+      )}
+
+      <SettingsDisclosureButton
+        expanded={expanded}
+        onClick={() => setExpanded((current) => !current)}
+        label={expanded ? 'Hide presets' : 'Show presets'}
+      />
     </GlassCard>
   );
 };
@@ -221,16 +362,15 @@ export const AIPreferencesCard: React.FC<AIPreferencesCardProps> = ({
   onAIPreferenceChange,
   onAIPreferenceCommit,
 }) => {
+  const [expanded, setExpanded] = useState(false);
   const percentValue = (value: number) => Math.round(value * 100);
 
   return (
     <GlassCard className="p-5">
-      <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-text">
-        <Brain size={16} className="text-brand" /> AI Preferences
-      </h4>
+      <SettingsCardTitle icon={Brain} eyebrow="Automation" title="AI Preferences" />
 
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-text-muted">Auto-start AI when stream connects</span>
+      <div className="mb-3 flex items-center justify-between rounded-2xl border border-white/25 bg-white/25 p-3">
+        <span className="pr-4 text-sm font-medium text-text-muted">Auto-start AI when stream connects</span>
         <button
           onClick={() => onAutoConnectChange(!preferences.autoConnect)}
           className={`
@@ -247,48 +387,58 @@ export const AIPreferencesCard: React.FC<AIPreferencesCardProps> = ({
         </button>
       </div>
 
-      <SettingsRangeControl
-        label="AI Polling Interval"
-        value={preferences.ai.pollingIntervalMs}
-        displayValue={`${preferences.ai.pollingIntervalMs / 1000}s`}
-        min="2000"
-        max="60000"
-        step="1000"
-        onChange={(value) => onAIPreferenceChange({ pollingIntervalMs: value })}
-        onCommit={(value) => onAIPreferenceCommit({ pollingIntervalMs: value })}
-      />
-      <SettingsRangeControl
-        label="Detection Confidence Threshold"
-        value={percentValue(preferences.ai.detectionConfidenceThreshold)}
-        displayValue={`${percentValue(preferences.ai.detectionConfidenceThreshold)}%`}
-        min="10"
-        max="90"
-        step="5"
-        parser="percent"
-        onChange={(value) => onAIPreferenceChange({ detectionConfidenceThreshold: value })}
-        onCommit={(value) => onAIPreferenceCommit({ detectionConfidenceThreshold: value })}
-      />
-      <SettingsRangeControl
-        label="Species Confidence Threshold"
-        value={percentValue(preferences.ai.speciesConfidenceThreshold)}
-        displayValue={`${percentValue(preferences.ai.speciesConfidenceThreshold)}%`}
-        min="10"
-        max="90"
-        step="5"
-        parser="percent"
-        onChange={(value) => onAIPreferenceChange({ speciesConfidenceThreshold: value })}
-        onCommit={(value) => onAIPreferenceCommit({ speciesConfidenceThreshold: value })}
-      />
-      <SettingsRangeControl
-        label="Diagnosis Minimum Confidence"
-        value={percentValue(preferences.ai.diagnosisMinConfidence)}
-        displayValue={`${percentValue(preferences.ai.diagnosisMinConfidence)}%`}
-        min="30"
-        max="90"
-        step="5"
-        parser="percent"
-        onChange={(value) => onAIPreferenceChange({ diagnosisMinConfidence: value })}
-        onCommit={(value) => onAIPreferenceCommit({ diagnosisMinConfidence: value })}
+      {expanded && (
+        <div className="flex flex-col gap-3">
+          <SettingsRangeControl
+            label="AI Polling Interval"
+            value={preferences.ai.pollingIntervalMs}
+            displayValue={`${preferences.ai.pollingIntervalMs / 1000}s`}
+            min="2000"
+            max="60000"
+            step="1000"
+            onChange={(value) => onAIPreferenceChange({ pollingIntervalMs: value })}
+            onCommit={(value) => onAIPreferenceCommit({ pollingIntervalMs: value })}
+          />
+          <SettingsRangeControl
+            label="Detection Confidence Threshold"
+            value={percentValue(preferences.ai.detectionConfidenceThreshold)}
+            displayValue={`${percentValue(preferences.ai.detectionConfidenceThreshold)}%`}
+            min="10"
+            max="90"
+            step="5"
+            parser="percent"
+            onChange={(value) => onAIPreferenceChange({ detectionConfidenceThreshold: value })}
+            onCommit={(value) => onAIPreferenceCommit({ detectionConfidenceThreshold: value })}
+          />
+          <SettingsRangeControl
+            label="Species Confidence Threshold"
+            value={percentValue(preferences.ai.speciesConfidenceThreshold)}
+            displayValue={`${percentValue(preferences.ai.speciesConfidenceThreshold)}%`}
+            min="10"
+            max="90"
+            step="5"
+            parser="percent"
+            onChange={(value) => onAIPreferenceChange({ speciesConfidenceThreshold: value })}
+            onCommit={(value) => onAIPreferenceCommit({ speciesConfidenceThreshold: value })}
+          />
+          <SettingsRangeControl
+            label="Diagnosis Minimum Confidence"
+            value={percentValue(preferences.ai.diagnosisMinConfidence)}
+            displayValue={`${percentValue(preferences.ai.diagnosisMinConfidence)}%`}
+            min="30"
+            max="90"
+            step="5"
+            parser="percent"
+            onChange={(value) => onAIPreferenceChange({ diagnosisMinConfidence: value })}
+            onCommit={(value) => onAIPreferenceCommit({ diagnosisMinConfidence: value })}
+          />
+        </div>
+      )}
+
+      <SettingsDisclosureButton
+        expanded={expanded}
+        onClick={() => setExpanded((current) => !current)}
+        label={expanded ? 'Hide thresholds' : 'Show thresholds'}
       />
     </GlassCard>
   );
@@ -312,24 +462,21 @@ export const MediaStorageCard: React.FC<MediaStorageCardProps> = ({
 
   return (
     <GlassCard className="p-5">
-      <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-text">
-        <FolderOpen size={16} className="text-brand" /> Media Storage
-      </h4>
-      <div className="flex flex-col gap-4">
+      <SettingsCardTitle icon={FolderOpen} eyebrow="Library" title="Media Storage" />
+      <div className="flex flex-col gap-3">
         {rows.map((row) => (
-          <div key={row.label} className="flex items-center justify-between rounded-lg bg-surface p-3">
-            <div className="flex items-center gap-3">
-              <Video size={18} className="text-text-muted" />
-              <div>
-                <span className="block text-sm font-semibold text-text">{row.label}</span>
-                <span className="text-xs text-text-muted">{row.count} saved</span>
-              </div>
-            </div>
-            <GlassButton variant="outline" size="sm" onClick={row.onClear} disabled={row.count === 0}>
-              <Trash2 size={12} />
-              Clear
-            </GlassButton>
-          </div>
+          <SettingsPanelRow
+            key={row.label}
+            icon={Video}
+            title={row.label}
+            detail={`${row.count} saved`}
+            action={(
+              <GlassButton variant="outline" size="sm" onClick={row.onClear} disabled={row.count === 0}>
+                <Trash2 size={12} />
+                Clear
+              </GlassButton>
+            )}
+          />
         ))}
       </div>
     </GlassCard>
@@ -354,22 +501,34 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
   onStartRename,
 }) => (
   <GlassCard className="p-5">
+    <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Identity" />
     {editing ? (
-      <form onSubmit={handleNameChange} className="flex gap-2.5">
-        <GlassInput id="tank-name" value={name} onChange={(event) => setName(event.target.value)} />
-        <GlassButton variant="primary" size="sm" type="submit">Save</GlassButton>
+      <form onSubmit={handleNameChange} className="flex items-end gap-2.5">
+        <GlassInput
+          id="tank-name"
+          label="Tank name"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+        <GlassButton variant="primary" size="sm" type="submit">
+          <Save size={12} />
+          Save
+        </GlassButton>
       </form>
     ) : (
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="text-caption font-semibold text-text-muted uppercase">Tank Name</span>
-          <strong className="mt-0.5 block text-lg text-text">{activeTank?.name}</strong>
-        </div>
-        <GlassButton variant="outline" size="sm" onClick={onStartRename}>Rename</GlassButton>
-      </div>
+      <SettingsPanelRow
+        title={activeTank?.name}
+        detail="Tank name"
+        action={(
+          <GlassButton variant="outline" size="sm" onClick={onStartRename}>
+            <Pencil size={12} />
+            Rename
+          </GlassButton>
+        )}
+      />
     )}
 
-    <div className="mt-4 border-t border-border pt-4 text-xs text-text-muted">
+    <div className="mt-3 rounded-2xl border border-white/25 bg-white/25 p-3 text-xs text-text-muted">
       <span>Tank Reference Code: </span>
       <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
         {activeTank?.id}
@@ -382,37 +541,34 @@ interface SettingsMenuCardProps {
   onNavigateToFish: () => void;
   onNavigateToHistory: () => void;
   onNavigateToAlerts: () => void;
-  onNavigateToMonitor: () => void;
 }
 
 export const SettingsMenuCard: React.FC<SettingsMenuCardProps> = ({
   onNavigateToFish,
   onNavigateToHistory,
   onNavigateToAlerts,
-  onNavigateToMonitor,
 }) => {
   const rows = [
-    { label: 'Manage Fish Inventory', onClick: onNavigateToFish },
-    { label: 'Water Clarity Reports', onClick: onNavigateToHistory },
-    { label: 'Safety Alert Logs', onClick: onNavigateToAlerts },
-    { label: 'IoT Scanner Console', onClick: onNavigateToMonitor, highlight: true },
+    { label: 'Manage Fish Inventory', detail: 'Species list and visibility', icon: Fish, onClick: onNavigateToFish },
+    { label: 'Water Clarity Reports', detail: 'Historical trend review', icon: Clock, onClick: onNavigateToHistory },
+    { label: 'Safety Alert Logs', detail: 'Warnings and event history', icon: Bell, onClick: onNavigateToAlerts },
   ];
 
   return (
-    <GlassCard className="px-4 py-1">
-      {rows.map((row, index) => (
-        <div
-          key={row.label}
-          className={`
-            flex cursor-pointer items-center justify-between py-4
-            ${index < rows.length - 1 ? 'border-b border-border' : ''}
-          `}
-          onClick={row.onClick}
-        >
-          <span className={`text-h3 font-semibold ${row.highlight ? 'text-brand' : ''}`}>{row.label}</span>
-          <ChevronRight size={18} className={row.highlight ? 'text-brand' : 'text-text-muted'} />
-        </div>
-      ))}
+    <GlassCard className="p-5">
+      <SettingsCardTitle icon={ChevronRight} eyebrow="Shortcuts" title="Account Actions" />
+      <div className="flex flex-col gap-3">
+        {rows.map((row) => (
+          <SettingsPanelRow
+            key={row.label}
+            icon={row.icon}
+            title={row.label}
+            detail={row.detail}
+            onClick={row.onClick}
+            action={<ChevronRight size={18} className="text-text-muted" />}
+          />
+        ))}
+      </div>
     </GlassCard>
   );
 };
@@ -433,34 +589,53 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
   onTurbidityCommit,
   onFishPctChange,
   onFishPctCommit,
-}) => (
-  <GlassCard className="p-5">
-    <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-text">
-      <ShieldCheck size={16} className="text-brand" /> Safety Boundaries & Notification Thresholds
-    </h4>
-    <SettingsRangeControl
-      label="Maximum FNU Threshold"
-      value={maxTurbidity}
-      displayValue={`${maxTurbidity} FNU`}
-      min="1.0"
-      max="10.0"
-      step="0.5"
-      parser="float"
-      onChange={onTurbidityChange}
-      onCommit={onTurbidityCommit}
-    />
-    <SettingsRangeControl
-      label="Discrepancy Alarm Trigger"
-      value={fishChangePct}
-      displayValue={`${fishChangePct}% visibility`}
-      min="20"
-      max="80"
-      step="10"
-      onChange={onFishPctChange}
-      onCommit={onFishPctCommit}
-    />
-  </GlassCard>
-);
+}) => {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <GlassCard className="p-5">
+      <SettingsCardTitle icon={ShieldCheck} eyebrow="Safety" title="Notification Thresholds" />
+      <div className="flex flex-col gap-3">
+        <SettingsPanelRow
+          icon={Bell}
+          title="Alert sensitivity"
+          detail={`${maxTurbidity} FNU turbidity max, ${fishChangePct}% fish visibility change`}
+          highlight
+        />
+        {expanded && (
+          <>
+            <SettingsRangeControl
+              label="Maximum FNU Threshold"
+              value={maxTurbidity}
+              displayValue={`${maxTurbidity} FNU`}
+              min="1.0"
+              max="10.0"
+              step="0.5"
+              parser="float"
+              onChange={onTurbidityChange}
+              onCommit={onTurbidityCommit}
+            />
+            <SettingsRangeControl
+              label="Discrepancy Alarm Trigger"
+              value={fishChangePct}
+              displayValue={`${fishChangePct}% visibility`}
+              min="20"
+              max="80"
+              step="10"
+              onChange={onFishPctChange}
+              onCommit={onFishPctCommit}
+            />
+          </>
+        )}
+      </div>
+      <SettingsDisclosureButton
+        expanded={expanded}
+        onClick={() => setExpanded((current) => !current)}
+        label={expanded ? 'Hide thresholds' : 'Adjust thresholds'}
+      />
+    </GlassCard>
+  );
+};
 
 interface DisconnectTankCardProps {
   activeTank?: TankBrief | null;
@@ -479,11 +654,11 @@ export const DisconnectTankCard: React.FC<DisconnectTankCardProps> = ({
 }) => (
   showConfirmUnlink ? (
     <GlassCard className="border-critical/30 p-5">
-      <strong className="text-sm text-critical">Are you sure you want to disconnect?</strong>
-      <p className="m-0 text-xs leading-[140%] text-text-muted">
+      <SettingsCardTitle icon={X} eyebrow="Disconnect" title="Remove Active Tank" />
+      <p className="m-0 text-xs leading-relaxed text-text-muted">
         This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
       </p>
-      <div className="mt-1 flex gap-2.5">
+      <div className="mt-4 flex gap-2.5">
         <GlassButton variant="outline" size="sm" onClick={onCancelUnlink}>Cancel</GlassButton>
         <GlassButton variant="danger" size="sm" onClick={onConfirmUnlink}>Yes, Disconnect</GlassButton>
       </div>
@@ -495,7 +670,95 @@ export const DisconnectTankCard: React.FC<DisconnectTankCardProps> = ({
       fullWidth
       onClick={onRequestUnlink}
     >
-      Disconnect from Tank
-    </GlassButton>
+    Disconnect from Tank
+  </GlassButton>
   )
+);
+
+interface AquariumPanelCardProps extends TankIdentityCardProps, DisconnectTankCardProps {
+  onNavigateToMonitor: () => void;
+}
+
+export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
+  activeTank,
+  editing,
+  name,
+  setName,
+  handleNameChange,
+  onStartRename,
+  onNavigateToMonitor,
+  showConfirmUnlink,
+  onRequestUnlink,
+  onCancelUnlink,
+  onConfirmUnlink,
+}) => (
+  <GlassCard className="p-5">
+    <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Management" />
+
+    <div className="flex flex-col gap-3">
+      {editing ? (
+        <form onSubmit={handleNameChange} className="flex items-end gap-2.5 rounded-2xl border border-white/25 bg-white/25 p-3">
+          <GlassInput
+            id="tank-name"
+            label="Tank name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <GlassButton variant="primary" size="sm" type="submit">
+            <Save size={12} />
+            Save
+          </GlassButton>
+        </form>
+      ) : (
+        <SettingsPanelRow
+          icon={Fish}
+          title={activeTank?.name}
+          detail="Active aquarium"
+          action={(
+            <GlassButton variant="outline" size="sm" onClick={onStartRename}>
+              <Pencil size={12} />
+              Rename
+            </GlassButton>
+          )}
+        />
+      )}
+
+      <SettingsPanelRow
+        icon={Monitor}
+        title="IoT Scanner Console"
+        detail="Pair or review monitor hardware"
+        onClick={onNavigateToMonitor}
+        highlight
+        action={<ChevronRight size={18} className="text-brand" />}
+      />
+
+      <div className="rounded-2xl border border-white/25 bg-white/25 p-3 text-xs text-text-muted">
+        <span>Tank Reference Code: </span>
+        <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
+          {activeTank?.id}
+        </code>
+      </div>
+
+      {showConfirmUnlink ? (
+        <div className="rounded-2xl border border-critical/20 bg-critical/8 p-3">
+          <p className="m-0 text-xs leading-relaxed text-text-muted">
+            This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
+          </p>
+          <div className="mt-3 flex gap-2.5">
+            <GlassButton variant="outline" size="sm" onClick={onCancelUnlink}>Cancel</GlassButton>
+            <GlassButton variant="danger" size="sm" onClick={onConfirmUnlink}>Yes, Disconnect</GlassButton>
+          </div>
+        </div>
+      ) : (
+        <SettingsPanelRow
+          icon={X}
+          title="Disconnect from Tank"
+          detail="Remove this tank from the active dashboard"
+          onClick={onRequestUnlink}
+          danger
+          action={<ChevronRight size={18} className="text-critical" />}
+        />
+      )}
+    </div>
+  </GlassCard>
 );
