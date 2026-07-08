@@ -219,25 +219,22 @@ export const MyFishScreen: React.FC<{
           <GlassCard className="p-5">
             <CardSectionHeader icon={BarChart3} title="Species Distribution" />
             <DonutChart speciesDistribution={speciesDistribution} />
-          </GlassCard>
 
-          <GlassCard
-            data-aquarium-overview
-            clickable
-            hover
-            className="
-              flex cursor-pointer flex-col overflow-hidden p-0
-            "
-            onClick={onToggleAquariumOverview}
-          >
-            {/* Main row — always visible */}
-            <div className="flex items-center justify-between p-3">
+            <div className="mt-5 h-px bg-border" />
+
+            <div
+              data-aquarium-overview
+              className="
+                mt-4 flex cursor-pointer items-center justify-between rounded-xl
+                p-3
+              "
+              onClick={onToggleAquariumOverview}
+            >
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <div className="
                   flex size-10 shrink-0 items-center justify-center rounded-lg
-                  bg-brand/10
                 ">
-                  <Fish size={22} className="text-brand" />
+                  <Fish size={29} className="text-brand" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <span className="
@@ -264,7 +261,6 @@ export const MyFishScreen: React.FC<{
               </div>
             </div>
 
-            {/* ─── Expanded Detail Panel ─── */}
             <div className={`
               grid
               transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
@@ -305,6 +301,41 @@ export const MyFishScreen: React.FC<{
                       }
                       colorClass="bg-[rgba(147,112,219,0.08)]"
                     />
+                  </div>
+
+                  <div className="mt-4">
+                    <div className="
+                      mb-2 text-caption font-bold tracking-wider
+                      text-text-muted uppercase
+                    ">
+                      Tank Compatibility
+                    </div>
+                    <div className="
+                      flex items-center gap-2 border-b border-border py-1.5
+                      last:border-b-0
+                    ">
+                      <div
+                        className="size-2 shrink-0 rounded-full"
+                        style={{
+                          backgroundColor: getCompatibilityColor(
+                            getCompatibilityLevel(stats.overallCompatibility)
+                          ),
+                        }}
+                      />
+                      <span className="
+                        flex-1 text-xs font-semibold text-text
+                      ">Overall tank compatibility</span>
+                      <span
+                        className="text-caption font-bold"
+                        style={{
+                          color: getCompatibilityColor(
+                            getCompatibilityLevel(stats.overallCompatibility)
+                          ),
+                        }}
+                      >
+                        {stats.overallCompatibility}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

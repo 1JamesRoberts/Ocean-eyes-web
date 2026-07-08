@@ -350,9 +350,6 @@
   font-size: 0.75rem;
   font-weight: 700;
   background: var(--glass-bg-inline);
-  backdrop-filter: blur(var(--glass-blur-sm));
-  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
-  border: 1px solid var(--glass-border-subtle);
 }
 
 @layer utilities {
