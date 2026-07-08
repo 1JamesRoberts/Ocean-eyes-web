@@ -349,7 +349,7 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
     <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Identity" />
     <GlassPanel className="mb-3 text-xs text-text-muted">
       <span>Tank Reference Code: </span>
-      <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
+      <code className="ml-1 align-baseline text-caption">
         {activeTank?.id}
       </code>
     </GlassPanel>
@@ -611,7 +611,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
           detail={(
             <>
               Ref Code:{' '}
-              <code className="inline-block px-1.5 py-0.5 align-middle text-caption">
+              <code className="align-baseline text-caption">
                 {activeTank?.id}
               </code>
             </>
