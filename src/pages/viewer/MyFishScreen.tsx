@@ -16,7 +16,6 @@ import {
   GlassCard,
   GlassIconButton,
   GlassModal,
-  GlassPanel,
 } from '../../components/shared';
 import {
   getSpeciesById,
@@ -56,42 +55,6 @@ const breedingLabel: Record<BreedingDifficulty, string> = {
   easy: 'Easy', medium: 'Medium', hard: 'Hard', no_record: 'No Record'
 };
 
-interface IdealParameterTileProps {
-  icon: React.ReactNode;
-  color: string;
-  label: string;
-  value: React.ReactNode;
-  conflict?: boolean;
-}
-
-const IdealParameterTile: React.FC<IdealParameterTileProps> = ({
-  icon,
-  color,
-  label,
-  value,
-  conflict = false,
-}) => (
-  <GlassPanel className="flex min-w-0 flex-col gap-1 max-xs:p-3">
-    <div className="flex items-center gap-1.5">
-      <span style={{ color }}>{icon}</span>
-      <span style={{ color }} className="
-        truncate text-caption font-bold tracking-wider uppercase
-      ">{label}</span>
-    </div>
-    <div className="flex items-center gap-1.5">
-      <span className="text-2xl font-extrabold text-text">{value}</span>
-      {conflict && (
-        <span
-          className="mt-0.5 shrink-0"
-          title="Species have conflicting requirements - showing the full range"
-        >
-          <AlertTriangle size={14} className="text-critical" />
-        </span>
-      )}
-    </div>
-  </GlassPanel>
-);
-
 interface FishCountStepperProps {
   count: number;
   onDecrement: () => void;
@@ -103,7 +66,9 @@ const FishCountStepper: React.FC<FishCountStepperProps> = ({
   onDecrement,
   onIncrement,
 }) => (
-  <div className="flex items-center rounded-xl border border-white/20 bg-white/30 p-0.5">
+  <div className="
+    flex items-center rounded-xl border border-white/20 bg-white/30 p-0.5
+  ">
     <button
       className="
         flex size-6 cursor-pointer items-center justify-center border-none
@@ -169,14 +134,18 @@ const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
   <div className={`
     shimmer z-50 origin-top -translate-y-3
     transition-[max-height_0.4s_cubic-bezier(0.4,0,0.2,1),opacity_0.3s_ease,transform_0.4s_cubic-bezier(0.4,0,0.2,1),margin_0.4s_ease]
-    ${show ? 'mb-5 max-h-[500px] translate-y-0 opacity-100' : 'pointer-events-none max-h-0 opacity-0'}
+    ${show ? 'mb-5 max-h-[500px] translate-y-0 opacity-100' : `
+      pointer-events-none max-h-0 opacity-0
+    `}
   `}>
-    <form onSubmit={onAdd} className="flex flex-col gap-3.5 glass-card p-6 transition-smooth">
+    <form onSubmit={onAdd} className="
+      flex flex-col gap-3.5 glass-card p-6 transition-smooth
+    ">
       <h4 className="text-sm font-bold text-text">Add New Species Entry</h4>
       <div>
         <label className="
-          mb-1 block text-caption font-semibold tracking-wider
-          text-text-muted uppercase
+          mb-1 block text-caption font-semibold tracking-wider text-text-muted
+          uppercase
         ">SPECIES</label>
         <SpeciesSelector
           selectedSpeciesId={selectedSpeciesId}
@@ -186,7 +155,9 @@ const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
         />
       </div>
       <div className="mt-1.5 flex gap-2.5">
-        <GlassButton variant="primary" size="md" type="submit" className="flex-1">
+        <GlassButton variant="primary" size="md" type="submit" className="
+          flex-1
+        ">
           Add Species
         </GlassButton>
         <GlassButton variant="outline" size="md" type="button" onClick={onClose}>
@@ -273,8 +244,8 @@ export const MyFishScreen: React.FC<{
                     block truncate text-base font-bold text-text
                   ">Fish Overview</span>
                   <span className="
-                    mb-1 block truncate text-xs font-medium
-                    text-text-muted italic
+                    mb-1 block truncate text-xs font-medium text-text-muted
+                    italic
                   ">{stats.uniqueSpecies} species</span>
                   <span className="mt-0.5 block text-xs text-text-muted">
                     Visible: {stats.totalDetected} / {stats.totalExpected}
@@ -307,46 +278,36 @@ export const MyFishScreen: React.FC<{
                     -translate-y-3 opacity-0
                   `}
                 `}>
-                  {/* Reserved for future Aquarium Overview expansion content. */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <DetailChip
+                      icon={<Maximize2 size={14} />}
+                      label="Tank Min"
+                      value={stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '—'}
+                      colorClass="bg-[rgba(16,185,129,0.08)]"
+                    />
+                    <DetailChip
+                      icon={<Thermometer size={14} />}
+                      label="Temp"
+                      value={
+                        stats.tempResult.range != null
+                          ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '°C')
+                          : '—'
+                      }
+                      colorClass="bg-[rgba(245,158,11,0.08)]"
+                    />
+                    <DetailChip
+                      icon={<Droplets size={14} />}
+                      label="pH"
+                      value={
+                        stats.phResult.range != null
+                          ? formatRange(stats.phResult.range[0], stats.phResult.range[1], '', 1)
+                          : '—'
+                      }
+                      colorClass="bg-[rgba(147,112,219,0.08)]"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </GlassCard>
-
-          <GlassCard className="p-5">
-            <CardSectionHeader icon={Thermometer} title="Ideal Parameters" />
-            <div className="
-              grid grid-cols-2 gap-3
-              xs:grid-cols-3
-            ">
-              {[
-                {
-                  icon: <Maximize2 size={14} />,
-                  color: 'var(--color-primary-dark)',
-                  label: 'Tank Size',
-                  value: stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '-',
-                },
-                {
-                  icon: <Thermometer size={14} />,
-                  color: 'var(--color-warning)',
-                  label: 'Temperature',
-                  value: stats.tempResult.range != null
-                    ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '°C')
-                    : '-',
-                  conflict: stats.tempResult.conflict,
-                },
-                {
-                  icon: <Droplets size={14} />,
-                  color: 'rgba(147, 112, 219, 1)',
-                  label: 'pH',
-                  value: stats.phResult.range != null
-                    ? formatRange(stats.phResult.range[0], stats.phResult.range[1], '', 1)
-                    : '-',
-                  conflict: stats.phResult.conflict,
-                },
-              ].map((item) => (
-                <IdealParameterTile key={item.label} {...item} />
-              ))}
             </div>
           </GlassCard>
         </div>
