@@ -372,7 +372,7 @@ export const MyFishScreen: React.FC<{
                 clickable
                 hover
                 className="
-                  flex cursor-pointer flex-col overflow-hidden p-0
+                  flex cursor-pointer flex-col overflow-hidden p-4!
                 "
                 onClick={() => onToggleFish(fish.id)}
               >

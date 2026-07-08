@@ -10,6 +10,7 @@ import {
   Pencil,
   RotateCcw,
   Save,
+  ShieldAlert,
   ShieldCheck,
   SlidersHorizontal,
   Trash2,
@@ -587,7 +588,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
   onConfirmUnlink,
 }) => (
   <GlassCard className="p-5">
-    <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Management" />
+    <SettingsCardTitle icon={ShieldAlert} eyebrow="Aquarium" title="Tank Management" />
 
     <div className="flex flex-col gap-3">
       {editing ? (

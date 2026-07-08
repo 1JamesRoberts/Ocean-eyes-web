@@ -40,6 +40,16 @@ export function getHealthColor(score: number): string {
   return 'var(--color-critical)';
 }
 
+export function getHealthHeading(score: number): string {
+  if (score >= 8) {
+    return 'System is optimal.';
+  }
+  if (score >= 6) {
+    return 'Mild fluctuation.';
+  }
+  return 'Critical violation!';
+}
+
 export function getHealthMessage(score: number): string {
   if (score >= 8) {
     return 'System is optimal.';

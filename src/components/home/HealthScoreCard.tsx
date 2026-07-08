@@ -1,5 +1,5 @@
 import React from 'react';
-import { calculateHealthScore, getHealthMessage, type HealthReading } from '../../models/services/healthService';
+import { calculateHealthScore, getHealthHeading, getHealthMessage, type HealthReading } from '../../models/services/healthService';
 
 interface HealthScoreCardProps {
   reading: HealthReading;
@@ -8,6 +8,7 @@ interface HealthScoreCardProps {
 export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) => {
   const healthScore = calculateHealthScore(reading);
   const healthMessage = getHealthMessage(healthScore);
+  const healthHeading = getHealthHeading(healthScore);
   const isHealthy = healthScore >= 8;
   const healthDetails = isHealthy
     ? 'All parameters are in safe bands. System is optimal.'
@@ -62,7 +63,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
       <div className="flex-1">
         <span className="block text-xs text-text-muted">Aquarium Health Index</span>
         <h3 className="whitespace-nowrap text-[17px] font-bold leading-tight text-brand sm:text-2xl">
-          {healthMessage}
+          {healthHeading}
         </h3>
         <p className="mt-0.5 text-xs text-text-muted">{healthDetails}</p>
       </div>

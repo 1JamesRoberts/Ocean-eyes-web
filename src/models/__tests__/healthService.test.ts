@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateHealthScore,
   getHealthColor,
+  getHealthHeading,
   getHealthMessage,
 } from '../services/healthService';
 
@@ -69,6 +70,20 @@ describe('healthService', () => {
 
     it('returns critical message for low scores', () => {
       expect(getHealthMessage(3)).toContain('Critical');
+    });
+  });
+
+  describe('getHealthHeading', () => {
+    it('returns short optimal heading for high scores', () => {
+      expect(getHealthHeading(8.5)).toBe('System is optimal.');
+    });
+
+    it('returns short caution heading for medium scores', () => {
+      expect(getHealthHeading(6.5)).toBe('Mild fluctuation.');
+    });
+
+    it('returns short critical heading for low scores', () => {
+      expect(getHealthHeading(3)).toBe('Critical violation!');
     });
   });
 });
