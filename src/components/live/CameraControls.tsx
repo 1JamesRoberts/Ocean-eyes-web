@@ -93,11 +93,12 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   return (
     <div 
       className="
-        absolute bottom-3 z-20 flex items-center gap-2 transition-[right]
-        duration-300
+        pointer-events-auto absolute bottom-0 z-20 flex items-center gap-2
+        transition-[right] duration-300
       "
       style={{
         right: isFullscreen && showFsInventory ? '332px' : '12px',
+        bottom: isFullscreen ? '12px' : '0',
       }}
     >
       <button 

@@ -14,31 +14,36 @@ interface DonutChartProps {
 export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
   const total = speciesDistribution.reduce((sum, s) => sum + s.count, 0);
   const radius = 80;
+  const strokeWidth = 24;
+  const separatorWidth = speciesDistribution.length > 1 ? 3 : 0;
   const circumference = 2 * Math.PI * radius;
+  const divisor = total > 0 ? total : 1;
 
   const segmentsWithOffsets = useMemo(
     () =>
       speciesDistribution.reduce<
         Array<{
           species: SpeciesSlice;
+          segmentLength: number;
           dashLength: number;
           gapLength: number;
           index: number;
           offset: number;
         }>
       >((acc, species, index) => {
-        const percentage = species.count / total;
-        const dashLength = circumference * percentage;
+        const percentage = species.count / divisor;
+        const segmentLength = circumference * percentage;
+        const dashLength = Math.max(segmentLength - separatorWidth, 0);
         const gapLength = circumference - dashLength;
         const offset =
-          acc.length > 0 ? acc[acc.length - 1].offset + acc[acc.length - 1].dashLength : 0;
-        acc.push({ species, dashLength, gapLength, index, offset });
+          acc.length > 0 ? acc[acc.length - 1].offset + acc[acc.length - 1].segmentLength : 0;
+        acc.push({ species, segmentLength, dashLength, gapLength, index, offset });
         return acc;
       }, []),
-    [speciesDistribution, total, circumference]
+    [speciesDistribution, divisor, circumference, separatorWidth]
   );
 
-  if (speciesDistribution.length === 0) {
+  if (speciesDistribution.length === 0 || total <= 0) {
     return (
       <div className="
         flex h-[200px] items-center justify-center text-text-muted
@@ -53,6 +58,14 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
       <div className="relative size-[200px]">
         <svg width="200" height="200" viewBox="0 0 200 200">
           <g transform="rotate(-90 100 100)">
+            <circle
+              cx="100"
+              cy="100"
+              r={radius}
+              fill="none"
+              stroke="white"
+              strokeWidth={strokeWidth}
+            />
             {segmentsWithOffsets.map(({ species, dashLength, gapLength, offset, index }) => (
               <circle
                 key={index}
@@ -61,7 +74,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
                 r={radius}
                 fill="none"
                 stroke={species.color}
-                strokeWidth="24"
+                strokeWidth={strokeWidth}
                 strokeDasharray={`${dashLength} ${gapLength}`}
                 strokeDashoffset={-offset}
                 className="transition-all duration-300 ease-in-out"

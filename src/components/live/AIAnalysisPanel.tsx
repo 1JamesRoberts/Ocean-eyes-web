@@ -54,7 +54,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             ">
               FNU
             </span>
-            <strong className="mt-1 block text-title text-info">
+            <strong className="mt-1 block text-title text-brand">
               {lastTurbidityResult.turbidity.fnu.toFixed(2)}
             </strong>
           </GlassPanel>

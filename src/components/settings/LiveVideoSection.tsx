@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { Video } from 'lucide-react';
 import { useTank } from '../../hooks/useTank';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
 import { useFish } from '../../hooks/useFish';
@@ -18,6 +19,7 @@ import { SnapshotGallery } from '../live/SnapshotGallery';
 import { StreamAdjustments } from '../live/StreamAdjustments';
 import { AIAnalysisPanel } from '../live/AIAnalysisPanel';
 import { VideoDecorations } from '../live/VideoDecorations';
+import { CardSectionHeader, GlassCard } from '../shared';
 
 interface LiveVideoSectionProps {
   tankId?: string | null;
@@ -168,9 +170,11 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
         <div
           ref={viewportRef}
           className={`
-            relative z-30 -mt-[92px] overflow-hidden transition-[height]
-            duration-300
-            ${isFullscreen ? 'h-screen bg-black' : 'sticky top-[157px] h-16'}
+            z-30 overflow-hidden transition-[height] duration-300
+            ${isFullscreen
+              ? 'relative h-screen bg-black'
+              : 'pointer-events-none fixed top-[223px] left-1/2 h-10 w-[393px] max-w-full -translate-x-1/2'
+            }
           `}
         >
           <div
@@ -290,25 +294,37 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
             lastManualDiagnosis={lastManualDiagnosis}
           />
 
-          {showStreamAdjustments && (
-            <StreamAdjustments
-              filters={filters}
-              onFilterChange={handleFilterChange}
-            />
-          )}
-
         </>
       )}
 
-      {showSnapshotGallery && (
-        <SnapshotGallery
-          snapshots={snapshots}
-          recordings={recordings}
-          onDownloadSnapshot={downloadSnapshot}
-          onDeleteSnapshot={deleteSnapshot}
-          onDownloadRecording={downloadRecording}
-          onDeleteRecording={deleteRecording}
-        />
+      {(showSnapshotGallery || (isStreaming && showStreamAdjustments)) && (
+        <GlassCard className="p-5">
+          <CardSectionHeader
+            icon={Video}
+            title="Stream Media"
+            detail="Image tuning, snapshots, and recordings"
+          />
+
+          <div className="flex flex-col gap-5">
+            {isStreaming && showStreamAdjustments && (
+              <StreamAdjustments
+                filters={filters}
+                onFilterChange={handleFilterChange}
+              />
+            )}
+
+            {showSnapshotGallery && (
+              <SnapshotGallery
+                snapshots={snapshots}
+                recordings={recordings}
+                onDownloadSnapshot={downloadSnapshot}
+                onDeleteSnapshot={deleteSnapshot}
+                onDownloadRecording={downloadRecording}
+                onDeleteRecording={deleteRecording}
+              />
+            )}
+          </div>
+        </GlassCard>
       )}
     </div>
   );
