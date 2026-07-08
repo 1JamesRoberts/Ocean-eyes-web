@@ -60,7 +60,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   const getBtnClasses = (active: boolean, disabled: boolean, isPulseClass = ''): string => {
     const base = "relative flex size-7 items-center justify-center border-0 bg-transparent p-0 text-white/85 drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)] transition-smooth";
     if (active) {
-      return `${base} cursor-pointer text-brand-bright after:absolute after:-bottom-0.5 after:left-1/2 after:h-0.5 after:w-3 after:-translate-x-1/2 after:rounded-full after:bg-current hover:text-white ${isPulseClass}`;
+      return `${base} rounded-full cursor-pointer text-brand-bright after:absolute after:-bottom-0.5 after:left-1/2 after:h-0.5 after:w-3 after:-translate-x-1/2 after:rounded-full after:bg-current hover:text-white ${isPulseClass}`;
     }
     if (disabled) {
       return `${base} text-white/35 cursor-not-allowed`;
