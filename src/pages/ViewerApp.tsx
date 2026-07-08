@@ -8,14 +8,14 @@ import { HeroLiveFeedSection } from '../components/home/HeroLiveFeedSection';
 import { SpatialDetectionHeatmapOverlay } from '../components/analytics/SpatialDetectionHeatmapOverlay';
 import { RootGateOnboarding } from './viewer/RootGateOnboarding';
 import { HomeScreen } from './viewer/HomeScreen';
-import { SettingsScreen } from './viewer/SettingsScreen';
 import { LiveTuningScreen } from './viewer/LiveTuningScreen';
 import { AlertsScreen } from './viewer/AlertsScreen';
 import { HistoryDetailScreen } from './viewer/HistoryDetailScreen';
 import { MyFishScreen } from './viewer/MyFishScreen';
 import { AnalyticsScreen } from './viewer/AnalyticsScreen';
+import { IoTMonitor } from './IoTMonitor';
 
-const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'live', 'my_fish', 'analytics', 'alerts', 'history'];
+const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'live', 'settings', 'my_fish', 'analytics', 'alerts', 'history'];
 
 interface ViewerAppProps {
   showAddFishForm?: boolean;
@@ -60,14 +60,15 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
     switch (activeTab) {
       case 'home':
         return <HomeScreen />;
-      case 'settings':
-        return <SettingsScreen />;
       case 'live':
+      case 'settings':
         return <LiveTuningScreen />;
       case 'alerts':
         return <AlertsScreen />;
       case 'history':
         return <HistoryDetailScreen />;
+      case 'monitor':
+        return <IoTMonitor />;
       case 'my_fish':
         return (
           <MyFishScreen

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Fish, BarChart3, User, Video } from 'lucide-react';
+import { Home, Fish, BarChart3, User } from 'lucide-react';
 import { useNavigation, type ViewerTab } from '../../context/NavigationContext';
 import { useAlerts } from '../../hooks/useAlerts';
 
@@ -11,10 +11,9 @@ interface PillNavItem {
 
 const PILL_ITEMS: PillNavItem[] = [
   { tab: 'home', icon: Home, label: 'Dashboard' },
-  { tab: 'live', icon: Video, label: 'Live' },
   { tab: 'my_fish', icon: Fish, label: 'My Fish' },
   { tab: 'analytics', icon: BarChart3, label: 'Analytics' },
-  { tab: 'settings', icon: User, label: 'Account' },
+  { tab: 'live', icon: User, label: 'Account' },
 ];
 
 export const PillNavigation: React.FC = () => {
@@ -26,7 +25,7 @@ export const PillNavigation: React.FC = () => {
     <nav className="pill-nav" aria-label="Primary">
       {PILL_ITEMS.map((item) => {
         const Icon = item.icon;
-        const isActive = activeTab === item.tab || (item.tab === 'settings' && activeTab === 'alerts');
+        const isActive = activeTab === item.tab || (item.tab === 'live' && activeTab === 'settings');
         return (
           <button
             key={item.tab}
@@ -40,7 +39,7 @@ export const PillNavigation: React.FC = () => {
           >
             <span className="pill-nav-icon">
               <Icon size={20} />
-              {item.tab === 'settings' && activeAlertCount > 0 && (
+              {item.tab === 'live' && activeAlertCount > 0 && (
                 <span className="pill-nav-badge">{activeAlertCount}</span>
               )}
             </span>
