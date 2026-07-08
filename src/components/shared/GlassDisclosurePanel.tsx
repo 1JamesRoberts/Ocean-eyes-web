@@ -23,10 +23,10 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
   children,
   className = '',
   contentClassName = 'flex flex-col gap-4 pt-4',
-  iconClassName = 'bg-white/40 text-text-muted',
+  iconClassName = 'bg-white/30 text-text-muted',
   chevronClassName = 'text-brand',
 }) => (
-  <div className={`rounded-2xl border border-white/25 bg-white/25 p-3 ${className}`}>
+  <div className={`rounded-2xl border border-white/20 bg-white/20 p-3 ${className}`}>
     <button
       type="button"
       onClick={onToggle}
@@ -34,7 +34,7 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
       className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent p-0 text-left"
     >
       <span className="flex min-w-0 items-center gap-3">
-        <span className={`grid size-9 shrink-0 place-items-center rounded-2xl ${iconClassName}`}>
+        <span className={`grid size-9 shrink-0 place-items-center rounded-xl ${iconClassName}`}>
           <Icon size={17} />
         </span>
         <span className="min-w-0">

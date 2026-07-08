@@ -10,7 +10,14 @@ import { DonutChart } from '../../components/fish/DonutChart';
 import { FishThumbnail } from '../../components/fish/FishThumbnail';
 import { DetailChip } from '../../components/fish/DetailChip';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
-import { GlassCard, GlassButton, GlassIconButton, GlassModal } from '../../components/shared';
+import {
+  CardSectionHeader,
+  GlassButton,
+  GlassCard,
+  GlassIconButton,
+  GlassModal,
+  GlassPanel,
+} from '../../components/shared';
 import {
   getSpeciesById,
   checkTankCompatibility,
@@ -64,11 +71,7 @@ const OverviewMetricTile: React.FC<OverviewMetricTileProps> = ({
   value,
   conflict = false,
 }) => (
-  <div className="
-    flex min-w-0 flex-col gap-1 rounded-xl border
-    border-white/20 bg-white/30 p-3.5
-    max-xs:p-3
-  ">
+  <GlassPanel className="flex min-w-0 flex-col gap-1 max-xs:p-3">
     <div className="flex items-center gap-1.5">
       <span style={{ color }}>{icon}</span>
       <span style={{ color }} className="
@@ -86,7 +89,7 @@ const OverviewMetricTile: React.FC<OverviewMetricTileProps> = ({
         </span>
       )}
     </div>
-  </div>
+  </GlassPanel>
 );
 
 interface FishCountStepperProps {
@@ -241,24 +244,21 @@ export const MyFishScreen: React.FC<{
         {/* Chart & Stats */}
         <div className="flex flex-col gap-4">
           <GlassCard className="p-5">
-            <div className="mb-4 flex items-center gap-2">
-              <BarChart3 size={18} className="text-brand" />
-              <h3 className="text-base font-bold text-text">Species Distribution</h3>
-            </div>
+            <CardSectionHeader icon={BarChart3} title="Species Distribution" />
             <DonutChart speciesDistribution={speciesDistribution} />
           </GlassCard>
 
           <GlassCard className="p-5">
-            <div className="mb-4 flex items-center gap-2">
-              <Fish size={18} className="text-brand" />
-              <h3 className="text-base font-bold text-text">Aquarium Overview</h3>
-              <div className="ml-auto">
+            <CardSectionHeader
+              icon={Fish}
+              title="Aquarium Overview"
+              action={(
                 <DetectionVisibilityRing
                   detected={stats.totalDetected}
                   expected={stats.totalExpected}
                 />
-              </div>
-            </div>
+              )}
+            />
             <div className="
               grid grid-cols-2 gap-3
               xs:grid-cols-3
@@ -280,7 +280,7 @@ export const MyFishScreen: React.FC<{
             {/* ── Ideal Parameters ── */}
             <div className="mt-4 border-t border-border pt-4">
               <span className="
-                mb-3 block text-caption font-bold tracking-wider text-text-muted
+                mb-3 block text-xs font-medium tracking-widest text-text-muted
                 uppercase
               ">
                 Ideal Parameters
@@ -325,7 +325,7 @@ export const MyFishScreen: React.FC<{
         {/* Right Column — Fish Cards */}
         <div className="flex flex-col gap-3">
           {fishList.length === 0 && (
-            <GlassCard className="p-10 text-center">
+            <GlassCard className="p-6 text-center">
               <span className="text-5xl">🐟</span>
               <p className="text-base font-bold text-text">No fish in your inventory</p>
               <p className="text-xs text-text-muted">Tap + to add your first species</p>
@@ -348,10 +348,10 @@ export const MyFishScreen: React.FC<{
 
             return (
               <GlassCard key={fish.id} data-fish-card
+                clickable
+                hover
                 className="
                   flex cursor-pointer flex-col overflow-hidden p-0
-                  transition-[box-shadow_0.25s_cubic-bezier(0.4,0,0.2,1)]
-                  hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
                 "
                 onClick={() => onToggleFish(fish.id)}
               >
@@ -432,15 +432,6 @@ export const MyFishScreen: React.FC<{
                             <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass="bg-[rgba(147,112,219,0.08)]" />
                             <DetailChip icon={<HelpCircle size={14} />} label="Breeding" value={breedingLabel[species.breeding ?? 'no_record']} colorClass="bg-[rgba(148,163,184,0.12)]" />
                           </div>
-
-                          {/* Origin */}
-                          {species.origin && (
-                            <span className="
-                              inline-block rounded-[20px]
-                              bg-[rgba(13,148,136,0.08)] p-[4px_10px]
-                              text-caption font-semibold text-brand
-                            ">{species.origin}</span>
-                          )}
 
                           {/* Compatibility section */}
                           {compResults.length > 0 && (

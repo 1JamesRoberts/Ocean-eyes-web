@@ -1,7 +1,8 @@
 import React from 'react';
+import { Database, Waves } from 'lucide-react';
 import { useHistoryDetail } from '../../hooks/pages/useHistoryDetail';
 import { MiniClarityChart } from '../../components/analytics/MiniClarityChart';
-import { GlassCard, GlassBadge } from '../../components/shared';
+import { CardSectionHeader, GlassBadge, GlassCard, GlassPanel } from '../../components/shared';
 
 export const HistoryDetailScreen: React.FC = () => {
   const { readings, recentReadings, onBack } = useHistoryDetail();
@@ -32,10 +33,11 @@ export const HistoryDetailScreen: React.FC = () => {
 
       {/* Main Clarity Area Chart */}
       <GlassCard className="p-5">
-        <h3 className="mb-4 flex items-center justify-between text-h3 font-bold">
-          <span>Water Clarity Trend</span>
-          <GlassBadge color="live">Live Sync</GlassBadge>
-        </h3>
+        <CardSectionHeader
+          icon={Waves}
+          title="Water Clarity Trend"
+          action={<GlassBadge color="live">Live Sync</GlassBadge>}
+        />
 
         <div className="w-full py-2.5">
           <MiniClarityChart readings={readings} height={180} />
@@ -52,7 +54,7 @@ export const HistoryDetailScreen: React.FC = () => {
       </GlassCard>
 
       {/* Diagnostic Logs */}
-      <h3 className="mb-3 text-h3 font-bold text-text">Database Reading Log Entries</h3>
+      <CardSectionHeader icon={Database} title="Database Reading Log Entries" className="mb-0" />
       <div className="flex flex-col gap-2.5">
         {recentReadings.map(reading => {
           const date = new Date(reading.timestamp);
@@ -60,9 +62,7 @@ export const HistoryDetailScreen: React.FC = () => {
           const day = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 
           return (
-            <GlassCard key={reading.id} className="
-              flex items-center justify-between px-4 py-3
-            ">
+            <GlassPanel key={reading.id} className="flex items-center justify-between px-4 py-3">
               <div>
                 <strong className="text-sm text-text">Clarity: {reading.clarity}/10</strong>
                 <span className="mt-0.5 block text-caption text-text-muted">
@@ -73,7 +73,7 @@ export const HistoryDetailScreen: React.FC = () => {
                 <span>pH {reading.ph}</span>
                 <span>{reading.temp}°C</span>
               </div>
-            </GlassCard>
+            </GlassPanel>
           );
         })}
       </div>

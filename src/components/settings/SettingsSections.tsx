@@ -17,7 +17,14 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { GlassButton, GlassCard, GlassDisclosurePanel, GlassInput } from '../shared';
+import {
+  CardSectionHeader,
+  GlassButton,
+  GlassCard,
+  GlassDisclosurePanel,
+  GlassInput,
+  GlassPanel,
+} from '../shared';
 import type {
   AIPreferences,
   CameraFilters,
@@ -41,22 +48,12 @@ const SettingsCardTitle: React.FC<SettingsCardTitleProps> = ({
   eyebrow,
   action,
 }) => (
-  <div className="mb-4 flex items-start justify-between gap-3">
-    <div className="flex min-w-0 items-center gap-3">
-      <span className="text-brand">
-        <Icon size={17} />
-      </span>
-      <div className="min-w-0">
-        {eyebrow && (
-          <span className="block text-2xs font-bold tracking-widest text-text-subtle uppercase">
-            {eyebrow}
-          </span>
-        )}
-        <h4 className="text-sm font-bold text-text">{title}</h4>
-      </div>
-    </div>
-    {action && <div className="shrink-0">{action}</div>}
-  </div>
+  <CardSectionHeader
+    icon={Icon}
+    title={title}
+    detail={eyebrow}
+    action={action}
+  />
 );
 
 interface SettingsPanelRowProps {
@@ -79,8 +76,7 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
   danger = false,
 }) => {
   const className = `
-    flex w-full items-center justify-between gap-3 rounded-2xl border border-white/25
-    bg-white/25 p-3 text-left transition-smooth
+    flex items-center justify-between gap-3 text-left
     ${onClick ? 'cursor-pointer hover:bg-white/55 active:scale-[0.99]' : ''}
     ${highlight ? 'border-brand/20 bg-brand/8' : ''}
     ${danger ? 'border-critical/20 bg-critical/8' : ''}
@@ -91,8 +87,8 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
         {Icon && (
           <span
             className={`
-              grid size-9 shrink-0 place-items-center rounded-2xl
-              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'bg-brand/10 text-brand' : 'bg-white/40 text-text-muted'}
+              grid size-9 shrink-0 place-items-center rounded-xl
+              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'bg-brand/10 text-brand' : 'bg-white/30 text-text-muted'}
             `}
           >
             <Icon size={17} />
@@ -112,17 +108,18 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
   );
 
   return onClick ? (
-    <button
+    <GlassPanel
+      as="button"
       type="button"
       onClick={onClick}
       className={className}
     >
       {content}
-    </button>
+    </GlassPanel>
   ) : (
-    <div className={className}>
+    <GlassPanel className={className}>
       {content}
-    </div>
+    </GlassPanel>
   );
 };
 
@@ -140,7 +137,7 @@ const SettingsDisclosureButton: React.FC<SettingsDisclosureButtonProps> = ({
   <button
     type="button"
     onClick={onClick}
-    className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/20 px-3 py-2.5 text-xs font-bold text-text-muted transition-smooth hover:bg-white/45"
+    className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/20 px-3 py-2.5 text-xs font-bold text-text-muted transition-smooth hover:bg-white/45"
     aria-expanded={expanded}
   >
     {label}
@@ -186,7 +183,7 @@ export const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
   };
 
   return (
-    <div className={variant === 'panel' ? 'rounded-2xl border border-white/25 bg-white/25 p-3' : ''}>
+    <div className={variant === 'panel' ? 'rounded-2xl border border-white/20 bg-white/20 p-3' : ''}>
       <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
         <span className="min-w-0 font-medium text-text-muted">{label}</span>
         <strong className="shrink-0 text-brand">{displayValue}</strong>
@@ -244,10 +241,10 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
 
       <div className="grid grid-cols-2 gap-2.5 text-sm">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-2xl border border-white/25 bg-white/25 p-3">
+          <GlassPanel key={metric.label}>
             <span className="block text-xs font-medium text-text-muted">{metric.label}</span>
             <strong className="text-text">{metric.value}</strong>
-          </div>
+          </GlassPanel>
         ))}
       </div>
 
@@ -349,12 +346,12 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
 }) => (
   <GlassCard className="p-5">
     <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Identity" />
-    <div className="mb-3 rounded-2xl border border-white/25 bg-white/25 p-3 text-xs text-text-muted">
+    <GlassPanel className="mb-3 text-xs text-text-muted">
       <span>Tank Reference Code: </span>
       <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
         {activeTank?.id}
       </code>
-    </div>
+    </GlassPanel>
     {editing ? (
       <form onSubmit={handleNameChange} className="flex items-end gap-2.5">
         <GlassInput
@@ -594,7 +591,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
 
     <div className="flex flex-col gap-3">
       {editing ? (
-        <form onSubmit={handleNameChange} className="flex items-end gap-2.5 rounded-2xl border border-white/25 bg-white/25 p-3">
+        <form onSubmit={handleNameChange} className="flex items-end gap-2.5 rounded-2xl border border-white/20 bg-white/20 p-3">
           <GlassInput
             id="tank-name"
             label="Tank name"

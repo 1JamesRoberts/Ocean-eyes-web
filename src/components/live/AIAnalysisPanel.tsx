@@ -1,6 +1,6 @@
 import React from 'react';
-import { Brain } from 'lucide-react';
-import { GlassCard } from '../shared';
+import { Activity, Brain, Waves } from 'lucide-react';
+import { CardSectionHeader, GlassCard, GlassPanel } from '../shared';
 import { getSpeciesById } from '../../data/speciesCatalog';
 import { resolveCropUrl } from '../../models/api/aiApi';
 import type { AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
@@ -23,24 +23,21 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
   const diagnosis = diagnosisDetection?.diagnosis;
   return (
     <GlassCard className="p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="m-0 flex items-center gap-2 text-h3 font-bold text-text">
-          <Brain size={18} className="text-brand" />
-          AI Analysis Results
-        </h3>
-        <span className="text-caption font-semibold text-text-muted">
+      <CardSectionHeader
+        icon={Brain}
+        title="AI Analysis Results"
+        action={(
+          <span className="text-caption font-semibold text-text-muted">
           {new Date(lastPrediction.timestamp).toLocaleTimeString()}
-        </span>
-      </div>
+          </span>
+        )}
+      />
 
       <div className="
         mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3
       ">
-        <div className="
-          rounded-2xl border border-white/20 bg-white/20 p-3 backdrop-blur-sm
-          transition-smooth
-          hover:bg-white/60
-        ">
+        <GlassPanel className="hover:bg-white/60">
+          <Activity size={15} className="mb-2 text-brand" />
           <span className="
             block text-2xs font-semibold text-text-muted uppercase
           ">
@@ -49,14 +46,11 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <strong className="mt-1 block text-title text-brand">
             {lastPrediction.summary.total_detections}
           </strong>
-        </div>
+        </GlassPanel>
 
         {lastTurbidityResult && (
-          <div className="
-            rounded-2xl border border-white/20 bg-white/20 p-3 backdrop-blur-sm
-            transition-smooth
-            hover:bg-white/60
-          ">
+          <GlassPanel className="hover:bg-white/60">
+            <Waves size={15} className="mb-2 text-info" />
             <span className="
               block text-2xs font-semibold text-text-muted uppercase
             ">
@@ -65,7 +59,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             <strong className="mt-1 block text-title text-info">
               {lastTurbidityResult.turbidity.fnu.toFixed(2)}
             </strong>
-          </div>
+          </GlassPanel>
         )}
 
       </div>
@@ -99,7 +93,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
       {/* Disease Diagnosis Section */}
       {diagnosis && (
-        <GlassCard
+        <GlassPanel
           className={`
             mt-4
             ${diagnosis.error ? 'border-l-4 border-l-critical' : diagnosis.healthy ? `
@@ -169,7 +163,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
               )}
             </>
           )}
-        </GlassCard>
+        </GlassPanel>
       )}
     </GlassCard>
   );

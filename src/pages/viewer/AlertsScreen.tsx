@@ -1,7 +1,8 @@
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useAlertsScreen } from '../../hooks/pages/useAlertsScreen';
 import { AlertDetail } from '../../components/shared/AlertDetail';
-import { GlassCard } from '../../components/shared';
+import { GlassPanel } from '../../components/shared';
 
 export const AlertsScreen: React.FC = () => {
   const {
@@ -41,30 +42,33 @@ export const AlertsScreen: React.FC = () => {
 
       <div className="flex flex-col gap-3">
         {alerts.map(alert => (
-          <GlassCard
+          <GlassPanel
+            as="button"
+            type="button"
             key={alert.id}
             className={`
-              cursor-pointer p-4 transition-smooth
-              hover:-translate-y-px hover:border-[rgba(13,148,136,0.12)]
-              hover:shadow-[0_8px_24px_rgba(13,148,136,0.08)]
+              p-4
               ${alert.resolved ? `opacity-60` : ''}
+              ${alert.resolved ? 'border-l-4 border-l-good' : alert.severity === 'critical' ? 'border-l-4 border-l-critical' : 'border-l-4 border-l-warning'}
             `}
-            style={{ borderLeftWidth: '5px', borderLeftColor: alert.resolved ? 'var(--color-good)' : alert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)' }}
             onClick={() => onSelectAlert(alert.id)}
           >
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-text">{alert.title}</h4>
-              <span className="text-caption text-text-muted">{alert.timeAgo}</span>
+              <h4 className="text-sm font-bold text-brand">{alert.title}</h4>
+              <ChevronRight size={16} className="text-text-muted" />
             </div>
-            <p className="mt-1 truncate text-xs text-text-muted">
+            <p className="mt-1 text-xs/relaxed text-text-muted">
               {alert.message}
             </p>
-            {alert.resolved && (
-              <span className="mt-2 block text-2xs font-semibold text-good">
-                ✓ RESOLVED
-              </span>
-            )}
-          </GlassCard>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <span className="text-caption text-text-muted">{alert.timeAgo}</span>
+              {alert.resolved && (
+                <span className="rounded-full bg-good/12 px-2.5 py-1 text-2xs font-bold text-good">
+                  Resolved
+                </span>
+              )}
+            </div>
+          </GlassPanel>
         ))}
       </div>
     </div>

@@ -33,9 +33,9 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
   return (
     <section className="glass-card p-6">
       <div className="mb-4 flex items-center gap-2">
-        <ShieldAlert size={16} className="text-text-muted/70" />
+        <ShieldAlert size={16} strokeWidth={2.5} className="text-brand" />
         <h3 className="
-          text-xs font-medium tracking-widest text-text-muted/70 uppercase
+          text-xs font-medium tracking-widest text-text-muted uppercase
         ">
           Active Safety Alerts
         </h3>

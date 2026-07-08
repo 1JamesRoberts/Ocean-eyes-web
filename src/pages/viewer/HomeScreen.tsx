@@ -51,8 +51,8 @@ export const HomeScreen: React.FC = () => {
           <div className="glass-card p-5">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FlaskConical size={16} className="text-text-muted/70" />
-                <h3 className="text-xs font-medium tracking-widest text-text-muted/70 uppercase">
+                <FlaskConical size={16} strokeWidth={2.5} className="text-brand" />
+                <h3 className="text-xs font-medium tracking-widest text-text-muted uppercase">
                   Water Parameters
                 </h3>
               </div>

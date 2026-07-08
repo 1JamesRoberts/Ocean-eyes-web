@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlaskConical, Thermometer, Shield, Zap, Cloud } from 'lucide-react';
+import { FlaskConical, Thermometer, Shield, Cloud } from 'lucide-react';
 import type { ReadingItem } from '../../types/aquarium';
 
 interface WaterChemistryGridProps {
@@ -25,25 +25,17 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
       isCritical: false
     },
     {
-      label: 'NH₃',
-      value: reading.ammonia === undefined ? '—' : `${reading.ammonia}`,
-      unit: 'ppm',
-      colorClass: 'text-brand bg-brand/10',
-      icon: Shield,
-      isCritical: (reading.ammonia ?? 0) > 0
-    },
-    {
       label: 'NO₂',
       value: reading.nitrite === undefined ? '—' : `${reading.nitrite}`,
       unit: 'ppm',
-      colorClass: 'text-purple-600 bg-purple-100/30',
-      icon: Zap,
+      colorClass: 'text-brand bg-brand/10',
+      icon: Shield,
       isCritical: (reading.nitrite ?? 0) > 0.2
     },
     {
       label: 'CO₂',
       value: '—',
-      unit: '',
+      unit: 'ppm',
       colorClass: 'text-blue-600 bg-blue-100/30',
       icon: Cloud,
       isCritical: false
@@ -51,7 +43,7 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
   ];
 
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <div className="grid grid-cols-4 gap-2">
       {parameters.map(param => (
         <div
           key={param.label}

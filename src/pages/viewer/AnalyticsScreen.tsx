@@ -1,12 +1,12 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React from 'react';
-import { Calendar, RotateCcw, Loader2, ArrowRight, Trash2 } from 'lucide-react';
+import { Activity, Brain, Calendar, Fish, Loader2, RotateCcw, Trash2, Waves } from 'lucide-react';
 import type { useAnalytics } from '../../hooks/pages/useAnalytics';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
-import { GlassCard, GlassButton, GlassIconButton } from '../../components/shared';
+import { CardSectionHeader, GlassButton, GlassCard, GlassIconButton, GlassPanel } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
 
 type AnalyticsScreenProps = ReturnType<typeof useAnalytics>;
@@ -25,10 +25,9 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
   const isHealthy = diagnosis.diagnosis.healthy;
 
   return (
-    <div
+    <GlassPanel
       className={`
-        flex flex-col gap-2 rounded-xl border bg-white/20 p-3.5
-        backdrop-blur-sm
+        flex flex-col gap-2 p-3.5
         ${isErr ? 'border-critical' : isHealthy ? 'border-good' : 'border-warning'}
       `}
     >
@@ -84,7 +83,7 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </GlassPanel>
   );
 };
 
@@ -178,11 +177,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
               flex min-h-0 flex-col gap-3 overflow-hidden p-5
               lg:col-span-2
             ">
-              <h3 className="m-0 shrink-0 text-sm font-bold text-text">Fish Count Over Time</h3>
+              <CardSectionHeader icon={Fish} title="Fish Count Over Time" className="mb-0" />
               <div className="min-h-0 flex-1">
                 <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
-              <h3 className="m-0 shrink-0 text-sm font-bold text-text">Fish Spread Over Time</h3>
+              <CardSectionHeader icon={Activity} title="Fish Spread Over Time" className="mb-0 mt-2" />
               <div className="min-h-0 flex-1">
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
@@ -199,15 +198,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter') onViewHistory(); }}
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="m-0 text-sm font-bold text-text">Water Clarity Trend</h3>
-                <p className="m-0 text-xs text-text-muted">
-                  {(readings.length > 0 ? readings.length : turbidityRecords.length) || 'No'} clarity readings
-                </p>
-              </div>
-              <ArrowRight size={16} className="text-text-muted" />
-            </div>
+            <CardSectionHeader
+              icon={Waves}
+              title="Water Clarity Trend"
+              detail={`${(readings.length > 0 ? readings.length : turbidityRecords.length) || 'No'} clarity readings`}
+            />
             <ClarityTrendChart
               records={turbidityRecords}
               readings={readings}
@@ -224,13 +219,13 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             p-5
             lg:col-span-2
           ">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="m-0 text-sm font-bold text-text">AI Health Diagnostics History</h3>
-                <p className="m-0 text-xs text-text-muted">
-                  Disease diagnosis runs in this range
-                </p>
-              </div>
+            <div className="flex items-start justify-between gap-3">
+              <CardSectionHeader
+                icon={Brain}
+                title="AI Health Diagnostics History"
+                detail="Disease diagnosis runs in this range"
+                className="mb-0"
+              />
               {diagnoses.length > 0 && !confirmClear && !isFallback && (
                 <GlassButton variant="outline" size="sm" className="
                   border-critical text-critical
