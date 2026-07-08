@@ -63,7 +63,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
               cy="100"
               r={radius}
               fill="none"
-              stroke="white"
+              stroke="transparent"
               strokeWidth={strokeWidth}
             />
             {segmentsWithOffsets.map(({ species, dashLength, gapLength, offset, index }) => (

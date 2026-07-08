@@ -38,35 +38,31 @@ export const AIBoundingBoxes: React.FC<AIBoundingBoxesProps> = ({
         const top = offsetY + ny1 * displayedHeight;
         const width = (nx2 - nx1) * displayedWidth;
         const height = (ny2 - ny1) * displayedHeight;
-        const diameter = Math.min(width, height);
-        const circleLeft = left + (width - diameter) / 2;
-        const circleTop = top + (height - diameter) / 2;
-        const fontSize = Math.max(10, Math.min(22, diameter * 0.18));
+        const fontSize = Math.max(10, Math.min(22, width * 0.12));
 
         return (
           <div
             key={idx}
-            className="pointer-events-none absolute"
+            className="absolute"
             style={{
-              left: `${circleLeft}px`,
-              top: `${circleTop}px`,
-              width: `${diameter}px`,
-              height: `${diameter}px`,
+              left: `${left}px`,
+              top: `${top}px`,
+              width: `${width}px`,
+              height: `${height}px`,
               border: `2px solid ${boxColor}`,
-              borderRadius: '50%',
-              boxShadow: `0 0 12px ${boxColor}66, inset 0 0 6px ${boxColor}33`,
+              boxShadow: `0 0 8px ${boxColor}40`,
             }}
           >
             <span
               className="
-                pointer-events-none absolute left-1/2 -translate-x-1/2
-                whitespace-nowrap opacity-90 font-semibold
+                pointer-events-none absolute left-[2px] whitespace-nowrap
+                opacity-85
               "
               style={{
-                top: `-${fontSize + 6}px`,
+                top: `-${fontSize + 4}px`,
                 fontSize: `${fontSize}px`,
                 color: boxColor,
-                textShadow: '0 1px 3px rgba(0,0,0,0.75)',
+                textShadow: '0 1px 2px rgba(0,0,0,0.6)',
               }}
             >
               {det.species_display} {(det.confidence * 100).toFixed(0)}%
