@@ -58,14 +58,14 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   const isOnline = backendStatus === 'online';
 
   const getBtnClasses = (active: boolean, disabled: boolean, isPulseClass = ''): string => {
-    const base = "flex items-center justify-center rounded-full backdrop-blur-[8px] border text-white transition-smooth w-10 h-10";
+    const base = "relative flex size-7 items-center justify-center border-0 bg-transparent p-0 text-white/85 drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)] transition-smooth";
     if (active) {
-      return `${base} bg-primary-gradient border-primary-dark/50 text-white cursor-pointer ${isPulseClass}`;
+      return `${base} cursor-pointer text-brand-bright after:absolute after:-bottom-0.5 after:left-1/2 after:h-0.5 after:w-3 after:-translate-x-1/2 after:rounded-full after:bg-current hover:text-white ${isPulseClass}`;
     }
     if (disabled) {
-      return `${base} bg-[rgba(100,100,100,0.5)] border-[rgba(255,255,255,0.2)] text-[#AAA] cursor-not-allowed`;
+      return `${base} text-white/35 cursor-not-allowed`;
     }
-    return `${base} bg-[rgba(15,23,42,0.75)] border-[rgba(255,255,255,0.15)] text-white cursor-pointer hover:bg-primary-gradient hover:border-primary-dark/50 hover:-translate-y-0.5 active:translate-y-0`;
+    return `${base} cursor-pointer hover:text-white active:scale-95`;
   };
 
   const getAIButtonTitle = (): string => {
@@ -93,12 +93,11 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   return (
     <div 
       className="
-        pointer-events-auto absolute bottom-0 z-20 flex items-center gap-2
+        pointer-events-auto absolute bottom-3 z-20 flex items-center gap-3
         transition-[right] duration-300
       "
       style={{
-        right: isFullscreen && showFsInventory ? '332px' : '12px',
-        bottom: isFullscreen ? '12px' : '0',
+        right: isFullscreen && showFsInventory ? '332px' : '16px',
       }}
     >
       <button 
@@ -110,7 +109,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       </button>
 
       <button
-        className={getBtnClasses(isRecording, false, 'bg-critical border-white/30 animate-pulse-recording')}
+        className={getBtnClasses(isRecording, false, 'text-critical after:bg-critical animate-pulse-recording')}
         onClick={onToggleRecording}
         title={isRecording ? "Stop Recording" : "Start Recording"}
       >

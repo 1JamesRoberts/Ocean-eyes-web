@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Video } from 'lucide-react';
 import { useTank } from '../../hooks/useTank';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
@@ -102,6 +103,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   const { fishList } = useFish(tankId);
 
   const cameraFeedRef = useRef<CameraFeedHandle>(null);
+  const [heroActionLayer, setHeroActionLayer] = useState<HTMLElement | null>(null);
 
   const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen();
 
@@ -154,6 +156,32 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
     tankId,
   });
 
+  useEffect(() => {
+    setHeroActionLayer(document.getElementById('viewer-hero-action-layer'));
+  }, []);
+
+  const cameraControls = (
+    <CameraControls
+      isRecording={isRecording}
+      isStreaming={isStreaming}
+      isAIActive={isAIActive}
+      aiLoading={aiLoading}
+      backendStatus={backendStatus}
+      turbidityLoading={turbidityLoading}
+      manualDiagnoseLoading={manualDiagnosisLoading}
+      hasImageSource={isWebcam}
+      isFullscreen={isFullscreen}
+      showFsInventory={showFsInventory}
+      onTakeSnapshot={() => takeSnapshot(currentFishCount, currentClarity)}
+      onToggleRecording={() => toggleRecording(currentFishCount, currentClarity)}
+      onMeasureTurbidity={measureTurbidity}
+      onToggleAI={toggleAI}
+      onManualDiagnose={manualDiagnose}
+      onToggleFullscreen={toggleFullscreen}
+      onToggleFsInventory={() => setShowFsInventory(!showFsInventory)}
+    />
+  );
+
   return (
     <div className="flex flex-col gap-6">
       {!activeTank && (
@@ -169,14 +197,14 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
       {isStreaming && (
         <div
           ref={viewportRef}
-          className={`
-            z-30 overflow-hidden transition-[height] duration-300
-            ${isFullscreen
-              ? 'relative h-screen bg-black'
-              : 'pointer-events-none fixed top-[223px] left-1/2 h-10 w-[393px] max-w-full -translate-x-1/2'
-            }
-          `}
-        >
+            className={`
+              z-30 overflow-hidden transition-[height] duration-300
+              ${isFullscreen
+                ? 'relative h-screen bg-black'
+                : 'pointer-events-none fixed top-0 left-1/2 h-[221px] w-[393px] max-w-full -translate-x-1/2'
+              }
+            `}
+          >
           <div
             ref={imageContainerRef}
             className={`
@@ -264,27 +292,11 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
             <RecordingBadge recordingSeconds={recordingSeconds} />
           )}
 
-          <CameraControls
-            isRecording={isRecording}
-            isStreaming={isStreaming}
-            isAIActive={isAIActive}
-            aiLoading={aiLoading}
-            backendStatus={backendStatus}
-            turbidityLoading={turbidityLoading}
-            manualDiagnoseLoading={manualDiagnosisLoading}
-            hasImageSource={isWebcam}
-            isFullscreen={isFullscreen}
-            showFsInventory={showFsInventory}
-            onTakeSnapshot={() => takeSnapshot(currentFishCount, currentClarity)}
-            onToggleRecording={() => toggleRecording(currentFishCount, currentClarity)}
-            onMeasureTurbidity={measureTurbidity}
-            onToggleAI={toggleAI}
-            onManualDiagnose={manualDiagnose}
-            onToggleFullscreen={toggleFullscreen}
-            onToggleFsInventory={() => setShowFsInventory(!showFsInventory)}
-          />
+          {isFullscreen && cameraControls}
         </div>
       )}
+
+      {isStreaming && !isFullscreen && heroActionLayer && createPortal(cameraControls, heroActionLayer)}
 
       {isStreaming && (
         <>

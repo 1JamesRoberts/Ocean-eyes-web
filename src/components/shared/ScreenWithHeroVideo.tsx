@@ -24,6 +24,10 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
         `}
       >
         {hero}
+        <div
+          id="viewer-hero-action-layer"
+          className="pointer-events-none absolute inset-0 z-30"
+        />
       </section>
       {children}
     </div>
