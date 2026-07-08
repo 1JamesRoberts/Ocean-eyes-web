@@ -610,7 +610,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
           detail={(
             <>
               Ref Code:{' '}
-              <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
+              <code className="inline-block px-1.5 py-0.5 align-middle text-caption">
                 {activeTank?.id}
               </code>
             </>

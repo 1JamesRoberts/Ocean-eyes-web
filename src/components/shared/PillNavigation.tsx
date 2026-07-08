@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Home, Fish, BarChart3, User } from 'lucide-react';
 import { useNavigation, type ViewerTab } from '../../context/NavigationContext';
 import { useAlerts } from '../../hooks/useAlerts';
@@ -21,14 +21,52 @@ export const PillNavigation: React.FC = () => {
   const { alerts } = useAlerts();
   const activeAlertCount = alerts.filter((a) => !a.resolved).length;
 
+  const navRef = useRef<HTMLElement>(null);
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const nav = navRef.current;
+      const activeEntry = PILL_ITEMS.find(
+        (item) => activeTab === item.tab || (item.tab === 'live' && activeTab === 'settings')
+      );
+      const btn = activeEntry ? buttonRefs.current[activeEntry.tab] : null;
+      if (!nav || !btn) return;
+      const navRect = nav.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      setIndicator({
+        left: btnRect.left - navRect.left,
+        width: btnRect.width,
+      });
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [activeTab]);
+
   return (
-    <nav className="pill-nav" aria-label="Primary">
+    <nav className="pill-nav" aria-label="Primary" ref={navRef}>
+      <span
+        className="pill-nav-indicator"
+        style={
+          {
+            '--pill-indicator-x': `${indicator.left}px`,
+            '--pill-indicator-w': `${indicator.width}px`,
+          } as React.CSSProperties
+        }
+        aria-hidden="true"
+      />
       {PILL_ITEMS.map((item) => {
         const Icon = item.icon;
         const isActive = activeTab === item.tab || (item.tab === 'live' && activeTab === 'settings');
         return (
           <button
             key={item.tab}
+            ref={(el) => {
+              buttonRefs.current[item.tab] = el;
+            }}
             type="button"
             onClick={() => setActiveTab(item.tab)}
             className={`
