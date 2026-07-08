@@ -1,4 +1,5 @@
 export { GlassCard } from "./GlassCard";
+export { GlassDisclosurePanel } from "./GlassDisclosurePanel";
 export { CardHeader } from "./CardHeader";
 export { GlassButton } from "./GlassButton";
 export { GlassBadge } from "./GlassBadge";

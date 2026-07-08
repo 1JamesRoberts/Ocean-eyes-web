@@ -17,7 +17,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { GlassButton, GlassCard, GlassInput } from '../shared';
+import { GlassButton, GlassCard, GlassDisclosurePanel, GlassInput } from '../shared';
 import type {
   AIPreferences,
   CameraFilters,
@@ -418,71 +418,37 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
     <GlassCard className="p-5">
       <SettingsCardTitle icon={ShieldCheck} eyebrow="Safety" title="Alerts & Thresholds" />
       <div className="flex flex-col gap-3">
-        <div className="rounded-2xl border border-white/25 bg-white/25 p-3">
-          <button
-            type="button"
-            onClick={() => setExpanded((current) => !current)}
-            aria-expanded={expanded}
-            className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent p-0 text-left"
-          >
-            <span className="flex min-w-0 items-center gap-3">
-              <span className="grid size-9 shrink-0 place-items-center rounded-2xl bg-white/40 text-text-muted">
-                <Bell size={17} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-semibold text-text">Alert sensitivity</span>
-                <span className="mt-0.5 block text-xs leading-snug text-text-muted">
-                  {maxTurbidity} FNU turbidity max, {fishChangePct}% fish visibility change
-                </span>
-              </span>
-            </span>
-            <ChevronRight
-              size={18}
-              className={`shrink-0 text-brand transition-transform duration-300 ease-in-out ${expanded ? 'rotate-90' : ''}`}
-            />
-          </button>
-
-          <div
-            className={`
-              grid transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
-              ${expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}
-            `}
-          >
-            <div className="overflow-hidden">
-              <div
-                className={`
-                  flex flex-col gap-4 pt-4
-                  transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)]
-                  ${expanded ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'}
-                `}
-              >
-                <SettingsRangeControl
-                  label="Maximum FNU Threshold"
-                  value={maxTurbidity}
-                  displayValue={`${maxTurbidity} FNU`}
-                  min="1.0"
-                  max="10.0"
-                  step="0.5"
-                  parser="float"
-                  variant="inline"
-                  onChange={onTurbidityChange}
-                  onCommit={onTurbidityCommit}
-                />
-                <SettingsRangeControl
-                  label="Discrepancy Alarm Trigger"
-                  value={fishChangePct}
-                  displayValue={`${fishChangePct}% visibility`}
-                  min="20"
-                  max="80"
-                  step="10"
-                  variant="inline"
-                  onChange={onFishPctChange}
-                  onCommit={onFishPctCommit}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        <GlassDisclosurePanel
+          icon={Bell}
+          title="Alert sensitivity"
+          detail={`${maxTurbidity} FNU turbidity max, ${fishChangePct}% fish visibility change`}
+          expanded={expanded}
+          onToggle={() => setExpanded((current) => !current)}
+        >
+          <SettingsRangeControl
+            label="Maximum FNU Threshold"
+            value={maxTurbidity}
+            displayValue={`${maxTurbidity} FNU`}
+            min="1.0"
+            max="10.0"
+            step="0.5"
+            parser="float"
+            variant="inline"
+            onChange={onTurbidityChange}
+            onCommit={onTurbidityCommit}
+          />
+          <SettingsRangeControl
+            label="Discrepancy Alarm Trigger"
+            value={fishChangePct}
+            displayValue={`${fishChangePct}% visibility`}
+            min="20"
+            max="80"
+            step="10"
+            variant="inline"
+            onChange={onFishPctChange}
+            onCommit={onFishPctCommit}
+          />
+        </GlassDisclosurePanel>
         <SettingsPanelRow
           icon={Bell}
           title="Safety Alert Logs"
@@ -491,112 +457,78 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
           action={<ChevronRight size={18} className="text-text-muted" />}
         />
 
-        <div className="rounded-2xl border border-white/25 bg-white/25 p-3">
-          <button
-            type="button"
-            onClick={() => setAiExpanded((current) => !current)}
-            aria-expanded={aiExpanded}
-            className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent p-0 text-left"
-          >
-            <span className="flex min-w-0 items-center gap-3">
-              <span className="grid size-9 shrink-0 place-items-center rounded-2xl bg-white/40 text-text-muted">
-                <Brain size={17} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-semibold text-text">AI Preferences</span>
-                <span className="mt-0.5 block text-xs leading-snug text-text-muted">
-                  {preferences.autoConnect ? 'Auto-start enabled' : 'Auto-start disabled'}, {preferences.ai.pollingIntervalMs / 1000}s polling
-                </span>
-              </span>
-            </span>
-            <ChevronRight
-              size={18}
-              className={`shrink-0 text-brand transition-transform duration-300 ease-in-out ${aiExpanded ? 'rotate-90' : ''}`}
-            />
-          </button>
-
-          <div
-            className={`
-              grid transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
-              ${aiExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}
-            `}
-          >
-            <div className="overflow-hidden">
-              <div
+        <GlassDisclosurePanel
+          icon={Brain}
+          title="AI Preferences"
+          detail={`${preferences.autoConnect ? 'Auto-start enabled' : 'Auto-start disabled'}, ${preferences.ai.pollingIntervalMs / 1000}s polling`}
+          expanded={aiExpanded}
+          onToggle={() => setAiExpanded((current) => !current)}
+        >
+          <div className="flex items-center justify-between">
+            <span className="pr-4 text-sm font-medium text-text-muted">Auto-start AI when stream connects</span>
+            <button
+              onClick={() => onAutoConnectChange(!preferences.autoConnect)}
+              className={`
+                relative inline-flex h-6 w-11 cursor-pointer rounded-full border-none transition-colors
+                ${preferences.autoConnect ? 'bg-brand' : 'bg-text/20 ring-1 ring-inset ring-text/20'}
+              `}
+            >
+              <span
                 className={`
-                  flex flex-col gap-4 pt-4
-                  transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)]
-                  ${aiExpanded ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'}
+                  absolute top-1 left-1 inline-block h-4 w-4 rounded-full bg-white transition-transform
+                  ${preferences.autoConnect ? 'translate-x-5' : 'translate-x-0'}
                 `}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="pr-4 text-sm font-medium text-text-muted">Auto-start AI when stream connects</span>
-                  <button
-                    onClick={() => onAutoConnectChange(!preferences.autoConnect)}
-                    className={`
-                      relative inline-flex h-6 w-11 cursor-pointer rounded-full border-none transition-colors
-                      ${preferences.autoConnect ? 'bg-brand' : 'bg-text/20 ring-1 ring-inset ring-text/20'}
-                    `}
-                  >
-                    <span
-                      className={`
-                        absolute top-1 left-1 inline-block h-4 w-4 rounded-full bg-white transition-transform
-                        ${preferences.autoConnect ? 'translate-x-5' : 'translate-x-0'}
-                      `}
-                    />
-                  </button>
-                </div>
-              <SettingsRangeControl
-                label="AI Polling Interval"
-                value={preferences.ai.pollingIntervalMs}
-                displayValue={`${preferences.ai.pollingIntervalMs / 1000}s`}
-                min="2000"
-                max="60000"
-                step="1000"
-                variant="inline"
-                onChange={(value) => onAIPreferenceChange({ pollingIntervalMs: value })}
-                onCommit={(value) => onAIPreferenceCommit({ pollingIntervalMs: value })}
               />
-              <SettingsRangeControl
-                label="Detection Confidence Threshold"
-                value={percentValue(preferences.ai.detectionConfidenceThreshold)}
-                displayValue={`${percentValue(preferences.ai.detectionConfidenceThreshold)}%`}
-                min="10"
-                max="90"
-                step="5"
-                parser="percent"
-                variant="inline"
-                onChange={(value) => onAIPreferenceChange({ detectionConfidenceThreshold: value })}
-                onCommit={(value) => onAIPreferenceCommit({ detectionConfidenceThreshold: value })}
-              />
-              <SettingsRangeControl
-                label="Species Confidence Threshold"
-                value={percentValue(preferences.ai.speciesConfidenceThreshold)}
-                displayValue={`${percentValue(preferences.ai.speciesConfidenceThreshold)}%`}
-                min="10"
-                max="90"
-                step="5"
-                parser="percent"
-                variant="inline"
-                onChange={(value) => onAIPreferenceChange({ speciesConfidenceThreshold: value })}
-                onCommit={(value) => onAIPreferenceCommit({ speciesConfidenceThreshold: value })}
-              />
-              <SettingsRangeControl
-                label="Diagnosis Minimum Confidence"
-                value={percentValue(preferences.ai.diagnosisMinConfidence)}
-                displayValue={`${percentValue(preferences.ai.diagnosisMinConfidence)}%`}
-                min="30"
-                max="90"
-                step="5"
-                parser="percent"
-                variant="inline"
-                onChange={(value) => onAIPreferenceChange({ diagnosisMinConfidence: value })}
-                onCommit={(value) => onAIPreferenceCommit({ diagnosisMinConfidence: value })}
-              />
-              </div>
-            </div>
+            </button>
           </div>
-        </div>
+          <SettingsRangeControl
+            label="AI Polling Interval"
+            value={preferences.ai.pollingIntervalMs}
+            displayValue={`${preferences.ai.pollingIntervalMs / 1000}s`}
+            min="2000"
+            max="60000"
+            step="1000"
+            variant="inline"
+            onChange={(value) => onAIPreferenceChange({ pollingIntervalMs: value })}
+            onCommit={(value) => onAIPreferenceCommit({ pollingIntervalMs: value })}
+          />
+          <SettingsRangeControl
+            label="Detection Confidence Threshold"
+            value={percentValue(preferences.ai.detectionConfidenceThreshold)}
+            displayValue={`${percentValue(preferences.ai.detectionConfidenceThreshold)}%`}
+            min="10"
+            max="90"
+            step="5"
+            parser="percent"
+            variant="inline"
+            onChange={(value) => onAIPreferenceChange({ detectionConfidenceThreshold: value })}
+            onCommit={(value) => onAIPreferenceCommit({ detectionConfidenceThreshold: value })}
+          />
+          <SettingsRangeControl
+            label="Species Confidence Threshold"
+            value={percentValue(preferences.ai.speciesConfidenceThreshold)}
+            displayValue={`${percentValue(preferences.ai.speciesConfidenceThreshold)}%`}
+            min="10"
+            max="90"
+            step="5"
+            parser="percent"
+            variant="inline"
+            onChange={(value) => onAIPreferenceChange({ speciesConfidenceThreshold: value })}
+            onCommit={(value) => onAIPreferenceCommit({ speciesConfidenceThreshold: value })}
+          />
+          <SettingsRangeControl
+            label="Diagnosis Minimum Confidence"
+            value={percentValue(preferences.ai.diagnosisMinConfidence)}
+            displayValue={`${percentValue(preferences.ai.diagnosisMinConfidence)}%`}
+            min="30"
+            max="90"
+            step="5"
+            parser="percent"
+            variant="inline"
+            onChange={(value) => onAIPreferenceChange({ diagnosisMinConfidence: value })}
+            onCommit={(value) => onAIPreferenceCommit({ diagnosisMinConfidence: value })}
+          />
+        </GlassDisclosurePanel>
       </div>
     </GlassCard>
   );
@@ -659,12 +591,6 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
 }) => (
   <GlassCard className="p-5">
     <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Management" />
-    <div className="mb-3 rounded-2xl border border-white/25 bg-white/25 p-3 text-xs text-text-muted">
-      <span>Tank Reference Code: </span>
-      <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
-        {activeTank?.id}
-      </code>
-    </div>
 
     <div className="flex flex-col gap-3">
       {editing ? (
@@ -684,7 +610,14 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
         <SettingsPanelRow
           icon={Fish}
           title={activeTank?.name}
-          detail="Active aquarium"
+          detail={(
+            <>
+              Ref Code:{' '}
+              <code className="ml-1 inline-block px-1.5 py-0.5 align-middle text-caption">
+                {activeTank?.id}
+              </code>
+            </>
+          )}
           action={(
             <GlassButton variant="outline" size="sm" onClick={onStartRename}>
               <Pencil size={12} />
