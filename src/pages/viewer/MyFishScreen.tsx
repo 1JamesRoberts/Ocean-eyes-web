@@ -216,7 +216,20 @@ export const MyFishScreen: React.FC<{
       <div className="flex flex-col gap-6">
         {/* Chart & Stats */}
         <div className="flex flex-col gap-4">
-          <GlassCard className="p-5">
+          <GlassCard
+            className="p-5"
+            clickable
+            hover
+            role="button"
+            tabIndex={0}
+            onClick={onToggleAquariumOverview}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onToggleAquariumOverview();
+              }
+            }}
+          >
             <CardSectionHeader icon={BarChart3} title="Species Distribution" />
             <DonutChart speciesDistribution={speciesDistribution} />
 
@@ -225,10 +238,9 @@ export const MyFishScreen: React.FC<{
             <div
               data-aquarium-overview
               className="
-                mt-4 flex cursor-pointer items-center justify-between rounded-xl
+                mt-4 flex items-center justify-between rounded-xl
                 p-3
               "
-              onClick={onToggleAquariumOverview}
             >
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <div className="

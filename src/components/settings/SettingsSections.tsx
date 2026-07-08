@@ -88,8 +88,8 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
         {Icon && (
           <span
             className={`
-              grid size-9 shrink-0 place-items-center rounded-xl
-              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'bg-brand/10 text-brand' : 'bg-white/30 text-text-muted'}
+              grid size-9 shrink-0 place-items-center rounded-full
+              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'text-brand' : 'text-text-muted'}
             `}
           >
             <Icon size={17} />

@@ -18,7 +18,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
         <div className="flex items-center gap-2">
           <FishSymbol size={18} strokeWidth={2.5} className="text-brand" />
           <h3 className="
-            text-xs font-medium tracking-widest text-text-muted uppercase
+            text-xs font-semibold tracking-widest text-brand-bright uppercase
           ">
             Fish Inventory
           </h3>
@@ -63,7 +63,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                     <SpeciesAvatar speciesId={fish.speciesId} size={40} radius={8} objectFit="contain" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-brand">{fish.name}</p>
+                    <p className="text-sm font-semibold text-black">{fish.name}</p>
                     <p className="text-2xs text-text-muted">
                       {fish.detected} / {fish.count} detected
                     </p>
