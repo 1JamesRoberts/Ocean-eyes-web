@@ -29,6 +29,7 @@ export const useMyFish = (external?: {
   const [internalShowAddForm, setInternalShowAddForm] = useState(false);
   const showAddForm = external?.externalShowAddForm ?? internalShowAddForm;
   const [activeFishId, setActiveFishId] = useState<string | null>(null);
+  const [aquariumOverviewExpanded, setAquariumOverviewExpanded] = useState(false);
   const [fishToDelete, setFishToDelete] = useState<string | null>(null);
 
   const { stats, speciesDistribution }: FishTankAnalysis = useMemo(
@@ -116,6 +117,10 @@ export const useMyFish = (external?: {
     setActiveFishId((prev) => (prev === id ? null : id));
   }, []);
 
+  const onToggleAquariumOverview = useCallback(() => {
+    setAquariumOverviewExpanded((prev) => !prev);
+  }, []);
+
   const onIncrementCount = useCallback(
     (id: string, current: number) => updateFishCount(id, current + 1),
     [updateFishCount]
@@ -145,6 +150,7 @@ export const useMyFish = (external?: {
     setSelectedSpeciesId,
     showAddForm,
     activeFishId,
+    aquariumOverviewExpanded,
     fishToDelete,
     getSpeciesDisplay,
     onToggleAddForm,
@@ -152,6 +158,7 @@ export const useMyFish = (external?: {
     onSpeciesSelect,
     onAdd,
     onToggleFish,
+    onToggleAquariumOverview,
     onIncrementCount,
     onDecrementCount,
     onUpdateFishCount: updateFishCount,

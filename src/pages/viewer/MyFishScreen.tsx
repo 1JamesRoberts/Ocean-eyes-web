@@ -1,9 +1,9 @@
 import React from 'react';
 import { useMyFish } from '../../hooks/pages/useMyFish';
 import {
-  Trash2, Fish, Hash, BarChart3,
+  Trash2, Fish, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
-  AlertTriangle, CheckCircle, HelpCircle, Heart
+  AlertTriangle, CheckCircle, HelpCircle
 } from 'lucide-react';
 import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
 import { DonutChart } from '../../components/fish/DonutChart';
@@ -56,7 +56,7 @@ const breedingLabel: Record<BreedingDifficulty, string> = {
   easy: 'Easy', medium: 'Medium', hard: 'Hard', no_record: 'No Record'
 };
 
-interface OverviewMetricTileProps {
+interface IdealParameterTileProps {
   icon: React.ReactNode;
   color: string;
   label: string;
@@ -64,7 +64,7 @@ interface OverviewMetricTileProps {
   conflict?: boolean;
 }
 
-const OverviewMetricTile: React.FC<OverviewMetricTileProps> = ({
+const IdealParameterTile: React.FC<IdealParameterTileProps> = ({
   icon,
   color,
   label,
@@ -213,12 +213,14 @@ export const MyFishScreen: React.FC<{
     selectedSpeciesId,
     showAddForm,
     activeFishId,
+    aquariumOverviewExpanded,
     fishToDelete,
     getSpeciesDisplay,
     onCloseAddForm,
     onSpeciesSelect,
     onAdd,
     onToggleFish,
+    onToggleAquariumOverview,
     onIncrementCount,
     onDecrementCount,
     onRequestDelete,
@@ -248,76 +250,103 @@ export const MyFishScreen: React.FC<{
             <DonutChart speciesDistribution={speciesDistribution} />
           </GlassCard>
 
-          <GlassCard className="p-5">
-            <CardSectionHeader
-              icon={Fish}
-              title="Aquarium Overview"
-              action={(
+          <GlassCard
+            data-aquarium-overview
+            clickable
+            hover
+            className="
+              flex cursor-pointer flex-col overflow-hidden p-0
+            "
+            onClick={onToggleAquariumOverview}
+          >
+            {/* Main row — always visible */}
+            <div className="flex items-center justify-between p-3">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <div className="
+                  flex size-10 shrink-0 items-center justify-center rounded-lg
+                  bg-brand/10
+                ">
+                  <Fish size={22} className="text-brand" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="
+                    block truncate text-base font-bold text-text
+                  ">Fish Overview</span>
+                  <span className="
+                    mb-1 block truncate text-xs font-medium
+                    text-text-muted italic
+                  ">{stats.uniqueSpecies} species</span>
+                  <span className="mt-0.5 block text-xs text-text-muted">
+                    Visible: {stats.totalDetected} / {stats.totalExpected}
+                  </span>
+                </div>
+              </div>
+
+              <div className="
+                flex items-center gap-2
+                max-xs:gap-1.5
+              ">
                 <DetectionVisibilityRing
                   detected={stats.totalDetected}
                   expected={stats.totalExpected}
                 />
-              )}
-            />
+              </div>
+            </div>
+
+            {/* ─── Expanded Detail Panel ─── */}
+            <div className={`
+              grid
+              transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
+              ${aquariumOverviewExpanded ? `grid-rows-[1fr]` : `grid-rows-[0fr]`}
+            `}>
+              <div className="overflow-hidden">
+                <div className={`
+                  p-[0_12px_16px_12px]
+                  transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)]
+                  ${aquariumOverviewExpanded ? 'translate-y-0 opacity-100' : `
+                    -translate-y-3 opacity-0
+                  `}
+                `}>
+                  {/* Reserved for future Aquarium Overview expansion content. */}
+                </div>
+              </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard className="p-5">
+            <CardSectionHeader icon={Thermometer} title="Ideal Parameters" />
             <div className="
               grid grid-cols-2 gap-3
               xs:grid-cols-3
             ">
               {[
-                { icon: <Hash size={14} />, color: 'var(--color-primary-dark)', label: 'Total Fish', value: stats.totalFish },
-                { icon: <Fish size={14} />, color: 'var(--color-info)', label: 'Species', value: stats.uniqueSpecies },
                 {
-                  icon: <Heart size={14} />,
-                  color: getCompatibilityColor(getCompatibilityLevel(stats.overallCompatibility)),
-                  label: 'Compatibility',
-                  value: stats.overallCompatibility,
+                  icon: <Maximize2 size={14} />,
+                  color: 'var(--color-primary-dark)',
+                  label: 'Tank Size',
+                  value: stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '-',
+                },
+                {
+                  icon: <Thermometer size={14} />,
+                  color: 'var(--color-warning)',
+                  label: 'Temperature',
+                  value: stats.tempResult.range != null
+                    ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '°C')
+                    : '-',
+                  conflict: stats.tempResult.conflict,
+                },
+                {
+                  icon: <Droplets size={14} />,
+                  color: 'rgba(147, 112, 219, 1)',
+                  label: 'pH',
+                  value: stats.phResult.range != null
+                    ? formatRange(stats.phResult.range[0], stats.phResult.range[1], '', 1)
+                    : '-',
+                  conflict: stats.phResult.conflict,
                 },
               ].map((item) => (
-                <OverviewMetricTile key={item.label} {...item} />
+                <IdealParameterTile key={item.label} {...item} />
               ))}
-            </div>
-
-            {/* ── Ideal Parameters ── */}
-            <div className="mt-4 border-t border-border pt-4">
-              <span className="
-                mb-3 block text-xs font-medium tracking-widest text-text-muted
-                uppercase
-              ">
-                Ideal Parameters
-              </span>
-              <div className="
-                grid grid-cols-2 gap-3
-                xs:grid-cols-3
-              ">
-                {[
-                  {
-                    icon: <Maximize2 size={14} />,
-                    color: 'var(--color-primary-dark)',
-                    label: 'Tank Size',
-                    value: stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '-',
-                  },
-                  {
-                    icon: <Thermometer size={14} />,
-                    color: 'var(--color-warning)',
-                    label: 'Temperature',
-                    value: stats.tempResult.range != null
-                      ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '°C')
-                      : '-',
-                    conflict: stats.tempResult.conflict,
-                  },
-                  {
-                    icon: <Droplets size={14} />,
-                    color: 'rgba(147, 112, 219, 1)',
-                    label: 'pH',
-                    value: stats.phResult.range != null
-                      ? formatRange(stats.phResult.range[0], stats.phResult.range[1], '', 1)
-                      : '-',
-                    conflict: stats.phResult.conflict,
-                  },
-                ].map((item) => (
-                  <OverviewMetricTile key={item.label} {...item} />
-                ))}
-              </div>
             </div>
           </GlassCard>
         </div>
