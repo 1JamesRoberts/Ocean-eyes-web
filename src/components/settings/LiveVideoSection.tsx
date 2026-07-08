@@ -170,7 +170,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
           className={`
             relative z-30 -mt-[92px] overflow-hidden transition-[height]
             duration-300
-            ${isFullscreen ? 'h-screen bg-black' : 'h-16'}
+            ${isFullscreen ? 'h-screen bg-black' : 'sticky top-[157px] h-16'}
           `}
         >
           <div

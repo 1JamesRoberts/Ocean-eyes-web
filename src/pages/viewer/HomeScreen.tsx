@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, FlaskConical } from 'lucide-react';
 import { useHome } from '../../hooks/pages/useHome';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
@@ -50,9 +50,12 @@ export const HomeScreen: React.FC = () => {
 
           <div className="glass-card p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-xs font-medium tracking-widest text-text-muted/70 uppercase">
-                Water Parameters
-              </h3>
+              <div className="flex items-center gap-2">
+                <FlaskConical size={16} className="text-text-muted/70" />
+                <h3 className="text-xs font-medium tracking-widest text-text-muted/70 uppercase">
+                  Water Parameters
+                </h3>
+              </div>
               <button
                 onClick={onViewHistory}
                 aria-label="View water parameter history"
