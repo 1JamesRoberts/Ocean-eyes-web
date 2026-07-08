@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Brain, Waves } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { CardSectionHeader, GlassCard, GlassPanel } from '../shared';
 import { getSpeciesById } from '../../data/speciesCatalog';
 import { resolveCropUrl } from '../../models/api/aiApi';
@@ -37,7 +37,6 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
         mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3
       ">
         <GlassPanel className="hover:bg-white/60">
-          <Activity size={15} className="mb-2 text-brand" />
           <span className="
             block text-2xs font-semibold text-text-muted uppercase
           ">
@@ -50,7 +49,6 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
         {lastTurbidityResult && (
           <GlassPanel className="hover:bg-white/60">
-            <Waves size={15} className="mb-2 text-info" />
             <span className="
               block text-2xs font-semibold text-text-muted uppercase
             ">
