@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import { LiveFeedProvider } from './context/LiveFeedContext';
 import { AnalyticsControlsProvider } from './context/AnalyticsControlsContext';
-import { PhoneFrame, StatusBar, PillNavigation } from './components/shared';
+import { PhoneFrame, PillNavigation } from './components/shared';
 import { ViewerApp } from './pages/ViewerApp';
 import { useTank } from './hooks/useTank';
 
@@ -14,23 +14,17 @@ const OceanEyesDashboard: React.FC = () => {
   const [showAddFishForm, setShowAddFishForm] = useState(false);
 
   return (
-    <PhoneFrame>
-      <StatusBar />
-
-      <div className="phone-content bg-gradient-mint">
-        <main className="flex flex-1 flex-col gap-4 p-4 pb-28">
-          <LiveFeedProvider tankId={tankId}>
-            <AnalyticsControlsProvider active={activeTab === 'analytics'}>
-              <ViewerApp
-                showAddFishForm={showAddFishForm}
-                onToggleAddFish={() => setShowAddFishForm((v) => !v)}
-              />
-            </AnalyticsControlsProvider>
-          </LiveFeedProvider>
-        </main>
-      </div>
-
-      <PillNavigation />
+    <PhoneFrame navigation={<PillNavigation />}>
+      <main className="flex flex-1 flex-col gap-4 p-4 pb-28">
+        <LiveFeedProvider tankId={tankId}>
+          <AnalyticsControlsProvider active={activeTab === 'analytics'}>
+            <ViewerApp
+              showAddFishForm={showAddFishForm}
+              onToggleAddFish={() => setShowAddFishForm((v) => !v)}
+            />
+          </AnalyticsControlsProvider>
+        </LiveFeedProvider>
+      </main>
     </PhoneFrame>
   );
 };

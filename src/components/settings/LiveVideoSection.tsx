@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Video } from 'lucide-react';
 import { useTank } from '../../hooks/useTank';
@@ -21,6 +21,7 @@ import { StreamAdjustments } from '../live/StreamAdjustments';
 import { AIAnalysisPanel } from '../live/AIAnalysisPanel';
 import { VideoDecorations } from '../live/VideoDecorations';
 import { CardSectionHeader, GlassCard } from '../shared';
+import { useHeroActionLayer } from '../shared/HeroActionLayerContext';
 
 interface LiveVideoSectionProps {
   tankId?: string | null;
@@ -103,9 +104,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   const { fishList } = useFish(tankId);
 
   const cameraFeedRef = useRef<CameraFeedHandle>(null);
-  const [heroActionLayer] = useState<HTMLElement | null>(() =>
-    document.getElementById('viewer-hero-action-layer')
-  );
+  const heroActionLayer = useHeroActionLayer();
 
   const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen();
 
@@ -199,7 +198,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
               z-30 overflow-hidden transition-[height] duration-300
               ${isFullscreen
                 ? 'relative h-screen bg-black'
-                : 'pointer-events-none fixed top-0 left-1/2 h-[221px] w-[393px] max-w-full -translate-x-1/2'
+                : 'pointer-events-none fixed top-0 left-1/2 h-[var(--mobile-hero-height)] w-[var(--mobile-frame-width)] max-w-full -translate-x-1/2'
               }
             `}
           >

@@ -51,6 +51,13 @@
   --color-recording-glow: rgba(239, 68, 68, 0.4);
   --color-ai-glow: rgba(13, 148, 136, 0.4);
 
+  /* Mobile shell geometry */
+  --mobile-frame-width: 393px;
+  --mobile-status-bar-height: 54px;
+  --mobile-hero-height: 221px;
+  --mobile-content-radius: 20px;
+  --mobile-content-gutter: 1rem;
+
   /* Font */
   --font-main: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
   --type-ink: rgb(0 0 0);
@@ -688,7 +695,7 @@
 }
 
 .phone-frame {
-  width: 393px;
+  width: var(--mobile-frame-width);
   height: 100vh;
   background: #000;
   position: relative;
@@ -714,7 +721,10 @@
   overflow-x: hidden;
   position: relative;
   z-index: 10;
-  padding-top: 54px;
+  padding-top: var(--mobile-status-bar-height);
+  border-top-left-radius: var(--mobile-content-radius);
+  border-top-right-radius: var(--mobile-content-radius);
+  background: linear-gradient(180.05deg, #ffffff 0%, #c1e0dd 99.99%);
 }
 
 .phone-content::-webkit-scrollbar {
@@ -812,6 +822,57 @@
 /* ─── Phone Background Gradient ─── */
 .bg-gradient-mint {
   background: linear-gradient(180.05deg, #ffffff 0%, #c1e0dd 99.99%);
+}
+
+/* ─── Mobile Hero Shell ─── */
+@utility mobile-hero-video {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  width: calc(100% + (var(--mobile-content-gutter) * 2));
+  height: var(--mobile-hero-height);
+  margin-top: calc(var(--mobile-content-gutter) * -1);
+  margin-left: calc(var(--mobile-content-gutter) * -1);
+  margin-right: calc(var(--mobile-content-gutter) * -1);
+  cursor: pointer;
+  overflow: hidden;
+  background: #000;
+}
+
+@utility mobile-hero-corner-overlay {
+  pointer-events: none;
+  position: sticky;
+  top: var(--mobile-hero-height);
+  z-index: 30;
+  height: var(--mobile-content-radius);
+  margin-top: calc(var(--mobile-content-radius) * -1);
+  margin-left: calc(var(--mobile-content-gutter) * -1);
+  margin-right: calc(var(--mobile-content-gutter) * -1);
+}
+
+@utility mobile-hero-corner {
+  position: absolute;
+  top: 0;
+  width: var(--mobile-content-radius);
+  height: var(--mobile-content-radius);
+}
+
+@utility mobile-hero-corner-left {
+  left: 0;
+  background: radial-gradient(
+    circle at bottom right,
+    transparent 0 var(--mobile-content-radius),
+    #000 calc(var(--mobile-content-radius) + 0.5px)
+  );
+}
+
+@utility mobile-hero-corner-right {
+  right: 0;
+  background: radial-gradient(
+    circle at bottom left,
+    transparent 0 var(--mobile-content-radius),
+    #000 calc(var(--mobile-content-radius) + 0.5px)
+  );
 }
 
 /* ─── Pill Navigation ─── */

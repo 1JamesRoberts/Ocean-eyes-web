@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from 'react';
+import { HeroActionLayerContext } from './HeroActionLayerContext';
 
 interface ScreenWithHeroVideoProps {
   /** Hero content rendered inside the sticky section. */
@@ -14,22 +15,39 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
   showHero = true,
   children,
 }) => {
+  const [heroActionLayer, setHeroActionLayer] = useState<HTMLElement | null>(null);
+
   return (
-    <div className="flex w-full flex-1 flex-col gap-4">
-      <section
-        className={`
-          sticky top-0 z-20 -mx-4 -mt-4 h-[221px] w-[calc(100%+2rem)]
-          cursor-pointer overflow-hidden bg-black
-          ${showHero ? "block" : "hidden"}
-        `}
-      >
-        {hero}
-        <div
-          id="viewer-hero-action-layer"
-          className="pointer-events-none absolute inset-0 z-30"
-        />
-      </section>
-      {children}
-    </div>
+    <HeroActionLayerContext.Provider value={heroActionLayer}>
+      <div className="flex w-full flex-1 flex-col bg-black">
+        <section
+          className={`
+            mobile-hero-video
+            ${showHero ? 'block' : 'hidden'}
+          `}
+        >
+          {hero}
+          <div
+            ref={setHeroActionLayer}
+            className="pointer-events-none absolute inset-0 z-30"
+          />
+        </section>
+        {showHero && (
+          <div className="mobile-hero-corner-overlay">
+            <div
+              aria-hidden="true"
+              className="mobile-hero-corner mobile-hero-corner-left"
+            />
+            <div
+              aria-hidden="true"
+              className="mobile-hero-corner mobile-hero-corner-right"
+            />
+          </div>
+        )}
+        <div className="relative z-10 -mx-4 bg-gradient-mint px-4 pt-4">
+          {children}
+        </div>
+      </div>
+    </HeroActionLayerContext.Provider>
   );
 };
