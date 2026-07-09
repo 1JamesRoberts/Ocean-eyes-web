@@ -15,7 +15,6 @@ import { CameraFeed } from '../live/CameraFeed';
 import type { CameraFeedHandle } from '../live/CameraFeed';
 import { FullscreenInventory } from '../live/FullscreenInventory';
 import { AIAnalysisPanel } from '../live/AIAnalysisPanel';
-import { VideoDecorations } from '../live/VideoDecorations';
 import { useHeroActionLayer } from '../shared/HeroActionLayerContext';
 import type { CameraFilters } from '../../types/aquarium';
 
@@ -35,37 +34,6 @@ const RecordingBadge: React.FC<{ recordingSeconds: number }> = ({ recordingSecon
   ">
     <div className="size-2 animate-recording-blink rounded-full bg-critical" />
     <span>REC {formatDuration(recordingSeconds)}</span>
-  </div>
-);
-
-interface AIStatusBadgeProps {
-  aiLoading: boolean;
-  aiError: string | null;
-  detectionCount: number;
-}
-
-const AIStatusBadge: React.FC<AIStatusBadgeProps> = ({
-  aiLoading,
-  aiError,
-  detectionCount,
-}) => (
-  <div
-    className="
-      absolute top-3 left-1/2 z-16 flex -translate-x-1/2
-      items-center gap-1.5 rounded-[20px] bg-[rgba(15,23,42,0.85)]
-      px-3 py-1.5 type-caption-inverse
-    "
-  >
-    <div
-      className="size-2 rounded-full"
-      style={{
-        backgroundColor: aiLoading ? 'var(--color-warning)' : aiError ? 'var(--color-critical)' : 'var(--color-good)',
-        animation: aiLoading ? 'pulse 1.5s infinite' : 'none',
-      }}
-    />
-    <span>
-      {aiLoading ? 'AI Analyzing...' : aiError ? `AI Error: ${aiError}` : `AI Active - ${detectionCount} fish detected`}
-    </span>
   </div>
 );
 
@@ -123,7 +91,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   const {
     isAIActive,
     aiLoading,
-    aiError,
     backendStatus,
     lastPrediction,
     lastTurbidityResult,
@@ -240,24 +207,11 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
                 `}
               />
 
-              <VideoDecorations
-                currentFishCount={currentFishCount}
-                currentClarity={currentClarity}
-              />
-
               {isAIActive && lastPrediction && (
                 <AIBoundingBoxes
                   lastPrediction={lastPrediction}
                   containerSize={containerSize}
                   imageNaturalSize={imageNaturalSize}
-                />
-              )}
-
-              {isAIActive && (
-                <AIStatusBadge
-                  aiLoading={aiLoading}
-                  aiError={aiError}
-                  detectionCount={lastPrediction?.summary.total_detections || 0}
                 />
               )}
 
