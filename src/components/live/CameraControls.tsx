@@ -58,9 +58,9 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   const isOnline = backendStatus === 'online';
 
   const getBtnClasses = (active: boolean, disabled: boolean, isPulseClass = ''): string => {
-    const base = "relative flex size-7 items-center justify-center border-0 bg-transparent p-0 text-white/85 drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)] transition-smooth";
+    const base = "relative flex size-7 items-center justify-center rounded-full border-0 bg-black/40 p-0 text-white/85 shadow-[0_1px_3px_rgba(0,0,0,0.28)] backdrop-blur-md transition-smooth";
     if (active) {
-      return `${base} rounded-full cursor-pointer text-brand-bright after:absolute after:-bottom-0.5 after:left-1/2 after:h-0.5 after:w-3 after:-translate-x-1/2 after:rounded-full after:bg-current hover:text-white ${isPulseClass}`;
+      return `${base} cursor-pointer text-brand-bright after:absolute after:-bottom-0.5 after:left-1/2 after:h-0.5 after:w-3 after:-translate-x-1/2 after:rounded-full after:bg-current hover:text-white ${isPulseClass}`;
     }
     if (disabled) {
       return `${base} text-white/35 cursor-not-allowed`;
@@ -105,7 +105,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         onClick={onTakeSnapshot} 
         title="Capture Snapshot"
       >
-        <Camera size={16} />
+        <Camera size={14} />
       </button>
 
       <button
@@ -113,7 +113,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         onClick={onToggleRecording}
         title={isRecording ? "Stop Recording" : "Start Recording"}
       >
-        {isRecording ? <Square size={14} /> : <Video size={16} />}
+        {isRecording ? <Square size={12} /> : <Video size={14} />}
       </button>
 
       <button
@@ -122,9 +122,9 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         title={getTurbidityButtonTitle()}
         className={getBtnClasses(false, turbidityLoading || isChecking || !isStreaming || !hasImageSource)}
       >
-        {turbidityLoading || isChecking ? <Loader2 size={16} className="
+        {turbidityLoading || isChecking ? <Loader2 size={14} className="
           animate-spin
-        " /> : <Eye size={16} />}
+        " /> : <Eye size={14} />}
       </button>
 
       <button
@@ -133,7 +133,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         title={getAIButtonTitle()}
         className={getBtnClasses(isAIActive, aiLoading || isChecking || !isStreaming, 'animate-pulse-ai')}
       >
-        {aiLoading || isChecking ? <Loader2 size={16} className="animate-spin" /> : <Brain size={16} />}
+        {aiLoading || isChecking ? <Loader2 size={14} className="animate-spin" /> : <Brain size={14} />}
       </button>
 
       <button
@@ -142,7 +142,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         title={getDiagnoseButtonTitle()}
         className={getBtnClasses(false, manualDiagnoseLoading || aiLoading || isChecking || !isStreaming)}
       >
-        {manualDiagnoseLoading ? <Loader2 size={16} className="animate-spin" /> : <Stethoscope size={16} />}
+        {manualDiagnoseLoading ? <Loader2 size={14} className="animate-spin" /> : <Stethoscope size={14} />}
       </button>
 
       {isFullscreen && (
@@ -151,7 +151,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
           title={showFsInventory ? "Hide Fish Inventory" : "Show Fish Inventory"}
           className={getBtnClasses(showFsInventory, false)}
         >
-          <Fish size={16} />
+          <Fish size={14} />
         </button>
       )}
 
@@ -160,7 +160,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
         className={getBtnClasses(false, false)}
       >
-        {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+        {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
       </button>
     </div>
   );
