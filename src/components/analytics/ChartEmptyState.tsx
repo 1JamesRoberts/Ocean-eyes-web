@@ -9,9 +9,9 @@ interface Props {
 }
 
 export const ChartEmptyState = React.memo<Props>(({ message, hint, action, className = '' }) => {
-  const layout = hint || action 
-    ? "flex items-center justify-center text-text-muted text-sm flex-col gap-2 text-center px-6" 
-    : "flex items-center justify-center text-text-muted text-sm";
+  const layout = hint || action
+    ? "flex items-center justify-center type-body-muted flex-col gap-2 text-center px-6"
+    : "flex items-center justify-center type-body-muted";
 
   return (
     <div className={`
@@ -20,7 +20,7 @@ export const ChartEmptyState = React.memo<Props>(({ message, hint, action, class
       ${className || 'h-[240px]'}
     `}>
       <span>{message}</span>
-      {hint && <span className="text-xs opacity-70">{hint}</span>}
+      {hint && <span className="type-caption opacity-70">{hint}</span>}
       {action && (
         <div className={hint ? "mt-3" : "mt-2"}>
           {action}

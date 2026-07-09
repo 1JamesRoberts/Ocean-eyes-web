@@ -22,8 +22,8 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
         ">
           <span className="material-symbols-outlined text-display">check_circle</span>
         </div>
-        <h4 className="text-lg font-bold text-brand-bright">System Operating Safely</h4>
-        <p className="mt-1 text-xs text-text-muted">
+        <h4 className="type-title text-brand-bright">System Operating Safely</h4>
+        <p className="mt-1 type-caption">
           No active safety alarms triggered.
         </p>
       </section>
@@ -34,9 +34,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
     <section className="glass-card p-6">
       <div className="mb-4 flex items-center gap-2">
         <ShieldAlert size={16} strokeWidth={2.5} className="text-brand" />
-        <h3 className="
-          text-xs font-medium tracking-widest text-text-muted uppercase
-        ">
+        <h3 className="type-title">
           Active Safety Alerts
         </h3>
       </div>
@@ -58,10 +56,10 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
             onClick={() => onSelectAlert(alert.id)}
           >
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-brand">{alert.title}</h4>
+              <h4 className="type-strong text-brand">{alert.title}</h4>
               <ChevronRight size={16} className="text-text-muted" />
             </div>
-            <p className="mt-1 text-xs/relaxed text-text-muted">
+            <p className="mt-1 type-caption">
               {alert.message}
             </p>
           </button>

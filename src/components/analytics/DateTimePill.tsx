@@ -17,7 +17,7 @@ export const DateTimePill: React.FC<DateTimePillProps> = ({
     onClick={onClick}
     className={`
       ${isActive ? 'glass-button-primary' : 'glass-button'}
-      px-4 py-2.5 text-h3 font-medium
+      px-4 py-2.5 type-body
     `}
   >
     {label}

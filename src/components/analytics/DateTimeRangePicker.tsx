@@ -171,8 +171,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         aria-controls="date-range-editor"
         className="
           flex cursor-pointer items-center gap-2 rounded-full border-none
-          bg-surface-hover px-4 py-2.5 text-h3 font-medium whitespace-nowrap
-          text-text transition-colors
+          bg-surface-hover px-4 py-2.5 type-body whitespace-nowrap
+          transition-colors
           hover:bg-border
         "
       >
@@ -205,7 +205,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         <div className="flex flex-col gap-2">
           {/* Starts row */}
           <div className="flex items-center gap-2">
-            <span className="w-14 text-lg font-medium text-text">Starts</span>
+            <span className="w-14 type-strong">Starts</span>
             <DateTimePill
               label={formatDateForDisplay(value.startDate)}
               isActive={activeField === 'startDate'}
@@ -220,7 +220,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
 
           {/* Ends row */}
           <div className="flex items-center gap-2">
-            <span className="w-14 text-lg font-medium text-text">Ends</span>
+            <span className="w-14 type-strong">Ends</span>
             <DateTimePill
               label={formatDateForDisplay(value.endDate)}
               isActive={activeField === 'endDate'}

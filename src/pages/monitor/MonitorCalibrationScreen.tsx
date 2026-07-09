@@ -36,17 +36,17 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
 
   return (
     <div className="flex h-full flex-col bg-[#090D11] p-6 text-white">
-      <h3 className="mb-0.5 text-center text-base font-bold text-[#E2E8F0]">
+      <h3 className="mb-0.5 text-center type-title-inverse">
         Water Line Calibration
       </h3>
       {activeTank && (
         <span className="
-          mb-2 block text-center text-caption font-semibold text-brand
+          mb-2 block text-center type-caption text-brand
         ">
           Calibrating: {activeTank.name}
         </span>
       )}
-      <p className="mb-4 text-center text-caption leading-[135%] text-[#64748B]">
+      <p className="mb-4 text-center type-caption-inverse">
         Drag the dotted red line visually to match the physical water surface level in your tank.
       </p>
 
@@ -121,8 +121,8 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
         <button
           className="
             inline-flex flex-1 cursor-pointer items-center justify-center gap-2
-            rounded-xl border-none bg-primary-gradient px-6 py-3 font-main
-            text-h3 font-semibold text-text-inverse
+            rounded-xl border-none bg-primary-gradient px-6 py-3
+            type-strong-inverse
             shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
             hover:bg-primary-hover-gradient
             active:scale-[0.98]
@@ -137,7 +137,7 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
           className="
             inline-flex cursor-pointer items-center justify-center gap-2
             rounded-xl border border-monitor-border bg-transparent px-4 py-3
-            font-main text-[14px] font-semibold text-[#94A3B8] transition-smooth
+            type-caption-inverse transition-smooth
             hover:bg-[rgba(255,255,255,0.05)]
           "
           onClick={() => onNavigate('welcome')}

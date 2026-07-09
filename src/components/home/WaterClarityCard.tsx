@@ -28,8 +28,8 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
           <span className="material-symbols-outlined text-base">water_drop</span>
         </div>
         <div className="flex-1">
-          <span className="block text-2xs text-text-muted">Clarity</span>
-          <span className="text-lg font-bold text-brand">
+          <span className="block type-caption">Clarity</span>
+          <span className="type-title text-brand">
             {displayClarity.toFixed(2)} FNU
           </span>
         </div>
@@ -41,9 +41,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
     <section className="glass-card p-6">
       <div className="mb-4 flex items-center gap-2">
         <Droplets size={16} strokeWidth={2.5} className="text-brand" />
-        <h3 className="
-          text-xs font-medium tracking-widest text-text-muted uppercase
-        ">
+        <h3 className="type-title">
           Water Clarity
         </h3>
       </div>
@@ -64,8 +62,8 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
           <span className="material-symbols-outlined">water_drop</span>
         </div>
         <div>
-          <span className="block text-xs text-text-muted">Clarity</span>
-          <span className="text-xl font-bold text-brand">
+          <span className="block type-caption">Clarity</span>
+          <span className="type-title text-brand">
             {displayClarity.toFixed(2)} FNU
           </span>
         </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Video } from 'lucide-react';
 import { useTank } from '../../hooks/useTank';
@@ -32,7 +32,7 @@ const RecordingBadge: React.FC<{ recordingSeconds: number }> = ({ recordingSecon
   <div className="
     absolute top-4 left-1/2 z-10 flex -translate-x-1/2 items-center
     gap-1.5 rounded-[20px] border border-[rgba(255,255,255,0.08)]
-    bg-[rgba(239,68,68,0.85)] px-3 py-1.5 text-xs font-semibold
+    bg-[rgba(239,68,68,0.85)] px-3 py-1.5 type-caption
     text-white backdrop-blur-md
   ">
     <div className="size-2 animate-recording-blink rounded-full bg-critical" />
@@ -55,7 +55,7 @@ const AIStatusBadge: React.FC<AIStatusBadgeProps> = ({
     className="
       absolute top-3 left-1/2 z-16 flex -translate-x-1/2
       items-center gap-1.5 rounded-[20px] bg-[rgba(15,23,42,0.85)]
-      px-3 py-1.5 text-caption font-semibold text-white
+      px-3 py-1.5 type-caption-inverse
     "
   >
     <div
@@ -76,7 +76,7 @@ const TurbidityErrorBadge: React.FC<{ error: string }> = ({ error }) => (
     className="
       absolute top-11 left-1/2 z-16 flex -translate-x-1/2 items-center
       gap-1.5 rounded-[20px] border border-critical
-      bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-caption font-semibold
+      bg-[rgba(15,23,42,0.85)] px-3 py-1.5 type-caption-inverse
       text-white
     "
   >
@@ -103,7 +103,9 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   const { fishList } = useFish(tankId);
 
   const cameraFeedRef = useRef<CameraFeedHandle>(null);
-  const [heroActionLayer, setHeroActionLayer] = useState<HTMLElement | null>(null);
+  const [heroActionLayer] = useState<HTMLElement | null>(() =>
+    document.getElementById('viewer-hero-action-layer')
+  );
 
   const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen();
 
@@ -156,10 +158,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
     tankId,
   });
 
-  useEffect(() => {
-    setHeroActionLayer(document.getElementById('viewer-hero-action-layer'));
-  }, []);
-
   const cameraControls = (
     <CameraControls
       isRecording={isRecording}
@@ -187,9 +185,9 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
       {!activeTank && (
         <div className="
           mb-5 flex items-center gap-2.5 rounded-xl border border-warning
-          bg-warning/8 px-4 py-3 text-sm font-semibold text-warning
+          bg-warning/8 px-4 py-3 type-body text-warning
         ">
-          <span className="text-base font-extrabold text-warning">!</span>
+          <span className="type-strong text-warning">!</span>
           <span>No aquarium linked. Link a tank from the Dashboard to save camera feeds and enable AI detection.</span>
         </div>
       )}

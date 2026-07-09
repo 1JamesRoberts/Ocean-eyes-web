@@ -46,7 +46,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
   if (speciesDistribution.length === 0 || total <= 0) {
     return (
       <div className="
-        flex h-[200px] items-center justify-center text-text-muted
+        flex h-[200px] items-center justify-center type-body-muted
       ">
         No fish data available
       </div>
@@ -84,20 +84,20 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
         </svg>
         <div className="absolute top-1/2 left-1/2 -translate-1/2 text-center">
           <div className="text-display font-extrabold text-text">{total}</div>
-          <div className="text-caption font-semibold text-text-muted">TOTAL FISH</div>
+          <div className="type-caption">TOTAL FISH</div>
         </div>
       </div>
 
       <div className="flex w-full flex-wrap justify-center gap-2">
         {speciesDistribution.map((species, index) => (
           <div key={index} className="
-            flex items-center gap-1.5 text-xs font-semibold
+            flex items-center gap-1.5 type-caption
           ">
             <div
               className="size-2.5 rounded-full"
               style={{ backgroundColor: species.color }}
             />
-            <span className="text-text-muted">
+            <span>
               {species.name} ({species.count})
             </span>
           </div>

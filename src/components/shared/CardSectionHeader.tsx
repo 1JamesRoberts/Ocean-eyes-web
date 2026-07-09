@@ -20,11 +20,11 @@ export const CardSectionHeader: React.FC<CardSectionHeaderProps> = ({
     <div className="flex min-w-0 items-start gap-2">
       <Icon size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-brand" />
       <div className="min-w-0">
-        <h3 className="text-xs font-medium tracking-widest text-text-muted uppercase">
+        <h3 className="type-title">
           {title}
         </h3>
         {detail && (
-          <p className="mt-1 text-xs leading-snug text-text-muted">
+          <p className="mt-1 type-caption">
             {detail}
           </p>
         )}

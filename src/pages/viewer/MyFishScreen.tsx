@@ -72,17 +72,17 @@ const FishCountStepper: React.FC<FishCountStepperProps> = ({
     <button
       className="
         flex size-6 cursor-pointer items-center justify-center border-none
-        bg-transparent text-base font-extrabold text-text
+        bg-transparent type-strong
       "
       onClick={onDecrement}
     >
       -
     </button>
-    <span className="w-6 text-center text-sm font-bold text-text">{count}</span>
+    <span className="w-6 text-center type-strong">{count}</span>
     <button
       className="
         flex size-6 cursor-pointer items-center justify-center border-none
-        bg-transparent text-base font-extrabold text-text
+        bg-transparent type-strong
       "
       onClick={onIncrement}
     >
@@ -103,8 +103,8 @@ const DeleteFishModal: React.FC<DeleteFishModalProps> = ({
   onConfirm,
 }) => (
   <GlassModal isOpen={isOpen} onClose={onCancel}>
-    <h3 className="mb-2 text-lg font-bold text-text">Delete Fish Entry</h3>
-    <p className="mb-6 text-sm text-text-muted">
+    <h3 className="mb-2 type-title">Delete Fish Entry</h3>
+    <p className="mb-6 type-body-muted">
       Are you sure you want to delete this fish entry? This action cannot be undone.
     </p>
     <div className="flex justify-end gap-3">
@@ -141,10 +141,10 @@ const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
     <form onSubmit={onAdd} className="
       flex flex-col gap-3.5 glass-card p-6 transition-smooth
     ">
-      <h4 className="text-sm font-bold text-text">Add New Species Entry</h4>
+      <h4 className="type-strong">Add New Species Entry</h4>
       <div>
         <label className="
-          mb-1 block text-caption font-semibold tracking-wider text-text-muted
+          mb-1 block type-caption
           uppercase
         ">SPECIES</label>
         <SpeciesSelector
@@ -250,13 +250,13 @@ export const MyFishScreen: React.FC<{
                 </div>
                 <div className="min-w-0 flex-1">
                   <span className="
-                    block truncate text-base font-bold text-text
+                    block truncate type-strong
                   ">Fish Overview</span>
                   <span className="
-                    mb-1 block truncate text-xs font-medium text-text-muted
+                    mb-1 block truncate type-caption
                     italic
                   ">{stats.uniqueSpecies} species</span>
-                  <span className="mt-0.5 block text-xs text-text-muted">
+                  <span className="mt-0.5 block type-caption">
                     Visible: {stats.totalDetected} / {stats.totalExpected}
                   </span>
                 </div>
@@ -317,7 +317,7 @@ export const MyFishScreen: React.FC<{
 
                   <div className="mt-4">
                     <div className="
-                      mb-2 text-caption font-bold tracking-wider
+                      mb-2 type-caption
                       text-text-muted uppercase
                     ">
                       Tank Compatibility
@@ -335,10 +335,10 @@ export const MyFishScreen: React.FC<{
                         }}
                       />
                       <span className="
-                        flex-1 text-xs font-semibold text-text
+                        flex-1 type-caption
                       ">Overall tank compatibility</span>
                       <span
-                        className="text-caption font-bold"
+                        className="type-caption"
                         style={{
                           color: getCompatibilityColor(
                             getCompatibilityLevel(stats.overallCompatibility)
@@ -360,8 +360,8 @@ export const MyFishScreen: React.FC<{
           {fishList.length === 0 && (
             <GlassCard className="p-6 text-center">
               <span className="text-5xl">🐟</span>
-              <p className="text-base font-bold text-text">No fish in your inventory</p>
-              <p className="text-xs text-text-muted">Tap + to add your first species</p>
+              <p className="type-strong">No fish in your inventory</p>
+              <p className="type-caption">Tap + to add your first species</p>
             </GlassCard>
           )}
 
@@ -394,15 +394,15 @@ export const MyFishScreen: React.FC<{
                     <FishThumbnail imagePath={display.imagePath} initials={display.initials} color={display.color} />
                     <div className="min-w-0 flex-1">
                       <span className="
-                        block truncate text-base font-bold text-text
+                        block truncate type-strong
                       ">{display.name}</span>
                       {species?.scientificName && (
                         <span className="
-                          mb-1 block truncate text-xs font-medium
+                          mb-1 block truncate type-caption
                           text-text-muted italic
                         ">{species.scientificName}</span>
                       )}
-                      <span className="mt-0.5 block text-xs text-text-muted">
+                      <span className="mt-0.5 block type-caption">
                         Visible: {fish.detected} / {fish.count}
                       </span>
                     </div>
@@ -470,7 +470,7 @@ export const MyFishScreen: React.FC<{
                           {compResults.length > 0 && (
                             <div className="mt-4">
                               <div className="
-                                mb-2 text-caption font-bold tracking-wider
+                                mb-2 type-caption
                                 text-text-muted uppercase
                               ">
                                 Tank Compatibility
@@ -488,9 +488,9 @@ export const MyFishScreen: React.FC<{
                                       size-2 shrink-0 rounded-full
                                     " style={{ backgroundColor: color }} />
                                     <span className="
-                                      flex-1 text-xs font-semibold text-text
+                                      flex-1 type-caption
                                     ">{cr.speciesName}</span>
-                                    <span className="text-caption font-bold" style={{ color }}>{cr.score}%</span>
+                                    <span className="type-caption" style={{ color }}>{cr.score}%</span>
                                   </div>
                                 );
                               })}
@@ -499,7 +499,7 @@ export const MyFishScreen: React.FC<{
                         </>
                       )}
                       {!species && (
-                        <p className="text-xs text-text-muted">
+                        <p className="type-caption">
                           No detailed species data available for this entry.
                         </p>
                       )}

@@ -39,7 +39,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className="text-lg font-bold text-text">
+          <span className="type-title">
             {formatUTCDate(viewMonth, 'MMMM yyyy')}
           </span>
           <ChevronDown size={16} className="text-text-muted" />
@@ -75,7 +75,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
       {/* Weekday labels */}
       <div className="mb-2 grid grid-cols-7 text-center">
         {WEEKDAYS.map((day) => (
-          <span key={day} className="text-caption font-medium text-text-muted">
+          <span key={day} className="type-caption">
             {day}
           </span>
         ))}
@@ -94,13 +94,13 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
               onClick={() => onSelect(day)}
               className={`
                 relative mx-auto flex size-9 cursor-pointer items-center
-                justify-center rounded-full border-none text-h3 font-medium
+                justify-center rounded-full border-none type-body
                 transition-smooth
                 ${selected
                   ? `glass-button-primary bg-primary-gradient text-text-inverse`
                   : today
                     ? `
-                      bg-transparent font-semibold text-brand
+                      bg-transparent type-strong text-brand
                       hover:bg-white/30
                     `
                     : inMonth

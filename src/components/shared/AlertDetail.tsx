@@ -18,13 +18,12 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
       max-xs:flex-col max-xs:items-start max-xs:gap-3
     ">
       <div>
-        <span className="block text-xs font-semibold text-text-muted uppercase">Alert Details</span>
+        <span className="block type-caption">Alert Details</span>
         <h1 className="mt-0.5 text-display font-extrabold text-text">Alert Diagnostics</h1>
       </div>
       <button
         className="
-          cursor-pointer border-none bg-transparent font-main text-sm
-          font-semibold text-brand
+          cursor-pointer border-none bg-transparent type-strong text-brand
         "
         onClick={onBack}
       >
@@ -41,10 +40,10 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     >
       <div className="flex items-center gap-2">
         <AlertTriangle size={20} className="text-warning" />
-        <h2 className="text-xl font-extrabold">{alert.title}</h2>
+        <h2 className="type-title">{alert.title}</h2>
       </div>
-      <p className="mt-1.5 text-xs text-text-muted">{alert.timeAgo}</p>
-      <p className="mt-4 text-sm leading-[150%] text-text">
+      <p className="mt-1.5 type-caption">{alert.timeAgo}</p>
+      <p className="mt-4 type-body">
         {alert.message}
       </p>
     </GlassCard>
@@ -53,8 +52,8 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     <div className="mb-5 grid grid-cols-2 gap-4">
       {alert.clarityBefore && (
         <GlassCard className="p-5 text-center">
-          <span className="block text-xs text-text-muted">Clarity Shift</span>
-          <strong className="mt-1.5 block text-xl">
+          <span className="block type-caption">Clarity Shift</span>
+          <strong className="mt-1.5 block type-title">
             {alert.clarityBefore} → {alert.clarityAfter}
           </strong>
         </GlassCard>
@@ -62,8 +61,8 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
 
       {alert.fishBefore && (
         <GlassCard className="p-5 text-center">
-          <span className="block text-xs text-text-muted">Fish Discrepancy</span>
-          <strong className="mt-1.5 block text-xl">
+          <span className="block type-caption">Fish Discrepancy</span>
+          <strong className="mt-1.5 block type-title">
             {alert.fishBefore} → {alert.fishAfter}
           </strong>
         </GlassCard>
@@ -72,8 +71,8 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
 
     {/* Correction tip card */}
     <GlassCard className="mb-6 p-5">
-      <h4 className="mb-2 text-sm font-bold text-text">Action Plan & Tips</h4>
-      <p className="text-sm leading-[145%] text-text-muted">
+      <h4 className="mb-2 type-strong">Action Plan & Tips</h4>
+      <p className="type-body-muted">
         {alert.tip}
       </p>
     </GlassCard>
@@ -92,7 +91,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
       </GlassButton>
     ) : (
       <div className="
-        rounded-2xl bg-good/10 p-3 text-center font-semibold text-good
+        rounded-2xl bg-good/10 p-3 text-center type-strong text-good
       ">
         ✓ Resolved Alert
       </div>

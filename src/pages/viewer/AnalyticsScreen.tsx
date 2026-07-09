@@ -33,22 +33,22 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-text">{diagnosis.species}</span>
+          <span className="type-strong">{diagnosis.species}</span>
           <span
             className={`
-              rounded-xl px-2 py-0.5 text-caption font-bold
+              rounded-xl px-2 py-0.5 type-caption
               ${isErr ? 'bg-critical/12 text-critical' : isHealthy ? 'bg-good/12 text-good' : 'bg-warning/12 text-warning'}
             `}
           >
             {isErr ? 'Error' : isHealthy ? 'Healthy' : `Disease: ${diagnosis.diagnosis.disease}`}
           </span>
           {!isErr && (
-            <span className="text-caption font-semibold text-text-muted">
+            <span className="type-caption">
               {Math.round(diagnosis.diagnosis.confidence * 100)}% confidence
             </span>
           )}
         </div>
-        <span className="text-caption font-semibold text-text-muted">
+        <span className="type-caption">
           {new Date(diagnosis.timestamp).toLocaleTimeString()}
         </span>
       </div>
@@ -67,16 +67,16 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
         )}
 
         {isErr ? (
-          <p className="m-0 flex-1 text-xs text-text-muted">
+          <p className="m-0 flex-1 type-caption">
             <strong>Configuration Error:</strong> {diagnosis.diagnosis.error}
           </p>
         ) : (
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <p className="m-0 text-xs text-text">
+            <p className="m-0 type-body">
               <strong>Observation:</strong> {diagnosis.diagnosis.description}
             </p>
             {!isHealthy && diagnosis.diagnosis.treatment && (
-              <p className="mt-1 rounded-md border-l-3 border-warning bg-bg p-2 text-xs text-text-muted">
+              <p className="mt-1 rounded-md border-l-3 border-warning bg-bg p-2 type-caption">
                 <strong>Recommended Treatment:</strong> {diagnosis.diagnosis.treatment}
               </p>
             )}
@@ -117,7 +117,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
       {error && (
         <GlassCard className="border-critical bg-critical/10 p-3">
           <div className="
-            flex items-center justify-between gap-3 text-sm text-critical
+            flex items-center justify-between gap-3 type-body text-critical
           ">
             <span>{error}</span>
             <GlassButton variant="outline" size="sm" onClick={refetch}>Retry</GlassButton>
@@ -129,10 +129,10 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
       {loading && (
         <GlassCard className="p-6">
           <div className="
-            flex h-[240px] items-center justify-center text-sm text-text-muted
+            flex h-[240px] items-center justify-center type-body-muted
           ">
             <Loader2 size={28} className="text-info" />
-            <span className="ml-2 text-sm text-text-muted">
+            <span className="ml-2 type-body-muted">
               Loading analytics data...
             </span>
           </div>
@@ -144,10 +144,10 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
         <GlassCard className="px-6 py-12 text-center">
           <div className="flex flex-col items-center justify-center gap-2">
             <Calendar size={32} className="text-text-muted opacity-50" />
-            <span className="text-h3 font-semibold text-text">
+            <span className="type-strong">
               No data for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}
             </span>
-            <span className="text-sm text-text-muted">
+            <span className="type-body-muted">
               Try selecting a different range or run the AI pipeline to generate history.
             </span>
           </div>
@@ -237,7 +237,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
               )}
               {confirmClear && (
                 <div className="flex shrink-0 items-center gap-2">
-                  <span className="text-xs whitespace-nowrap text-text-muted">Delete all records for this date?</span>
+                  <span className="type-caption whitespace-nowrap">Delete all records for this date?</span>
                   <GlassButton variant="danger" size="sm" onClick={onConfirmClear} disabled={isClearing}>
                     {isClearing ? 'Deleting…' : 'Yes, clear'}
                   </GlassButton>
@@ -249,8 +249,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             </div>
             {diagnoses.length === 0 ? (
               <div className="
-                flex flex-col items-center justify-center p-6 text-sm
-                text-text-muted
+                flex flex-col items-center justify-center p-6 type-body-muted
               ">
                 No health diagnostic records found for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}.
               </div>

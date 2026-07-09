@@ -58,12 +58,12 @@ export const WaterChemistryGrid = React.memo<WaterChemistryGridProps>(({ reading
           </div>
           <div>
             <span className={`
-              block text-sm/tight font-bold
+              block type-strong
               ${param.isCritical ? `text-critical` : `text-brand`}
             `}>
               {param.value}
             </span>
-            <span className="block text-3xs text-text-muted">{param.unit}</span>
+            <span className="block type-caption">{param.unit}</span>
           </div>
         </div>
       ))}

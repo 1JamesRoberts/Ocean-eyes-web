@@ -22,7 +22,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
       flex h-full flex-col items-center justify-center bg-[#090D11] px-6
       py-[30px] text-white
     ">
-      <h3 className="mb-5 text-lg font-bold text-[#E2E8F0]">Pairing QR Code</h3>
+      <h3 className="mb-5 type-title-inverse">Pairing QR Code</h3>
 
       {activeTankId ? (
         <>
@@ -32,25 +32,24 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
             bg-surface p-6
           ">
             <div className="qr-code-canvas" />
-            <span className="mt-3 text-xs font-semibold text-[#64748B]">
+            <span className="mt-3 type-caption">
               SCAN ME IN APP
             </span>
           </div>
 
           <div className="mb-6 text-center">
             <span className="
-              block text-caption font-semibold text-[#64748B] uppercase
+              block type-caption-inverse
             ">Manual Pairing ID</span>
             <div className="
               mt-1.5 flex items-center gap-2.5 rounded-[10px] border
               border-[#1E293B] bg-[#0F172A] px-4 py-2.5
             ">
-              <code className="text-[13px] text-[#38BDF8]">{activeTankId}</code>
+              <code className="type-caption text-[#38BDF8]">{activeTankId}</code>
               <button
                 onClick={copyToClipboard}
                 className="
-                  cursor-pointer border-none bg-transparent text-caption
-                  font-semibold text-brand underline
+                  cursor-pointer border-none bg-transparent type-caption text-brand underline
                 "
               >
                 {isCopied ? 'Copied!' : 'Copy'}
@@ -59,7 +58,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
           </div>
         </>
       ) : (
-        <p className="mb-6 text-center text-sm text-[#64748B]">
+        <p className="mb-6 text-center type-body-muted-inverse">
           No tank configured. Create a tank first to generate a pairing code.
         </p>
       )}
@@ -68,7 +67,7 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         className="
           inline-flex w-full max-w-[240px] cursor-pointer items-center
           justify-center gap-2 rounded-xl border-none bg-primary-gradient px-6
-          py-3 font-main text-h3 font-semibold text-text-inverse
+          py-3 type-strong-inverse
           shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
           hover:bg-primary-hover-gradient
           active:scale-[0.98]

@@ -39,11 +39,10 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
     ">
       <div className="flex flex-col gap-3">
         <div className="
-          flex items-center justify-between border-b border-brand pb-2 text-h3
-          font-bold text-text
+          flex items-center justify-between border-b border-brand pb-2 type-title
         ">
           <span className="flex items-center gap-1.5"><Camera size={16} /> Snapshots</span>
-          <span className="text-xs font-medium text-text-muted">{snapshots.length} saved</span>
+          <span className="type-caption">{snapshots.length} saved</span>
         </div>
         <div className="
           flex max-h-[380px] flex-col gap-3 overflow-y-auto pr-1
@@ -52,7 +51,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           [&::-webkit-scrollbar-thumb]:bg-border
         ">
           {snapshots.length === 0 ? (
-            <div className="p-5 text-center text-sm text-text-muted">
+            <div className="p-5 text-center type-body-muted">
               No snapshots yet
             </div>
           ) : (
@@ -72,8 +71,8 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                 </div>
                 <div className="flex flex-1 flex-col justify-between p-3">
                   <div>
-                    <span className="text-xs font-semibold text-text">{snap.timestamp}</span>
-                    <div className="mt-0.5 text-caption text-text-muted">
+                    <span className="type-caption">{snap.timestamp}</span>
+                    <div className="mt-0.5 type-caption">
                       {snap.fishCount} fish · {snap.clarity.toFixed(2)} FNU
                     </div>
                   </div>
@@ -122,11 +121,10 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
 
       <div className="flex flex-col gap-3">
         <div className="
-          flex items-center justify-between border-b border-brand pb-2 text-h3
-          font-bold text-text
+          flex items-center justify-between border-b border-brand pb-2 type-title
         ">
           <span className="flex items-center gap-1.5"><Video size={16} /> Recordings</span>
-          <span className="text-xs font-medium text-text-muted">{recordings.length} saved</span>
+          <span className="type-caption">{recordings.length} saved</span>
         </div>
         <div className="
           flex max-h-[380px] flex-col gap-3 overflow-y-auto pr-1
@@ -135,7 +133,7 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
           [&::-webkit-scrollbar-thumb]:bg-border
         ">
           {recordings.length === 0 ? (
-            <div className="p-5 text-center text-sm text-text-muted">
+            <div className="p-5 text-center type-body-muted">
               No recordings yet
             </div>
           ) : (
@@ -147,8 +145,8 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                 hover:-translate-y-0.5 hover:shadow-card
               ">
                 <div>
-                  <span className="text-xs font-semibold text-text">{rec.timestamp}</span>
-                  <div className="mt-0.5 text-caption text-text-muted">
+                  <span className="type-caption">{rec.timestamp}</span>
+                  <div className="mt-0.5 type-caption">
                     ⏱ {formatDuration(rec.duration)} · {rec.fishCount} fish · {rec.clarity.toFixed(2)} FNU
                   </div>
                 </div>

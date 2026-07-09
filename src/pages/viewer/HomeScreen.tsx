@@ -25,10 +25,10 @@ export const HomeScreen: React.FC = () => {
       {!hasReadingData ? (
         <div className="glass-card p-6 text-center transition-smooth">
           <span className="mb-3 block text-4xl">🐠</span>
-          <h3 className="mb-2 text-base font-bold text-text">
+          <h3 className="mb-2 type-strong">
             Waiting for monitor data…
           </h3>
-          <p className="mx-auto text-xs leading-relaxed text-text-muted">
+          <p className="mx-auto type-caption">
             The AI backend has not yet returned any readings. Make sure the OceanEyes inference service is running and has processed at least one frame.
           </p>
         </div>
@@ -52,7 +52,7 @@ export const HomeScreen: React.FC = () => {
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FlaskConical size={16} strokeWidth={2.5} className="text-brand" />
-                <h3 className="text-xs font-medium tracking-widest text-text-muted uppercase">
+                <h3 className="type-title">
                   Water Parameters
                 </h3>
               </div>

@@ -38,9 +38,9 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
           <Icon size={17} />
         </span>
         <span className="min-w-0">
-          <span className="block text-sm font-semibold text-text">{title}</span>
+          <span className="block type-strong">{title}</span>
           {detail && (
-            <span className="mt-0.5 block text-xs leading-snug text-text-muted">
+            <span className="mt-0.5 block type-caption">
               {detail}
             </span>
           )}

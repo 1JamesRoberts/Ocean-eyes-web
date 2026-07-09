@@ -27,7 +27,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
         icon={Brain}
         title="AI Analysis Results"
         action={(
-          <span className="text-caption font-semibold text-text-muted">
+          <span className="type-caption">
           {new Date(lastPrediction.timestamp).toLocaleTimeString()}
           </span>
         )}
@@ -37,24 +37,20 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
         mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3
       ">
         <GlassPanel className="hover:bg-white/60">
-          <span className="
-            block text-2xs font-semibold text-text-muted uppercase
-          ">
+          <span className="block type-caption">
             Fish Detected
           </span>
-          <strong className="mt-1 block text-title text-brand">
+          <strong className="mt-1 block type-title text-brand">
             {lastPrediction.summary.total_detections}
           </strong>
         </GlassPanel>
 
         {lastTurbidityResult && (
           <GlassPanel className="hover:bg-white/60">
-            <span className="
-              block text-2xs font-semibold text-text-muted uppercase
-            ">
+            <span className="block type-caption">
               FNU
             </span>
-            <strong className="mt-1 block text-title text-brand">
+            <strong className="mt-1 block type-title text-brand">
               {lastTurbidityResult.turbidity.fnu.toFixed(2)}
             </strong>
           </GlassPanel>
@@ -64,9 +60,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
       {Object.entries(lastPrediction.summary.species_counts).length > 0 && (
         <div>
-          <h4 className="
-            mb-2.5 text-xs font-bold tracking-wider text-text-muted uppercase
-          ">
+          <h4 className="mb-2.5 type-title">
             Species Breakdown
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -76,8 +70,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
               const displayName = speciesInfo?.displayName || speciesId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
               return (
                 <div key={speciesId} className="
-                  glass-pill flex items-center gap-1.5 px-3 py-1.5 text-xs
-                  font-semibold
+                  glass-pill flex items-center gap-1.5 px-3 py-1.5 type-caption
                 " style={{ borderColor: `${color}40` }}>
                   <div className="size-2 rounded-full" style={{ backgroundColor: color }} />
                   <span className="text-text">{displayName}</span>
@@ -100,8 +93,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           `}
         >
           <h4 className={`
-            m-0 mb-2 flex items-center gap-1.5 text-xs font-bold tracking-wider
-            uppercase
+            m-0 mb-2 flex items-center gap-1.5 type-strong
             ${diagnosis.error ? `text-critical` : diagnosis.healthy ? `
               text-good
             ` : `text-warning`}
@@ -109,26 +101,26 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             🩺 Fish Health Diagnosis
           </h4>
           {diagnosis.error ? (
-            <p className="m-0 text-xs leading-[1.4] font-medium text-text">
+            <p className="m-0 type-body">
               <strong>Error:</strong> {diagnosis.error}
             </p>
           ) : (
             <>
-              <div className="mb-2 text-sm">
-                <span className="font-bold text-text">Status: </span>
+              <div className="mb-2 type-body">
+                <span>Status: </span>
                 <span className={`
-                  font-extrabold
+                  type-strong
                   ${diagnosis.healthy ? `text-good` : `text-warning`}
                 `}>
                   {diagnosis.healthy ? 'HEALTHY' : `DISEASE DETECTED (${diagnosis.disease})`}
                 </span>
-                <span className="ml-2 text-caption text-text-muted">
+                <span className="ml-2 type-caption">
                   (Confidence: {Math.round(diagnosis.confidence * 100)}%)
                 </span>
               </div>
 
               {diagnosisDetection && (
-                <div className="mb-2 text-caption text-text-muted italic">
+                <div className="mb-2 type-caption italic">
                   Diagnosed Subject: {diagnosisDetection.species_display}
                 </div>
               )}
@@ -147,14 +139,14 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                 />
               )}
 
-              <p className="m-0 mb-2 text-xs leading-[1.4] text-text">
+              <p className="m-0 mb-2 type-body">
                 <strong>Observation:</strong> {diagnosis.description}
               </p>
 
               {!diagnosis.healthy && diagnosis.treatment && (
                 <p className="
                   m-0 rounded-md border-l-3 border-warning bg-white/20 p-2
-                  text-xs leading-[1.4] text-text-muted
+                  type-caption
                 ">
                   <strong>Recommended Treatment:</strong> {diagnosis.treatment}
                 </p>

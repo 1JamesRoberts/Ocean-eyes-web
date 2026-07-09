@@ -55,15 +55,14 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                 >
                   videocam
                 </span>
-                <p className="text-xs text-text-muted">
+                <p className="type-caption">
                   Feed is idle. Connect stream to monitor.
                 </p>
                 <button
                   className="
                     mx-auto mt-2 inline-flex cursor-pointer items-center
                     justify-center gap-2 rounded-3xl border-none
-                    bg-primary-gradient px-4 py-2 font-main text-xs
-                    font-semibold text-text-inverse shadow-primary-hover
+                    bg-primary-gradient px-4 py-2 type-caption-inverse shadow-primary-hover
                     transition-smooth
                     hover:bg-primary-hover-gradient
                     active:scale-[0.98]
@@ -99,14 +98,13 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
         <div className="flex gap-2">
           <span
             className="
-              rounded-full bg-brand-bright/10 px-3 py-1 text-xs font-bold
-              text-brand-bright
+              rounded-full bg-brand-bright/10 px-3 py-1 type-caption text-brand-bright
             "
           >
             Live
           </span>
           <span
-            className="rounded-full bg-brand/10 px-3 py-1 text-xs text-brand"
+            className="rounded-full bg-brand/10 px-3 py-1 type-caption text-brand"
           >
             1080p
           </span>
@@ -147,7 +145,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                   >
                     videocam
                   </span>
-                  <p className="text-xs text-text-muted">
+                  <p className="type-caption">
                     Feed is idle. Connect stream to monitor.
                   </p>
                 </div>
@@ -164,7 +162,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               <div
                 className="
                   rounded-lg border border-white/20 bg-black/40 px-3 py-1
-                  text-xs text-white backdrop-blur-md
+                  type-caption-inverse backdrop-blur-md
                 "
               >
                 {displayFishCount} fish
@@ -172,7 +170,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               <div
                 className="
                   rounded-lg border border-white/20 bg-black/40 px-3 py-1
-                  text-xs text-white backdrop-blur-md
+                  type-caption-inverse backdrop-blur-md
                 "
               >
                 {displayClarity.toFixed(2)} FNU
@@ -206,14 +204,14 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                 videocam
               </span>
             </div>
-            <p className="mb-2.5 text-xs text-text-muted">
+            <p className="mb-2.5 type-caption">
               Feed is idle. Connect stream to monitor.
             </p>
             <button
               className="
                 mx-auto inline-flex cursor-pointer items-center justify-center
                 gap-2 rounded-3xl border-none bg-primary-gradient px-4 py-2
-                font-main text-xs font-semibold text-text-inverse
+                type-caption-inverse
                 shadow-primary-hover transition-smooth
                 hover:bg-primary-hover-gradient
                 active:scale-[0.98]

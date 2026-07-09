@@ -56,16 +56,16 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
           absolute inset-0 flex flex-col items-center justify-center
         ">
           <span className="text-2xl font-bold text-brand">{healthScore}</span>
-          <span className="text-2xs font-medium text-text-muted">Score</span>
+          <span className="type-caption">Score</span>
         </div>
       </div>
 
       <div className="flex-1">
-        <span className="block text-xs text-text-muted">Aquarium Health Index</span>
+        <span className="block type-caption">Aquarium Health Index</span>
         <h3 className="whitespace-nowrap text-[17px] font-bold leading-tight text-brand sm:text-2xl">
           {healthHeading}
         </h3>
-        <p className="mt-0.5 text-xs text-text-muted">{healthDetails}</p>
+        <p className="mt-0.5 type-caption">{healthDetails}</p>
       </div>
     </section>
   );

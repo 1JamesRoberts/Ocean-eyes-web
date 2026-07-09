@@ -53,6 +53,10 @@
 
   /* Font */
   --font-main: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --type-ink: rgb(0 0 0);
+  --type-ink-muted: rgb(0 0 0 / 70%);
+  --type-ink-inverse: rgb(255 255 255);
+  --type-ink-inverse-muted: rgb(255 255 255 / 70%);
 
   /* Backward-compat CSS var aliases (for inline var() usage in components) */
   --color-text-primary: var(--color-text);
@@ -80,6 +84,10 @@
   --color-text-muted: #3f484a;
   --color-text-subtle: #6f797a;
   --color-text-inverse: #ffffff;
+  --color-type-ink: rgb(0 0 0);
+  --color-type-ink-muted: rgb(0 0 0 / 70%);
+  --color-type-ink-inverse: rgb(255 255 255);
+  --color-type-ink-inverse-muted: rgb(255 255 255 / 70%);
 
   /* ─── Border ─── */
   --color-border: #e2e2e2;
@@ -168,6 +176,96 @@
   transition: var(--transition-smooth);
 }
 
+@utility type-title {
+  font-family: var(--font-main);
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--type-ink);
+}
+
+@utility type-strong {
+  font-family: var(--font-main);
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--type-ink);
+}
+
+@utility type-body {
+  font-family: var(--font-main);
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--type-ink);
+}
+
+@utility type-body-muted {
+  font-family: var(--font-main);
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--type-ink-muted);
+}
+
+@utility type-caption {
+  font-family: var(--font-main);
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--type-ink-muted);
+}
+
+@utility type-title-inverse {
+  font-family: var(--font-main);
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--type-ink-inverse);
+}
+
+@utility type-strong-inverse {
+  font-family: var(--font-main);
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--type-ink-inverse);
+}
+
+@utility type-body-inverse {
+  font-family: var(--font-main);
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--type-ink-inverse);
+}
+
+@utility type-body-muted-inverse {
+  font-family: var(--font-main);
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--type-ink-inverse-muted);
+}
+
+@utility type-caption-inverse {
+  font-family: var(--font-main);
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--type-ink-inverse-muted);
+}
+
 @utility liquid-bg {
   background: linear-gradient(180deg, #f9f9f9 0%, #d4e6e5 100%);
 }
@@ -218,7 +316,9 @@
   border-radius: var(--glass-radius-inline);
   color: var(--color-text);
   font-family: var(--font-main);
-  font-size: 0.875rem;
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 400;
   padding: 0.625rem 0.875rem;
   transition: var(--transition-smooth);
   outline: none;
@@ -247,8 +347,9 @@
   border-radius: var(--glass-radius-pill);
   padding: 0.5rem 1.25rem;
   font-family: var(--font-main);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 700;
   color: var(--color-text);
   transition: var(--transition-smooth);
   white-space: nowrap;
@@ -273,8 +374,9 @@
   border-radius: var(--glass-radius-pill);
   padding: 0.625rem 1.5rem;
   font-family: var(--font-main);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 700;
   color: #ffffff;
   box-shadow: var(--shadow-primary-glow);
   transition: var(--transition-smooth);
@@ -302,8 +404,9 @@
   border-radius: var(--glass-radius-pill);
   padding: 0.5rem 1.25rem;
   font-family: var(--font-main);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 700;
   color: var(--color-brand);
   transition: var(--transition-smooth);
   white-space: nowrap;
@@ -347,8 +450,9 @@
   align-items: center;
   padding: 0.25rem 0.75rem;
   border-radius: var(--glass-radius-pill);
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 400;
   background: var(--glass-bg-inline);
 }
 
@@ -416,7 +520,7 @@
   h5,
   h6 {
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 }
 

@@ -96,11 +96,11 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
           </span>
         )}
         <span className="min-w-0">
-          <span className={`block text-sm font-semibold ${danger ? 'text-critical' : highlight ? 'text-brand' : 'text-text'}`}>
+          <span className={`block type-strong ${danger ? 'text-critical' : highlight ? 'text-brand' : ''}`}>
             {title}
           </span>
           {detail && (
-            <span className="mt-0.5 block text-xs leading-snug text-text-muted">{detail}</span>
+            <span className="mt-0.5 block type-caption">{detail}</span>
           )}
         </span>
       </span>
@@ -138,7 +138,7 @@ const SettingsDisclosureButton: React.FC<SettingsDisclosureButtonProps> = ({
   <button
     type="button"
     onClick={onClick}
-    className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/20 px-3 py-2.5 text-xs font-bold text-text-muted transition-smooth hover:bg-white/45"
+    className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/20 px-3 py-2.5 type-caption transition-smooth hover:bg-white/45"
     aria-expanded={expanded}
   >
     {label}
@@ -185,8 +185,8 @@ export const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
 
   return (
     <div className={variant === 'panel' ? 'rounded-2xl border border-white/20 bg-white/20 p-3' : ''}>
-      <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
-        <span className="min-w-0 font-medium text-text-muted">{label}</span>
+      <div className="mb-1.5 flex items-baseline justify-between gap-3 type-body">
+        <span className="min-w-0 type-body-muted">{label}</span>
         <strong className="shrink-0 text-brand">{displayValue}</strong>
       </div>
       <input
@@ -240,10 +240,10 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
         )}
       />
 
-      <div className="grid grid-cols-2 gap-2.5 text-sm">
+      <div className="grid grid-cols-2 gap-2.5 type-body">
         {metrics.map((metric) => (
           <GlassPanel key={metric.label}>
-            <span className="block text-xs font-medium text-text-muted">{metric.label}</span>
+            <span className="block type-caption">{metric.label}</span>
             <strong className="text-text">{metric.value}</strong>
           </GlassPanel>
         ))}
@@ -251,15 +251,15 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
 
       {expanded && (
         <div className="mt-4">
-          <h5 className="mb-2 text-2xs font-bold tracking-widest text-text-subtle uppercase">Saved Presets</h5>
+          <h5 className="mb-2 type-caption">Saved Presets</h5>
           {filterPresets.length === 0 ? (
-            <p className="text-sm text-text-muted">No custom presets saved.</p>
+            <p className="type-body-muted">No custom presets saved.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {filterPresets.map((preset) => (
                 <div
                   key={preset.id}
-                  className="flex items-center gap-2 rounded-full bg-surface px-3 py-1.5 text-xs text-text"
+                  className="flex items-center gap-2 rounded-full bg-surface px-3 py-1.5 type-caption"
                 >
                   <span>{preset.name}</span>
                   <button
@@ -274,7 +274,7 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
             </div>
           )}
 
-          <p className="mt-3 text-xs leading-relaxed text-text-muted">
+          <p className="mt-3 type-caption">
             Adjust filters in the live preview above, then save the current look as a preset or as the default filter.
           </p>
         </div>
@@ -347,9 +347,9 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
 }) => (
   <GlassCard className="p-5">
     <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Identity" />
-    <GlassPanel className="mb-3 text-xs text-text-muted">
+    <GlassPanel className="mb-3 type-caption">
       <span>Tank Reference Code: </span>
-      <code className="ml-1 align-baseline text-caption">
+      <code className="ml-1 align-baseline type-caption">
         {activeTank?.id}
       </code>
     </GlassPanel>
@@ -463,7 +463,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
           onToggle={() => setAiExpanded((current) => !current)}
         >
           <div className="flex items-center justify-between">
-            <span className="pr-4 text-sm font-medium text-text-muted">Auto-start AI when stream connects</span>
+            <span className="pr-4 type-body-muted">Auto-start AI when stream connects</span>
             <button
               onClick={() => onAutoConnectChange(!preferences.autoConnect)}
               className={`
@@ -550,7 +550,7 @@ export const DisconnectTankCard: React.FC<DisconnectTankCardProps> = ({
   showConfirmUnlink ? (
     <GlassCard className="border-critical/30 p-5">
       <SettingsCardTitle icon={X} eyebrow="Disconnect" title="Remove Active Tank" />
-      <p className="m-0 text-xs leading-relaxed text-text-muted">
+      <p className="m-0 type-caption">
         This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
       </p>
       <div className="mt-4 flex gap-2.5">
@@ -611,7 +611,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
           detail={(
             <>
               Ref Code:{' '}
-              <code className="align-baseline text-caption">
+              <code className="align-baseline type-caption">
                 {activeTank?.id}
               </code>
             </>
@@ -636,7 +636,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
 
       {showConfirmUnlink ? (
         <div className="rounded-2xl border border-critical/20 bg-critical/8 p-3">
-          <p className="m-0 text-xs leading-relaxed text-text-muted">
+          <p className="m-0 type-caption">
             This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
           </p>
           <div className="mt-3 flex gap-2.5">

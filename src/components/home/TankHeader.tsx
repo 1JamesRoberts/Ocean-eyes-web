@@ -44,7 +44,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
       max-xs:flex-col max-xs:items-start max-xs:gap-3
     ">
       <div>
-        <span className="block text-xs font-semibold text-text-muted uppercase">My Aquarium</span>
+        <span className="block type-caption">My Aquarium</span>
         {linkedTanks.length > 1 ? (
           <div ref={dropdownRef} className="relative mt-0.5 inline-block">
             <button
@@ -83,7 +83,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
                     }}
                     className={`
                       w-full cursor-pointer rounded-[10px] border-none px-3
-                      py-2.5 text-left font-main text-sm font-semibold
+                      py-2.5 text-left type-strong
                       transition-colors
                       hover:bg-bg
                       ${t.id === tankId ? `bg-info/8 text-brand` : `
@@ -105,7 +105,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
                   className="
                     flex w-full cursor-pointer items-center gap-1.5
                     rounded-[10px] border-none bg-transparent px-3 py-2.5
-                    text-left font-main text-sm font-bold text-brand
+                    text-left type-strong text-brand
                   "
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -124,8 +124,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
             <button
               className="
                 inline-flex cursor-pointer items-center gap-1 rounded-lg border
-                border-border bg-surface px-2 py-1 text-caption font-semibold
-                text-text transition-smooth
+                border-border bg-surface px-2 py-1 type-caption transition-smooth
                 hover:border-text-muted hover:bg-surface-hover
               "
               onClick={onAddTank}

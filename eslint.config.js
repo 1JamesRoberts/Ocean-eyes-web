@@ -59,6 +59,7 @@ export default defineConfig([
           '^phone-frame-root$',
           '^phone-frame$',
           '^pill-nav$',
+          '^pill-nav-indicator$',
           '^pill-nav-item$',
           '^pill-nav-active$',
           '^pill-nav-icon$',

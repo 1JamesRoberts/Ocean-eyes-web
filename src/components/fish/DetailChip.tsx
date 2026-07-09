@@ -16,14 +16,12 @@ export const DetailChip: React.FC<DetailChipProps> = ({
 }) => (
   <GlassBadge
     className={`
-      gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-text
+      gap-1.5 rounded-xl px-3 py-1.5 type-caption
       ${colorClass || ''}
     `}
   >
     {icon}
-    <span className="
-      mr-0.5 text-2xs font-medium tracking-wider text-text-muted uppercase
-    ">
+    <span className="mr-0.5 type-caption">
       {label}
     </span>
     {value}

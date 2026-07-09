@@ -10,8 +10,7 @@ const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
   const bgColor = type === 'shrimp' ? '#FF9800' : type === 'snail' ? '#8BC34A' : type === 'crab' ? '#E91E63' : 'var(--color-border)';
   return (
     <span className="
-      rounded-sm px-1.5 py-0.5 text-2xs/tight font-semibold tracking-[0.5px]
-      text-white uppercase
+      rounded-sm px-1.5 py-0.5 type-caption-inverse
     " style={{ backgroundColor: bgColor }}>
       {emoji} {type}
     </span>
@@ -128,7 +127,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
           placeholder={selectedSpecies ? selectedSpecies.displayName : placeholder}
           className="
             w-full rounded-lg border border-border bg-surface px-3 py-2.5 pl-9
-            font-main text-sm outline-none
+            type-body outline-none
           "
         />
       </div>
@@ -150,7 +149,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 onClick={() => handleSelect(species)}
                 className="
                   flex w-full cursor-pointer items-center gap-2.5 border-none
-                  px-3 py-2 text-left font-main text-sm text-text
+                  px-3 py-2 text-left type-body
                 "
                 style={{ background: selectedSpeciesId === species.id ? 'var(--color-primary-light)' : 'transparent' }}
                 onMouseEnter={e => {
@@ -181,8 +180,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 onClick={handleCustomSelect}
                 className="
                   flex w-full cursor-pointer items-center gap-2.5 border-none
-                  bg-transparent px-3 py-2 text-left font-main text-sm
-                  text-brand italic
+                  bg-transparent px-3 py-2 text-left type-body text-brand italic
                 "
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-hover)'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -190,7 +188,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
                 <div
                   className="
                     flex size-8 shrink-0 items-center justify-center rounded-md
-                    bg-border text-caption font-bold text-text-muted
+                    bg-border type-caption
                   "
                 >
                   ??
@@ -200,7 +198,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             )}
 
             {filteredSpecies.length === 0 && !showCustomOption && (
-              <div className="py-3 text-center text-sm text-text-muted">
+              <div className="py-3 text-center type-body-muted">
                 No species found
               </div>
             )}

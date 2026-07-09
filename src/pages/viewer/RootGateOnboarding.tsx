@@ -39,7 +39,7 @@ export const RootGateOnboarding: React.FC = () => {
           <QrCode size={36} />
         </div>
         <h2 className="mb-2 text-section font-extrabold text-text">Link Your Aquarium</h2>
-        <p className="text-sm leading-[145%] text-text-muted">
+        <p className="type-body-muted">
           Scan the QR code displayed on your OceanEyes smart monitoring hardware unit or enter the code manually.
         </p>
       </div>
@@ -51,17 +51,17 @@ export const RootGateOnboarding: React.FC = () => {
             <GlassInput id="tank-id" placeholder="Enter Tank ID" value={qrInput} onChange={(e) => setQrInput(e.target.value)} />
           </div>
 
-          {error && <p className="text-center text-sm font-medium text-critical">{error}</p>}
+          {error && <p className="text-center type-body text-critical">{error}</p>}
 
           <GlassButton variant="primary" size="lg" fullWidth type="submit">Link Tank</GlassButton>
 
-          <p className="mt-6 text-center text-sm text-text-muted">
+          <p className="mt-6 text-center type-body-muted">
             No hardware?{' '}
             <button
               type="button"
               className="
                 cursor-pointer border-none bg-transparent font-main
-                font-semibold text-brand
+                type-strong text-brand
               "
               onClick={() => setShowCreate(true)}
             >

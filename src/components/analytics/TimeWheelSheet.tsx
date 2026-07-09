@@ -74,7 +74,7 @@ const WheelColumn: React.FC<WheelColumnProps> = ({ items, selected, onSelect }) 
               }}
               className={`
                 flex h-[44px] w-full cursor-pointer items-center justify-center
-                border-none bg-transparent text-title font-normal
+                border-none bg-transparent type-body
                 transition-colors
                 ${isSelected ? 'text-text' : 'text-text-muted/45'}
               `}

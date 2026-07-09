@@ -31,8 +31,7 @@ export const AlertsScreen: React.FC = () => {
       <div className="flex items-center justify-between">
         <button
           className="
-            cursor-pointer border-none bg-transparent font-main text-sm
-            font-semibold text-brand
+            cursor-pointer border-none bg-transparent type-strong text-brand
           "
           onClick={onBack}
         >
@@ -54,16 +53,16 @@ export const AlertsScreen: React.FC = () => {
             onClick={() => onSelectAlert(alert.id)}
           >
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-brand">{alert.title}</h4>
+              <h4 className="type-strong text-brand">{alert.title}</h4>
               <ChevronRight size={16} className="text-text-muted" />
             </div>
-            <p className="mt-1 text-xs/relaxed text-text-muted">
+            <p className="mt-1 type-caption">
               {alert.message}
             </p>
             <div className="mt-2 flex items-center justify-between gap-3">
-              <span className="text-caption text-text-muted">{alert.timeAgo}</span>
+              <span className="type-caption">{alert.timeAgo}</span>
               {alert.resolved && (
-                <span className="rounded-full bg-good/12 px-2.5 py-1 text-2xs font-bold text-good">
+                <span className="rounded-full bg-good/12 px-2.5 py-1 type-caption text-good">
                   Resolved
                 </span>
               )}

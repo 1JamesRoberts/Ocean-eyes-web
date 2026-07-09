@@ -27,8 +27,7 @@ export const GlassBadge: React.FC<GlassBadgeProps> = ({
 }) => (
   <span
     className={`
-      glass-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs
-      font-bold
+      glass-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 type-caption
       ${colorStyles[color]}
       ${className}
     `}

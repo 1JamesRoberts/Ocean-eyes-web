@@ -14,7 +14,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
 }) => (
   <div className="flex flex-col gap-1.5">
     {label && (
-      <label htmlFor={id} className="text-xs font-semibold text-text-muted">
+      <label htmlFor={id} className="type-caption">
         {label}
       </label>
     )}

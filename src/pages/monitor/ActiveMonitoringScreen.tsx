@@ -72,9 +72,9 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
   return (
     <div className="flex h-full flex-col bg-[#090D11] p-4 text-white">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-caption font-semibold text-[#94A3B8]">Active Stream Feed</span>
+        <span className="type-caption-inverse">Active Stream Feed</span>
         {activeTank && (
-          <span className="text-caption font-semibold text-brand">
+          <span className="type-caption text-brand">
             {activeTank.name}
           </span>
         )}
@@ -179,13 +179,13 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
       {/* Grid of monitored stats */}
       <div className="mb-4 grid grid-cols-2 gap-2.5">
         <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-2.5">
-          <span className="block text-2xs text-[#64748B]">VISIBILITY COUNT</span>
-          <strong className="text-base text-[#38BDF8]">{displayFish} fish detected</strong>
+          <span className="block type-caption-inverse">VISIBILITY COUNT</span>
+          <strong className="type-strong text-[#38BDF8]">{displayFish} fish detected</strong>
         </div>
 
         <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-2.5">
-          <span className="block text-2xs text-[#64748B]">WATER CLARITY</span>
-          <strong className="text-base text-[#38BDF8]">{displayClarity.toFixed(2)} FNU</strong>
+          <span className="block type-caption-inverse">WATER CLARITY</span>
+          <strong className="type-strong text-[#38BDF8]">{displayClarity.toFixed(2)} FNU</strong>
         </div>
       </div>
 
@@ -195,15 +195,14 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         p-3
       ">
         <span className="
-          mb-2 block text-caption font-semibold text-[#64748B] uppercase
+          mb-2 block type-caption-inverse
         ">
           Aquarium Simulator Controls
         </span>
         <div className="grid grid-cols-2 gap-2">
           <button
             className="
-              cursor-pointer rounded-lg border-none px-2.5 py-2 text-caption
-              font-semibold text-white transition-colors
+              cursor-pointer rounded-lg border-none px-2.5 py-2 type-caption-inverse transition-colors
             "
             style={{ backgroundColor: hasClarityIssue ? 'var(--color-critical)' : '#1E293B' }}
             onClick={() => {
@@ -224,7 +223,7 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         className="
           inline-flex w-full cursor-pointer items-center justify-center gap-2
           rounded-xl border border-monitor-border bg-transparent px-5 py-2.5
-          font-main text-[13px] font-semibold text-[#94A3B8] transition-smooth
+          type-caption-inverse transition-smooth
           hover:bg-[rgba(255,255,255,0.05)]
         "
         onClick={() => onNavigate('welcome')}

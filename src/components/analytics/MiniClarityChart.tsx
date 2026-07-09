@@ -45,8 +45,7 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
   if (points.length === 0) {
     return (
       <div className="
-        flex h-[140px] min-h-[120px] items-center justify-center text-sm
-        text-text-muted
+        flex h-[140px] min-h-[120px] items-center justify-center type-body-muted
       ">
         No water clarity readings available
       </div>

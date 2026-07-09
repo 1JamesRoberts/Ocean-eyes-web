@@ -35,7 +35,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
           border-[rgba(255,255,255,0.1)] p-4
         "
       >
-        <h3 className="m-0 flex items-center gap-2 text-h3 font-bold text-white">
+        <h3 className="m-0 flex items-center gap-2 type-title-inverse">
           <Fish size={18} className="text-brand" />
           <span>Fish Inventory</span>
         </h3>
@@ -52,20 +52,20 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
 
       <div className="grid grid-cols-2 gap-2 border-b border-[rgba(255,255,255,0.1)] p-4">
         <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
-          <span className="block text-3xs font-semibold text-[rgba(255,255,255,0.5)]">TOTAL FISH</span>
-          <strong className="text-h3 text-white">{totalFish}</strong>
+          <span className="block type-caption-inverse">TOTAL FISH</span>
+          <strong className="type-strong-inverse">{totalFish}</strong>
         </div>
         <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
-          <span className="block text-3xs font-semibold text-[rgba(255,255,255,0.5)]">SPECIES</span>
-          <strong className="text-h3 text-white">{uniqueSpecies}</strong>
+          <span className="block type-caption-inverse">SPECIES</span>
+          <strong className="type-strong-inverse">{uniqueSpecies}</strong>
         </div>
         <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
-          <span className="block text-3xs font-semibold text-[rgba(255,255,255,0.5)]">DETECTED</span>
-          <strong className="text-h3 text-good">{totalDetected}</strong>
+          <span className="block type-caption-inverse">DETECTED</span>
+          <strong className="type-strong text-good">{totalDetected}</strong>
         </div>
         <div className="rounded-lg bg-[rgba(255,255,255,0.04)] px-3 py-2">
-          <span className="block text-3xs font-semibold text-[rgba(255,255,255,0.5)]">DETECTION</span>
-          <strong className="text-h3 text-warning">{detectionRate}%</strong>
+          <span className="block type-caption-inverse">DETECTION</span>
+          <strong className="type-strong text-warning">{detectionRate}%</strong>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
             >
               <div className="flex items-center gap-2.5">
                 <SpeciesAvatar speciesId={fish.speciesId} radius={8} />
-                <span className="text-sm font-semibold">{display.name}</span>
+                <span className="type-strong-inverse">{display.name}</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -121,7 +121,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
                     transform="rotate(-90 14 14)"
                   />
                 </svg>
-                <span className="text-caption font-bold" style={{ color: barColor }}>
+                <span className="type-caption" style={{ color: barColor }}>
                   {visibilityPercent}%
                 </span>
               </div>
