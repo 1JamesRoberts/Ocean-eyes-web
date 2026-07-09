@@ -16,7 +16,7 @@ export const CardSectionHeader: React.FC<CardSectionHeaderProps> = ({
   detail,
   className = '',
 }) => (
-  <div className={`mb-4 flex items-start justify-between gap-3 ${className}`}>
+  <div className={`mb-3 flex items-start justify-between gap-3 ${className}`}>
     <div className="flex min-w-0 items-start gap-2">
       <Icon size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-brand" />
       <div className="min-w-0">
