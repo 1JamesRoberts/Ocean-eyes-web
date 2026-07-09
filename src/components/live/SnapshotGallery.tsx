@@ -24,6 +24,16 @@ interface SnapshotGalleryProps {
 
 import { formatDuration } from '../../utils/formatters';
 
+const iconButtonClass = `
+  flex size-7 cursor-pointer items-center justify-center
+  rounded-full border border-[rgba(255,255,255,0.15)] bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
+  transition-smooth
+  hover:not-disabled:-translate-y-0.5
+  hover:not-disabled:bg-primary-gradient
+  active:not-disabled:translate-y-0
+  disabled:cursor-not-allowed disabled:opacity-40
+`;
+
 export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
   snapshots,
   recordings,
@@ -78,34 +88,14 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                   </div>
                   <div className="flex gap-1.5">
                     <button
-                      className="
-                        flex size-7 cursor-pointer items-center justify-center
-                        rounded-full border border-[rgba(255,255,255,0.15)]
-                        bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
-                        transition-smooth
-                        hover:not-disabled:-translate-y-0.5
-                        hover:not-disabled:border-brand/50
-                        hover:not-disabled:bg-primary-gradient
-                        active:not-disabled:translate-y-0
-                        disabled:cursor-not-allowed disabled:opacity-40
-                      "
+                      className={iconButtonClass}
                       onClick={() => onDownloadSnapshot(snap)}
                       title="Download"
                     >
                       <Download size={12} />
                     </button>
                     <button
-                      className="
-                        flex size-7 cursor-pointer items-center justify-center
-                        rounded-full border border-[rgba(255,255,255,0.15)]
-                        bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
-                        transition-smooth
-                        hover:not-disabled:-translate-y-0.5
-                        hover:not-disabled:border-brand/50
-                        hover:not-disabled:bg-primary-gradient
-                        active:not-disabled:translate-y-0
-                        disabled:cursor-not-allowed disabled:opacity-40
-                      "
+                      className={iconButtonClass}
                       onClick={() => onDeleteSnapshot(snap.id)}
                       title="Delete"
                     >
@@ -152,34 +142,14 @@ export const SnapshotGallery: React.FC<SnapshotGalleryProps> = ({
                 </div>
                 <div className="flex gap-1.5">
                   <button
-                    className="
-                      flex size-7 cursor-pointer items-center justify-center
-                      rounded-full border border-[rgba(255,255,255,0.15)]
-                      bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
-                      transition-smooth
-                      hover:not-disabled:-translate-y-0.5
-                      hover:not-disabled:border-brand/50
-                      hover:not-disabled:bg-primary-gradient
-                      active:not-disabled:translate-y-0
-                      disabled:cursor-not-allowed disabled:opacity-40
-                    "
+                    className={iconButtonClass}
                     onClick={() => onDownloadRecording(rec)}
                     title="Download"
                   >
                     <Download size={12} />
                   </button>
                   <button
-                    className="
-                      flex size-7 cursor-pointer items-center justify-center
-                      rounded-full border border-[rgba(255,255,255,0.15)]
-                      bg-[rgba(15,23,42,0.75)] text-white backdrop-blur-sm
-                      transition-smooth
-                      hover:not-disabled:-translate-y-0.5
-                      hover:not-disabled:border-brand/50
-                      hover:not-disabled:bg-primary-gradient
-                      active:not-disabled:translate-y-0
-                      disabled:cursor-not-allowed disabled:opacity-40
-                    "
+                    className={iconButtonClass}
                     onClick={() => onDeleteRecording(rec.id)}
                     title="Delete"
                   >
