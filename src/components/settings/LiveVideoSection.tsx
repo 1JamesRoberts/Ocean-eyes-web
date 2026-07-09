@@ -1,12 +1,10 @@
 import React, { useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Video } from 'lucide-react';
 import { useTank } from '../../hooks/useTank';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
 import { useFish } from '../../hooks/useFish';
 import { useFullscreen } from '../../hooks/live/useFullscreen';
 import { useViewportSize } from '../../hooks/live/useViewportSize';
-import { useCameraFilters } from '../../hooks/live/useCameraFilters';
 import { useMediaCapture } from '../../hooks/live/useMediaCapture';
 import { useAIAnalytics } from '../../hooks/live/useAIAnalytics';
 
@@ -16,15 +14,16 @@ import { CameraControls } from '../live/CameraControls';
 import { CameraFeed } from '../live/CameraFeed';
 import type { CameraFeedHandle } from '../live/CameraFeed';
 import { FullscreenInventory } from '../live/FullscreenInventory';
-import { StreamAdjustments } from '../live/StreamAdjustments';
 import { AIAnalysisPanel } from '../live/AIAnalysisPanel';
 import { VideoDecorations } from '../live/VideoDecorations';
-import { CardSectionHeader, GlassCard } from '../shared';
 import { useHeroActionLayer } from '../shared/HeroActionLayerContext';
+import type { CameraFilters } from '../../types/aquarium';
 
 interface LiveVideoSectionProps {
   tankId?: string | null;
-  showStreamAdjustments?: boolean;
+  filters: CameraFilters;
+  temperatureOverlay: { backgroundColor: string; opacity: number } | null;
+  tintOverlay: { backgroundColor: string; opacity: number } | null;
 }
 
 const RecordingBadge: React.FC<{ recordingSeconds: number }> = ({ recordingSeconds }) => (
@@ -86,7 +85,9 @@ const TurbidityErrorBadge: React.FC<{ error: string }> = ({ error }) => (
 
 export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   tankId: propTankId,
-  showStreamAdjustments = true,
+  filters,
+  temperatureOverlay,
+  tintOverlay,
 }) => {
   const { activeTank, tankId: activeTankId } = useTank();
   const tankId = propTankId ?? activeTankId;
@@ -106,8 +107,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen();
 
   const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSize();
-
-  const { filters, temperatureOverlay, tintOverlay, handleFilterChange } = useCameraFilters({ tankId });
 
   const {
     flashActive,
@@ -295,21 +294,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
           />
 
         </>
-      )}
-
-      {isStreaming && showStreamAdjustments && (
-        <GlassCard className="p-5">
-          <CardSectionHeader
-            icon={Video}
-            title="Stream Media"
-            detail="Image tuning"
-          />
-
-          <StreamAdjustments
-            filters={filters}
-            onFilterChange={handleFilterChange}
-          />
-        </GlassCard>
       )}
     </div>
   );

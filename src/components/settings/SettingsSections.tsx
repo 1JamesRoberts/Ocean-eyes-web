@@ -26,6 +26,7 @@ import {
   GlassInput,
   GlassPanel,
 } from '../shared';
+import { StreamAdjustments } from '../live/StreamAdjustments';
 import type {
   AIPreferences,
   CameraFilters,
@@ -572,6 +573,8 @@ export const DisconnectTankCard: React.FC<DisconnectTankCardProps> = ({
 
 interface AquariumPanelCardProps extends TankIdentityCardProps, DisconnectTankCardProps {
   onNavigateToMonitor: () => void;
+  filters?: CameraFilters;
+  onFilterChange?: (filters: Partial<CameraFilters>) => void;
 }
 
 export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
@@ -586,6 +589,8 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
   onRequestUnlink,
   onCancelUnlink,
   onConfirmUnlink,
+  filters,
+  onFilterChange,
 }) => (
   <GlassCard className="p-5">
     <SettingsCardTitle icon={ShieldAlert} eyebrow="Aquarium" title="Tank Management" />
@@ -633,6 +638,10 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
         highlight
         action={<ChevronRight size={18} className="text-brand" />}
       />
+
+      {filters && onFilterChange && (
+        <StreamAdjustments filters={filters} onFilterChange={onFilterChange} />
+      )}
 
       {showConfirmUnlink ? (
         <div className="rounded-2xl border border-critical/20 bg-critical/8 p-3">

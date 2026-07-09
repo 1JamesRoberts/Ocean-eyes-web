@@ -1,5 +1,7 @@
 import React from 'react';
 import { useSettings } from '../../hooks/pages/useSettings';
+import { useTank } from '../../hooks/useTank';
+import { useCameraFilters } from '../../hooks/live/useCameraFilters';
 import { LiveVideoSection } from '../../components/settings/LiveVideoSection';
 import {
   AquariumPanelCard,
@@ -8,11 +10,20 @@ import {
 
 export const LiveTuningScreen: React.FC = () => {
   const settings = useSettings();
+  const { tankId: activeTankId } = useTank();
+  const tankId = activeTankId ?? null;
+  const { filters, temperatureOverlay, tintOverlay, handleFilterChange } =
+    useCameraFilters({ tankId });
 
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <LiveVideoSection />
+        <LiveVideoSection
+          tankId={tankId}
+          filters={filters}
+          temperatureOverlay={temperatureOverlay}
+          tintOverlay={tintOverlay}
+        />
       </section>
 
       <section className="flex flex-col gap-6">
@@ -28,6 +39,8 @@ export const LiveTuningScreen: React.FC = () => {
           onRequestUnlink={settings.onRequestUnlink}
           onCancelUnlink={settings.onCancelUnlink}
           onConfirmUnlink={settings.onConfirmUnlink}
+          filters={filters}
+          onFilterChange={handleFilterChange}
         />
 
         <SafetyThresholdsCard
