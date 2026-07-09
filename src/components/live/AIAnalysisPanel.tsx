@@ -16,11 +16,12 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
   lastTurbidityResult,
   lastManualDiagnosis
 }) => {
-  if (!lastPrediction) return null;
-
   const diagnosisSource = lastManualDiagnosis ?? lastPrediction;
-  const diagnosisDetection = diagnosisSource.detections.find(d => d.diagnosis);
+  const diagnosisDetection = diagnosisSource?.detections.find(d => d.diagnosis);
   const diagnosis = diagnosisDetection?.diagnosis;
+  const speciesEntries = lastPrediction
+    ? Object.entries(lastPrediction.summary.species_counts)
+    : [];
   return (
     <GlassCard className="p-5">
       <CardSectionHeader
@@ -28,7 +29,9 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
         title="AI Analysis Results"
         action={(
           <span className="type-caption">
-          {new Date(lastPrediction.timestamp).toLocaleTimeString()}
+            {lastPrediction
+              ? new Date(lastPrediction.timestamp).toLocaleTimeString()
+              : '—'}
           </span>
         )}
       />
@@ -41,30 +44,28 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             Fish Detected
           </span>
           <strong className="mt-1 block type-title text-brand">
-            {lastPrediction.summary.total_detections}
+            {lastPrediction ? lastPrediction.summary.total_detections : '—'}
           </strong>
         </GlassPanel>
 
-        {lastTurbidityResult && (
-          <GlassPanel className="hover:bg-white/60">
-            <span className="block type-caption">
-              FNU
-            </span>
-            <strong className="mt-1 block type-title text-brand">
-              {lastTurbidityResult.turbidity.fnu.toFixed(2)}
-            </strong>
-          </GlassPanel>
-        )}
+        <GlassPanel className="hover:bg-white/60">
+          <span className="block type-caption">
+            FNU
+          </span>
+          <strong className="mt-1 block type-title text-brand">
+            {lastTurbidityResult ? lastTurbidityResult.turbidity.fnu.toFixed(2) : '—'}
+          </strong>
+        </GlassPanel>
 
       </div>
 
-      {Object.entries(lastPrediction.summary.species_counts).length > 0 && (
-        <div>
-          <h4 className="mb-2.5 type-title text-brand">
-            Species Breakdown
-          </h4>
+      <div>
+        <h4 className="mb-2.5 type-title text-brand">
+          Species Breakdown
+        </h4>
+        {speciesEntries.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {Object.entries(lastPrediction.summary.species_counts).map(([speciesId, count]) => {
+            {speciesEntries.map(([speciesId, count]) => {
               const speciesInfo = getSpeciesById(speciesId);
               const color = speciesInfo?.color || '#3B82F6';
               const displayName = speciesInfo?.displayName || speciesId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -79,28 +80,32 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
               );
             })}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="m-0 type-caption text-text-muted">
+            Awaiting analysis…
+          </p>
+        )}
+      </div>
 
       {/* Disease Diagnosis Section */}
-      {diagnosis && (
-        <GlassPanel
-          className={`
-            mt-4
-            ${diagnosis.error ? 'border-l-4 border-l-critical' : diagnosis.healthy ? `
-              border-l-4 border-l-good
-            ` : `border-l-4 border-l-warning`}
-          `}
-        >
-          <h4 className={`
-            m-0 mb-2 flex items-center gap-1.5 type-strong
-            ${diagnosis.error ? `text-critical` : diagnosis.healthy ? `
-              text-good
-            ` : `text-warning`}
-          `}>
-            🩺 Fish Health Diagnosis
-          </h4>
-          {diagnosis.error ? (
+      <GlassPanel
+        className={`
+          mt-4
+          ${diagnosis ? (diagnosis.error ? 'border-l-4 border-l-critical' : diagnosis.healthy ? `
+            border-l-4 border-l-good
+          ` : `border-l-4 border-l-warning`) : 'border-l-4 border-l-transparent'}
+        `}
+      >
+        <h4 className={`
+          m-0 mb-2 flex items-center gap-1.5 type-strong
+          ${diagnosis ? (diagnosis.error ? `text-critical` : diagnosis.healthy ? `
+            text-good
+          ` : `text-warning`) : 'text-text-muted'}
+        `}>
+          🩺 Fish Health Diagnosis
+        </h4>
+        {diagnosis ? (
+          diagnosis.error ? (
             <p className="m-0 type-body">
               <strong>Error:</strong> {diagnosis.error}
             </p>
@@ -152,9 +157,13 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                 </p>
               )}
             </>
-          )}
-        </GlassPanel>
-      )}
+          )
+        ) : (
+          <p className="m-0 type-caption text-text-muted">
+            Awaiting diagnosis…
+          </p>
+        )}
+      </GlassPanel>
     </GlassCard>
   );
 };
