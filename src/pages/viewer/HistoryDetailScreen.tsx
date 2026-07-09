@@ -2,7 +2,7 @@ import React from 'react';
 import { Database, Waves } from 'lucide-react';
 import { useHistoryDetail } from '../../hooks/pages/useHistoryDetail';
 import { MiniClarityChart } from '../../components/analytics/MiniClarityChart';
-import { CardSectionHeader, GlassBadge, GlassCard, GlassPanel } from '../../components/shared';
+import { CardSectionHeader, GlassCard, GlassPanel } from '../../components/shared';
 
 export const HistoryDetailScreen: React.FC = () => {
   const { readings, recentReadings, onBack } = useHistoryDetail();
@@ -33,7 +33,6 @@ export const HistoryDetailScreen: React.FC = () => {
         <CardSectionHeader
           icon={Waves}
           title="Water Clarity Trend"
-          action={<GlassBadge color="live">Live Sync</GlassBadge>}
         />
 
         <div className="w-full py-2.5">
@@ -50,7 +49,7 @@ export const HistoryDetailScreen: React.FC = () => {
       </GlassCard>
 
       {/* Diagnostic Logs */}
-      <CardSectionHeader icon={Database} title="Database Reading Log Entries" className="mb-0" />
+      <CardSectionHeader icon={Database} title="Recent Readings" className="mb-0" />
       <div className="flex flex-col gap-2.5">
         {recentReadings.map(reading => {
           const date = new Date(reading.timestamp);
