@@ -1,20 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Home, Fish, BarChart3, User } from 'lucide-react';
-import { useNavigation, type ViewerTab } from '../../context/NavigationContext';
+import { useNavigation } from '../../context/NavigationContext';
 import { useAlerts } from '../../hooks/useAlerts';
-
-interface PillNavItem {
-  tab: ViewerTab;
-  icon: React.ElementType;
-  label: string;
-}
-
-const PILL_ITEMS: PillNavItem[] = [
-  { tab: 'home', icon: Home, label: 'Dashboard' },
-  { tab: 'my_fish', icon: Fish, label: 'My Fish' },
-  { tab: 'analytics', icon: BarChart3, label: 'Analytics' },
-  { tab: 'live', icon: User, label: 'Account' },
-];
+import { getPrimaryTabForViewerTab, PRIMARY_TAB_ITEMS } from './primaryTabs';
 
 export const PillNavigation: React.FC = () => {
   const { activeTab, setActiveTab } = useNavigation();
@@ -28,9 +15,8 @@ export const PillNavigation: React.FC = () => {
   useLayoutEffect(() => {
     const measure = () => {
       const nav = navRef.current;
-      const activeEntry = PILL_ITEMS.find(
-        (item) => activeTab === item.tab || (item.tab === 'live' && activeTab === 'settings')
-      );
+      const primaryTab = getPrimaryTabForViewerTab(activeTab);
+      const activeEntry = PRIMARY_TAB_ITEMS.find((item) => primaryTab === item.tab);
       const btn = activeEntry ? buttonRefs.current[activeEntry.tab] : null;
       if (!nav || !btn) return;
       const navRect = nav.getBoundingClientRect();
@@ -58,9 +44,9 @@ export const PillNavigation: React.FC = () => {
         }
         aria-hidden="true"
       />
-      {PILL_ITEMS.map((item) => {
+      {PRIMARY_TAB_ITEMS.map((item) => {
         const Icon = item.icon;
-        const isActive = activeTab === item.tab || (item.tab === 'live' && activeTab === 'settings');
+        const isActive = getPrimaryTabForViewerTab(activeTab) === item.tab;
         return (
           <button
             key={item.tab}
