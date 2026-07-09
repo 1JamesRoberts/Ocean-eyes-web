@@ -44,7 +44,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
             />
           </div>
         )}
-        <div className="relative z-10 -mx-4 bg-gradient-mint px-4 pt-4">
+        <div className="relative z-10 -mx-4 flex flex-1 flex-col bg-gradient-mint px-4 pt-4">
           {children}
         </div>
       </div>
