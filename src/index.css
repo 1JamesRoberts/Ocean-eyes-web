@@ -820,7 +820,14 @@
 
 /* ─── Phone Background Gradient ─── */
 .bg-gradient-mint {
-  background: linear-gradient(180.05deg, #ffffff 0%, #c1e0dd 99.99%);
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    transparent calc(var(--mobile-hero-height) * 0.5),
+    #ffffff calc(var(--mobile-hero-height) * 0.5),
+    #c1e0dd 100%
+  );
+  background-attachment: fixed;
 }
 
 /* ─── Mobile Hero Shell ─── */
