@@ -39,7 +39,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
   }
 
   return (
-    <section className="glass-card p-6">
+    <section className="glass-card p-5">
       <CardSectionHeader icon={Droplets} title="Water Clarity" />
 
       <button
