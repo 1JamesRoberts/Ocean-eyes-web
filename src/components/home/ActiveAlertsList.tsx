@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight, ShieldAlert } from 'lucide-react';
+import { CardSectionHeader } from '../shared';
 import type { AlertItem } from '../../types/aquarium';
 
 interface ActiveAlertsListProps {
@@ -32,12 +33,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
 
   return (
     <section className="glass-card p-6">
-      <div className="mb-4 flex items-center gap-2">
-        <ShieldAlert size={16} strokeWidth={2.5} className="text-brand" />
-        <h3 className="type-title">
-          Active Safety Alerts
-        </h3>
-      </div>
+      <CardSectionHeader icon={ShieldAlert} title="Active Safety Alerts" />
 
       <div className="space-y-3">
         {activeAlerts.map(alert => (

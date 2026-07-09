@@ -141,7 +141,7 @@ const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
     <form onSubmit={onAdd} className="
       flex flex-col gap-3.5 glass-card p-6 transition-smooth
     ">
-      <h4 className="type-strong">Add New Species Entry</h4>
+      <CardSectionHeader icon={Fish} title="Add New Species Entry" className="mb-0" />
       <div>
         <label className="
           mb-1 block type-caption

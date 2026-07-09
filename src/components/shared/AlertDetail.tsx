@@ -40,7 +40,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     >
       <div className="flex items-center gap-2">
         <AlertTriangle size={20} className="text-warning" />
-        <h2 className="type-title">{alert.title}</h2>
+        <h2 className="type-title text-brand">{alert.title}</h2>
       </div>
       <p className="mt-1.5 type-caption">{alert.timeAgo}</p>
       <p className="mt-4 type-body">
@@ -71,7 +71,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
 
     {/* Correction tip card */}
     <GlassCard className="mb-6 p-5">
-      <h4 className="mb-2 type-strong">Action Plan & Tips</h4>
+      <h4 className="mb-2 type-strong text-brand">Action Plan & Tips</h4>
       <p className="type-body-muted">
         {alert.tip}
       </p>

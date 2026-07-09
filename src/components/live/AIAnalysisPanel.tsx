@@ -60,7 +60,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
       {Object.entries(lastPrediction.summary.species_counts).length > 0 && (
         <div>
-          <h4 className="mb-2.5 type-title">
+          <h4 className="mb-2.5 type-title text-brand">
             Species Breakdown
           </h4>
           <div className="flex flex-wrap gap-2">

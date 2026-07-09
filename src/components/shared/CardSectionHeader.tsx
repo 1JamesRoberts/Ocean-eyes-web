@@ -20,7 +20,7 @@ export const CardSectionHeader: React.FC<CardSectionHeaderProps> = ({
     <div className="flex min-w-0 items-start gap-2">
       <Icon size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-brand" />
       <div className="min-w-0">
-        <h3 className="type-title">
+        <h3 className="type-title text-brand">
           {title}
         </h3>
         {detail && (

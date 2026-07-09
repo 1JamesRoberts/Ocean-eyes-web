@@ -20,7 +20,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
       ${className}
     `}
   >
-    <div className="flex items-center gap-2 type-title">
+    <div className="flex items-center gap-2 type-title text-brand">
       <span className="material-symbols-outlined">{icon}</span>
       <span>{title}</span>
     </div>

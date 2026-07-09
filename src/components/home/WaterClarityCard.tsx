@@ -1,5 +1,6 @@
 import React from 'react';
 import { Droplets } from 'lucide-react';
+import { CardSectionHeader } from '../shared';
 import type { ReadingItem } from '../../types/aquarium';
 
 interface WaterClarityCardProps {
@@ -39,12 +40,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
 
   return (
     <section className="glass-card p-6">
-      <div className="mb-4 flex items-center gap-2">
-        <Droplets size={16} strokeWidth={2.5} className="text-brand" />
-        <h3 className="type-title">
-          Water Clarity
-        </h3>
-      </div>
+      <CardSectionHeader icon={Droplets} title="Water Clarity" />
 
       <button
         type="button"

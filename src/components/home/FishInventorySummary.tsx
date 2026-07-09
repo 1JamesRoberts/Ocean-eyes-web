@@ -1,6 +1,7 @@
 import React from 'react';
 import { FishSymbol, ChevronRight } from 'lucide-react';
 import { SpeciesAvatar } from '../fish/SpeciesAvatar';
+import { CardSectionHeader } from '../shared';
 import type { FishEntry } from '../../types/aquarium';
 
 interface FishInventorySummaryProps {
@@ -14,24 +15,22 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
 }) => {
   return (
     <section className="glass-card p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FishSymbol size={18} strokeWidth={2.5} className="text-brand" />
-          <h3 className="type-title text-brand">
-            Fish Inventory
-          </h3>
-        </div>
-        <button
-          onClick={onManageFish}
-          aria-label="Manage fish list"
-          className="
-            cursor-pointer border-none bg-transparent p-0 transition-opacity
-            hover:opacity-80
-          "
-        >
-          <ChevronRight size={18} className="text-brand" />
-        </button>
-      </div>
+      <CardSectionHeader
+        icon={FishSymbol}
+        title="Fish Inventory"
+        action={(
+          <button
+            onClick={onManageFish}
+            aria-label="Manage fish list"
+            className="
+              cursor-pointer border-none bg-transparent p-0 transition-opacity
+              hover:opacity-80
+            "
+          >
+            <ChevronRight size={18} className="text-brand" />
+          </button>
+        )}
+      />
 
       <div className="space-y-2">
         {fishList.length === 0 ? (
