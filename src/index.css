@@ -28,7 +28,8 @@
   --glass-radius-pill: 9999px;
 
   /* Shadow tokens (only --shadow-glass not in @theme) */
-  --shadow-glass: inset 1px 1px 0px rgba(255, 255, 255, 0.45);
+  --shadow-glass: inset 2px 2px 0px rgba(255, 255, 255, 0.5),
+    inset -2px -2px 5px rgba(0, 67, 73, 0.05);
 
   /* Transitions */
   --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
