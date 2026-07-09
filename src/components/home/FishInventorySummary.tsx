@@ -17,7 +17,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FishSymbol size={18} strokeWidth={2.5} className="text-brand" />
-          <h3 className="type-title text-brand-bright">
+          <h3 className="type-title text-brand">
             Fish Inventory
           </h3>
         </div>

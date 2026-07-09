@@ -12,24 +12,18 @@
       --font-main: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
       --font-ios-status: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', system-ui, sans-serif;
       --font-mono: 'SF Mono', 'Cascadia Code', Consolas, monospace;
-      --text-display: 28px;
-      --text-hero: 32px;
-      --text-title: 22px;
-      --text-section: 26px;
-      --text-h3: 15px;
-      --text-caption: 11px;
-      --text-2xs: 10px;
-      --text-3xs: 9px;
+      --type-ink: rgb(0 0 0);
+      --type-ink-muted: rgb(0 0 0 / 70%);
+      --type-ink-inverse: rgb(255 255 255);
+      --type-ink-inverse-muted: rgb(255 255 255 / 70%);
       --color-bg: #f9f9f9;
-      --color-text: #1a1c1c;
-      --color-text-muted: #3f484a;
-      --color-text-subtle: #6f797a;
       --color-brand: #004349;
       --color-brand-bright: #196a59;
-      --color-brand-glow: #abeef6;
       --color-surface: rgba(255, 255, 255, 0.42);
       --color-panel: rgba(255, 255, 255, 0.28);
       --color-border: rgba(255, 255, 255, 0.34);
+      --color-monitor-bg: #090d11;
+      --color-monitor-surface: #0f172a;
       --shadow-card: inset 2px 2px 0 rgba(255, 255, 255, 0.5),
         inset -2px -2px 5px rgba(0, 67, 73, 0.05),
         0 4px 20px rgba(0, 67, 73, 0.05),
@@ -47,7 +41,7 @@
       padding: 32px;
       background: linear-gradient(180deg, #f9f9f9 0%, #d4e6e5 100%);
       background-attachment: fixed;
-      color: var(--color-text);
+      color: var(--type-ink);
       font-family: var(--font-main);
       -webkit-font-smoothing: antialiased;
     }
@@ -56,7 +50,7 @@
     h2,
     h3 {
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
     }
 
     code {
@@ -90,10 +84,10 @@
     .eyebrow {
       margin-bottom: 10px;
       color: var(--color-brand-bright);
-      font-size: var(--text-caption);
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0;
     }
 
     .header h1 {
@@ -103,11 +97,12 @@
     }
 
     .header p {
-      max-width: 760px;
+      max-width: 780px;
       margin-top: 14px;
-      color: var(--color-text-muted);
+      color: var(--type-ink-muted);
       font-size: 16px;
-      line-height: 1.55;
+      font-weight: 400;
+      line-height: 1.45;
     }
 
     .meta {
@@ -122,8 +117,9 @@
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.42);
       color: var(--color-brand);
-      font-size: var(--text-caption);
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.35;
       padding: 7px 12px;
     }
 
@@ -141,23 +137,26 @@
     }
 
     .section-header h2 {
-      color: var(--color-brand);
-      font-size: var(--text-title);
-      line-height: 1.1;
+      color: var(--type-ink);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
     }
 
     .section-note {
-      max-width: 620px;
+      max-width: 720px;
       margin: -6px 0 20px;
-      color: var(--color-text-muted);
-      font-size: 14px;
-      line-height: 1.5;
+      color: var(--type-ink-muted);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.45;
     }
 
     .source {
-      color: var(--color-text-subtle);
+      color: var(--type-ink-muted);
       font-family: var(--font-mono);
-      font-size: var(--text-caption);
+      font-size: 14px;
+      line-height: 1.35;
     }
 
     .grid {
@@ -174,14 +173,17 @@
       padding: 16px;
     }
 
+    .dark-card {
+      background: var(--color-monitor-surface);
+    }
+
     .label {
       margin-bottom: 8px;
-      color: var(--color-text-subtle);
+      color: var(--type-ink-muted);
       font-family: var(--font-mono);
-      font-size: var(--text-caption);
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.35;
     }
 
     .value {
@@ -194,10 +196,11 @@
 
     .font-sample {
       margin-top: 14px;
-      font-size: 26px;
+      color: var(--type-ink);
+      font-size: 18px;
       font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.05;
+      line-height: 1.3;
+      letter-spacing: 0;
     }
 
     .table-wrap {
@@ -208,18 +211,17 @@
       width: 100%;
       border-collapse: separate;
       border-spacing: 0 8px;
-      min-width: 720px;
+      min-width: 760px;
     }
 
     th {
       padding: 0 14px 4px;
-      color: var(--color-text-subtle);
+      color: var(--type-ink-muted);
       font-family: var(--font-mono);
-      font-size: var(--text-caption);
-      font-weight: 800;
-      letter-spacing: 0.05em;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.35;
       text-align: left;
-      text-transform: uppercase;
     }
 
     td {
@@ -241,42 +243,116 @@
       border-radius: 0 14px 14px 0;
     }
 
-    .sample {
-      color: var(--color-text);
-      line-height: 1.15;
-    }
-
     .usage {
-      color: var(--color-text-muted);
-      font-size: 13px;
-      line-height: 1.4;
+      color: var(--type-ink-muted);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.35;
     }
 
-    .weight-grid {
+    .type-title {
+      color: var(--type-ink);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    .type-strong {
+      color: var(--type-ink);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .type-body {
+      color: var(--type-ink);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    .type-body-muted {
+      color: var(--type-ink-muted);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    .type-caption {
+      color: var(--type-ink-muted);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .type-title-inverse {
+      color: var(--type-ink-inverse);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    .type-strong-inverse {
+      color: var(--type-ink-inverse);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .type-body-inverse {
+      color: var(--type-ink-inverse);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    .type-body-muted-inverse {
+      color: var(--type-ink-inverse-muted);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    .type-caption-inverse {
+      color: var(--type-ink-inverse-muted);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .swatches {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .swatch {
+      display: flex;
       gap: 12px;
+      align-items: center;
     }
 
-    .weight-card {
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.24);
-      padding: 14px;
+    .swatch-chip {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 12px;
+      background: var(--chip-bg);
     }
 
-    .weight-card strong {
-      display: block;
-      color: var(--color-brand);
-      font-size: 30px;
-      line-height: 1;
-    }
-
-    .weight-card span {
-      display: block;
-      margin-top: 8px;
-      color: var(--color-text-muted);
-      font-family: var(--font-mono);
-      font-size: 12px;
+    .dark-swatch {
+      background: var(--color-monitor-bg);
     }
 
     .pattern-grid {
@@ -285,24 +361,10 @@
       gap: 14px;
     }
 
-    .pattern-title {
-      color: var(--color-brand);
-      font-size: 18px;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .pattern-copy {
-      margin-top: 8px;
-      color: var(--color-text-muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
     .footer {
-      color: var(--color-text-subtle);
-      font-size: 13px;
-      line-height: 1.5;
+      color: var(--type-ink-muted);
+      font-size: 14px;
+      line-height: 1.35;
       padding: 22px 26px;
       text-align: center;
     }
@@ -334,14 +396,14 @@
       <div class="eyebrow">Typography Tokens</div>
       <h1>OceanEyes Font Reference</h1>
       <p>
-        A focused typography-only reference for the OceanEyes mobile webapp.
-        Values mirror <code>src/index.css</code> and are intended for design review,
-        handoff, and implementation checks.
+        A typography-only reference for the OceanEyes mobile webapp. The current
+        implementation keeps Hanken Grotesk as the primary font and standardizes
+        most UI text around five reusable utility styles.
       </p>
       <div class="meta" aria-label="Typography metadata">
         <span class="pill">Primary font: Hanken Grotesk</span>
-        <span class="pill">Weights: 300-800</span>
-        <span class="pill">Source: Tailwind v4 @theme</span>
+        <span class="pill">Runtime source: src/index.css</span>
+        <span class="pill">Utility source: Tailwind v4 @utility</span>
       </div>
     </header>
 
@@ -359,146 +421,166 @@
         <article class="card">
           <div class="label">iOS Status Bar Exception</div>
           <div class="value">-apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', system-ui, sans-serif</div>
-          <div class="font-sample" style="font-family: var(--font-ios-status); font-size: 24px;">9:41</div>
+          <div class="font-sample" style="font-family: var(--font-ios-status);">9:41</div>
         </article>
         <article class="card">
-          <div class="label">Reference Mono</div>
+          <div class="label">Documentation Mono</div>
           <div class="value">'SF Mono', 'Cascadia Code', Consolas, monospace</div>
-          <div class="font-sample" style="font-family: var(--font-mono); font-size: 16px; font-weight: 600; letter-spacing: 0;">--text-display: 28px;</div>
+          <div class="font-sample" style="font-family: var(--font-mono); font-size: 16px; font-weight: 700;">type-title</div>
         </article>
       </div>
     </section>
 
-    <section class="glass section" aria-labelledby="scale-heading">
+    <section class="glass section" aria-labelledby="core-heading">
       <div class="section-header">
-        <h2 id="scale-heading">Type Scale</h2>
-        <span class="source">@theme typography tokens</span>
+        <h2 id="core-heading">Core Utility Styles</h2>
+        <span class="source">@utility type-*</span>
       </div>
       <p class="section-note">
-        The app combines custom mobile-first sizes with Tailwind defaults. The
-        custom token names below are the values explicitly defined in OceanEyes.
+        Apart from hero, metric, status bar, dense chart, and technical overlay
+        text, use these five styles for hierarchy. All use
+        <code>--font-main</code> and <code>letter-spacing: 0</code>.
       </p>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Token</th>
-              <th>Size</th>
+              <th>Class</th>
+              <th>Spec</th>
               <th>Sample</th>
               <th>Typical Use</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>--text-3xs</td>
-              <td>9px</td>
-              <td><span class="sample" style="font-size: var(--text-3xs);">AI confidence and dense chart labels</span></td>
-              <td class="usage">Micro labels where space is highly constrained.</td>
+              <td>.type-title</td>
+              <td class="usage">18px / 1.3 / 700 / black</td>
+              <td><span class="type-title">Water Chemistry</span></td>
+              <td class="usage">Card titles, sheet headings, major compact section labels.</td>
             </tr>
             <tr>
-              <td>--text-2xs</td>
-              <td>10px</td>
-              <td><span class="sample" style="font-size: var(--text-2xs);">Live detection badge and nav label</span></td>
-              <td class="usage">Badges, compact pills, and bottom navigation labels.</td>
+              <td>.type-strong</td>
+              <td class="usage">16px / 1.35 / 600 / black</td>
+              <td><span class="type-strong">Start Monitoring</span></td>
+              <td class="usage">Buttons, important row labels, selected states, compact headings.</td>
             </tr>
             <tr>
-              <td>--text-caption</td>
-              <td>11px</td>
-              <td><span class="sample" style="font-size: var(--text-caption);">WATER CLARITY STATUS</span></td>
-              <td class="usage">Captions, uppercase section labels, metadata.</td>
+              <td>.type-body</td>
+              <td class="usage">16px / 1.45 / 400 / black</td>
+              <td><span class="type-body">Aquarium readings are stable.</span></td>
+              <td class="usage">Primary body copy, input values, normal readable text.</td>
             </tr>
             <tr>
-              <td>--text-h3</td>
-              <td>15px</td>
-              <td><span class="sample" style="font-size: var(--text-h3); font-weight: 600;">Pair aquarium monitor</span></td>
-              <td class="usage">Compact headings, date controls, primary mobile buttons.</td>
+              <td>.type-body-muted</td>
+              <td class="usage">16px / 1.45 / 400 / black at 70%</td>
+              <td><span class="type-body-muted">Last update synced one minute ago.</span></td>
+              <td class="usage">Secondary explanations, supporting copy, less prominent values.</td>
             </tr>
             <tr>
-              <td>base default</td>
-              <td>16px</td>
-              <td><span class="sample" style="font-size: 16px;">Aquarium health readings are stable.</span></td>
-              <td class="usage">Default browser and Tailwind base text size.</td>
-            </tr>
-            <tr>
-              <td>--text-title</td>
-              <td>22px</td>
-              <td><span class="sample" style="font-size: var(--text-title); font-weight: 700;">Fish Inventory</span></td>
-              <td class="usage">Screen titles and important card headings.</td>
-            </tr>
-            <tr>
-              <td>--text-section</td>
-              <td>26px</td>
-              <td><span class="sample" style="font-size: var(--text-section); font-weight: 800;">Link Your Aquarium</span></td>
-              <td class="usage">Major onboarding and monitor section headings.</td>
-            </tr>
-            <tr>
-              <td>--text-display</td>
-              <td>28px</td>
-              <td><span class="sample" style="font-size: var(--text-display); font-weight: 800;">Clarity Analytics</span></td>
-              <td class="usage">Primary mobile page display headings and large values.</td>
-            </tr>
-            <tr>
-              <td>--text-hero</td>
-              <td>32px</td>
-              <td><span class="sample" style="font-size: var(--text-hero); font-weight: 800;">OceanEyes</span></td>
-              <td class="usage">Hero-level mobile titles and highest emphasis text.</td>
+              <td>.type-caption</td>
+              <td class="usage">14px / 1.35 / 400 / black at 70%</td>
+              <td><span class="type-caption">Confidence 94%</span></td>
+              <td class="usage">Captions, labels, metadata, badges, compact helper text.</td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <section class="glass section" aria-labelledby="weights-heading">
+    <section class="glass section" aria-labelledby="inverse-heading">
       <div class="section-header">
-        <h2 id="weights-heading">Font Weights</h2>
-        <span class="source">Google Fonts import</span>
+        <h2 id="inverse-heading">Inverse Utility Styles</h2>
+        <span class="source">@utility type-*-inverse</span>
       </div>
-      <div class="weight-grid">
-        <div class="weight-card"><strong style="font-weight: 300;">Aa</strong><span>300 Light</span></div>
-        <div class="weight-card"><strong style="font-weight: 400;">Aa</strong><span>400 Regular</span></div>
-        <div class="weight-card"><strong style="font-weight: 500;">Aa</strong><span>500 Medium</span></div>
-        <div class="weight-card"><strong style="font-weight: 600;">Aa</strong><span>600 Semibold</span></div>
-        <div class="weight-card"><strong style="font-weight: 700;">Aa</strong><span>700 Bold</span></div>
-        <div class="weight-card"><strong style="font-weight: 800;">Aa</strong><span>800 Extrabold</span></div>
+      <p class="section-note">
+        Monitor and camera surfaces use the same hierarchy with white foreground
+        tokens. Muted inverse text uses white at 70% opacity.
+      </p>
+      <div class="grid">
+        <article class="card dark-card">
+          <div class="type-title-inverse">Active Monitoring</div>
+          <p class="type-body-muted-inverse" style="margin-top: 8px;">Live detection is running.</p>
+        </article>
+        <article class="card dark-card">
+          <div class="type-strong-inverse">Camera Feed</div>
+          <p class="type-body-inverse" style="margin-top: 8px;">Water clarity is within range.</p>
+        </article>
+        <article class="card dark-card">
+          <div class="type-caption-inverse">MODEL CONFIDENCE 94%</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="glass section" aria-labelledby="ink-heading">
+      <div class="section-header">
+        <h2 id="ink-heading">Ink Tokens</h2>
+        <span class="source">:root and @theme color aliases</span>
+      </div>
+      <div class="swatches">
+        <article class="card swatch">
+          <div class="swatch-chip" style="--chip-bg: var(--type-ink);"></div>
+          <div>
+            <div class="type-strong">--type-ink</div>
+            <div class="type-caption">rgb(0 0 0)</div>
+          </div>
+        </article>
+        <article class="card swatch">
+          <div class="swatch-chip" style="--chip-bg: var(--type-ink-muted);"></div>
+          <div>
+            <div class="type-strong">--type-ink-muted</div>
+            <div class="type-caption">rgb(0 0 0 / 70%)</div>
+          </div>
+        </article>
+        <article class="card swatch dark-swatch">
+          <div class="swatch-chip" style="--chip-bg: var(--type-ink-inverse);"></div>
+          <div>
+            <div class="type-strong-inverse">--type-ink-inverse</div>
+            <div class="type-caption-inverse">rgb(255 255 255)</div>
+          </div>
+        </article>
+        <article class="card swatch dark-swatch">
+          <div class="swatch-chip" style="--chip-bg: var(--type-ink-inverse-muted);"></div>
+          <div>
+            <div class="type-strong-inverse">--type-ink-inverse-muted</div>
+            <div class="type-caption-inverse">rgb(255 255 255 / 70%)</div>
+          </div>
+        </article>
       </div>
     </section>
 
     <section class="glass section" aria-labelledby="patterns-heading">
       <div class="section-header">
-        <h2 id="patterns-heading">Usage Patterns</h2>
-        <span class="source">observed app conventions</span>
+        <h2 id="patterns-heading">Current Usage Rules</h2>
+        <span class="source">implementation conventions</span>
       </div>
       <div class="pattern-grid">
         <article class="card">
-          <div class="label">Headings</div>
-          <div class="pattern-title">Bold, tight, and compact</div>
-          <p class="pattern-copy">
-            Base headings use <code>font-weight: 700</code> and
-            <code>letter-spacing: -0.02em</code>. Large mobile headings often use
-            <code>font-weight: 800</code>.
+          <div class="type-title">Hierarchy</div>
+          <p class="type-body-muted" style="margin-top: 8px;">
+            Prefer the utility classes over ad hoc Tailwind text sizes for normal
+            UI copy. Use bold only for title and strong emphasis.
           </p>
         </article>
         <article class="card">
-          <div class="label">Labels</div>
-          <div class="pattern-title" style="font-size: var(--text-caption); letter-spacing: 0.1em; text-transform: uppercase;">AQUARIUM STATUS</div>
-          <p class="pattern-copy">
-            Metadata and section labels use small sizes, semibold or bold weight,
-            and wider uppercase tracking for scanability.
+          <div class="type-title">Controls</div>
+          <p class="type-body-muted" style="margin-top: 8px;">
+            Glass buttons and outline buttons align to 16px bold. Glass inputs
+            align to 16px regular.
           </p>
         </article>
         <article class="card">
-          <div class="label">Body Copy</div>
-          <p class="pattern-copy" style="margin-top: 0; color: var(--color-text);">
-            Body text stays near 14-16px with relaxed percentage line heights such
-            as 145% or 150% when explanatory content needs easier reading.
+          <div class="type-title">Exceptions</div>
+          <p class="type-body-muted" style="margin-top: 8px;">
+            Hero titles, large metrics, donut totals, status bar text, bottom nav
+            micro labels, and live debug overlays may keep specialized sizes.
           </p>
         </article>
         <article class="card">
-          <div class="label">Controls</div>
-          <div class="pattern-title" style="font-size: 14px; font-weight: 600;">Start Monitoring</div>
-          <p class="pattern-copy">
-            Buttons and inputs use <code>--font-main</code>, usually 14px or 15px,
-            with semibold weight for clear touch targets.
+          <div class="type-title">Legacy Tokens</div>
+          <p class="type-body-muted" style="margin-top: 8px;">
+            <code>--text-display</code>, <code>--text-hero</code>, and other old
+            size tokens still exist in <code>@theme</code> for compatibility, but
+            they are no longer the default hierarchy for ordinary UI text.
           </p>
         </article>
       </div>
