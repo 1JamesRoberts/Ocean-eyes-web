@@ -33,7 +33,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
 
   return (
     <section className="glass-card p-6">
-      <CardSectionHeader icon={ShieldAlert} title="Active Safety Alerts" />
+      <CardSectionHeader icon={ShieldAlert} title="Alerts" />
 
       <div className="space-y-3">
         {activeAlerts.map(alert => (

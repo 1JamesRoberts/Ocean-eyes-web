@@ -17,7 +17,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
     <section className="glass-card p-5">
       <CardSectionHeader
         icon={FishSymbol}
-        title="Fish Inventory"
+        title="My Fish"
         action={(
           <button
             onClick={onManageFish}
@@ -67,7 +67,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                   </div>
                 </div>
                 <span
-                  className="rounded-full px-2.5 py-1 type-caption"
+                  className="inline-flex items-center rounded-full px-2.5 py-1 leading-none type-caption"
                   style={{
                     backgroundColor: isComplete ? 'rgba(25, 106, 89, 0.12)' : 'rgba(186, 26, 26, 0.12)',
                     color: isComplete ? 'var(--color-good)' : 'var(--color-critical)'
