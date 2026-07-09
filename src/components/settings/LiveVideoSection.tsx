@@ -16,7 +16,6 @@ import { CameraControls } from '../live/CameraControls';
 import { CameraFeed } from '../live/CameraFeed';
 import type { CameraFeedHandle } from '../live/CameraFeed';
 import { FullscreenInventory } from '../live/FullscreenInventory';
-import { SnapshotGallery } from '../live/SnapshotGallery';
 import { StreamAdjustments } from '../live/StreamAdjustments';
 import { AIAnalysisPanel } from '../live/AIAnalysisPanel';
 import { VideoDecorations } from '../live/VideoDecorations';
@@ -26,7 +25,6 @@ import { useHeroActionLayer } from '../shared/HeroActionLayerContext';
 interface LiveVideoSectionProps {
   tankId?: string | null;
   showStreamAdjustments?: boolean;
-  showSnapshotGallery?: boolean;
 }
 
 const RecordingBadge: React.FC<{ recordingSeconds: number }> = ({ recordingSeconds }) => (
@@ -89,7 +87,6 @@ const TurbidityErrorBadge: React.FC<{ error: string }> = ({ error }) => (
 export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   tankId: propTankId,
   showStreamAdjustments = true,
-  showSnapshotGallery = true,
 }) => {
   const { activeTank, tankId: activeTankId } = useTank();
   const tankId = propTankId ?? activeTankId;
@@ -113,17 +110,11 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   const { filters, temperatureOverlay, tintOverlay, handleFilterChange } = useCameraFilters({ tankId });
 
   const {
-    snapshots,
-    recordings,
     flashActive,
     isRecording,
     recordingSeconds,
     takeSnapshot,
-    downloadSnapshot,
-    deleteSnapshot,
     toggleRecording,
-    downloadRecording,
-    deleteRecording,
   } = useMediaCapture({
     cameraFeedRef,
     isStreaming,
@@ -306,33 +297,18 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
         </>
       )}
 
-      {(showSnapshotGallery || (isStreaming && showStreamAdjustments)) && (
+      {isStreaming && showStreamAdjustments && (
         <GlassCard className="p-5">
           <CardSectionHeader
             icon={Video}
             title="Stream Media"
-            detail="Image tuning, snapshots, and recordings"
+            detail="Image tuning"
           />
 
-          <div className="flex flex-col gap-5">
-            {isStreaming && showStreamAdjustments && (
-              <StreamAdjustments
-                filters={filters}
-                onFilterChange={handleFilterChange}
-              />
-            )}
-
-            {showSnapshotGallery && (
-              <SnapshotGallery
-                snapshots={snapshots}
-                recordings={recordings}
-                onDownloadSnapshot={downloadSnapshot}
-                onDeleteSnapshot={deleteSnapshot}
-                onDownloadRecording={downloadRecording}
-                onDeleteRecording={deleteRecording}
-              />
-            )}
-          </div>
+          <StreamAdjustments
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
         </GlassCard>
       )}
     </div>
