@@ -49,7 +49,7 @@
   --color-overlay: rgba(0, 0, 0, 0.4);
   --color-scanline: rgba(45, 212, 191, 0.25);
   --color-recording-glow: rgba(239, 68, 68, 0.4);
-  --color-ai-glow: rgba(13, 148, 136, 0.4);
+  --color-ai-glow: rgba(255, 255, 255, 0.3);
 
   /* Mobile shell geometry */
   --mobile-frame-width: 393px;
@@ -171,7 +171,7 @@
   /* ─── Animations ─── */
   --animate-scan: scan 4s linear infinite;
   --animate-pulse-recording: pulse-recording-border 1.5s infinite;
-  --animate-pulse-ai: pulse-ai-border 2s infinite;
+  --animate-pulse-ai: pulse-ai-border 4s infinite;
   --animate-camera-flash: camera-flash-shutter 0.4s ease-out;
   --animate-recording-blink: recording-blink 1s infinite alternate;
   --animate-fade-in: fadeIn 0.2s ease-out;
@@ -679,7 +679,7 @@
   }
   50% {
     opacity: 1;
-    box-shadow: 0 0 0 6px rgba(13, 148, 136, 0);
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
   }
 }
 
@@ -748,7 +748,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 11px 15px 0;
-  background: #4a4a4a;
+  background: #1a1a1a;
 }
 
 .status-bar-notch {
