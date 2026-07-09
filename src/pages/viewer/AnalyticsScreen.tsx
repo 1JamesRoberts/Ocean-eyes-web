@@ -159,7 +159,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
         <>
           {/* Mobile controls — desktop controls live in the top app bar */}
           <div className="
-            flex items-center justify-end gap-3
+            flex items-center justify-between gap-3
             md:hidden
           ">
             <DateTimeRangePicker value={range} onChange={setRange} />

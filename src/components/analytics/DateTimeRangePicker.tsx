@@ -170,10 +170,12 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         aria-expanded={isExpanded}
         aria-controls="date-range-editor"
         className="
-          flex cursor-pointer items-center gap-2 rounded-full border-none
-          bg-surface-hover px-4 py-2.5 type-body whitespace-nowrap
+          flex cursor-pointer items-center gap-2 rounded-full
+          border border-white/30
+          bg-white/30 backdrop-blur-[6px]
+          px-4 py-2.5 type-body whitespace-nowrap
           transition-colors
-          hover:bg-border
+          hover:bg-white/50
         "
       >
         <CalendarDays size={16} className="text-text-muted" />

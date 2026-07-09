@@ -45,9 +45,11 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
             />
           </div>
         )}
-        <div className="relative z-10 -mx-4 flex flex-1 flex-col bg-gradient-mint px-4 pt-4 pb-28">
+        <div className="relative z-10 -mx-4 flex flex-1 flex-col bg-gradient-mint px-4 pb-28">
           {showHero && (
-            <TabPageDots className="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2" />
+            <div className="flex h-4 items-center justify-center">
+              <TabPageDots />
+            </div>
           )}
           {children}
         </div>
