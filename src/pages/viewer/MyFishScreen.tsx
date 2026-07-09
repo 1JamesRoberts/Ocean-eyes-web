@@ -3,7 +3,7 @@ import { useMyFish } from '../../hooks/pages/useMyFish';
 import {
   Trash2, Fish, BarChart3,
   Thermometer, Droplets, Ruler, Maximize2,
-  AlertTriangle, CheckCircle, HelpCircle
+  AlertTriangle, CheckCircle
 } from 'lucide-react';
 import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
 import { DonutChart } from '../../components/fish/DonutChart';
@@ -26,19 +26,14 @@ import {
 } from '../../data/speciesCatalog';
 import { formatRange } from '../../models/services/speciesService';
 import type {
-  Difficulty,
   Aggression,
   BehaviorType,
   SwimLocation,
   Availability,
-  BreedingDifficulty,
 } from '../../types/aquarium';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const difficultyLabel: Record<Difficulty, string> = {
-  beginner: 'Beginner', easy: 'Easy', medium: 'Medium', difficult: 'Difficult'
-};
 const aggressionLabel: Record<Aggression, string> = {
   peaceful: 'Peaceful', mostly_peaceful: 'Mostly Peaceful', aggressive: 'Aggressive'
 };
@@ -50,9 +45,6 @@ const swimLabel: Record<SwimLocation, string> = {
 };
 const availabilityLabel: Record<Availability, string> = {
   very_common: 'Very Common', common: 'Common', rare: 'Rare', very_rare: 'Very Rare'
-};
-const breedingLabel: Record<BreedingDifficulty, string> = {
-  easy: 'Easy', medium: 'Medium', hard: 'Hard', no_record: 'No Record'
 };
 
 interface FishCountStepperProps {
@@ -458,12 +450,10 @@ export const MyFishScreen: React.FC<{
                             <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass="bg-[rgba(16,185,129,0.08)]" />
                             <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass="bg-[rgba(245,158,11,0.08)]" />
                             <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} colorClass="bg-[rgba(147,112,219,0.08)]" />
-                            <DetailChip icon={<HelpCircle size={14} />} label="Difficulty" value={difficultyLabel[species.difficulty ?? 'medium']} colorClass="bg-[rgba(13,148,136,0.08)]" />
                             <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} colorClass="bg-[rgba(16,185,129,0.08)]" />
                             <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} colorClass="bg-[rgba(239,68,68,0.08)]" />
                             <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} colorClass="bg-[rgba(59,130,246,0.08)]" />
                             <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass="bg-[rgba(147,112,219,0.08)]" />
-                            <DetailChip icon={<HelpCircle size={14} />} label="Breeding" value={breedingLabel[species.breeding ?? 'no_record']} colorClass="bg-[rgba(148,163,184,0.12)]" />
                           </div>
 
                           {/* Compatibility section */}
