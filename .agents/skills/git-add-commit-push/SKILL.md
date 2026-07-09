@@ -2,7 +2,6 @@
 name: git-add-commit-push
 description: 'Use when: staging files, creating commits, pushing to remote, or running any git write command. Handles the Windows git auto-gc "n/n/n/n" prompt problem by setting GIT_ASK_YESNO=false.'
 ---
-
 # Git Add / Commit / Push
 
 ## Problem: Windows git auto-gc prompts
@@ -39,33 +38,34 @@ The variable only affects the current PowerShell session — no global side effe
 ## Procedure
 
 1. **Check status**
+
    ```powershell
    git status --short
    ```
-
 2. **Stage files** — if many files changed, consider using a subagent to batch the work
+
    ```powershell
    $env:GIT_ASK_YESNO='false'
    git add <files or .>
    ```
-
 3. **Commit** — generate the commit message yourself based on the diff; do not ask the user
+
    ```powershell
    git commit -m "type(scope): description"
    ```
-
 4. **Pull & rebase** (if push is rejected)
+
    ```powershell
    git fetch
    git rebase origin/main
    ```
-
 5. **Push**
+
    ```powershell
    git push
    ```
 
-If `git push` is rejected due to non-fast-forward, rebase first (step 4), then push again.
+If `git push` is rejected due to non-fast-forward, rebase first (step 4), then push again. Push the current branch, preferrably origin.
 
 ## Common Mistakes
 
