@@ -209,7 +209,7 @@ export const MyFishScreen: React.FC<{
         {/* Chart & Stats */}
         <div className="flex flex-col gap-4">
           <GlassCard
-            className="p-5"
+            className="!p-5"
             clickable
             hover
             role="button"
@@ -224,7 +224,7 @@ export const MyFishScreen: React.FC<{
           >
             <CardSectionHeader
               icon={BarChart3}
-              title="Species Distribution"
+              title="Species"
               className="mb-1!"
             />
             <DonutChart speciesDistribution={speciesDistribution} />
@@ -233,7 +233,7 @@ export const MyFishScreen: React.FC<{
               data-aquarium-overview
               className="
                 mt-2 flex items-center justify-between rounded-xl
-                p-2
+                p-3
               "
             >
               <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -280,7 +280,7 @@ export const MyFishScreen: React.FC<{
                     -translate-y-3 opacity-0
                   `}
                 `}>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 gap-3">
                     <DetailChip
                       icon={<Maximize2 size={14} />}
                       label="Tank Min"
