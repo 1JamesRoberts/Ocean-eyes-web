@@ -181,21 +181,28 @@ export const MyFishScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-baseline gap-2">
-          <h1 className="text-display leading-none font-extrabold text-text">My Fish</h1>
-          <span className="truncate type-caption">Tank inhabitants</span>
+      <header className="mb-5 flex -translate-y-4 items-end justify-between gap-4">
+        <div className="min-w-0">
+          <div className="mb-1.5 flex items-center">
+            <span className="text-xs font-semibold tracking-[0.12em] text-brand uppercase">
+              Aquarium inventory
+            </span>
+          </div>
+          <h1 className="text-display leading-none font-extrabold tracking-[-0.03em] text-text">
+            My Fish
+          </h1>
         </div>
         <GlassButton
           variant="primary"
           size="sm"
           onClick={onToggleAddForm}
           aria-label="Add fish"
-          className="!h-10 !w-10 !rounded-full !p-0"
+          className="!h-11 shrink-0 !gap-2 !rounded-full !px-4 shadow-primary-glow"
         >
-          <Plus size={17} aria-hidden="true" />
+          <Plus size={17} strokeWidth={2.5} aria-hidden="true" />
+          <span className="font-semibold">Add fish</span>
         </GlassButton>
-      </div>
+      </header>
 
       <AddSpeciesForm
         isOpen={showAddForm}
