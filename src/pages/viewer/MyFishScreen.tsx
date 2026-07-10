@@ -181,7 +181,7 @@ export const MyFishScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col">
-      <header className="mb-5 flex -translate-y-4 items-end justify-between gap-4">
+      <header className="mb-5 flex items-end justify-between gap-4">
         <div className="min-w-0">
           <div className="mb-1.5 flex items-center">
             <span className="text-xs font-semibold tracking-[0.12em] text-brand uppercase">
@@ -193,13 +193,13 @@ export const MyFishScreen: React.FC = () => {
           </h1>
         </div>
         <GlassButton
-          variant="primary"
+          variant="outline"
           size="sm"
           onClick={onToggleAddForm}
           aria-label="Add fish"
-          className="!h-11 shrink-0 !gap-2 !rounded-full !px-4 shadow-primary-glow"
+          className="!h-9 shrink-0 !gap-1.5 !rounded-full !px-3"
         >
-          <Plus size={17} strokeWidth={2.5} aria-hidden="true" />
+          <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
           <span className="font-semibold">Add fish</span>
         </GlassButton>
       </header>

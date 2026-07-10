@@ -403,7 +403,7 @@
   justify-content: center;
   gap: 0.5rem;
   cursor: pointer;
-  border: 1px solid rgba(0, 67, 73, 0.15);
+  border: 0;
   background: transparent;
   backdrop-filter: blur(var(--glass-blur-sm));
   -webkit-backdrop-filter: blur(var(--glass-blur-sm));
@@ -414,12 +414,13 @@
   line-height: 1.35;
   font-weight: 700;
   color: var(--color-brand);
+  box-shadow: var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05);
   transition: var(--transition-smooth);
   white-space: nowrap;
 
   &:hover {
     background: rgba(0, 67, 73, 0.06);
-    border-color: rgba(0, 67, 73, 0.3);
+    box-shadow: var(--shadow-glass), 0 6px 24px 0 rgba(0, 67, 73, 0.08);
   }
 
   &:active {
@@ -432,18 +433,20 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: 0.5px solid var(--glass-border-strong);
+  border: 0;
   background: var(--glass-bg-inline);
   backdrop-filter: blur(var(--glass-blur-sm));
   -webkit-backdrop-filter: blur(var(--glass-blur-sm));
   border-radius: var(--glass-radius-inline);
   padding: 0.5rem;
   color: var(--color-text-muted);
+  box-shadow: var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05);
   transition: var(--transition-smooth);
 
   &:hover {
     background: rgba(255, 255, 255, 0.5);
     color: var(--color-brand);
+    box-shadow: var(--shadow-glass), 0 6px 24px 0 rgba(0, 67, 73, 0.08);
   }
 
   &:active {
