@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronRight, FlaskConical } from 'lucide-react';
 import { useHome } from '../../hooks/pages/useHome';
-import { CardSectionHeader } from '../../components/shared';
+import { CardSectionHeader, ScreenHeader } from '../../components/shared';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
 import { WaterClarityCard } from '../../components/home/WaterClarityCard';
@@ -23,6 +23,7 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      <ScreenHeader eyebrow="Aquarium overview" title="Dashboard" className="-mb-1" />
       {!hasReadingData ? (
         <div className="glass-card p-6 text-center transition-smooth">
           <span className="mb-3 block text-4xl">🐠</span>

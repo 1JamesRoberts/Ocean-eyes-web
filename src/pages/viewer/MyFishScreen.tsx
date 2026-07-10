@@ -15,6 +15,7 @@ import {
   GlassCard,
   GlassIconButton,
   GlassModal,
+  ScreenHeader,
 } from '../../components/shared';
 import {
   getSpeciesById,
@@ -181,28 +182,23 @@ export const MyFishScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col">
-      <header className="mb-5 flex items-end justify-between gap-4">
-        <div className="min-w-0">
-          <div className="mb-1.5 flex items-center">
-            <span className="text-xs font-semibold tracking-[0.12em] text-brand uppercase">
-              Aquarium inventory
-            </span>
-          </div>
-          <h1 className="text-display leading-none font-extrabold tracking-[-0.03em] text-text">
-            My Fish
-          </h1>
-        </div>
-        <GlassButton
-          variant="outline"
-          size="sm"
-          onClick={onToggleAddForm}
-          aria-label="Add fish"
-          className="!h-9 shrink-0 !gap-1.5 !rounded-full !px-3"
-        >
-          <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
-          <span className="font-semibold">Add fish</span>
-        </GlassButton>
-      </header>
+      <ScreenHeader
+        eyebrow="Aquarium inventory"
+        title="My Fish"
+        className="mb-4"
+        action={(
+          <GlassButton
+            variant="outline"
+            size="sm"
+            onClick={onToggleAddForm}
+            aria-label="Add fish"
+            className="!h-9 !gap-1.5 !rounded-full !px-3"
+          >
+            <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
+            <span className="font-semibold">Add fish</span>
+          </GlassButton>
+        )}
+      />
 
       <AddSpeciesForm
         isOpen={showAddForm}

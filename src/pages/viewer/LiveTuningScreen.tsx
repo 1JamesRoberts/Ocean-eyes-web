@@ -7,6 +7,7 @@ import {
   AquariumPanelCard,
   SafetyThresholdsCard,
 } from '../../components/settings/SettingsSections';
+import { ScreenHeader } from '../../components/shared';
 
 export const LiveTuningScreen: React.FC = () => {
   const settings = useSettings();
@@ -17,6 +18,7 @@ export const LiveTuningScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
+      <ScreenHeader eyebrow="Aquarium controls" title="Account" className="-mb-1" />
       <section>
         <LiveVideoSection
           tankId={tankId}

@@ -2,6 +2,7 @@ export { GlassCard } from "./GlassCard";
 export { GlassDisclosurePanel } from "./GlassDisclosurePanel";
 export { CardHeader } from "./CardHeader";
 export { CardSectionHeader } from "./CardSectionHeader";
+export { ScreenHeader } from "./ScreenHeader";
 export { GlassPanel } from "./GlassPanel";
 export { GlassButton } from "./GlassButton";
 export { GlassBadge } from "./GlassBadge";

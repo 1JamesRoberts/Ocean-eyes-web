@@ -6,7 +6,7 @@ import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePic
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
-import { CardSectionHeader, GlassButton, GlassCard, GlassIconButton, GlassPanel } from '../../components/shared';
+import { CardSectionHeader, GlassButton, GlassCard, GlassIconButton, GlassPanel, ScreenHeader } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
 
 type AnalyticsScreenProps = ReturnType<typeof useAnalytics>;
@@ -113,6 +113,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-6">
+      <ScreenHeader eyebrow="Aquarium intelligence" title="Analytics" className="-mb-1" />
       {/* Error banner */}
       {error && (
         <GlassCard className="border-critical bg-critical/10 p-3">
