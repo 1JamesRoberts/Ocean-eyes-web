@@ -13,11 +13,12 @@ interface GlassButtonProps {
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
   fullWidth?: boolean;
+  'aria-label'?: string;
 }
 
 const variantStyles: Record<GlassVariant, string> = {
   default: 'glass-button',
-  primary: 'glass-button-primary',
+  primary: 'glass-button-primary text-text-inverse',
   outline: 'glass-button-outline',
   danger: `
     inline-flex items-center justify-center gap-2 cursor-pointer
@@ -52,11 +53,13 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   type = 'button',
   disabled = false,
   fullWidth = false,
+  'aria-label': ariaLabel,
 }) => (
   <button
     type={type}
     onClick={onClick}
     disabled={disabled}
+    aria-label={ariaLabel}
     className={`
       ${variantStyles[variant]}
       ${sizeStyles[size]}

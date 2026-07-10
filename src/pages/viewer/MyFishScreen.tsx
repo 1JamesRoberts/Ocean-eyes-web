@@ -186,9 +186,14 @@ export const MyFishScreen: React.FC = () => {
           <h1 className="text-display leading-none font-extrabold text-text">My Fish</h1>
           <span className="truncate type-caption">Tank inhabitants</span>
         </div>
-        <GlassButton variant="primary" size="sm" onClick={onToggleAddForm}>
+        <GlassButton
+          variant="primary"
+          size="sm"
+          onClick={onToggleAddForm}
+          aria-label="Add fish"
+          className="!h-10 !w-10 !rounded-full !p-0"
+        >
           <Plus size={17} aria-hidden="true" />
-          Add fish
         </GlassButton>
       </div>
 
