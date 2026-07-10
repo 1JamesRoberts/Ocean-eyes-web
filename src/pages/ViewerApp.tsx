@@ -17,12 +17,7 @@ import { IoTMonitor } from './IoTMonitor';
 
 const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'live', 'settings', 'my_fish', 'analytics', 'alerts', 'history'];
 
-interface ViewerAppProps {
-  showAddFishForm?: boolean;
-  onToggleAddFish?: () => void;
-}
-
-export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleAddFish }) => {
+export const ViewerApp: React.FC = () => {
   const tankId = useTank().tankId;
   const { activeTab } = useNavigation();
 
@@ -70,12 +65,7 @@ export const ViewerApp: React.FC<ViewerAppProps> = ({ showAddFishForm, onToggleA
       case 'monitor':
         return <IoTMonitor />;
       case 'my_fish':
-        return (
-          <MyFishScreen
-            showAddForm={showAddFishForm}
-            onToggleAddForm={onToggleAddFish}
-          />
-        );
+        return <MyFishScreen />;
       case 'analytics':
         return <AnalyticsScreen {...analyticsData} />;
       default:

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMyFish } from '../../hooks/pages/useMyFish';
 import {
-  Trash2, Fish, BarChart3,
+  Trash2, Fish, BarChart3, Plus, X,
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle
 } from 'lucide-react';
@@ -94,8 +94,8 @@ const DeleteFishModal: React.FC<DeleteFishModalProps> = ({
   onCancel,
   onConfirm,
 }) => (
-  <GlassModal isOpen={isOpen} onClose={onCancel}>
-    <h3 className="mb-2 type-title">Delete Fish Entry</h3>
+  <GlassModal isOpen={isOpen} onClose={onCancel} labelledBy="delete-fish-title">
+    <h3 id="delete-fish-title" className="mb-2 type-title">Delete Fish Entry</h3>
     <p className="mb-6 type-body-muted">
       Are you sure you want to delete this fish entry? This action cannot be undone.
     </p>
@@ -107,81 +107,68 @@ const DeleteFishModal: React.FC<DeleteFishModalProps> = ({
 );
 
 interface AddSpeciesFormProps {
-  show: boolean;
-  selectedSpeciesId: string | null;
+  isOpen: boolean;
   fishList: { speciesId: string }[];
   onSpeciesSelect: (species: SpeciesInfo | null, customName?: string) => void;
-  onAdd: (event: React.FormEvent) => void;
   onClose: () => void;
 }
 
 const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
-  show,
-  selectedSpeciesId,
+  isOpen,
   fishList,
   onSpeciesSelect,
-  onAdd,
   onClose,
 }) => (
-  <div className={`
-    shimmer z-50 origin-top -translate-y-3
-    transition-[max-height_0.4s_cubic-bezier(0.4,0,0.2,1),opacity_0.3s_ease,transform_0.4s_cubic-bezier(0.4,0,0.2,1),margin_0.4s_ease]
-    ${show ? 'mb-5 max-h-[500px] translate-y-0 opacity-100' : `
-      pointer-events-none max-h-0 opacity-0
-    `}
-  `}>
-    <form onSubmit={onAdd} className="
-      flex flex-col gap-3.5 glass-card p-5 transition-smooth
-    ">
-      <CardSectionHeader icon={Fish} title="Add New Species Entry" className="mb-0" />
-      <div>
-        <label className="
-          mb-1 block type-caption
-          uppercase
-        ">SPECIES</label>
-        <SpeciesSelector
-          selectedSpeciesId={selectedSpeciesId}
-          onSelect={onSpeciesSelect}
-          placeholder="Search or select a species..."
-          excludeSpeciesIds={fishList.map((fish) => fish.speciesId)}
-        />
+    <GlassModal
+      isOpen={isOpen}
+      onClose={onClose}
+      placement="bottom"
+      labelledBy="add-fish-title"
+      className="flex flex-col"
+    >
+      <div className="flex min-h-0 flex-1 flex-col">
+        <h2 id="add-fish-title" className="sr-only">Add fish</h2>
+        <div className="flex justify-end px-3 pt-3">
+          <GlassIconButton
+            size="sm"
+            label="Close add fish"
+            onClick={onClose}
+            className="
+              shrink-0 border-none! bg-transparent! shadow-none!
+              backdrop-blur-none! hover:bg-transparent!
+            "
+          >
+            <X size={18} />
+          </GlassIconButton>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-2 pb-5">
+          <SpeciesSelector
+            selectedSpeciesId={null}
+            onSelect={onSpeciesSelect}
+            placeholder="Search common or scientific name"
+            excludeSpeciesIds={fishList.map((fish) => fish.speciesId)}
+            presentation="inline"
+          />
+        </div>
       </div>
-      <div className="mt-1.5 flex gap-2.5">
-        <GlassButton variant="primary" size="md" type="submit" className="
-          flex-1
-        ">
-          Add Species
-        </GlassButton>
-        <GlassButton variant="outline" size="md" type="button" onClick={onClose}>
-          Cancel
-        </GlassButton>
-      </div>
-    </form>
-  </div>
+    </GlassModal>
 );
 
-export const MyFishScreen: React.FC<{
-  showAddForm?: boolean;
-  onToggleAddForm?: () => void;
-}> = ({ showAddForm: externalShowAddForm, onToggleAddForm: externalToggleAddForm }) => {
-  const hookValues = useMyFish(
-    externalShowAddForm !== undefined
-      ? { externalShowAddForm, onExternalToggleAddForm: externalToggleAddForm }
-      : undefined
-  );
+export const MyFishScreen: React.FC = () => {
+  const hookValues = useMyFish();
   const {
     fishList,
     stats,
     speciesDistribution,
-    selectedSpeciesId,
     showAddForm,
     activeFishId,
     aquariumOverviewExpanded,
     fishToDelete,
     getSpeciesDisplay,
+    onToggleAddForm,
     onCloseAddForm,
     onSpeciesSelect,
-    onAdd,
     onToggleFish,
     onToggleAquariumOverview,
     onIncrementCount,
@@ -195,12 +182,21 @@ export const MyFishScreen: React.FC<{
 
   return (
     <div className="flex flex-col">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <div>
+          <span className="block type-caption">Tank inhabitants</span>
+          <h1 className="mt-0.5 text-display font-extrabold text-text">My Fish</h1>
+        </div>
+        <GlassButton variant="primary" size="sm" onClick={onToggleAddForm}>
+          <Plus size={17} aria-hidden="true" />
+          Add fish
+        </GlassButton>
+      </div>
+
       <AddSpeciesForm
-        show={showAddForm}
-        selectedSpeciesId={selectedSpeciesId}
+        isOpen={showAddForm}
         fishList={fishList}
         onSpeciesSelect={onSpeciesSelect}
-        onAdd={onAdd}
         onClose={onCloseAddForm}
       />
 
@@ -353,9 +349,18 @@ export const MyFishScreen: React.FC<{
         <div className="flex flex-col gap-3">
           {fishList.length === 0 && (
             <GlassCard className="p-6 text-center">
-              <span className="text-5xl">🐟</span>
+              <span className="mb-2 block text-5xl">🐟</span>
               <p className="type-strong">No fish in your inventory</p>
-              <p className="type-caption">Tap + to add your first species</p>
+              <p className="mt-1 type-caption">Build your tank profile one species at a time.</p>
+              <GlassButton
+                variant="primary"
+                size="md"
+                onClick={onToggleAddForm}
+                className="mt-4"
+              >
+                <Plus size={18} aria-hidden="true" />
+                Add your first fish
+              </GlassButton>
             </GlassCard>
           )}
 

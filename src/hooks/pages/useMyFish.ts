@@ -17,17 +17,11 @@ interface SpeciesDisplay {
   imagePath: string | undefined;
 }
 
-export const useMyFish = (external?: {
-  externalShowAddForm?: boolean;
-  onExternalToggleAddForm?: () => void;
-}) => {
+export const useMyFish = () => {
   const { tankId } = useTank();
   const { fishList, addFish, removeFish, updateFishCount } = useFish(tankId);
 
-  const [name, setName] = useState('');
-  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string | null>(null);
-  const [internalShowAddForm, setInternalShowAddForm] = useState(false);
-  const showAddForm = external?.externalShowAddForm ?? internalShowAddForm;
+  const [showAddForm, setShowAddForm] = useState(false);
   const [activeFishId, setActiveFishId] = useState<string | null>(null);
   const [aquariumOverviewExpanded, setAquariumOverviewExpanded] = useState(false);
   const [fishToDelete, setFishToDelete] = useState<string | null>(null);
@@ -68,50 +62,20 @@ export const useMyFish = (external?: {
   }, []);
 
   const onToggleAddForm = useCallback(() => {
-    if (external?.onExternalToggleAddForm) {
-      external.onExternalToggleAddForm();
-    } else {
-      setInternalShowAddForm((prev) => !prev);
-    }
-  }, [external]);
-
-  const onCloseAddForm = useCallback(() => {
-    if (external?.onExternalToggleAddForm) {
-      external.onExternalToggleAddForm();
-    } else {
-      setInternalShowAddForm(false);
-    }
-    setName('');
-    setSelectedSpeciesId(null);
-  }, [external]);
-
-  const onSpeciesSelect = useCallback((species: SpeciesInfo | null, customName?: string) => {
-    if (species) {
-      setSelectedSpeciesId(species.id);
-      setName(species.name);
-    } else if (customName) {
-      setSelectedSpeciesId(null);
-      setName(customName);
-    }
+    setShowAddForm((prev) => !prev);
   }, []);
 
-  const onAdd = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!name.trim() || !tankId) return;
-      const species = selectedSpeciesId ? getSpeciesById(selectedSpeciesId) : null;
-      const imageUrl = species ? species.imagePath : '/species-placeholder.png';
-      addFish(name.trim(), imageUrl, 1);
-      setName('');
-      setSelectedSpeciesId(null);
-      if (external?.onExternalToggleAddForm) {
-        external.onExternalToggleAddForm();
-      } else {
-        setInternalShowAddForm(false);
-      }
-    },
-    [name, selectedSpeciesId, tankId, addFish, external]
-  );
+  const onCloseAddForm = useCallback(() => {
+    setShowAddForm(false);
+  }, []);
+
+  const onSpeciesSelect = useCallback((species: SpeciesInfo | null, customName?: string) => {
+    const speciesName = species?.name ?? customName?.trim();
+    if (!speciesName || !tankId) return;
+
+    addFish(speciesName, species?.imagePath ?? '/species-placeholder.png', 1);
+    setShowAddForm(false);
+  }, [addFish, tankId]);
 
   const onToggleFish = useCallback((id: string) => {
     setActiveFishId((prev) => (prev === id ? null : id));
@@ -144,10 +108,6 @@ export const useMyFish = (external?: {
     fishList,
     stats,
     speciesDistribution,
-    name,
-    setName,
-    selectedSpeciesId,
-    setSelectedSpeciesId,
     showAddForm,
     activeFishId,
     aquariumOverviewExpanded,
@@ -156,7 +116,6 @@ export const useMyFish = (external?: {
     onToggleAddForm,
     onCloseAddForm,
     onSpeciesSelect,
-    onAdd,
     onToggleFish,
     onToggleAquariumOverview,
     onIncrementCount,
