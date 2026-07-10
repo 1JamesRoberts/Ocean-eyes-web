@@ -184,7 +184,6 @@ export const MyFishScreen: React.FC = () => {
     <div className="flex flex-col">
       <ScreenHeader
         eyebrow="Aquarium inventory"
-        title="My Fish"
         className="mb-4"
         action={(
           <GlassButton

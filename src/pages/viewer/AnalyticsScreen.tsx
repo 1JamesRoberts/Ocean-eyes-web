@@ -113,7 +113,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-6">
-      <ScreenHeader eyebrow="Aquarium intelligence" title="Analytics" className="-mb-1" />
+      <ScreenHeader eyebrow="Aquarium intelligence" className="-mb-1" />
       {/* Error banner */}
       {error && (
         <GlassCard className="border-critical bg-critical/10 p-3">

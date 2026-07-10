@@ -18,7 +18,7 @@ export const LiveTuningScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <ScreenHeader eyebrow="Aquarium controls" title="Account" className="-mb-1" />
+      <ScreenHeader eyebrow="Aquarium controls" className="-mb-1" />
       <section>
         <LiveVideoSection
           tankId={tankId}
