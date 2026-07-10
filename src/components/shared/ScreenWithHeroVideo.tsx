@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HeroActionLayerContext } from './HeroActionLayerContext';
-import { TabPageDots } from './TabPageDots';
+
 
 interface ScreenWithHeroVideoProps {
   /** Hero content rendered inside the sticky section. */
@@ -47,9 +47,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
         )}
         <div className="relative z-10 -mx-4 flex flex-1 flex-col bg-gradient-mint px-4 pb-28">
           {showHero && (
-            <div className="flex h-5 translate-y-1 items-center justify-center">
-              <TabPageDots />
-            </div>
+            <div className="h-5 translate-y-1" aria-hidden="true" />
           )}
           {children}
         </div>
