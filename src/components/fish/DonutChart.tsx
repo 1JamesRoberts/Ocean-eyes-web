@@ -13,8 +13,10 @@ interface DonutChartProps {
 
 export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) => {
   const total = speciesDistribution.reduce((sum, s) => sum + s.count, 0);
+  const chartSize = 200;
+  const chartCenter = chartSize / 2;
   const radius = 80;
-  const strokeWidth = 24;
+  const strokeWidth = 19.2;
   const separatorWidth = speciesDistribution.length > 1 ? 3 : 0;
   const circumference = 2 * Math.PI * radius;
   const divisor = total > 0 ? total : 1;
@@ -53,14 +55,58 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
     );
   }
 
+  const speciesBySide = speciesDistribution.reduce<[SpeciesSlice[], SpeciesSlice[]]>(
+    (sides, species, index) => {
+      sides[index % 2].push(species);
+      return sides;
+    },
+    [[], []]
+  );
+  const chartColumnClass =
+    speciesDistribution.length <= 4
+      ? 'grid-cols-[minmax(0,1fr)_clamp(7rem,50%,13.5rem)_minmax(0,1fr)]'
+      : 'grid-cols-[minmax(0,1fr)_clamp(7rem,40%,11rem)_minmax(0,1fr)]';
+
+  const renderSpeciesLabel = (species: SpeciesSlice, side: 'left' | 'right') => (
+    <li
+      key={species.name}
+      className={`flex max-w-full min-w-0 items-center gap-1 overflow-hidden text-[11px] leading-tight text-text-muted ${
+        side === 'left' ? 'justify-end text-right' : 'justify-start text-left'
+      }`}
+      title={`${species.name} (${species.count})`}
+    >
+      <span
+        aria-hidden="true"
+        className="size-2 shrink-0 rounded-full"
+        style={{ backgroundColor: species.color }}
+      />
+      <span className="min-w-0 overflow-hidden whitespace-nowrap">{species.name}</span>
+      <span className="shrink-0">({species.count})</span>
+    </li>
+  );
+
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative size-[200px]">
-        <svg width="200" height="200" viewBox="0 0 200 200">
-          <g transform="rotate(-90 100 100)">
+    <div
+      className={`grid w-full items-stretch overflow-hidden transition-[grid-template-columns] duration-300 ${chartColumnClass}`}
+    >
+      <ul
+        aria-label="Species on the left of the chart"
+        className="flex min-w-0 flex-col justify-evenly gap-2 py-2 pr-1"
+      >
+        {speciesBySide[0].map((species) => renderSpeciesLabel(species, 'left'))}
+      </ul>
+
+      <div className="relative aspect-square w-full self-center">
+        <svg
+          aria-label={`Species distribution for ${total} fish`}
+          className="size-full"
+          role="img"
+          viewBox={`0 0 ${chartSize} ${chartSize}`}
+        >
+          <g transform={`rotate(-90 ${chartCenter} ${chartCenter})`}>
             <circle
-              cx="100"
-              cy="100"
+              cx={chartCenter}
+              cy={chartCenter}
               r={radius}
               fill="none"
               stroke="transparent"
@@ -68,9 +114,9 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
             />
             {segmentsWithOffsets.map(({ species, dashLength, gapLength, offset, index }) => (
               <circle
-                key={index}
-                cx="100"
-                cy="100"
+                key={`${species.name}-${index}`}
+                cx={chartCenter}
+                cy={chartCenter}
                 r={radius}
                 fill="none"
                 stroke={species.color}
@@ -83,26 +129,17 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
           </g>
         </svg>
         <div className="absolute top-1/2 left-1/2 -translate-1/2 text-center">
-          <div className="text-display font-extrabold text-text">{total}</div>
-          <div className="type-strong">Total Fish</div>
+          <div className="text-3xl font-extrabold leading-none text-text">{total}</div>
+          <div className="text-[11px] leading-tight font-normal text-text-muted">Total Fish</div>
         </div>
       </div>
 
-      <div className="flex w-full flex-wrap justify-center gap-2">
-        {speciesDistribution.map((species, index) => (
-          <div key={index} className="
-            flex items-center gap-1.5 type-caption
-          ">
-            <div
-              className="size-2.5 rounded-full"
-              style={{ backgroundColor: species.color }}
-            />
-            <span>
-              {species.name} ({species.count})
-            </span>
-          </div>
-        ))}
-      </div>
+      <ul
+        aria-label="Species on the right of the chart"
+        className="flex min-w-0 flex-col justify-evenly gap-2 py-2 pl-1"
+      >
+        {speciesBySide[1].map((species) => renderSpeciesLabel(species, 'right'))}
+      </ul>
     </div>
   );
 };

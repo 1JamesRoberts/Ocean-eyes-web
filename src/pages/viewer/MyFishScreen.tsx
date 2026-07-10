@@ -222,16 +222,18 @@ export const MyFishScreen: React.FC<{
               }
             }}
           >
-            <CardSectionHeader icon={BarChart3} title="Species Distribution" />
+            <CardSectionHeader
+              icon={BarChart3}
+              title="Species Distribution"
+              className="mb-1!"
+            />
             <DonutChart speciesDistribution={speciesDistribution} />
-
-            <div className="mt-5 h-px bg-border" />
 
             <div
               data-aquarium-overview
               className="
-                mt-4 flex items-center justify-between rounded-xl
-                p-3
+                mt-2 flex items-center justify-between rounded-xl
+                p-2
               "
             >
               <div className="flex min-w-0 flex-1 items-center gap-3">
