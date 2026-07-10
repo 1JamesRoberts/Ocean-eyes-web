@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMyFish } from '../../hooks/pages/useMyFish';
 import {
-  Trash2, Fish, BarChart3, Plus, X,
+  Trash2, Fish, Plus, X,
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle
 } from 'lucide-react';
@@ -11,7 +11,7 @@ import { FishThumbnail } from '../../components/fish/FishThumbnail';
 import { DetailChip } from '../../components/fish/DetailChip';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
 import {
-  CardSectionHeader,
+
   GlassButton,
   GlassCard,
   GlassIconButton,
@@ -182,10 +182,10 @@ export const MyFishScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="mb-4 flex items-end justify-between gap-4">
-        <div>
-          <span className="block type-caption">Tank inhabitants</span>
-          <h1 className="mt-0.5 text-display font-extrabold text-text">My Fish</h1>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-baseline gap-2">
+          <h1 className="text-display leading-none font-extrabold text-text">My Fish</h1>
+          <span className="truncate type-caption">Tank inhabitants</span>
         </div>
         <GlassButton variant="primary" size="sm" onClick={onToggleAddForm}>
           <Plus size={17} aria-hidden="true" />
@@ -218,11 +218,6 @@ export const MyFishScreen: React.FC = () => {
               }
             }}
           >
-            <CardSectionHeader
-              icon={BarChart3}
-              title="Species"
-              className="mb-1!"
-            />
             <DonutChart speciesDistribution={speciesDistribution} />
 
             <div
