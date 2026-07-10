@@ -11,7 +11,6 @@ import { FishThumbnail } from '../../components/fish/FishThumbnail';
 import { DetailChip } from '../../components/fish/DetailChip';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
 import {
-
   GlassButton,
   GlassCard,
   GlassIconButton,
