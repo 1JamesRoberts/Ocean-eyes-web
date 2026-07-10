@@ -9,7 +9,7 @@ interface Props {
 
 const DEFAULT_HEIGHT = 140;
 const PADDING = 20;
-const MAX_VAL = 5;
+const LABEL_GAP = 8;
 const MIN_VAL = 0;
 const DEFAULT_WIDTH = 600;
 
@@ -35,10 +35,17 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
   const points = useMemo(() => {
     const history = [...readings].reverse().slice(-7);
     if (history.length === 0) return [];
+
+    const maxClarity = Math.max(...history.map((r) => r.clarity ?? MIN_VAL), MIN_VAL);
+    const maxVal = Math.max(5, Math.ceil(maxClarity));
+    const plotTop = PADDING + LABEL_GAP;
+    const plotHeight = HEIGHT - PADDING - plotTop;
+
     return history.map((r, idx) => {
       const x = PADDING + (idx * (width - 2 * PADDING) / Math.max(1, history.length - 1));
-      const y = HEIGHT - PADDING - ((r.clarity - MIN_VAL) * (HEIGHT - 2 * PADDING) / (MAX_VAL - MIN_VAL));
-      return { x, y, clarity: r.clarity };
+      const clarity = r.clarity ?? MIN_VAL;
+      const y = HEIGHT - PADDING - ((clarity - MIN_VAL) * plotHeight / (maxVal - MIN_VAL));
+      return { x, y, clarity };
     });
   }, [readings, width, HEIGHT]);
 
@@ -58,9 +65,7 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
 
   return (
     <div ref={containerRef} className="w-full">
-      <svg width="100%" height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} className="
-        block overflow-visible
-      ">
+      <svg width="100%" height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} className="block overflow-hidden">
         <defs>
           <linearGradient id="miniChartGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-info)" stopOpacity="0.3" />
