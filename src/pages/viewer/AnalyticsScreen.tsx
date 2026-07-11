@@ -132,7 +132,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   isFallback,
 }) => {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <ScreenHeader
         eyebrow="Aquarium intelligence"
         className="relative items-start -mb-1"

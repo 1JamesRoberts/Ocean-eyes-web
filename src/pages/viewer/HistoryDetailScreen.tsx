@@ -2,31 +2,25 @@ import React from 'react';
 import { Database, Waves } from 'lucide-react';
 import { useHistoryDetail } from '../../hooks/pages/useHistoryDetail';
 import { MiniClarityChart } from '../../components/analytics/MiniClarityChart';
-import { CardSectionHeader, GlassCard, GlassPanel } from '../../components/shared';
+import { CardSectionHeader, GlassCard, GlassPanel, ScreenHeader } from '../../components/shared';
 
 export const HistoryDetailScreen: React.FC = () => {
   const { readings, recentReadings, onBack } = useHistoryDetail();
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="
-        flex min-h-[75px] items-center justify-between border-b border-border
-        pb-3
-        max-xs:flex-col max-xs:items-start max-xs:gap-3
-      ">
-        <div>
-          <span className="block type-caption">History</span>
-          <h1 className="mt-0.5 text-display font-extrabold text-text">Clarity Analytics</h1>
-        </div>
-        <button
-          className="
-            cursor-pointer border-none bg-transparent type-strong text-brand
-          "
-          onClick={onBack}
-        >
-          ← Back
-        </button>
-      </div>
+    <div className="flex flex-col gap-4">
+      <ScreenHeader
+        eyebrow="Clarity analytics"
+        className="-mb-1"
+        action={(
+          <button
+            className="cursor-pointer border-none bg-transparent type-strong text-brand"
+            onClick={onBack}
+          >
+            ← Back
+          </button>
+        )}
+      />
 
       {/* Main Clarity Area Chart */}
       <GlassCard className="p-5">

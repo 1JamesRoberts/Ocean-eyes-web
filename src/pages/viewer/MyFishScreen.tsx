@@ -181,10 +181,10 @@ export const MyFishScreen: React.FC = () => {
   // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-4">
       <ScreenHeader
         eyebrow="Aquarium inventory"
-        className="relative items-start mb-4"
+        className="relative items-start -mb-1"
         action={(
           <div className="absolute top-0 right-0 -translate-y-2.5">
             <GlassButton

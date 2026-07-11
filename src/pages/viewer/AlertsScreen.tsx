@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useAlertsScreen } from '../../hooks/pages/useAlertsScreen';
 import { AlertDetail } from '../../components/shared/AlertDetail';
-import { GlassPanel } from '../../components/shared';
+import { GlassPanel, ScreenHeader } from '../../components/shared';
 
 export const AlertsScreen: React.FC = () => {
   const {
@@ -27,17 +27,19 @@ export const AlertsScreen: React.FC = () => {
 
   // Alerts Log List
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <button
-          className="
-            cursor-pointer border-none bg-transparent type-strong text-brand
-          "
-          onClick={onBack}
-        >
-          ← Back
-        </button>
-      </div>
+    <div className="flex flex-col gap-4">
+      <ScreenHeader
+        eyebrow="Alerts"
+        className="-mb-1"
+        action={(
+          <button
+            className="cursor-pointer border-none bg-transparent type-strong text-brand"
+            onClick={onBack}
+          >
+            ← Back
+          </button>
+        )}
+      />
 
       <div className="flex flex-col gap-3">
         {alerts.map(alert => (

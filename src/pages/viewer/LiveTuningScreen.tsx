@@ -17,7 +17,7 @@ export const LiveTuningScreen: React.FC = () => {
     useCameraFilters({ tankId });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <ScreenHeader eyebrow="Aquarium controls" className="-mb-1" />
       <section>
         <LiveVideoSection
