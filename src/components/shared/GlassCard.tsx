@@ -4,7 +4,7 @@ import React from 'react';
 interface GlassCardProps {
   children: React.ReactNode;
   className?: string;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLElement>;
   role?: string;
   tabIndex?: number;
   onKeyDown?: (e: React.KeyboardEvent) => void;

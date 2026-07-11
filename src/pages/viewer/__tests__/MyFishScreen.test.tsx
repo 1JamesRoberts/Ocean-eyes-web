@@ -5,7 +5,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SpeciesInfo } from '../../../data/speciesCatalog';
 import { MyFishScreen } from '../MyFishScreen';
 
-const { mockPersistFish } = vi.hoisted(() => ({ mockPersistFish: vi.fn() }));
+const {
+  inventoryTestState,
+  mockPersistFish,
+  mockIncrementCount,
+  mockDecrementCount,
+} = vi.hoisted(() => ({
+  inventoryTestState: { enabled: false },
+  mockPersistFish: vi.fn(),
+  mockIncrementCount: vi.fn(),
+  mockDecrementCount: vi.fn(),
+}));
 
 afterEach(cleanup);
 
@@ -16,6 +26,8 @@ vi.mock('../../../components/fish/DonutChart', () => ({
 vi.mock('../../../hooks/pages/useMyFish', () => ({
   useMyFish: () => {
     const [showAddForm, setShowAddForm] = useState(false);
+    const [activeFishId, setActiveFishId] = useState<string | null>(null);
+    const [fishToDelete, setFishToDelete] = useState<string | null>(null);
 
     const onToggleAddForm = useCallback(() => setShowAddForm((open) => !open), []);
     const onCloseAddForm = useCallback(() => setShowAddForm(false), []);
@@ -23,9 +35,19 @@ vi.mock('../../../hooks/pages/useMyFish', () => ({
       mockPersistFish();
       setShowAddForm(false);
     }, []);
+    const fishList = inventoryTestState.enabled
+      ? [{
+          id: 'fish-1',
+          speciesId: 'cardinal_tetra',
+          name: 'Cardinal tetra',
+          image: '/fish_crops/cardinal_tetra.png',
+          count: 9,
+          detected: 4,
+        }]
+      : [];
 
     return {
-      fishList: [],
+      fishList,
       stats: {
         uniqueSpecies: 0,
         totalDetected: 0,
@@ -37,26 +59,34 @@ vi.mock('../../../hooks/pages/useMyFish', () => ({
       },
       speciesDistribution: [],
       showAddForm,
-      activeFishId: null,
+      activeFishId,
       aquariumOverviewExpanded: false,
-      fishToDelete: null,
-      getSpeciesDisplay: vi.fn(),
+      fishToDelete,
+      getSpeciesDisplay: () => ({
+        initials: 'CT',
+        color: '#DC2626',
+        name: 'Cardinal tetra',
+        imagePath: '/fish_crops/cardinal_tetra.png',
+      }),
       onToggleAddForm,
       onCloseAddForm,
       onSpeciesSelect,
-      onToggleFish: vi.fn(),
+      onToggleFish: (id: string) => setActiveFishId((current) => current === id ? null : id),
       onToggleAquariumOverview: vi.fn(),
-      onIncrementCount: vi.fn(),
-      onDecrementCount: vi.fn(),
-      onRequestDelete: vi.fn(),
-      onCancelDelete: vi.fn(),
+      onIncrementCount: mockIncrementCount,
+      onDecrementCount: mockDecrementCount,
+      onRequestDelete: setFishToDelete,
+      onCancelDelete: () => setFishToDelete(null),
       onConfirmDelete: vi.fn(),
     };
   },
 }));
 
 describe('MyFishScreen add flow', () => {
-  beforeEach(() => mockPersistFish.mockReset());
+  beforeEach(() => {
+    inventoryTestState.enabled = false;
+    mockPersistFish.mockReset();
+  });
 
   it('opens a headerless picker without a separate confirmation action', () => {
     render(<MyFishScreen />);
@@ -81,5 +111,62 @@ describe('MyFishScreen add flow', () => {
 
     expect(mockPersistFish).toHaveBeenCalledOnce();
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+});
+
+describe('MyFishScreen inventory controls', () => {
+  beforeEach(() => {
+    inventoryTestState.enabled = true;
+    mockIncrementCount.mockReset();
+    mockDecrementCount.mockReset();
+  });
+
+  it('reveals inline controls while retaining the species details', () => {
+    render(<MyFishScreen />);
+
+    const fishDisclosure = screen.getByRole('button', { name: /Cardinal tetra/i });
+    expect(fishDisclosure.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.getByText('44%')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Increase fish count' })).toBeNull();
+
+    fireEvent.click(fishDisclosure);
+
+    expect(fishDisclosure.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.queryByText('44%')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Increase fish count' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Delete fish' })).toBeTruthy();
+    expect(screen.getByText('Size')).toBeTruthy();
+    expect(screen.queryByText('Inventory count')).toBeNull();
+  });
+
+  it('runs inventory actions without collapsing the fish card', () => {
+    render(<MyFishScreen />);
+
+    const fishDisclosure = screen.getByRole('button', { name: /Cardinal tetra/i });
+    fireEvent.click(fishDisclosure);
+    fireEvent.click(screen.getByRole('button', { name: 'Decrease fish count' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Increase fish count' }));
+
+    expect(mockDecrementCount).toHaveBeenCalledWith('fish-1', 9);
+    expect(mockIncrementCount).toHaveBeenCalledWith('fish-1', 9);
+    expect(fishDisclosure.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete fish' }));
+    expect(screen.getByRole('dialog', { name: 'Delete Fish Entry' })).toBeTruthy();
+    expect(fishDisclosure.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('toggles from non-control areas anywhere inside the card', () => {
+    render(<MyFishScreen />);
+
+    const fishDisclosure = screen.getByRole('button', { name: /Cardinal tetra/i });
+    const fishCard = fishDisclosure.closest('[data-fish-card]');
+    expect(fishCard).toBeTruthy();
+
+    fireEvent.click(fishCard!);
+    expect(fishDisclosure.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(screen.getByText('Size'));
+    expect(fishDisclosure.getAttribute('aria-expanded')).toBe('false');
   });
 });

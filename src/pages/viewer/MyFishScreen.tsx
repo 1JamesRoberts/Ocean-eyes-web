@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMyFish } from '../../hooks/pages/useMyFish';
 import {
-  Trash2, Fish, Plus, X,
+  Trash2, Fish, Minus, Plus, X,
   Thermometer, Droplets, Ruler, Maximize2,
   AlertTriangle, CheckCircle
 } from 'lucide-react';
@@ -59,31 +59,29 @@ const FishCountStepper: React.FC<FishCountStepperProps> = ({
   onDecrement,
   onIncrement,
 }) => (
-  <div className="
-    flex items-center rounded-xl border border-white/20 bg-white/30 p-0.5
-  ">
+  <div className="flex items-center gap-0.5">
     <button
       type="button"
       aria-label="Decrease fish count"
       className="
-        flex size-11 cursor-pointer items-center justify-center rounded-lg border-none
-        bg-transparent type-strong
+        flex size-9 cursor-pointer items-center justify-center border-none bg-transparent
+        type-strong
       "
       onClick={onDecrement}
     >
-      -
+      <Minus size={14} strokeWidth={2.25} aria-hidden="true" />
     </button>
-    <span className="w-6 text-center type-strong">{count}</span>
+    <span className="w-5 text-center type-strong">{count}</span>
     <button
       type="button"
       aria-label="Increase fish count"
       className="
-        flex size-11 cursor-pointer items-center justify-center rounded-lg border-none
-        bg-transparent type-strong
+        flex size-9 cursor-pointer items-center justify-center border-none bg-transparent
+        type-strong
       "
       onClick={onIncrement}
     >
-      +
+      <Plus size={14} strokeWidth={2.25} aria-hidden="true" />
     </button>
   </div>
 );
@@ -250,9 +248,6 @@ export const MyFishScreen: React.FC = () => {
                   <span className="
                     block truncate type-strong
                   ">Fish Overview</span>
-                  <span className="
-                    block truncate type-caption
-                  ">Species mix and visibility</span>
                   <span className="mt-0.5 block type-caption italic">
                     {stats.uniqueSpecies} species
                   </span>
@@ -388,7 +383,16 @@ export const MyFishScreen: React.FC = () => {
               : [];
 
             return (
-              <GlassCard key={fish.id} data-fish-card className="flex flex-col overflow-hidden p-4!">
+              <GlassCard
+                key={fish.id}
+                data-fish-card
+                clickable
+                className="flex flex-col overflow-hidden p-4!"
+                onClick={(event) => {
+                  if ((event.target as HTMLElement).closest('button')) return;
+                  onToggleFish(fish.id);
+                }}
+              >
                 {/* Main row — always visible */}
                 <div className="flex items-center justify-between p-3">
                   <button
@@ -414,16 +418,36 @@ export const MyFishScreen: React.FC = () => {
                     </div>
                   </button>
 
-                  <div className="
-                    flex items-center gap-2
-                    max-xs:gap-1.5
-                  ">
+                  <div className="flex shrink-0 items-center gap-1">
                     {/* Visibility ring */}
                     <DetectionVisibilityRing
                       detected={fish.detected}
                       expected={fish.count}
+                      size={isActive ? 40 : undefined}
+                      showLabel={!isActive}
                     />
 
+                    {isActive && (
+                      <>
+                        <FishCountStepper
+                          count={fish.count}
+                          onDecrement={() => onDecrementCount(fish.id, fish.count)}
+                          onIncrement={() => onIncrementCount(fish.id, fish.count)}
+                        />
+                        <GlassIconButton
+                          size="sm"
+                          label="Delete fish"
+                          onClick={() => onRequestDelete(fish.id)}
+                          className="
+                            size-9! border-none! bg-transparent! p-0! shadow-none!
+                            backdrop-blur-none!
+                            hover:bg-transparent! hover:shadow-none!
+                          "
+                        >
+                          <Trash2 size={16} />
+                        </GlassIconButton>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -443,19 +467,6 @@ export const MyFishScreen: React.FC = () => {
                     `}>
                       {species && (
                         <>
-                          <div className="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-white/20 bg-white/20 p-2">
-                            <span className="type-caption">Inventory count</span>
-                            <div className="flex items-center gap-2">
-                              <FishCountStepper
-                                count={fish.count}
-                                onDecrement={() => onDecrementCount(fish.id, fish.count)}
-                                onIncrement={() => onIncrementCount(fish.id, fish.count)}
-                              />
-                              <GlassIconButton size="sm" label="Delete fish" onClick={() => onRequestDelete(fish.id)}>
-                                <Trash2 size={16} />
-                              </GlassIconButton>
-                            </div>
-                          </div>
                           {/* Parameter chips — 2-column grid */}
                           <div className="
                             mb-3.5 grid grid-cols-1 gap-3
