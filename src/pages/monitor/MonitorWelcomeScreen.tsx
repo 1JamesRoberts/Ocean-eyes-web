@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTank } from '../../hooks/useTank';
 import { Camera } from 'lucide-react';
+import { MonitorButton } from '../../components/monitor/MonitorPrimitives';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
@@ -30,44 +31,17 @@ export const MonitorWelcomeScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
       </p>
 
       <div className="flex w-full max-w-[280px] flex-col gap-3.5">
-        <button
-          className="
-            inline-flex w-full cursor-pointer items-center justify-center gap-2
-            rounded-xl border-none bg-primary-gradient px-6 py-3.5
-            type-strong-inverse
-            shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
-            hover:bg-primary-hover-gradient
-            active:scale-[0.98]
-          "
-          onClick={() => onNavigate('active')}
-        >
+        <MonitorButton variant="primary" fullWidth onClick={() => onNavigate('active')}>
           {tankId ? 'Open Live Camera Monitor' : 'Open Live Camera Monitor (Demo Mode)'}
-        </button>
+        </MonitorButton>
 
-        <button
-          className="
-            inline-flex w-full cursor-pointer items-center justify-center gap-2
-            rounded-xl border border-monitor-border bg-[#1E293B] px-6 py-3.5
-            type-strong-inverse transition-smooth
-            hover:bg-monitor-border
-            active:scale-[0.98]
-          "
-          onClick={() => onNavigate('qr')}
-        >
+        <MonitorButton fullWidth onClick={() => onNavigate('qr')}>
           Pair with Mobile App
-        </button>
+        </MonitorButton>
 
-        <button
-          className="
-            inline-flex w-full cursor-pointer items-center justify-center gap-2
-            rounded-xl border border-monitor-border bg-transparent px-5 py-3
-            type-caption-inverse transition-smooth
-            hover:bg-[rgba(255,255,255,0.05)]
-          "
-          onClick={() => onNavigate('calibration')}
-        >
+        <MonitorButton variant="ghost" fullWidth onClick={() => onNavigate('calibration')}>
           Calibrate Water Level
-        </button>
+        </MonitorButton>
       </div>
 
       {activeTank && (

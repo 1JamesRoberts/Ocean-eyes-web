@@ -1,12 +1,12 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React from 'react';
-import { Activity, Brain, Calendar, Fish, Loader2, Trash2, Waves } from 'lucide-react';
+import { Activity, Brain, Calendar, Fish, Loader2, TriangleAlert, Trash2, Waves } from 'lucide-react';
 import type { useAnalytics } from '../../hooks/pages/useAnalytics';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
-import { CardSectionHeader, GlassButton, GlassCard, GlassPanel, ScreenHeader } from '../../components/shared';
+import { CardSectionHeader, GlassButton, GlassCard, GlassPanel, ScreenHeader, ScreenState } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
 
 type AnalyticsScreenProps = ReturnType<typeof useAnalytics>;
@@ -157,13 +157,15 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
       />
       {/* Error banner */}
       {error && (
-        <GlassCard className="border-critical bg-critical/10 p-3">
-          <div className="
-            flex items-center justify-between gap-3 type-body text-critical
-          ">
-            <span>{error}</span>
-            <GlassButton variant="outline" size="sm" onClick={refetch}>Retry</GlassButton>
-          </div>
+        <GlassCard className="border-critical bg-critical/10 p-0">
+          <ScreenState
+            icon={TriangleAlert}
+            title="Analytics could not be loaded"
+            description={error}
+            tone="danger"
+            compact
+            action={<GlassButton variant="outline" size="sm" onClick={refetch}>Retry</GlassButton>}
+          />
         </GlassCard>
       )}
 
@@ -176,16 +178,12 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
 
       {/* Empty state */}
       {!isInitialLoading && !error && !hasAnyData && (
-        <GlassCard className="px-6 py-12 text-center">
-          <div className="flex flex-col items-center justify-center gap-2">
-            <Calendar size={32} className="text-text-muted opacity-50" />
-            <span className="type-strong">
-              No data for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}
-            </span>
-            <span className="type-body-muted">
-              Try selecting a different range or run the AI pipeline to generate history.
-            </span>
-          </div>
+        <GlassCard className="p-0">
+          <ScreenState
+            icon={Calendar}
+            title={`No data for ${formatDateForDisplay(range.startDate)} – ${formatDateForDisplay(range.endDate)}`}
+            description="Choose another range or run the AI pipeline to generate history."
+          />
         </GlassCard>
       )}
 

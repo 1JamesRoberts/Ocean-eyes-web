@@ -1,7 +1,7 @@
 import React from 'react';
 import { FishSymbol, ChevronRight } from 'lucide-react';
 import { SpeciesAvatar } from '../fish/SpeciesAvatar';
-import { CardSectionHeader } from '../shared';
+import { CardSectionHeader, ScreenState } from '../shared';
 import type { FishEntry } from '../../types/aquarium';
 
 interface FishInventorySummaryProps {
@@ -34,11 +34,13 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
 
       <div className="space-y-2">
         {fishList.length === 0 ? (
-          <div className="
-            rounded-2xl border border-white/20 bg-white/20 p-4 text-center
-            type-caption
-          ">
-            No fish added yet.
+          <div className="rounded-2xl border border-white/20 bg-white/20">
+            <ScreenState
+              icon={FishSymbol}
+              title="No fish added"
+              description="Add your first fish to compare inventory with AI detections."
+              compact
+            />
           </div>
         ) : (
           fishList.slice(0, 3).map((fish) => {

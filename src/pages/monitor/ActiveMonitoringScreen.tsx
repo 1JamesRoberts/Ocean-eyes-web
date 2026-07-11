@@ -4,6 +4,7 @@ import { useReadings } from '../../hooks/useReadings';
 import { useFish } from '../../hooks/useFish';
 import { useAlerts } from '../../hooks/useAlerts';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
+import { MonitorButton, MonitorMetric } from '../../components/monitor/MonitorPrimitives';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
@@ -178,15 +179,8 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
 
       {/* Grid of monitored stats */}
       <div className="mb-4 grid grid-cols-2 gap-2.5">
-        <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-2.5">
-          <span className="block type-caption-inverse">VISIBILITY COUNT</span>
-          <strong className="type-strong text-[#38BDF8]">{displayFish} fish detected</strong>
-        </div>
-
-        <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-2.5">
-          <span className="block type-caption-inverse">WATER CLARITY</span>
-          <strong className="type-strong text-[#38BDF8]">{displayClarity.toFixed(2)} FNU</strong>
-        </div>
+        <MonitorMetric label="Visibility count" value={`${displayFish} fish detected`} />
+        <MonitorMetric label="Water clarity" value={`${displayClarity.toFixed(2)} FNU`} />
       </div>
 
       {/* Simulator triggers */}
@@ -200,11 +194,10 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
           Aquarium Simulator Controls
         </span>
         <div className="grid grid-cols-2 gap-2">
-          <button
-            className="
-              cursor-pointer rounded-lg border-none px-2.5 py-2 type-caption-inverse transition-colors
-            "
-            style={{ backgroundColor: hasClarityIssue ? 'var(--color-critical)' : '#1E293B' }}
+          <MonitorButton
+            variant={hasClarityIssue ? 'danger' : 'secondary'}
+            fullWidth
+            className="type-caption-inverse"
             onClick={() => {
               setHasClarityIssue(prev => {
                 const next = !prev;
@@ -214,22 +207,14 @@ export const ActiveMonitoringScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
             }}
           >
             {hasClarityIssue ? 'Restore Clarity' : 'Trigger Clog Filter'}
-          </button>
+          </MonitorButton>
 
         </div>
       </div>
 
-      <button
-        className="
-          inline-flex w-full cursor-pointer items-center justify-center gap-2
-          rounded-xl border border-monitor-border bg-transparent px-5 py-2.5
-          type-caption-inverse transition-smooth
-          hover:bg-[rgba(255,255,255,0.05)]
-        "
-        onClick={() => onNavigate('welcome')}
-      >
+      <MonitorButton variant="ghost" fullWidth onClick={() => onNavigate('welcome')}>
         Exit Active Monitoring
-      </button>
+      </MonitorButton>
     </div>
   );
 };

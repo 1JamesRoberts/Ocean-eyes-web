@@ -512,6 +512,23 @@
     padding: 0;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(25, 106, 89, 0.2);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: 3px;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
   }
 
   #root {
@@ -688,7 +705,7 @@
 
 /* ─── Phone Frame ─── */
 .phone-frame-root {
-  min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -697,8 +714,8 @@
 }
 
 .phone-frame {
-  width: var(--mobile-frame-width);
-  height: 100vh;
+  width: min(100%, var(--mobile-frame-width));
+  height: 100dvh;
   background: #000;
   position: relative;
   overflow: hidden;
@@ -888,7 +905,7 @@
 .pill-nav {
   position: absolute;
   left: 50%;
-  bottom: 16px;
+  bottom: max(12px, env(safe-area-inset-bottom));
   transform: translateX(-50%);
   z-index: 60;
   width: calc(100% - 32px);
@@ -924,6 +941,7 @@
   transition: color 0.25s ease, transform 0.15s ease;
   cursor: pointer;
   padding: 0 4px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pill-nav-item:hover {
@@ -942,9 +960,9 @@
   position: absolute;
   top: 6px;
   bottom: 6px;
-  left: 0;
-  width: var(--pill-indicator-w, 0px);
-  transform: translateX(var(--pill-indicator-x, 0px));
+  left: 8px;
+  width: calc((100% - 16px) / 4);
+  transform: translateX(calc(var(--pill-index, 0) * 100%));
   border-radius: 24px;
   background: linear-gradient(to right, #d0fffa 0%, #ffffff 140%);
   border: 0.5px solid var(--color-brand-bright);
@@ -993,6 +1011,17 @@
   .phone-frame .glass-card,
   .phone-frame .glass-panel {
     background: rgba(255, 255, 255, 0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

@@ -18,6 +18,7 @@ const ModalHarness: React.FC = () => {
         labelledBy="sheet-title"
       >
         <h2 id="sheet-title">Add a new fish</h2>
+        <button type="button">Save fish</button>
       </GlassModal>
     </>
   );
@@ -44,5 +45,12 @@ describe('GlassModal bottom placement', () => {
     fireEvent.click(screen.getByRole('dialog', { name: 'Add a new fish' }));
 
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('moves focus into the dialog when it opens', () => {
+    render(<ModalHarness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Add fish' }));
+
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Save fish' }));
   });
 });

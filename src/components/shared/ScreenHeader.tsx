@@ -6,17 +6,17 @@ interface ScreenHeaderProps {
   className?: string;
 }
 
-/** A consistent identity header and hero-to-content offset for primary app destinations. */
+/** A compact, semantic screen heading for primary and secondary destinations. */
 export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   eyebrow,
   action,
   className = '',
 }) => (
-  <header className={`-mt-2 -mb-1 flex h-5 items-center justify-between gap-4 ${className}`}>
+  <header className={`-mt-1 flex min-h-6 items-center justify-between gap-4 ${className}`}>
     <div className="min-w-0">
-      <p className="text-xs font-semibold tracking-[0.12em] text-brand uppercase">
+      <h1 className="text-xs font-semibold tracking-[0.12em] text-brand uppercase">
         {eyebrow}
-      </p>
+      </h1>
     </div>
     {action && <div className="shrink-0">{action}</div>}
   </header>

@@ -6,6 +6,8 @@ interface GlassPanelProps {
   as?: 'div' | 'button' | 'article';
   onClick?: () => void;
   type?: 'button';
+  disabled?: boolean;
+  'aria-label'?: string;
 }
 
 export const GlassPanel: React.FC<GlassPanelProps> = ({
@@ -18,7 +20,7 @@ export const GlassPanel: React.FC<GlassPanelProps> = ({
     className={`
       rounded-2xl border border-white/20 bg-white/20 p-3
       transition-colors
-      ${Tag === 'button' ? 'w-full cursor-pointer text-left hover:bg-white/60' : ''}
+      ${Tag === 'button' ? 'min-h-11 w-full cursor-pointer text-left hover:bg-white/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand' : ''}
       ${className}
     `}
     {...rest}

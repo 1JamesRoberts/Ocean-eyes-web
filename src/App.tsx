@@ -13,7 +13,10 @@ const OceanEyesDashboard: React.FC = () => {
 
   return (
     <PhoneFrame navigation={<PillNavigation />}>
-      <main className="flex flex-1 flex-col gap-4 p-4 pb-0">
+      <main
+        id="main-content"
+        className="flex flex-1 flex-col gap-4 p-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]"
+      >
         <LiveFeedProvider tankId={tankId}>
           <AnalyticsControlsProvider active={activeTab === 'analytics'}>
             <ViewerApp />

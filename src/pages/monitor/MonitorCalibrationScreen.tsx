@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTank } from '../../hooks/useTank';
 import { useLiveFeed } from '../../hooks/useLiveFeed';
+import { MonitorButton } from '../../components/monitor/MonitorPrimitives';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
@@ -52,15 +53,33 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
 
       {/* Interactive Calibration Canvas */}
       <div
+        role="slider"
+        tabIndex={0}
+        aria-label="Water line position"
+        aria-valuemin={0}
+        aria-valuemax={240}
+        aria-valuenow={Math.round(lineY)}
+        aria-valuetext={`${Math.round(((240 - lineY) / 240) * 100)} percent tank height`}
         onMouseMove={(e) => {
           if (e.buttons === 1) handleDrag(e);
         }}
         onMouseDown={handleDrag}
         onTouchMove={handleDrag}
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            setLineY((value) => Math.max(0, value - 4));
+          }
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            setLineY((value) => Math.min(240, value + 4));
+          }
+        }}
         className="
-          shimmer flex h-[240px] cursor-ns-resize items-center justify-center
+          shimmer flex h-[240px] touch-none cursor-ns-resize items-center justify-center
           rounded-xl border-2 border-[#1E293B]
           bg-[radial-gradient(circle_at_center,#1E293B_0%,#0F172A_100%)]
+          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-monitor-accent
         "
       >
 
@@ -118,32 +137,17 @@ export const MonitorCalibrationScreen: React.FC<ScreenProps> = ({ onNavigate }) 
       </div>
 
       <div className="mt-4 flex gap-2.5">
-        <button
-          className="
-            inline-flex flex-1 cursor-pointer items-center justify-center gap-2
-            rounded-xl border-none bg-primary-gradient px-6 py-3
-            type-strong-inverse
-            shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
-            hover:bg-primary-hover-gradient
-            active:scale-[0.98]
-            disabled:cursor-not-allowed disabled:opacity-50
-          "
+        <MonitorButton
+          variant="primary"
+          className="flex-1"
           onClick={handleSave}
           disabled={!activeTank}
         >
           {isSaved ? '✓ Calibration Saved' : 'Confirm Level'}
-        </button>
-        <button
-          className="
-            inline-flex cursor-pointer items-center justify-center gap-2
-            rounded-xl border border-monitor-border bg-transparent px-4 py-3
-            type-caption-inverse transition-smooth
-            hover:bg-[rgba(255,255,255,0.05)]
-          "
-          onClick={() => onNavigate('welcome')}
-        >
+        </MonitorButton>
+        <MonitorButton variant="ghost" onClick={() => onNavigate('welcome')}>
           Cancel
-        </button>
+        </MonitorButton>
       </div>
     </div>
   );

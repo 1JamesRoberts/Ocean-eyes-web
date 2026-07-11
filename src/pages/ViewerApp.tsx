@@ -1,5 +1,5 @@
 // ViewerApp.tsx - Recreating Flutter UI screens for the Mobile Viewer Portal
-import React, { useMemo } from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
 import { useNavigation, type ViewerTab } from '../context/NavigationContext';
 import { useTank } from '../hooks/useTank';
 import { useAnalytics } from '../hooks/pages/useAnalytics';
@@ -8,14 +8,23 @@ import { HeroLiveFeedSection } from '../components/home/HeroLiveFeedSection';
 import { SpatialDetectionHeatmapOverlay } from '../components/analytics/SpatialDetectionHeatmapOverlay';
 import { RootGateOnboarding } from './viewer/RootGateOnboarding';
 import { HomeScreen } from './viewer/HomeScreen';
-import { LiveTuningScreen } from './viewer/LiveTuningScreen';
-import { AlertsScreen } from './viewer/AlertsScreen';
-import { HistoryDetailScreen } from './viewer/HistoryDetailScreen';
-import { MyFishScreen } from './viewer/MyFishScreen';
-import { AnalyticsScreen } from './viewer/AnalyticsScreen';
-import { IoTMonitor } from './IoTMonitor';
+
+const LiveTuningScreen = lazy(() => import('./viewer/LiveTuningScreen').then((module) => ({ default: module.LiveTuningScreen })));
+const AlertsScreen = lazy(() => import('./viewer/AlertsScreen').then((module) => ({ default: module.AlertsScreen })));
+const HistoryDetailScreen = lazy(() => import('./viewer/HistoryDetailScreen').then((module) => ({ default: module.HistoryDetailScreen })));
+const MyFishScreen = lazy(() => import('./viewer/MyFishScreen').then((module) => ({ default: module.MyFishScreen })));
+const AnalyticsScreen = lazy(() => import('./viewer/AnalyticsScreen').then((module) => ({ default: module.AnalyticsScreen })));
+const IoTMonitor = lazy(() => import('./IoTMonitor').then((module) => ({ default: module.IoTMonitor })));
 
 const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'live', 'settings', 'my_fish', 'analytics', 'alerts', 'history'];
+
+const ScreenLoadingFallback = () => (
+  <div className="flex flex-col gap-4" aria-label="Loading screen" aria-busy="true">
+    <div className="h-5 w-32 animate-pulse rounded-full bg-brand/10" />
+    <div className="h-40 animate-pulse rounded-4xl bg-white/35" />
+    <div className="h-28 animate-pulse rounded-4xl bg-white/25" />
+  </div>
+);
 
 export const ViewerApp: React.FC = () => {
   const tankId = useTank().tankId;
@@ -85,7 +94,9 @@ export const ViewerApp: React.FC = () => {
       ) : (
         <div className="flex flex-1 flex-col">
           <ScreenWithHeroVideo hero={defaultHero} showHero={showHero}>
-            {renderActiveScreen()}
+            <Suspense fallback={<ScreenLoadingFallback />}>
+              {renderActiveScreen()}
+            </Suspense>
           </ScreenWithHeroVideo>
         </div>
       )}

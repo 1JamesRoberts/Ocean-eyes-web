@@ -19,6 +19,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
   labelledBy,
 }) => {
   const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -28,8 +29,38 @@ export const GlassModal: React.FC<GlassModalProps> = ({
     const previousOverflow = scrollContainer?.style.overflow;
     if (scrollContainer) scrollContainer.style.overflow = 'hidden';
 
+    const getFocusableElements = () => Array.from(
+      contentRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ) ?? [],
+    );
+
+    const focusableElements = getFocusableElements();
+    (focusableElements[0] ?? contentRef.current)?.focus();
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const elements = getFocusableElements();
+      if (elements.length === 0) {
+        event.preventDefault();
+        contentRef.current?.focus();
+        return;
+      }
+
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', handleKeyDown);
 
@@ -60,6 +91,8 @@ export const GlassModal: React.FC<GlassModalProps> = ({
 
       {/* Content */}
       <div
+        ref={contentRef}
+        tabIndex={-1}
         className={`
           relative z-10 w-full glass-card
           ${isBottomSheet

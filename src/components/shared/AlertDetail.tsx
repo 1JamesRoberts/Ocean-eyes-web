@@ -5,6 +5,7 @@ import type { AlertItem } from '../../types/aquarium';
 import { GlassCard } from './GlassCard';
 import { GlassButton } from './GlassButton';
 import { ScreenHeader } from './ScreenHeader';
+import { BackButton } from './BackButton';
 
 interface AlertDetailProps {
   alert: AlertItem;
@@ -17,12 +18,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     <ScreenHeader
       eyebrow="Alert diagnostics"
       action={(
-        <button
-          className="cursor-pointer border-none bg-transparent type-strong text-brand"
-          onClick={onBack}
-        >
-          ← Back
-        </button>
+        <BackButton onClick={onBack} />
       )}
     />
 

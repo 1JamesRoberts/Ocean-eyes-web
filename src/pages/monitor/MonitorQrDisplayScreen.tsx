@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTank } from '../../hooks/useTank';
+import { MonitorButton } from '../../components/monitor/MonitorPrimitives';
 
 interface ScreenProps {
   onNavigate: (screen: 'welcome' | 'qr' | 'calibration' | 'active') => void;
@@ -47,10 +48,12 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
             ">
               <code className="type-caption text-[#38BDF8]">{activeTankId}</code>
               <button
+                type="button"
                 onClick={copyToClipboard}
                 className="
                   cursor-pointer border-none bg-transparent type-caption text-brand underline
                 "
+                aria-live="polite"
               >
                 {isCopied ? 'Copied!' : 'Copy'}
               </button>
@@ -63,19 +66,9 @@ export const MonitorQrDisplayScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
         </p>
       )}
 
-      <button
-        className="
-          inline-flex w-full max-w-[240px] cursor-pointer items-center
-          justify-center gap-2 rounded-xl border-none bg-primary-gradient px-6
-          py-3 type-strong-inverse
-          shadow-[0_4px_12px_rgba(13,148,136,0.15)] transition-smooth
-          hover:bg-primary-hover-gradient
-          active:scale-[0.98]
-        "
-        onClick={() => onNavigate('welcome')}
-      >
+      <MonitorButton variant="primary" fullWidth className="max-w-60" onClick={() => onNavigate('welcome')}>
         Done pairing
-      </button>
+      </MonitorButton>
     </div>
   );
 };

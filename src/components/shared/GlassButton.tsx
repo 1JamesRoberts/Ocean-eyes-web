@@ -9,7 +9,7 @@ interface GlassButtonProps {
   variant?: GlassVariant;
   size?: GlassSize;
   className?: string;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
   fullWidth?: boolean;
@@ -42,7 +42,7 @@ const sizeStyles: Record<GlassSize, string> = {
   lg: 'px-6 py-3.5 type-title',
 };
 
-const disabledStyles = 'opacity-50 pointer-events-none';
+const disabledStyles = 'cursor-not-allowed opacity-50';
 
 export const GlassButton: React.FC<GlassButtonProps> = ({
   children,
@@ -61,6 +61,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
     disabled={disabled}
     aria-label={ariaLabel}
     className={`
+      min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
       ${variantStyles[variant]}
       ${sizeStyles[size]}
       ${fullWidth ? 'w-full' : ''}

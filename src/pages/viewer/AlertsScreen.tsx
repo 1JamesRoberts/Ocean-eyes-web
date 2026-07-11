@@ -1,8 +1,8 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { BellOff, ChevronRight } from 'lucide-react';
 import { useAlertsScreen } from '../../hooks/pages/useAlertsScreen';
 import { AlertDetail } from '../../components/shared/AlertDetail';
-import { GlassPanel, ScreenHeader } from '../../components/shared';
+import { BackButton, GlassBadge, GlassPanel, ScreenHeader, ScreenState } from '../../components/shared';
 
 export const AlertsScreen: React.FC = () => {
   const {
@@ -31,17 +31,20 @@ export const AlertsScreen: React.FC = () => {
       <ScreenHeader
         eyebrow="Alerts"
         action={(
-          <button
-            className="cursor-pointer border-none bg-transparent type-strong text-brand"
-            onClick={onBack}
-          >
-            ← Back
-          </button>
+          <BackButton onClick={onBack} />
         )}
       />
 
       <div className="flex flex-col gap-3">
-        {alerts.map(alert => (
+        {alerts.length === 0 ? (
+          <div className="glass-card">
+            <ScreenState
+              icon={BellOff}
+              title="No alerts yet"
+              description="Aquarium safety events and resolved notices will appear here."
+            />
+          </div>
+        ) : alerts.map(alert => (
           <GlassPanel
             as="button"
             type="button"
@@ -63,9 +66,7 @@ export const AlertsScreen: React.FC = () => {
             <div className="mt-2 flex items-center justify-between gap-3">
               <span className="type-caption">{alert.timeAgo}</span>
               {alert.resolved && (
-                <span className="rounded-full bg-good/12 px-2.5 py-1 type-caption text-good">
-                  Resolved
-                </span>
+                <GlassBadge color="good">Resolved</GlassBadge>
               )}
             </div>
           </GlassPanel>

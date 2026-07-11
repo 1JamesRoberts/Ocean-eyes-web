@@ -1,7 +1,7 @@
 import React from 'react';
-import { ChevronRight, FlaskConical } from 'lucide-react';
+import { ChevronRight, FlaskConical, Radio } from 'lucide-react';
 import { useHome } from '../../hooks/pages/useHome';
-import { CardSectionHeader, ScreenHeader } from '../../components/shared';
+import { CardSectionHeader, ScreenHeader, ScreenState } from '../../components/shared';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
 import { WaterClarityCard } from '../../components/home/WaterClarityCard';
@@ -25,14 +25,12 @@ export const HomeScreen: React.FC = () => {
     <div className="flex flex-col gap-4">
       <ScreenHeader eyebrow="Aquarium overview" />
       {!hasReadingData ? (
-        <div className="glass-card p-6 text-center transition-smooth">
-          <span className="mb-3 block text-4xl">🐠</span>
-          <h3 className="mb-2 type-strong">
-            Waiting for monitor data…
-          </h3>
-          <p className="mx-auto type-caption">
-            The AI backend has not yet returned any readings. Make sure the OceanEyes inference service is running and has processed at least one frame.
-          </p>
+        <div className="glass-card">
+          <ScreenState
+            icon={Radio}
+            title="Waiting for monitor data"
+            description="OceanEyes will populate this dashboard after the inference service processes its first frame."
+          />
         </div>
       ) : (
         <>

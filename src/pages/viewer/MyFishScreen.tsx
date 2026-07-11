@@ -16,6 +16,7 @@ import {
   GlassIconButton,
   GlassModal,
   ScreenHeader,
+  ScreenState,
 } from '../../components/shared';
 import {
   getSpeciesById,
@@ -62,8 +63,10 @@ const FishCountStepper: React.FC<FishCountStepperProps> = ({
     flex items-center rounded-xl border border-white/20 bg-white/30 p-0.5
   ">
     <button
+      type="button"
+      aria-label="Decrease fish count"
       className="
-        flex size-6 cursor-pointer items-center justify-center border-none
+        flex size-11 cursor-pointer items-center justify-center rounded-lg border-none
         bg-transparent type-strong
       "
       onClick={onDecrement}
@@ -72,8 +75,10 @@ const FishCountStepper: React.FC<FishCountStepperProps> = ({
     </button>
     <span className="w-6 text-center type-strong">{count}</span>
     <button
+      type="button"
+      aria-label="Increase fish count"
       className="
-        flex size-6 cursor-pointer items-center justify-center border-none
+        flex size-11 cursor-pointer items-center justify-center rounded-lg border-none
         bg-transparent type-strong
       "
       onClick={onIncrement}
@@ -192,7 +197,7 @@ export const MyFishScreen: React.FC = () => {
               size="sm"
               onClick={onToggleAddForm}
               aria-label="Add fish"
-              className="!h-9 !gap-1.5 !rounded-full !px-3"
+              className="gap-1.5 rounded-full px-3"
             >
               <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
               <span className="font-semibold">Add fish</span>
@@ -351,19 +356,18 @@ export const MyFishScreen: React.FC = () => {
         {/* Right Column — Fish Cards */}
         <div className="flex flex-col gap-3">
           {fishList.length === 0 && (
-            <GlassCard className="p-6 text-center">
-              <span className="mb-2 block text-5xl">🐟</span>
-              <p className="type-strong">No fish in your inventory</p>
-              <p className="mt-1 type-caption">Build your tank profile one species at a time.</p>
-              <GlassButton
-                variant="primary"
-                size="md"
-                onClick={onToggleAddForm}
-                className="mt-4"
-              >
-                <Plus size={18} aria-hidden="true" />
-                Add your first fish
-              </GlassButton>
+            <GlassCard className="p-0">
+              <ScreenState
+                icon={Fish}
+                title="No fish in your inventory"
+                description="Build your tank profile one species at a time."
+                action={(
+                  <GlassButton variant="primary" size="md" onClick={onToggleAddForm}>
+                    <Plus size={18} aria-hidden="true" />
+                    Add your first fish
+                  </GlassButton>
+                )}
+              />
             </GlassCard>
           )}
 
@@ -382,17 +386,15 @@ export const MyFishScreen: React.FC = () => {
               : [];
 
             return (
-              <GlassCard key={fish.id} data-fish-card
-                clickable
-                hover
-                className="
-                  flex cursor-pointer flex-col overflow-hidden p-4!
-                "
-                onClick={() => onToggleFish(fish.id)}
-              >
+              <GlassCard key={fish.id} data-fish-card className="flex flex-col overflow-hidden p-4!">
                 {/* Main row — always visible */}
                 <div className="flex items-center justify-between p-3">
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <button
+                    type="button"
+                    className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-xl border-none bg-transparent text-left focus-visible:outline-2 focus-visible:outline-brand"
+                    onClick={() => onToggleFish(fish.id)}
+                    aria-expanded={isActive}
+                  >
                     <FishThumbnail imagePath={display.imagePath} initials={display.initials} color={display.color} />
                     <div className="min-w-0 flex-1">
                       <span className="
@@ -408,30 +410,18 @@ export const MyFishScreen: React.FC = () => {
                         Visible: {fish.detected} / {fish.count}
                       </span>
                     </div>
-                  </div>
+                  </button>
 
                   <div className="
                     flex items-center gap-2
                     max-xs:gap-1.5
-                  " onClick={e => e.stopPropagation()}>
+                  ">
                     {/* Visibility ring */}
                     <DetectionVisibilityRing
                       detected={fish.detected}
                       expected={fish.count}
                     />
 
-                    {isActive && (
-                      <>
-                        <FishCountStepper
-                          count={fish.count}
-                          onDecrement={() => onDecrementCount(fish.id, fish.count)}
-                          onIncrement={() => onIncrementCount(fish.id, fish.count)}
-                        />
-                        <GlassIconButton size="sm" label="Delete fish" onClick={() => onRequestDelete(fish.id)}>
-                          <Trash2 size={16} />
-                        </GlassIconButton>
-                      </>
-                    )}
                   </div>
                 </div>
 
@@ -451,6 +441,19 @@ export const MyFishScreen: React.FC = () => {
                     `}>
                       {species && (
                         <>
+                          <div className="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-white/20 bg-white/20 p-2">
+                            <span className="type-caption">Inventory count</span>
+                            <div className="flex items-center gap-2">
+                              <FishCountStepper
+                                count={fish.count}
+                                onDecrement={() => onDecrementCount(fish.id, fish.count)}
+                                onIncrement={() => onIncrementCount(fish.id, fish.count)}
+                              />
+                              <GlassIconButton size="sm" label="Delete fish" onClick={() => onRequestDelete(fish.id)}>
+                                <Trash2 size={16} />
+                              </GlassIconButton>
+                            </div>
+                          </div>
                           {/* Parameter chips — 2-column grid */}
                           <div className="
                             mb-3.5 grid grid-cols-1 gap-3

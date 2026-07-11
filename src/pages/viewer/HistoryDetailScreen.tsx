@@ -2,7 +2,7 @@ import React from 'react';
 import { Database, Waves } from 'lucide-react';
 import { useHistoryDetail } from '../../hooks/pages/useHistoryDetail';
 import { MiniClarityChart } from '../../components/analytics/MiniClarityChart';
-import { CardSectionHeader, GlassCard, GlassPanel, ScreenHeader } from '../../components/shared';
+import { BackButton, CardSectionHeader, GlassCard, GlassPanel, ScreenHeader } from '../../components/shared';
 
 export const HistoryDetailScreen: React.FC = () => {
   const { readings, recentReadings, onBack } = useHistoryDetail();
@@ -12,12 +12,7 @@ export const HistoryDetailScreen: React.FC = () => {
       <ScreenHeader
         eyebrow="Clarity analytics"
         action={(
-          <button
-            className="cursor-pointer border-none bg-transparent type-strong text-brand"
-            onClick={onBack}
-          >
-            ← Back
-          </button>
+          <BackButton onClick={onBack} />
         )}
       />
 

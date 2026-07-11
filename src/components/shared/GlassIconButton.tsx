@@ -11,9 +11,9 @@ interface GlassIconButtonProps {
 }
 
 const sizeStyles = {
-  sm: 'p-1.5 text-sm',
-  md: 'p-2.5 text-base',
-  lg: 'p-3 text-lg',
+  sm: 'size-11 text-sm',
+  md: 'size-11 text-base',
+  lg: 'size-12 text-lg',
 };
 
 export const GlassIconButton: React.FC<GlassIconButtonProps> = ({
@@ -30,7 +30,7 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({
     aria-label={label}
     title={label}
     className={`
-      glass-icon-button
+      glass-icon-button focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
       ${sizeStyles[size]}
       ${active ? `
         border-none bg-primary-gradient text-text-inverse

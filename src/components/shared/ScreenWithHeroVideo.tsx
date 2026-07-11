@@ -45,7 +45,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
             />
           </div>
         )}
-        <div className="relative z-10 -mx-4 flex flex-1 flex-col bg-gradient-mint px-4 pb-28">
+        <div className="relative z-10 -mx-4 flex flex-1 flex-col bg-gradient-mint px-4">
           {showHero && (
             <div className="h-5 translate-y-1" aria-hidden="true" />
           )}
