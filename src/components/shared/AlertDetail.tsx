@@ -4,6 +4,7 @@ import { Check, AlertTriangle } from 'lucide-react';
 import type { AlertItem } from '../../types/aquarium';
 import { GlassCard } from './GlassCard';
 import { GlassButton } from './GlassButton';
+import { ScreenHeader } from './ScreenHeader';
 
 interface AlertDetailProps {
   alert: AlertItem;
@@ -12,24 +13,20 @@ interface AlertDetailProps {
 }
 
 export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResolve }) => (
-  <div className="flex flex-col gap-6">
-    <div className="
-      flex min-h-[75px] items-center justify-between border-b border-border pb-3
-      max-xs:flex-col max-xs:items-start max-xs:gap-3
-    ">
-      <div>
-        <span className="block type-caption">Alert Details</span>
-        <h1 className="mt-0.5 text-display font-extrabold text-text">Alert Diagnostics</h1>
-      </div>
-      <button
-        className="
-          cursor-pointer border-none bg-transparent type-strong text-brand
-        "
-        onClick={onBack}
-      >
-        ← Back
-      </button>
-    </div>
+  <div className="flex flex-col gap-4">
+    <ScreenHeader
+      eyebrow="Alert diagnostics"
+      action={(
+        <button
+          className="cursor-pointer border-none bg-transparent type-strong text-brand"
+          onClick={onBack}
+        >
+          ← Back
+        </button>
+      )}
+    />
+
+    <div className="flex flex-col gap-6">
 
     <GlassCard
       className="p-5"
@@ -96,5 +93,6 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
         ✓ Resolved Alert
       </div>
     )}
+    </div>
   </div>
 );

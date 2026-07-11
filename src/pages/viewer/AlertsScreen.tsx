@@ -30,7 +30,6 @@ export const AlertsScreen: React.FC = () => {
     <div className="flex flex-col gap-4">
       <ScreenHeader
         eyebrow="Alerts"
-        className="-mb-1"
         action={(
           <button
             className="cursor-pointer border-none bg-transparent type-strong text-brand"

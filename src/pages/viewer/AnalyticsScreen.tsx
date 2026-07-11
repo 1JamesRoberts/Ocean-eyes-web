@@ -135,9 +135,9 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
     <div className="flex flex-col gap-4">
       <ScreenHeader
         eyebrow="Aquarium intelligence"
-        className="relative items-start -mb-1"
+        className="relative"
         action={(
-          <div className="absolute top-0 right-0 flex items-center gap-2 -translate-y-2.5">
+          <div className="absolute top-1/2 right-0 flex -translate-y-1/2 items-center gap-2">
             {isRefreshing && (
               <span
                 className="flex items-center gap-1.5 rounded-full bg-surface/75 px-2 py-1 type-caption text-text-muted shadow-card"
