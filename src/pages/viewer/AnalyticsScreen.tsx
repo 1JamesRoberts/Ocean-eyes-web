@@ -67,7 +67,7 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
           <img
             src={resolveCropUrl(diagnosis.cropUrl)}
             alt={`Crop of ${diagnosis.species} sent to LLM`}
-            className="block max-h-[110px] w-40 shrink-0 rounded-sm object-contain"
+            className="block h-auto max-h-[110px] w-auto max-w-40 shrink-0 rounded-xl"
             style={{ imageRendering: 'pixelated' }}
             onError={(event) => {
               event.currentTarget.style.display = 'none';
