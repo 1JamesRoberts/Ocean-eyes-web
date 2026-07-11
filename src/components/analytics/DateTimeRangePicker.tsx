@@ -18,6 +18,8 @@ type ActiveField = 'startDate' | 'startTime' | 'endDate' | 'endTime' | null;
 interface DateTimeRangePickerProps {
   value: DateRange;
   onChange: (range: DateRange) => void;
+  /** Start as a calendar-only control and reveal the range on activation. */
+  collapseToIcon?: boolean;
 }
 
 interface OpenState {
@@ -28,6 +30,7 @@ interface OpenState {
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   value,
   onChange,
+  collapseToIcon = false,
 }) => {
   const [open, setOpen] = useState<OpenState | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -156,27 +159,37 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   const isCalendar = activeField === 'startDate' || activeField === 'endDate';
   const isTimeWheel = activeField === 'startTime' || activeField === 'endTime';
 
-  const toggleExpanded = useCallback(
-    () => setIsExpanded((prev) => !prev),
-    [],
-  );
+  const toggleExpanded = useCallback(() => {
+    setIsExpanded((previous) => !previous);
+  }, []);
+
+  const showSummary = !collapseToIcon;
 
   return (
-    <div ref={containerRef} className="relative">
-      {/* Summary button — always visible, stays static */}
+    <div
+      ref={containerRef}
+      className={`relative transition-[width] duration-300 ease-in-out ${
+        collapseToIcon
+          ? 'w-9'
+          : ''
+      }`}
+    >
+      {/* Compact header control keeps its footprint while toggling the range editor. */}
       <button
         type="button"
         onClick={toggleExpanded}
         aria-expanded={isExpanded}
         aria-controls="date-range-editor"
-        className="
-          flex cursor-pointer items-center gap-2 rounded-full
+        aria-label={showSummary ? 'Edit date range' : isExpanded ? 'Collapse date range' : 'Expand date range'}
+        className={`
+          flex w-full cursor-pointer items-center justify-center rounded-full
           border-0
           bg-white/30 backdrop-blur-[6px]
-          px-4 py-2.5 type-body whitespace-nowrap
+          type-body whitespace-nowrap
           transition-colors
           hover:bg-white/50
-        "
+          ${showSummary ? 'gap-2 px-4 py-2.5' : 'size-9'}
+        `}
         style={{
           boxShadow:
             'var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05)',
@@ -191,23 +204,30 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         }}
       >
         <CalendarDays size={16} className="text-text-muted" />
-        <span>{summaryText}</span>
-        <ChevronDown
-          size={16}
-          className={`
-            text-text-muted transition-transform duration-300 ease-in-out
-            ${isExpanded ? 'rotate-180' : ''}
-          `}
-        />
+        {showSummary && (
+          <>
+            <span className="min-w-0 truncate">{summaryText}</span>
+            <ChevronDown
+              size={16}
+              className={`
+                shrink-0 text-text-muted transition-transform duration-300 ease-in-out
+                ${isExpanded ? 'rotate-180' : ''}
+              `}
+            />
+          </>
+        )}
       </button>
 
       {/* Collapsible Starts / Ends rows — slides out below without shifting layout */}
       <div
         id="date-range-editor"
-        className="
-          absolute left-0 z-50 w-full overflow-hidden glass-card p-3
+        className={`
+          absolute z-50 overflow-hidden glass-card p-3
           transition-all duration-300 ease-in-out
-        "
+          ${collapseToIcon
+            ? 'right-0 w-[min(18rem,calc(100vw-2rem))]'
+            : 'left-0 w-full'}
+        `}
         style={{
           top: 'calc(100% + 8px)',
           maxHeight: isExpanded ? 200 : 0,
