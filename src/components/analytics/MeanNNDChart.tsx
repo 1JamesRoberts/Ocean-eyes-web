@@ -19,6 +19,8 @@ interface Props {
   selectedSpecies?: string;
 }
 
+const MAX_CHART_POINTS = 80;
+
 function filterDetectionsBySpecies(record: AIDetectionResult, selectedSpecies?: string): AIDetection[] {
   if (!selectedSpecies || selectedSpecies === 'all') {
     return record.detections;
@@ -28,7 +30,16 @@ function filterDetectionsBySpecies(record: AIDetectionResult, selectedSpecies?: 
 
 export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
   const data = useMemo(() => {
-    return records.map((r) => ({
+    const sampledRecords = records.length <= MAX_CHART_POINTS
+      ? records
+      : Array.from({ length: MAX_CHART_POINTS }, (_, index) => {
+          const recordIndex = Math.round(
+            (index * (records.length - 1)) / (MAX_CHART_POINTS - 1),
+          );
+          return records[recordIndex];
+        });
+
+    return sampledRecords.map((r) => ({
       time: formatTimeShort(r.timestamp),
       nnd: calculateMeanNND(
         filterDetectionsBySpecies(r, selectedSpecies),

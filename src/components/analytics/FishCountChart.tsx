@@ -1,8 +1,8 @@
-// FishCountChart.tsx - Area chart of total fish detections over time
+// FishCountChart.tsx - Histogram of total fish detections over time
 import React, { useMemo } from 'react';
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -18,6 +18,8 @@ interface Props {
   selectedSpecies?: string;
 }
 
+const MAX_HISTOGRAM_BINS = 20;
+
 function countBySpecies(record: AIDetectionResult, selectedSpecies?: string): number {
   if (!selectedSpecies || selectedSpecies === 'all') {
     return record.summary?.total_detections ?? 0;
@@ -27,11 +29,34 @@ function countBySpecies(record: AIDetectionResult, selectedSpecies?: string): nu
 
 export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) => {
   const data = useMemo(() => {
-    return records
-      .map((r) => ({
-        time: formatTimeShort(r.timestamp),
-        count: countBySpecies(r, selectedSpecies),
+    if (records.length <= MAX_HISTOGRAM_BINS) {
+      return records.map((record) => ({
+        time: formatTimeShort(record.timestamp),
+        count: countBySpecies(record, selectedSpecies),
       }));
+    }
+
+    const bins = Array.from({ length: MAX_HISTOGRAM_BINS }, () => ({
+      total: 0,
+      samples: 0,
+      timestamp: records[0].timestamp,
+    }));
+
+    records.forEach((record, index) => {
+      const binIndex = Math.min(
+        Math.floor((index * MAX_HISTOGRAM_BINS) / records.length),
+        MAX_HISTOGRAM_BINS - 1,
+      );
+      const bin = bins[binIndex];
+      bin.total += countBySpecies(record, selectedSpecies);
+      bin.samples += 1;
+      bin.timestamp = record.timestamp;
+    });
+
+    return bins.map((bin) => ({
+      time: formatTimeShort(bin.timestamp),
+      count: Math.round(bin.total / bin.samples),
+    }));
   }, [records, selectedSpecies]);
 
   if (data.length === 0) {
@@ -42,14 +67,21 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
 
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+      <BarChart
+        data={data}
+        margin={{ top: 8, right: 0, left: 0, bottom: 0 }}
+        barCategoryGap="18%"
+      >
         <defs>
-          <linearGradient id="fishCountGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-brand-bright)" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="var(--color-brand-bright)" stopOpacity={0} />
+          <linearGradient id="fishCountBarGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--color-brand-bright)" />
+            <stop offset="100%" stopColor="var(--color-brand)" />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+        <CartesianGrid
+          stroke="var(--color-border)"
+          strokeDasharray="5 6"
+        />
         <XAxis
           dataKey="time"
           tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
@@ -58,9 +90,11 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
         />
         <YAxis
           allowDecimals={false}
+          orientation="left"
           tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-border)' }}
-          tickLine={{ stroke: 'var(--color-border)' }}
+          axisLine={false}
+          tickLine={false}
+          width={32}
         />
         <Tooltip
           contentStyle={{
@@ -74,17 +108,13 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
           }}
           formatter={(value) => [`${value as number} fish`, 'Count']}
         />
-        <Area
-          type="monotone"
+        <Bar
           dataKey="count"
-          stroke="var(--color-brand-bright)"
-          strokeWidth={2}
-          fill="url(#fishCountGrad)"
+          fill="url(#fishCountBarGrad)"
           animationDuration={500}
-          dot={{ r: 3, fill: 'var(--color-brand-bright)', strokeWidth: 0 }}
-          activeDot={{ r: 5, fill: 'var(--color-brand-bright)', stroke: 'var(--color-surface)', strokeWidth: 2 }}
+          radius={[3, 3, 0, 0]}
         />
-      </AreaChart>
+      </BarChart>
     </ResponsiveContainer>
   );
 };
