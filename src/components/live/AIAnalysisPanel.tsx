@@ -59,8 +59,11 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
 
       </div>
 
-      <div>
-        <h4 className="mb-2.5 type-title text-brand">
+      <GlassPanel className="
+        mb-4
+        hover:bg-white/60
+      ">
+        <h4 className="mb-2.5 type-caption">
           Species Breakdown
         </h4>
         {speciesEntries.length > 0 ? (
@@ -71,11 +74,11 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
               const displayName = speciesInfo?.displayName || speciesId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
               return (
                 <div key={speciesId} className="
-                  glass-pill flex items-center gap-1.5 px-3 py-1.5 type-caption
-                " style={{ borderColor: `${color}40` }}>
+                  flex items-center gap-1.5 px-3 py-1.5 type-caption
+                ">
                   <div className="size-2 rounded-full" style={{ backgroundColor: color }} />
                   <span className="text-text">{displayName}</span>
-                  <span className="text-text-muted">{count}</span>
+                  <span className="text-brand">{count}</span>
                 </div>
               );
             })}
@@ -85,12 +88,11 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             Awaiting analysis…
           </p>
         )}
-      </div>
+      </GlassPanel>
 
       {/* Disease Diagnosis Section */}
       <GlassPanel
         className={`
-          mt-4
           ${diagnosis ? (diagnosis.error ? 'border-l-4 border-l-critical' : diagnosis.healthy ? `
             border-l-4 border-l-good
           ` : `border-l-4 border-l-warning`) : 'border-l-4 border-l-transparent'}
