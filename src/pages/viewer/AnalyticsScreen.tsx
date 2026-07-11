@@ -17,6 +17,15 @@ interface DiagnosisRecordCardProps {
   resolveCropUrl: (url?: string) => string | undefined;
 }
 
+const mainBranchChartCardStyle: React.CSSProperties = {
+  background: 'var(--glass-bg-card)',
+  backdropFilter: 'blur(var(--glass-blur-lg))',
+  WebkitBackdropFilter: 'blur(var(--glass-blur-lg))',
+  border: '1px solid var(--glass-border-strong)',
+  borderRadius: 'var(--glass-radius-card)',
+  boxShadow: 'var(--shadow-glass), var(--shadow-card)',
+};
+
 const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
   diagnosis,
   resolveCropUrl,
@@ -225,7 +234,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             <GlassCard className="
               flex min-h-0 flex-col gap-3 overflow-hidden p-5
               lg:col-span-2
-            ">
+            " style={mainBranchChartCardStyle}>
               <CardSectionHeader
                 icon={Fish}
                 title="Fish Count Over Time"
@@ -235,11 +244,20 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
               <div className="min-h-0 flex-1">
                 <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
+            </GlassCard>
+
+            <GlassCard
+              className="
+                flex min-h-0 flex-col gap-3 overflow-hidden p-5
+                lg:col-span-2
+              "
+              style={mainBranchChartCardStyle}
+            >
               <CardSectionHeader
                 icon={Activity}
                 title="Fish Spread Over Time"
                 detail="How evenly fish are distributed in the frame"
-                className="mb-0 mt-2"
+                className="mb-0"
               />
               <div className="min-h-0 flex-1">
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
