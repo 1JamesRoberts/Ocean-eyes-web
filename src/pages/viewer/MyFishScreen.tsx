@@ -412,9 +412,11 @@ export const MyFishScreen: React.FC = () => {
                           text-text-muted italic
                         ">{species.scientificName}</span>
                       )}
-                      <span className="mt-0.5 block type-caption">
-                        Visible: {fish.detected} / {fish.count}
-                      </span>
+                      {!isActive && (
+                        <span className="mt-0.5 block type-caption">
+                          Visible: {fish.detected} / {fish.count}
+                        </span>
+                      )}
                     </div>
                   </button>
 

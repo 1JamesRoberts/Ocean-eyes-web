@@ -127,12 +127,14 @@ describe('MyFishScreen inventory controls', () => {
     const fishDisclosure = screen.getByRole('button', { name: /Cardinal tetra/i });
     expect(fishDisclosure.getAttribute('aria-expanded')).toBe('false');
     expect(screen.getByText('44%')).toBeTruthy();
+    expect(screen.getByText('Visible: 4 / 9')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Increase fish count' })).toBeNull();
 
     fireEvent.click(fishDisclosure);
 
     expect(fishDisclosure.getAttribute('aria-expanded')).toBe('true');
     expect(screen.queryByText('44%')).toBeNull();
+    expect(screen.queryByText('Visible: 4 / 9')).toBeNull();
     expect(screen.getByRole('button', { name: 'Increase fish count' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Delete fish' })).toBeTruthy();
     expect(screen.getByText('Size')).toBeTruthy();
