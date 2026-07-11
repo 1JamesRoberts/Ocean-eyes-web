@@ -184,18 +184,20 @@ export const MyFishScreen: React.FC = () => {
     <div className="flex flex-col">
       <ScreenHeader
         eyebrow="Aquarium inventory"
-        className="mb-4"
+        className="relative items-start mb-4"
         action={(
-          <GlassButton
-            variant="outline"
-            size="sm"
-            onClick={onToggleAddForm}
-            aria-label="Add fish"
-            className="!h-9 !gap-1.5 !rounded-full !px-3"
-          >
-            <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
-            <span className="font-semibold">Add fish</span>
-          </GlassButton>
+          <div className="absolute top-0 right-0 -translate-y-2.5">
+            <GlassButton
+              variant="outline"
+              size="sm"
+              onClick={onToggleAddForm}
+              aria-label="Add fish"
+              className="!h-9 !gap-1.5 !rounded-full !px-3"
+            >
+              <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
+              <span className="font-semibold">Add fish</span>
+            </GlassButton>
+          </div>
         )}
       />
 
@@ -280,13 +282,13 @@ export const MyFishScreen: React.FC = () => {
                   <div className="grid grid-cols-1 gap-3">
                     <DetailChip
                       icon={<Maximize2 size={14} />}
-                      label="Tank Min"
+                      label="Ideal Tank Min"
                       value={stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '—'}
                       colorClass="bg-[rgba(16,185,129,0.08)]"
                     />
                     <DetailChip
                       icon={<Thermometer size={14} />}
-                      label="Temp"
+                      label="Ideal Temp"
                       value={
                         stats.tempResult.range != null
                           ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '°C')
@@ -296,7 +298,7 @@ export const MyFishScreen: React.FC = () => {
                     />
                     <DetailChip
                       icon={<Droplets size={14} />}
-                      label="pH"
+                      label="Ideal pH"
                       value={
                         stats.phResult.range != null
                           ? formatRange(stats.phResult.range[0], stats.phResult.range[1], '', 1)
