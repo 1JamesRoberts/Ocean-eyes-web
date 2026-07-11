@@ -122,15 +122,42 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   isRefreshing,
   error,
   refetch,
-  confirmClear,
   isClearing,
-  onStartClear,
-  onCancelClear,
   onConfirmClear,
   onViewHistory,
   resolveCropUrl,
   isFallback,
 }) => {
+  const [isClearButtonExpanded, setIsClearButtonExpanded] = React.useState(false);
+  const clearButtonRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!isClearButtonExpanded) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!clearButtonRef.current?.contains(event.target as Node)) {
+        setIsClearButtonExpanded(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [isClearButtonExpanded]);
+
+  const onClearButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (!isClearButtonExpanded) {
+      setIsClearButtonExpanded(true);
+      return;
+    }
+
+    if ((event.target as Element).closest('[data-clear-history-icon]')) {
+      onConfirmClear();
+      return;
+    }
+
+    setIsClearButtonExpanded(false);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <ScreenHeader
@@ -248,23 +275,19 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 detail="Disease diagnosis runs in this range"
                 className="mb-0"
               />
-              {diagnoses.length > 0 && !confirmClear && !isFallback && (
-                <GlassButton variant="outline" size="sm" className="
-                  border-critical text-critical
-                  hover:bg-critical/10
-                " onClick={onStartClear}>
-                  <Trash2 size={14} />
-                  Clear history
-                </GlassButton>
-              )}
-              {confirmClear && (
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="type-caption whitespace-nowrap">Delete all records for this date?</span>
-                  <GlassButton variant="danger" size="sm" onClick={onConfirmClear} disabled={isClearing}>
-                    {isClearing ? 'Deleting…' : 'Yes, clear'}
-                  </GlassButton>
-                  <GlassButton variant="outline" size="sm" onClick={onCancelClear} disabled={isClearing}>
-                    Cancel
+              {diagnoses.length > 0 && !isFallback && (
+                <div ref={clearButtonRef}>
+                  <GlassButton variant="outline" size="sm" className="
+                    justify-start overflow-hidden border-critical px-3 text-critical
+                    transition-[width,background-color] duration-200
+                    ${isClearButtonExpanded ? 'w-36 bg-critical/10' : 'w-11'}
+                  " onClick={onClearButtonClick} disabled={isClearing} aria-label="Clear history" aria-expanded={isClearButtonExpanded}>
+                    <span data-clear-history-icon>
+                      <Trash2 size={14} aria-hidden="true" />
+                    </span>
+                    <span className={`overflow-hidden whitespace-nowrap transition-[width,opacity] duration-200 ${isClearButtonExpanded ? 'w-20 opacity-100' : 'w-0 opacity-0'}`}>
+                      {isClearing ? 'Clearing…' : 'Clear history'}
+                    </span>
                   </GlassButton>
                 </div>
               )}

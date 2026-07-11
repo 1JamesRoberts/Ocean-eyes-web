@@ -14,6 +14,7 @@ interface GlassButtonProps {
   disabled?: boolean;
   fullWidth?: boolean;
   'aria-label'?: string;
+  'aria-expanded'?: boolean;
 }
 
 const variantStyles: Record<GlassVariant, string> = {
@@ -54,12 +55,14 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   disabled = false,
   fullWidth = false,
   'aria-label': ariaLabel,
+  'aria-expanded': ariaExpanded,
 }) => (
   <button
     type={type}
     onClick={onClick}
     disabled={disabled}
     aria-label={ariaLabel}
+    aria-expanded={ariaExpanded}
     className={`
       min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
       ${variantStyles[variant]}

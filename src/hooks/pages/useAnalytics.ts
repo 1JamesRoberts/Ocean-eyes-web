@@ -53,7 +53,6 @@ export const useAnalytics = () => {
   );
 
   const [selectedSpecies, setSelectedSpecies] = useState<string>('all');
-  const [confirmClear, setConfirmClear] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
 
   const onRangeChange = useCallback(
@@ -63,9 +62,6 @@ export const useAnalytics = () => {
 
   const onRefetch = useCallback(() => refetch(), [refetch]);
 
-  const onStartClear = useCallback(() => setConfirmClear(true), []);
-  const onCancelClear = useCallback(() => setConfirmClear(false), []);
-
   const onConfirmClear = useCallback(async () => {
     setIsClearing(true);
     try {
@@ -73,7 +69,6 @@ export const useAnalytics = () => {
         clearDetectionHistoryRange(range.startDate, range.endDate),
         clearTurbidityHistoryRange(range.startDate, range.endDate),
       ]);
-      setConfirmClear(false);
       refetch();
     } catch (err) {
       console.error('Failed to clear history:', err);
@@ -105,10 +100,7 @@ export const useAnalytics = () => {
     isRefreshing,
     error,
     refetch: onRefetch,
-    confirmClear,
     isClearing,
-    onStartClear,
-    onCancelClear,
     onConfirmClear,
     onViewHistory,
     resolveCropUrl,
