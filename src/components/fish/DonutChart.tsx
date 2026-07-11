@@ -73,7 +73,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
       className={`flex max-w-full min-w-0 items-center gap-1 overflow-hidden text-[11px] leading-tight text-text-muted motion-safe:animate-donut-detail-enter ${
         side === 'left' ? 'justify-end text-right' : 'justify-start text-left'
       }`}
-      style={{ animationDelay: '180ms' }}
+      style={{ animationDelay: '120ms' }}
       title={`${species.name} (${species.count})`}
     >
       <span
@@ -131,7 +131,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
         </svg>
         <div
           className="absolute top-1/2 left-1/2 -translate-1/2 text-center motion-safe:animate-donut-detail-enter"
-          style={{ animationDelay: '140ms' }}
+          style={{ animationDelay: '90ms' }}
         >
           <div className="text-3xl font-extrabold leading-none text-text">{total}</div>
           <div className="text-[11px] leading-tight font-normal text-text-muted">Total Fish</div>

@@ -178,8 +178,8 @@
   --animate-slide-up: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
   --animate-slide-down: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
   --animate-sheet-enter: sheetEnter 0.36s cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-donut-enter: donutEnter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-donut-detail-enter: donutDetailEnter 0.4s ease-out both;
+  --animate-donut-enter: donutEnter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-donut-detail-enter: donutDetailEnter 0.3s ease-out both;
 }
 
 @utility transition-smooth {
