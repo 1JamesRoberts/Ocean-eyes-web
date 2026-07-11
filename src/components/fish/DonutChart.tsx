@@ -70,9 +70,10 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
   const renderSpeciesLabel = (species: SpeciesSlice, side: 'left' | 'right') => (
     <li
       key={species.name}
-      className={`flex max-w-full min-w-0 items-center gap-1 overflow-hidden text-[11px] leading-tight text-text-muted ${
+      className={`flex max-w-full min-w-0 items-center gap-1 overflow-hidden text-[11px] leading-tight text-text-muted motion-safe:animate-donut-detail-enter ${
         side === 'left' ? 'justify-end text-right' : 'justify-start text-left'
       }`}
+      style={{ animationDelay: '180ms' }}
       title={`${species.name} (${species.count})`}
     >
       <span
@@ -99,7 +100,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
       <div className="relative aspect-square w-full self-center">
         <svg
           aria-label={`Species distribution for ${total} fish`}
-          className="size-full"
+          className="size-full origin-center motion-safe:animate-donut-enter"
           role="img"
           viewBox={`0 0 ${chartSize} ${chartSize}`}
         >
@@ -128,7 +129,10 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
             ))}
           </g>
         </svg>
-        <div className="absolute top-1/2 left-1/2 -translate-1/2 text-center">
+        <div
+          className="absolute top-1/2 left-1/2 -translate-1/2 text-center motion-safe:animate-donut-detail-enter"
+          style={{ animationDelay: '140ms' }}
+        >
           <div className="text-3xl font-extrabold leading-none text-text">{total}</div>
           <div className="text-[11px] leading-tight font-normal text-text-muted">Total Fish</div>
         </div>

@@ -127,7 +127,7 @@ const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
     <GlassModal
       isOpen={isOpen}
       onClose={onClose}
-      placement="bottom"
+      placement="below-hero"
       labelledBy="add-fish-title"
       className="flex flex-col"
     >

@@ -6,7 +6,7 @@ interface GlassModalProps {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
-  placement?: 'center' | 'bottom';
+  placement?: 'center' | 'bottom' | 'below-hero';
   labelledBy?: string;
 }
 
@@ -73,12 +73,17 @@ export const GlassModal: React.FC<GlassModalProps> = ({
 
   if (!isOpen) return null;
 
-  const isBottomSheet = placement === 'bottom';
+  const isBottomSheet = placement === 'bottom' || placement === 'below-hero';
+  const isBelowHero = placement === 'below-hero';
 
   return (
     <div
       className={`
-        fixed inset-0 z-[70] flex justify-center
+        fixed right-0 bottom-0 left-0 z-[70] flex justify-center
+        ${isBelowHero
+          ? 'top-[calc(var(--mobile-status-bar-height)+var(--mobile-hero-height))]'
+          : 'top-0'
+        }
         ${isBottomSheet ? 'items-end p-0' : 'items-center p-4'}
       `}
       onClick={onClose}
@@ -97,8 +102,9 @@ export const GlassModal: React.FC<GlassModalProps> = ({
           relative z-10 w-full glass-card
           ${isBottomSheet
             ? `
-              max-h-[85dvh] max-w-(--mobile-frame-width) overflow-hidden
+              max-w-(--mobile-frame-width) overflow-hidden
               rounded-t-[28px]! rounded-b-none! p-0
+              ${isBelowHero ? 'h-full motion-safe:animate-sheet-enter' : 'max-h-[85dvh]'}
             `
             : 'max-w-md p-6'
           }

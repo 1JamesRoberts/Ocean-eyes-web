@@ -177,6 +177,9 @@
   --animate-fade-in: fadeIn 0.2s ease-out;
   --animate-slide-up: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
   --animate-slide-down: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  --animate-sheet-enter: sheetEnter 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-donut-enter: donutEnter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-donut-detail-enter: donutDetailEnter 0.4s ease-out both;
 }
 
 @utility transition-smooth {
@@ -942,6 +945,38 @@
   cursor: pointer;
   padding: 0 4px;
   -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes donutEnter {
+  from {
+    opacity: 0;
+    transform: rotate(-8deg) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes donutDetailEnter {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheetEnter {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 .pill-nav-item:hover {
