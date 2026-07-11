@@ -271,7 +271,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             <div className="flex items-start justify-between gap-3">
               <CardSectionHeader
                 icon={Brain}
-                title="AI Health Diagnostics History"
+                title="Fish Diagnostics"
                 detail="Disease diagnosis runs in this range"
                 className="mb-0"
               />
