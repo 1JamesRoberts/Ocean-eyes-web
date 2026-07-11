@@ -1,5 +1,5 @@
 // App.tsx - Phone-aspect OceanEyes dashboard coordinator
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import { LiveFeedProvider } from './context/LiveFeedContext';
 import { AnalyticsControlsProvider } from './context/AnalyticsControlsContext';
@@ -10,6 +10,12 @@ import { useTank } from './hooks/useTank';
 const OceanEyesDashboard: React.FC = () => {
   const { activeTab } = useNavigation();
   const { tankId } = useTank();
+
+  // All tab screens share the phone-content scroll container, so reset it when
+  // the destination changes instead of carrying the previous screen's position.
+  useLayoutEffect(() => {
+    document.querySelector<HTMLElement>('.phone-content')?.scrollTo(0, 0);
+  }, [activeTab]);
 
   return (
     <PhoneFrame navigation={<PillNavigation />}>

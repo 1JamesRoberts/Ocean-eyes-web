@@ -52,6 +52,7 @@ export const HomeScreen: React.FC = () => {
             <CardSectionHeader
               icon={FlaskConical}
               title="Parameters"
+              detail="Latest water conditions"
               action={(
                 <button
                   onClick={onViewHistory}

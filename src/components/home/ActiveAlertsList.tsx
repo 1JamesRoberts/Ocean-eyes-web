@@ -27,7 +27,11 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
 
   return (
     <section className="glass-card p-5">
-      <CardSectionHeader icon={ShieldAlert} title="Alerts" />
+      <CardSectionHeader
+        icon={ShieldAlert}
+        title="Alerts"
+        detail="Items needing your attention"
+      />
 
       <div className="space-y-3">
         {activeAlerts.map(alert => (
