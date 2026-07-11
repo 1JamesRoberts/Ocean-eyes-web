@@ -846,8 +846,8 @@
   background: linear-gradient(
     180deg,
     transparent 0,
-    transparent calc(var(--mobile-hero-height) * 0.5),
-    #ffffff calc(var(--mobile-hero-height) * 0.5),
+    transparent calc(var(--mobile-hero-height) * 0.99),
+    #ffffff calc(var(--mobile-hero-height) * 0.99),
     #c1e0dd 100%
   );
   background-attachment: fixed;

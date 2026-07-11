@@ -51,7 +51,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
       </div>
 
       <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3">
-        <p className="pb-2 type-caption-inverse text-white/55 uppercase">Visibility by species</p>
+        <p className="pb-2 type-caption-inverse text-white/55">Visibility by species</p>
         {fishList.map((fish) => {
           const species = getSpeciesById(fish.speciesId);
           const display = species
