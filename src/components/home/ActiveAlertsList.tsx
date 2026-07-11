@@ -30,7 +30,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
       <CardSectionHeader
         icon={ShieldAlert}
         title="Alerts"
-        detail="Items needing your attention"
+        detail="Needs your attention"
       />
 
       <div className="space-y-3">

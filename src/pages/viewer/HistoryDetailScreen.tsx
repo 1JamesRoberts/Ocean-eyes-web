@@ -21,6 +21,7 @@ export const HistoryDetailScreen: React.FC = () => {
         <CardSectionHeader
           icon={Waves}
           title="Water Clarity Trend"
+          detail="Turbidity readings from recent scans"
         />
 
         <div className="w-full py-2.5">
@@ -37,7 +38,12 @@ export const HistoryDetailScreen: React.FC = () => {
       </GlassCard>
 
       {/* Diagnostic Logs */}
-      <CardSectionHeader icon={Database} title="Recent Readings" className="mb-0" />
+      <CardSectionHeader
+        icon={Database}
+        title="Recent Readings"
+        detail="Latest water quality snapshots"
+        className="mb-0"
+      />
       <div className="flex flex-col gap-2.5">
         {recentReadings.map(reading => {
           const date = new Date(reading.timestamp);

@@ -251,9 +251,11 @@ export const MyFishScreen: React.FC = () => {
                     block truncate type-strong
                   ">Fish Overview</span>
                   <span className="
-                    mb-1 block truncate type-caption
-                    italic
-                  ">{stats.uniqueSpecies} species</span>
+                    block truncate type-caption
+                  ">Species mix and visibility</span>
+                  <span className="mt-0.5 block type-caption italic">
+                    {stats.uniqueSpecies} species
+                  </span>
                   <span className="mt-0.5 block type-caption">
                     Visible: {stats.totalDetected} / {stats.totalExpected}
                   </span>

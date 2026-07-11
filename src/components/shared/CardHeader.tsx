@@ -3,6 +3,7 @@ import React from "react";
 interface CardHeaderProps {
   icon: string;
   title: string;
+  detail?: React.ReactNode;
   children?: React.ReactNode;
   className?: string;
 }
@@ -10,6 +11,7 @@ interface CardHeaderProps {
 export const CardHeader: React.FC<CardHeaderProps> = ({
   icon,
   title,
+  detail,
   children,
   className = "",
 }) => (
@@ -20,9 +22,12 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
       ${className}
     `}
   >
-    <div className="flex items-center gap-2 type-title text-brand">
+    <div className="flex min-w-0 items-start gap-2 text-brand">
       <span className="material-symbols-outlined">{icon}</span>
-      <span>{title}</span>
+      <div className="min-w-0">
+        <div className="type-title">{title}</div>
+        {detail && <p className="mt-0.5 type-caption">{detail}</p>}
+      </div>
     </div>
     <div className="flex items-center">
       {children}

@@ -18,7 +18,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
       <CardSectionHeader
         icon={FishSymbol}
         title="My Fish"
-        detail="Track your aquarium residents"
+        detail="Your aquarium residents"
         action={(
           <button
             onClick={onManageFish}

@@ -226,11 +226,21 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
               flex min-h-0 flex-col gap-3 overflow-hidden p-5
               lg:col-span-2
             ">
-              <CardSectionHeader icon={Fish} title="Fish Count Over Time" className="mb-0" />
+              <CardSectionHeader
+                icon={Fish}
+                title="Fish Count Over Time"
+                detail="Detected fish across the selected range"
+                className="mb-0"
+              />
               <div className="min-h-0 flex-1">
                 <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
-              <CardSectionHeader icon={Activity} title="Fish Spread Over Time" className="mb-0 mt-2" />
+              <CardSectionHeader
+                icon={Activity}
+                title="Fish Spread Over Time"
+                detail="How evenly fish are distributed in the frame"
+                className="mb-0 mt-2"
+              />
               <div className="min-h-0 flex-1">
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
@@ -250,7 +260,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             <CardSectionHeader
               icon={Waves}
               title="Water Clarity Trend"
-              detail={`${(readings.length > 0 ? readings.length : turbidityRecords.length) || 'No'} clarity readings`}
+              detail={`${(readings.length > 0 ? readings.length : turbidityRecords.length) || 'No'} readings recorded`}
             />
             <ClarityTrendChart
               records={turbidityRecords}
@@ -272,7 +282,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
               <CardSectionHeader
                 icon={Brain}
                 title="Fish Diagnostics"
-                detail="Disease diagnosis runs in this range"
+                detail="Diagnoses from this period"
                 className="mb-0"
               />
               {diagnoses.length > 0 && !isFallback && (

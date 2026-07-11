@@ -231,7 +231,7 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
     <GlassCard className="p-5">
       <SettingsCardTitle
         icon={SlidersHorizontal}
-        eyebrow="Image tuning"
+        eyebrow="Adjust camera image"
         title="Camera Filters"
         action={(
           <GlassButton variant="outline" size="sm" onClick={resetToDefaults} className="px-2.5">
@@ -308,7 +308,7 @@ export const MediaStorageCard: React.FC<MediaStorageCardProps> = ({
 
   return (
     <GlassCard className="p-5">
-      <SettingsCardTitle icon={FolderOpen} eyebrow="Library" title="Media Storage" />
+      <SettingsCardTitle icon={FolderOpen} eyebrow="Manage saved media" title="Media Storage" />
       <div className="flex flex-col gap-3">
         {rows.map((row) => (
           <SettingsPanelRow
@@ -347,7 +347,7 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
   onStartRename,
 }) => (
   <GlassCard className="p-5">
-    <SettingsCardTitle icon={ShieldCheck} eyebrow="Aquarium" title="Tank Identity" />
+    <SettingsCardTitle icon={ShieldCheck} eyebrow="View tank details" title="Tank Identity" />
     <GlassPanel className="mb-3 type-caption">
       <span>Tank Reference Code: </span>
       <code className="ml-1 align-baseline type-caption">
@@ -415,7 +415,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
 
   return (
     <GlassCard className="p-5">
-      <SettingsCardTitle icon={ShieldCheck} eyebrow="Safety" title="Alerts & Thresholds" />
+      <SettingsCardTitle icon={ShieldCheck} eyebrow="Set safety limits" title="Alerts & Thresholds" />
       <div className="flex flex-col gap-3">
         <GlassDisclosurePanel
           icon={Bell}
@@ -550,7 +550,7 @@ export const DisconnectTankCard: React.FC<DisconnectTankCardProps> = ({
 }) => (
   showConfirmUnlink ? (
     <GlassCard className="border-critical/30 p-5">
-      <SettingsCardTitle icon={X} eyebrow="Disconnect" title="Remove Active Tank" />
+      <SettingsCardTitle icon={X} eyebrow="Disconnect this tank" title="Remove Active Tank" />
       <p className="m-0 type-caption">
         This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
       </p>
@@ -593,7 +593,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
   onFilterChange,
 }) => (
   <GlassCard className="p-5">
-    <SettingsCardTitle icon={ShieldAlert} eyebrow="Aquarium" title="Tank Management" />
+    <SettingsCardTitle icon={ShieldAlert} eyebrow="Manage this aquarium" title="Tank Management" />
 
     <div className="flex flex-col gap-3">
       {editing ? (

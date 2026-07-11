@@ -94,7 +94,11 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
       className="cursor-pointer overflow-hidden glass-card"
       onClick={onViewAdvanced}
     >
-      <CardHeader icon="videocam" title="Live Feed Monitor">
+      <CardHeader
+        icon="videocam"
+        title="Live Feed Monitor"
+        detail="Watch your aquarium in real time"
+      >
         <div className="flex gap-2">
           <span
             className="

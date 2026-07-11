@@ -27,6 +27,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
       <CardSectionHeader
         icon={Brain}
         title="AI Analysis Results"
+        detail="Latest computer vision and water quality readings"
         action={(
           <span className="type-caption">
             {lastPrediction
