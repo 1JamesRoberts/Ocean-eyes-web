@@ -24,7 +24,7 @@ export const CardSectionHeader: React.FC<CardSectionHeaderProps> = ({
           {title}
         </h3>
         {detail && (
-          <p className="mt-1 type-caption">
+          <p className="mt-0.5 type-caption">
             {detail}
           </p>
         )}
