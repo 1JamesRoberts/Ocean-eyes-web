@@ -423,7 +423,6 @@ export const MyFishScreen: React.FC = () => {
                     <DetectionVisibilityRing
                       detected={fish.detected}
                       expected={fish.count}
-                      size={isActive ? 40 : undefined}
                       showLabel={!isActive}
                     />
 
