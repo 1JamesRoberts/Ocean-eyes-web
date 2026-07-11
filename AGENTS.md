@@ -1,6 +1,6 @@
 # Project Overview
 
-OceanEyes is a React + TypeScript dashboard for real-time AI aquarium monitoring. It combines computer vision (fish detection, species classification, turbidity). The current branch (mobile-ui)) is for Mobile webapp prototyp.
+OceanEyes is a React + TypeScript dashboard for real-time AI aquarium monitoring. It combines computer vision (fish detection, species classification, turbidity). The current branch (mobile-ui) is for Mobile webapp prototyp.
 
 ## Tech Stack
 
@@ -19,6 +19,10 @@ OceanEyes Web is a Vite + React + TypeScript dashboard. Main application code li
 ### Key Architecture
 
 The app use MVVM (Model-View-ViewModel) architecture
+
 - **Hooks** (`src/hooks/`) — React hooks that own state, side effects, and lifecycle. They are the public API that components consume.
 - **Model** (`src/models/`) — Data access, persistence, transport, and pure domain helpers. No React imports.
 - **UI** (`src/components/`, `src/pages/`) — JSX, Tailwind classes, and event wiring.
+
+## Preferred Behavior
+When editing the codebase, prioritize maintainability.
