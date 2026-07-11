@@ -1,7 +1,7 @@
 // DateTimeRangePicker.tsx - Apple-style Starts/Ends date-time range selector
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, CalendarDays } from 'lucide-react';
+import { ChevronDown, History } from 'lucide-react';
 import type { DateRange } from '../../types/aquarium';
 import {
   formatDateForDisplay,
@@ -35,6 +35,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   const [open, setOpen] = useState<OpenState | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const activeField = open?.field ?? null;
@@ -85,10 +87,9 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       if (
-        containerRef.current &&
-        !containerRef.current.contains(target) &&
-        popoverRef.current &&
-        !popoverRef.current.contains(target)
+        !containerRef.current?.contains(target) &&
+        !editorRef.current?.contains(target) &&
+        !popoverRef.current?.contains(target)
       ) {
         setOpen(null);
       }
@@ -165,17 +166,39 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
 
   const showSummary = !collapseToIcon;
 
+  const editorStyle = useMemo<React.CSSProperties>(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return { visibility: 'hidden' };
+
+    const rect = trigger.getBoundingClientRect();
+    const width = collapseToIcon
+      ? Math.min(288, window.innerWidth - 32)
+      : rect.width;
+
+    return {
+      position: 'fixed',
+      top: rect.bottom + 8,
+      left: Math.max(16, Math.min(rect.right - width, window.innerWidth - width - 16)),
+      width,
+      zIndex: 1000,
+      maxHeight: isExpanded ? 200 : 0,
+      opacity: isExpanded ? 1 : 0,
+      pointerEvents: isExpanded ? 'auto' : 'none',
+    };
+  }, [collapseToIcon, isExpanded]);
+
   return (
     <div
       ref={containerRef}
       className={`relative transition-[width] duration-300 ease-in-out ${
         collapseToIcon
-          ? 'w-9'
+          ? 'w-auto'
           : ''
       }`}
     >
       {/* Compact header control keeps its footprint while toggling the range editor. */}
       <button
+        ref={triggerRef}
         type="button"
         onClick={toggleExpanded}
         aria-expanded={isExpanded}
@@ -188,7 +211,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
           type-body whitespace-nowrap
           transition-colors
           hover:bg-white/50
-          ${showSummary ? 'gap-2 px-4 py-2.5' : 'size-9'}
+          ${showSummary ? 'gap-2 px-4 py-2.5' : 'gap-1.5 px-3 py-1.5 min-h-11 type-caption'}
         `}
         style={{
           boxShadow:
@@ -203,8 +226,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
             'var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05)';
         }}
       >
-        <CalendarDays size={16} className="text-text-muted" />
-        {showSummary && (
+        <History size={16} className="text-text-muted" />
+        {showSummary ? (
           <>
             <span className="min-w-0 truncate">{summaryText}</span>
             <ChevronDown
@@ -215,25 +238,17 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
               `}
             />
           </>
+        ) : (
+          <span className="font-semibold">Range</span>
         )}
       </button>
 
       {/* Collapsible Starts / Ends rows — slides out below without shifting layout */}
-      <div
+      {createPortal(<div
+        ref={editorRef}
         id="date-range-editor"
-        className={`
-          absolute z-50 overflow-hidden glass-card p-3
-          transition-all duration-300 ease-in-out
-          ${collapseToIcon
-            ? 'right-0 w-[min(18rem,calc(100vw-2rem))]'
-            : 'left-0 w-full'}
-        `}
-        style={{
-          top: 'calc(100% + 8px)',
-          maxHeight: isExpanded ? 200 : 0,
-          opacity: isExpanded ? 1 : 0,
-          pointerEvents: isExpanded ? 'auto' : 'none' as const,
-        }}
+        className="overflow-hidden glass-card p-3 transition-all duration-300 ease-in-out"
+        style={editorStyle}
         aria-label="Date range editor"
       >
         <div className="flex flex-col gap-2">
@@ -267,7 +282,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
             />
           </div>
         </div>
-      </div>
+      </div>, document.body)}
 
       {open &&
         createPortal(
