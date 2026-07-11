@@ -1,6 +1,6 @@
 // AnalyticsControlsContext.tsx - Shared analytics date range + history state
 // between the top app bar and the analytics screen.
-import React, { createContext, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDateRangeFromUrl } from '../hooks/useDateRangeFromUrl';
 import { useHistory } from '../hooks/useHistory';
 import { useLatestDetectionDate } from '../hooks/useLatestDetectionDate';
@@ -14,6 +14,8 @@ interface AnalyticsControlsContextValue {
   range: DateRange;
   setRange: (range: DateRange) => void;
   loading: boolean;
+  isInitialLoading: boolean;
+  isRefreshing: boolean;
   error: string | null;
   refetch: () => void;
   detectionData: HistoryDetectionResponse | null;
@@ -47,9 +49,12 @@ export const AnalyticsControlsProvider: React.FC<AnalyticsControlsProviderProps>
   active,
   children,
 }) => {
-  const { latestDate, loading: latestDateLoading, error: latestDateError, isFallback: latestDateIsFallback } = useLatestDetectionDate(true);
   const hasUrlParams = hasUrlRangeParams();
+  // Warm the default date for a future Analytics visit, but never wait on it
+  // when the URL already defines the requested range.
+  const { latestDate, loading: latestDateLoading, error: latestDateError, isFallback: latestDateIsFallback } = useLatestDetectionDate(!hasUrlParams);
   const initialDateRef = useRef<string | null>(null);
+  const [initialRangeReady, setInitialRangeReady] = useState(hasUrlParams);
 
   const defaultRange = useMemo<DateRange | undefined>(() => {
     if (!active) return undefined;
@@ -63,21 +68,25 @@ export const AnalyticsControlsProvider: React.FC<AnalyticsControlsProviderProps>
   const { range, setRange } = useDateRangeFromUrl({ defaultRange });
 
   useEffect(() => {
-    if (!latestDate || hasUrlParams) return;
-    if (initialDateRef.current === null) {
-      initialDateRef.current = latestDate;
+    if (!active || hasUrlParams || initialDateRef.current !== null || latestDateLoading) return;
+
+    initialDateRef.current = latestDate ?? 'none';
+    if (latestDate) {
       setRange(buildRangeForDate(latestDate));
     }
-  }, [latestDate, hasUrlParams, setRange]);
+    setInitialRangeReady(true);
+  }, [active, hasUrlParams, latestDate, latestDateLoading, setRange]);
 
   const {
     loading,
+    isInitialLoading: historyInitialLoading,
+    isRefreshing: historyRefreshing,
     error,
     refetch,
     detectionData,
     turbidityData,
     isFallback: historyIsFallback,
-  } = useHistory(range, active && !latestDateLoading);
+  } = useHistory(range, active && (hasUrlParams || initialRangeReady));
 
   useEffect(() => {
     if (!active || !latestDate || hasUrlParams) return;
@@ -89,13 +98,27 @@ export const AnalyticsControlsProvider: React.FC<AnalyticsControlsProviderProps>
     setRange(buildRangeForDate(latestDate));
   }, [active, latestDate, hasUrlParams, latestDateLoading, loading, detectionData, turbidityData, range, setRange]);
 
-  const combinedLoading = loading || latestDateLoading;
+  const isInitialLoading = active && !hasUrlParams && !initialRangeReady
+    ? latestDateLoading
+    : historyInitialLoading;
+  const combinedLoading = isInitialLoading || historyRefreshing;
   const isFallback = latestDateIsFallback || historyIsFallback;
   const combinedError = isFallback ? null : error || latestDateError;
 
   return (
     <AnalyticsControlsContext.Provider
-      value={{ range, setRange, loading: combinedLoading, error: combinedError, refetch, detectionData, turbidityData, isFallback }}
+      value={{
+        range,
+        setRange,
+        loading: combinedLoading,
+        isInitialLoading,
+        isRefreshing: historyRefreshing,
+        error: combinedError,
+        refetch,
+        detectionData,
+        turbidityData,
+        isFallback,
+      }}
     >
       {children}
     </AnalyticsControlsContext.Provider>

@@ -1,12 +1,12 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React from 'react';
-import { Activity, Brain, Calendar, Fish, Loader2, RotateCcw, Trash2, Waves } from 'lucide-react';
+import { Activity, Brain, Calendar, Fish, Loader2, Trash2, Waves } from 'lucide-react';
 import type { useAnalytics } from '../../hooks/pages/useAnalytics';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
-import { CardSectionHeader, GlassButton, GlassCard, GlassIconButton, GlassPanel, ScreenHeader } from '../../components/shared';
+import { CardSectionHeader, GlassButton, GlassCard, GlassPanel, ScreenHeader } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
 
 type AnalyticsScreenProps = ReturnType<typeof useAnalytics>;
@@ -87,6 +87,25 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
   );
 };
 
+const AnalyticsLoadingSkeleton: React.FC = () => (
+  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-hidden="true">
+    <GlassCard className="flex min-h-[468px] flex-col gap-5 overflow-hidden p-5 lg:col-span-2">
+      <div className="h-5 w-44 animate-pulse rounded bg-border-subtle/70" />
+      <div className="h-[180px] animate-pulse rounded-lg bg-bg/70" />
+      <div className="h-5 w-48 animate-pulse rounded bg-border-subtle/70" />
+      <div className="h-[180px] animate-pulse rounded-lg bg-bg/70" />
+    </GlassCard>
+    <GlassCard className="min-h-[320px] p-5 lg:col-span-2">
+      <div className="h-5 w-40 animate-pulse rounded bg-border-subtle/70" />
+      <div className="mt-5 h-[240px] animate-pulse rounded-lg bg-bg/70" />
+    </GlassCard>
+    <GlassCard className="min-h-[196px] p-5 lg:col-span-2">
+      <div className="h-5 w-64 animate-pulse rounded bg-border-subtle/70" />
+      <div className="mt-5 h-20 animate-pulse rounded-lg bg-bg/70" />
+    </GlassCard>
+  </div>
+);
+
 export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   tankId: _tankId,
   range,
@@ -99,7 +118,8 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   selectedSpecies,
   setSelectedSpecies: _setSelectedSpecies,
   hasAnyData,
-  loading,
+  isInitialLoading,
+  isRefreshing,
   error,
   refetch,
   confirmClear,
@@ -112,8 +132,29 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   isFallback,
 }) => {
   return (
-    <div className="flex flex-col gap-6">
-      <ScreenHeader eyebrow="Aquarium intelligence" className="-mb-1" />
+    <div className="flex flex-col gap-5">
+      <ScreenHeader
+        eyebrow="Aquarium intelligence"
+        className="relative items-start -mb-1"
+        action={(
+          <div className="absolute top-0 right-0 flex items-center gap-2 -translate-y-2.5">
+            {isRefreshing && (
+              <span
+                className="flex items-center gap-1.5 rounded-full bg-surface/75 px-2 py-1 type-caption text-text-muted shadow-card"
+                role="status"
+              >
+                <Loader2 size={12} className="animate-spin text-info" aria-hidden="true" />
+                Updating
+              </span>
+            )}
+            <DateTimeRangePicker
+              value={range}
+              onChange={setRange}
+              collapseToIcon
+            />
+          </div>
+        )}
+      />
       {/* Error banner */}
       {error && (
         <GlassCard className="border-critical bg-critical/10 p-3">
@@ -126,22 +167,15 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
         </GlassCard>
       )}
 
-      {/* Loading state */}
-      {loading && (
-        <GlassCard className="p-6">
-          <div className="
-            flex h-[240px] items-center justify-center type-body-muted
-          ">
-            <Loader2 size={28} className="text-info" />
-            <span className="ml-2 type-body-muted">
-              Loading analytics data...
-            </span>
-          </div>
-        </GlassCard>
+      {/* Initial loading keeps the dashboard geometry stable. */}
+      {isInitialLoading && !error && (
+        <section aria-label="Loading analytics" aria-busy="true">
+          <AnalyticsLoadingSkeleton />
+        </section>
       )}
 
       {/* Empty state */}
-      {!loading && !error && !hasAnyData && (
+      {!isInitialLoading && !error && !hasAnyData && (
         <GlassCard className="px-6 py-12 text-center">
           <div className="flex flex-col items-center justify-center gap-2">
             <Calendar size={32} className="text-text-muted opacity-50" />
@@ -156,19 +190,8 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
       )}
 
       {/* Charts grid */}
-      {!loading && !error && hasAnyData && (
+      {!isInitialLoading && !error && hasAnyData && (
         <>
-          {/* Mobile controls — desktop controls live in the top app bar */}
-          <div className="
-            flex items-center justify-start gap-3
-            md:hidden
-          ">
-            <DateTimeRangePicker value={range} onChange={setRange} />
-            <GlassIconButton size="sm" onClick={refetch} label="Refresh">
-              <RotateCcw size={14} />
-            </GlassIconButton>
-          </div>
-
           <div className="
             grid grid-cols-1 gap-4
             lg:grid-cols-2
