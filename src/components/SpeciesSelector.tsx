@@ -8,13 +8,12 @@ const MAX_INLINE_RESULTS = 60;
 
 /** Small coloured badge showing the creature type (shrimp/snail/crab) */
 const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
-  const emoji = type === 'shrimp' ? '🦐' : type === 'snail' ? '🐌' : type === 'crab' ? '🦀' : '';
   const bgColor = type === 'shrimp' ? '#FF9800' : type === 'snail' ? '#8BC34A' : type === 'crab' ? '#E91E63' : 'var(--color-border)';
   return (
     <span className="
       rounded-sm px-1.5 py-0.5 type-caption-inverse
     " style={{ backgroundColor: bgColor }}>
-      {emoji} {type}
+      {type}
     </span>
   );
 };

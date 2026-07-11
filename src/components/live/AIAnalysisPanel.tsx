@@ -100,12 +100,12 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
         `}
       >
         <h4 className={`
-          m-0 mb-2 flex items-center gap-1.5 type-strong
+          m-0 mb-2 flex items-center gap-1.5 type-caption
           ${diagnosis ? (diagnosis.error ? `text-critical` : diagnosis.healthy ? `
             text-good
           ` : `text-warning`) : 'text-text-muted'}
         `}>
-          🩺 Fish Health Diagnosis
+          Fish Health Diagnosis
         </h4>
         {diagnosis ? (
           diagnosis.error ? (
