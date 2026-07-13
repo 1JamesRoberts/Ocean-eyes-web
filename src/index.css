@@ -60,8 +60,8 @@
 
   /* Font */
   --font-main: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
-  --type-ink: rgb(0 0 0);
-  --type-ink-muted: rgb(0 0 0 / 70%);
+  --type-ink: rgb(5 30 50);
+  --type-ink-muted: rgb(5 30 50 / 60%);
   --type-ink-inverse: rgb(255 255 255);
   --type-ink-inverse-muted: rgb(255 255 255 / 70%);
 
@@ -87,12 +87,12 @@
   --color-surface-dim: #e8e8e8;
 
   /* ─── Text ─── */
-  --color-text: #1a1c1c;
-  --color-text-muted: #3f484a;
+  --color-text: #051e32;
+  --color-text-muted: rgb(5 30 50 / 60%);
   --color-text-subtle: #6f797a;
   --color-text-inverse: #ffffff;
-  --color-type-ink: rgb(0 0 0);
-  --color-type-ink-muted: rgb(0 0 0 / 70%);
+  --color-type-ink: rgb(5 30 50);
+  --color-type-ink-muted: rgb(5 30 50 / 60%);
   --color-type-ink-inverse: rgb(255 255 255);
   --color-type-ink-inverse-muted: rgb(255 255 255 / 70%);
 
@@ -102,7 +102,7 @@
   --color-border-strong: #bfc8c9;
 
   /* ─── Brand (teal) ─── */
-  --color-brand: #004349;
+  --color-brand: #051e32;
   --color-brand-bright: #196a59;
   --color-brand-dim: #0d5c63;
   --color-brand-glow: #abeef6;
@@ -226,7 +226,7 @@
   font-family: var(--font-main);
   font-size: 14px;
   line-height: 1.35;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0;
   color: var(--type-ink-muted);
 }
@@ -271,7 +271,7 @@
   font-family: var(--font-main);
   font-size: 14px;
   line-height: 1.35;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0;
   color: var(--type-ink-inverse-muted);
 }

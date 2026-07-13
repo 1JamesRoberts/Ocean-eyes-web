@@ -11,7 +11,6 @@ interface CardHeaderProps {
 export const CardHeader: React.FC<CardHeaderProps> = ({
   icon,
   title,
-  detail,
   children,
   className = "",
 }) => (
@@ -26,7 +25,6 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
       <span className="material-symbols-outlined">{icon}</span>
       <div className="min-w-0">
         <div className="type-title">{title}</div>
-        {detail && <p className="mt-0.5 type-caption">{detail}</p>}
       </div>
     </div>
     <div className="flex items-center">
