@@ -20,7 +20,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
 
   return (
     <HeroActionLayerContext.Provider value={heroActionLayer}>
-      <div className="flex w-full flex-1 flex-col bg-black">
+      <div className="bg-gradient-mint flex w-full flex-1 flex-col">
         <section
           className={`
             mobile-hero-video

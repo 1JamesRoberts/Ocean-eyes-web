@@ -21,7 +21,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
       ${className}
     `}
   >
-    <div className="flex min-w-0 items-start gap-2 text-brand">
+    <div className="flex min-w-0 items-start gap-2 text-text">
       <span className="material-symbols-outlined">{icon}</span>
       <div className="min-w-0">
         <div className="type-title">{title}</div>

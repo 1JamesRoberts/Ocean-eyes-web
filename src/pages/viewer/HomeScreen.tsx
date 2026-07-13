@@ -50,7 +50,7 @@ export const HomeScreen: React.FC = () => {
           <div className="glass-card p-5">
             <CardSectionHeader
               icon={FlaskConical}
-              iconClassName="text-brand"
+              iconClassName="text-text"
               title="Parameters"
               detail="Current water conditions"
               action={(

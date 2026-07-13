@@ -15,13 +15,13 @@ export const CardSectionHeader: React.FC<CardSectionHeaderProps> = ({
   title,
   action,
   className = '',
-  iconClassName = 'text-brand',
+  iconClassName = 'text-text',
 }) => (
   <div className={`-mt-1 mb-2 flex items-start justify-between gap-3 ${className}`}>
     <div className="flex min-w-0 items-start gap-2">
       <Icon size={16} strokeWidth={2.5} className={`mt-0.5 shrink-0 ${iconClassName}`} />
       <div className="min-w-0">
-        <h3 className="type-title text-brand">
+        <h3 className="type-title text-text">
           {title}
         </h3>
       </div>
