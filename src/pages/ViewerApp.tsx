@@ -38,7 +38,7 @@ export const ViewerApp: React.FC = () => {
   const analyticsHeroOverlay = useMemo(
     () => (
       <SpatialDetectionHeatmapOverlay
-        records={analyticsData.detectionRecords}
+        records={analyticsData.heatmapRecords}
         inventorySpeciesIds={analyticsData.inventorySpeciesIds}
         selectedSpecies={analyticsData.selectedSpecies}
         onSelectedSpeciesChange={analyticsData.setSelectedSpecies}
@@ -47,7 +47,7 @@ export const ViewerApp: React.FC = () => {
     ),
     [
       activeTab,
-      analyticsData.detectionRecords,
+      analyticsData.heatmapRecords,
       analyticsData.inventorySpeciesIds,
       analyticsData.selectedSpecies,
       analyticsData.setSelectedSpecies,

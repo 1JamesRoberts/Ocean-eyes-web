@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useTank } from '../useTank';
 import { useReadings } from '../useReadings';
 import { useFish } from '../useFish';
+import { useLiveFeed } from '../useLiveFeed';
 import { useAnalyticsControls } from '../../context/AnalyticsControlsContext';
 import { useNavigation } from '../../context/NavigationContext';
 import {
@@ -9,7 +10,11 @@ import {
   clearDetectionHistoryRange,
   clearTurbidityHistoryRange,
 } from '../../models/api/aiApi';
-import { selectDiagnoses, selectSpeciesList } from '../../models/services/historyAnalytics';
+import {
+  selectDiagnoses,
+  selectHeatmapRecords,
+  selectSpeciesList,
+} from '../../models/services/historyAnalytics';
 import type { DateRange } from '../../types/aquarium';
 
 export const useAnalytics = () => {
@@ -17,6 +22,7 @@ export const useAnalytics = () => {
   const { tankId } = useTank();
   const { readings } = useReadings();
   const { fishList } = useFish(tankId);
+  const { liveState } = useLiveFeed();
   const {
     range,
     setRange,
@@ -32,6 +38,10 @@ export const useAnalytics = () => {
 
   const detectionRecords = useMemo(() => detectionData?.records ?? [], [detectionData]);
   const turbidityRecords = useMemo(() => turbidityData?.records ?? [], [turbidityData]);
+  const heatmapRecords = useMemo(
+    () => selectHeatmapRecords(detectionRecords, liveState?.last_prediction, range),
+    [detectionRecords, liveState?.last_prediction, range],
+  );
 
   const diagnoses = useMemo(
     () => selectDiagnoses(detectionRecords),
@@ -88,6 +98,7 @@ export const useAnalytics = () => {
     setRange: onRangeChange,
     readings,
     detectionRecords,
+    heatmapRecords,
     turbidityRecords,
     diagnoses,
     speciesList,
