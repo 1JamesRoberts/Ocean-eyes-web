@@ -16,6 +16,11 @@
 
   /* Glass-system tokens */
   --glass-bg-card: rgba(255, 255, 255, 0.4);
+  --glass-bg-card-gradient: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.48) 0%,
+    rgba(255, 255, 255, 0.32) 100%
+  );
   --glass-bg-inline: rgba(255, 255, 255, 0.3);
   --glass-blur-lg: 20px;
   --glass-blur-md: 12px;
@@ -28,8 +33,9 @@
   --glass-radius-pill: 9999px;
 
   /* Shadow tokens (only --shadow-glass not in @theme) */
-  --shadow-glass: inset 2px 2px 0px rgba(255, 255, 255, 0.5),
-    inset -2px -2px 5px rgba(0, 67, 73, 0.05);
+  --shadow-glass: inset 1px 1px 0px rgba(255, 255, 255, 0.25),
+    inset -1px -1px 2px rgba(0, 67, 73, 0.03);
+  --shadow-glass-card: var(--shadow-glass), 0 8px 32px rgba(0, 67, 73, 0.12);
 
   /* Transitions */
   --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -282,11 +288,13 @@
 }
 
 @utility glass-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.32) 100%);
+  position: relative;
+  isolation: isolate;
+  background: var(--glass-bg-card-gradient);
   border: 0.5px solid var(--glass-border-strong);
   border-bottom-color: transparent;
   border-radius: var(--glass-radius-card);
-  box-shadow: var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05);
+  box-shadow: var(--shadow-glass-card);
 }
 
 @utility glass-header {
@@ -748,7 +756,7 @@
   padding-top: var(--mobile-status-bar-height);
   border-top-left-radius: var(--mobile-content-radius);
   border-top-right-radius: var(--mobile-content-radius);
-  background: linear-gradient(180.05deg, #ffffff 0%, #c1e0dd 99.99%);
+  background: #f2fdff;
 }
 
 .phone-content::-webkit-scrollbar {
@@ -845,14 +853,7 @@
 
 /* ─── Phone Background Gradient ─── */
 .bg-gradient-mint {
-  background: linear-gradient(
-    180deg,
-    transparent 0,
-    transparent calc(var(--mobile-hero-height) * 0.99),
-    #ffffff calc(var(--mobile-hero-height) * 0.99),
-    #c1e0dd 100%
-  );
-  background-attachment: fixed;
+  background: #f2fdff;
 }
 
 /* ─── Mobile Hero Shell ─── */

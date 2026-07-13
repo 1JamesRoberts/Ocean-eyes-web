@@ -22,7 +22,7 @@ export const HeroBadges: React.FC<HeroBadgesProps> = ({
           to-transparent
         "
       />
-      <div className="absolute bottom-3 left-4 z-10 flex gap-2">
+      <div className="absolute top-3 left-4 z-10 flex gap-2">
         <span
           className="
             rounded-full bg-black/40 px-2.5 py-1 text-2xs font-semibold

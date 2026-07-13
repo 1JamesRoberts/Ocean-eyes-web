@@ -17,15 +17,6 @@ interface DiagnosisRecordCardProps {
   resolveCropUrl: (url?: string) => string | undefined;
 }
 
-const mainBranchChartCardStyle: React.CSSProperties = {
-  background: 'var(--glass-bg-card)',
-  backdropFilter: 'blur(var(--glass-blur-lg))',
-  WebkitBackdropFilter: 'blur(var(--glass-blur-lg))',
-  border: '1px solid var(--glass-border-strong)',
-  borderRadius: 'var(--glass-radius-card)',
-  boxShadow: 'var(--shadow-glass), var(--shadow-card)',
-};
-
 const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
   diagnosis,
   resolveCropUrl,
@@ -171,9 +162,8 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
     <div className="flex flex-col gap-4">
       <ScreenHeader
         eyebrow="Aquarium intelligence"
-        className="relative"
         action={(
-          <div className="absolute top-1/2 right-0 flex -translate-y-1/2 items-center gap-2">
+          <div className="flex items-center gap-2">
             {isRefreshing && (
               <span
                 className="flex items-center gap-1.5 rounded-full bg-surface/75 px-2 py-1 type-caption text-text-muted shadow-card"
@@ -234,7 +224,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             <GlassCard className="
               flex min-h-0 flex-col gap-3 overflow-hidden p-5
               lg:col-span-2
-            " style={mainBranchChartCardStyle}>
+            ">
               <CardSectionHeader
                 icon={Fish}
                 title="Fish Count Over Time"
@@ -251,7 +241,6 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 flex min-h-0 flex-col gap-3 overflow-hidden p-5
                 lg:col-span-2
               "
-              style={mainBranchChartCardStyle}
             >
               <CardSectionHeader
                 icon={Activity}

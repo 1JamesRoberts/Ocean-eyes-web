@@ -187,9 +187,8 @@ export const MyFishScreen: React.FC = () => {
     <div className="flex flex-col gap-4">
       <ScreenHeader
         eyebrow="Aquarium inventory"
-        className="relative"
         action={(
-          <div className="absolute top-1/2 right-0 -translate-y-1/2">
+          <div>
             <GlassButton
               variant="outline"
               size="sm"
