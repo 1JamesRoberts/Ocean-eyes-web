@@ -33,7 +33,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
         detail="Needs your attention"
       />
 
-      <div className="space-y-3">
+      <div className="space-y-3 border-t border-text-muted/15 pt-3">
         {activeAlerts.map(alert => (
           <button
             key={alert.id}

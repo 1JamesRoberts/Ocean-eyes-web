@@ -387,14 +387,14 @@ export const MyFishScreen: React.FC = () => {
                 key={fish.id}
                 data-fish-card
                 clickable
-                className="flex flex-col overflow-hidden p-4!"
+                className="flex flex-col overflow-hidden px-4! py-3!"
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest('button')) return;
                   onToggleFish(fish.id);
                 }}
               >
                 {/* Main row — always visible */}
-                <div className="flex items-center justify-between p-3">
+                <div className="flex items-center justify-between px-3 py-2.5">
                   <button
                     type="button"
                     className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-xl border-none bg-transparent text-left focus-visible:outline-2 focus-visible:outline-brand"

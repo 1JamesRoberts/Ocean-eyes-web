@@ -14,7 +14,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 }) => (
   <header className={`-mt-1 flex min-h-6 items-center justify-between gap-4 ${className}`}>
     <div className="min-w-0">
-      <h1 className="text-xs font-semibold tracking-[0.12em] text-brand uppercase">
+      <h1 className="text-xs font-semibold tracking-[0.11em] text-brand uppercase">
         {eyebrow}
       </h1>
     </div>

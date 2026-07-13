@@ -51,7 +51,7 @@ export const MonitorMetric: React.FC<MonitorMetricProps> = ({ label, value }) =>
     rounded-xl border border-monitor-border bg-monitor-surface p-3
   ">
     <span className="
-      block text-2xs font-semibold tracking-[0.08em] text-monitor-text-muted
+      block text-2xs font-semibold tracking-[0.07em] text-monitor-text-muted
       uppercase
     ">
       {label}

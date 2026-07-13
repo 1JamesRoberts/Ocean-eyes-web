@@ -51,10 +51,10 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                 key={fish.id}
                 className="
                   flex items-center justify-between pb-3
-                  [&:first-child]:border-t [&:first-child]:border-text-muted/20
+                  [&:first-child]:border-t [&:first-child]:border-text-muted/15
                   [&:first-child]:pt-3
                   [&:not(:last-child)]:mb-3
-                  [&:not(:last-child)]:border-b [&:not(:last-child)]:border-text-muted/20
+                  [&:not(:last-child)]:border-b [&:not(:last-child)]:border-text-muted/15
                 "
               >
                 <div className="flex items-center gap-3">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Droplets, FlaskConical, Thermometer } from 'lucide-react';
+import { ChevronRight, Droplets, FlaskConical, Thermometer } from 'lucide-react';
 import {
   calculateHealthScore,
   getHealthColor,
@@ -17,8 +17,9 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
   const healthMessage = getHealthMessage(healthScore);
   const healthHeading = getHealthHeading(healthScore);
   const healthColor = getHealthColor(healthScore);
-  const strokeWidth = 8;
-  const radius = 48;
+  const displayScore = Math.round(healthScore * 10);
+  const strokeWidth = 9;
+  const radius = 50;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference * (1 - healthScore / 10);
   const parameters = [
@@ -40,11 +41,14 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
   ];
 
   return (
-    <section className="shimmer flex items-center gap-5 glass-card p-5">
+    <section className="
+      shimmer mx-auto grid w-full max-w-sm grid-cols-[7.25rem_minmax(0,1fr)]
+      items-center gap-4 glass-card rounded-[2.5rem] px-4 py-6
+    ">
       <div className="
-        relative flex size-28 shrink-0 items-center justify-center
+        relative flex size-29 shrink-0 items-center justify-center
       ">
-        <svg className="size-28" height="112" width="112" viewBox="0 0 112 112">
+        <svg className="size-full -rotate-90" viewBox="0 0 112 112">
           <defs>
             <linearGradient id="healthRingGradient" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#00A9CC" />
@@ -55,7 +59,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             cx="56"
             cy="56"
             r={radius}
-            className="text-text-muted/20"
+            className="text-brand-bright/10"
             stroke="currentColor"
             strokeWidth={strokeWidth}
             fill="none"
@@ -76,36 +80,52 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
         <div className="
           absolute inset-0 flex flex-col items-center justify-center
         ">
-          <span className="text-2xl font-bold text-brand">{healthScore}</span>
-          <span className="type-caption">Score</span>
+          <span className="
+            text-[2.65rem] leading-none font-bold tracking-[-0.06em] text-text
+          ">{displayScore}</span>
+          <span className="mt-1 text-sm leading-none text-text-muted">/100</span>
         </div>
       </div>
 
-      <div className="flex-1">
-        <div className="flex items-center gap-1.5">
+      <div className="relative min-w-0 self-stretch py-1">
+        <ChevronRight
+          aria-hidden="true"
+          className="absolute top-0 right-0 size-6 text-text"
+          strokeWidth={2.25}
+        />
+        <div className="flex items-center gap-2 pr-7">
           <span
             aria-hidden="true"
-            className="size-2 shrink-0 rounded-full"
+            className="size-2.5 shrink-0 rounded-full"
             style={{ backgroundColor: healthColor }}
           />
-          <span className="block type-caption" style={{ color: healthColor }}>{healthHeading}</span>
+          <span className="text-sm font-semibold" style={{ color: healthColor }}>{healthHeading}</span>
         </div>
-        <h3 className="whitespace-nowrap text-[17px] font-bold leading-tight text-brand sm:text-2xl">
+        <h3 className="
+          mt-2 text-xl leading-none font-bold tracking-tight whitespace-nowrap
+          text-text
+        ">
           Aquarium Health
         </h3>
-        <p className="mt-0.5 type-caption">{healthMessage}</p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <p className="mt-2 text-sm/tight text-text-muted">{healthMessage}</p>
+        <div className="mt-4 grid grid-cols-3 gap-1.5">
           {parameters.map((parameter) => (
             <div
               key={parameter.label}
               className="
-                flex min-w-0 items-center gap-1.5 rounded-full
-                bg-[#00A9CC]/5 px-2.5 py-1.5
+                flex min-w-0 items-center justify-center gap-1 rounded-2xl
+                bg-[#00A9CC]/5 px-1.5 py-2
               "
             >
-              <parameter.icon aria-hidden="true" className="size-3.5 shrink-0 text-brand-bright" style={{ color: '#00A9CC' }} />
+              <parameter.icon aria-hidden="true" className="
+                size-4 shrink-0 text-[#00A9CC]
+              " />
               <span className="sr-only">{parameter.label}: </span>
-              <span className="whitespace-nowrap text-[11px] font-semibold text-brand sm:text-xs">
+              <span className="
+                min-w-0 truncate text-2xs font-semibold whitespace-nowrap
+                text-text
+                sm:text-xs
+              ">
                 {parameter.value}
               </span>
             </div>

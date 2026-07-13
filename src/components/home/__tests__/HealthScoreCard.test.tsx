@@ -17,8 +17,8 @@ describe('HealthScoreCard', () => {
   it('displays the calculated health score', () => {
     render(<HealthScoreCard reading={healthyReading} />);
 
-    expect(screen.getByText('9.2')).toBeTruthy();
-    expect(screen.getByText('Score')).toBeTruthy();
+    expect(screen.getByText('92')).toBeTruthy();
+    expect(screen.getByText('/100')).toBeTruthy();
   });
 
   it('displays the current water parameters', () => {
