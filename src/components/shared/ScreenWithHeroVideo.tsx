@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { HeroActionLayerContext } from './HeroActionLayerContext';
 
-const CONTENT_FADE_HEIGHT_PX = 8;
+const CONTENT_FADE_HEIGHT_PX = 12;
 const CONTENT_CLEARANCE_BELOW_HEADING_PX = 8;
 
 interface ScreenWithHeroVideoProps {

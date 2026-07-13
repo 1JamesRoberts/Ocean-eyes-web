@@ -62,7 +62,7 @@ describe('ScreenWithHeroVideo transition', () => {
 
     await waitFor(() => {
       expect(maskedContent!.style.getPropertyValue('--mobile-hero-content-mask-start')).toBe('84px');
-      expect(maskedContent!.style.getPropertyValue('--mobile-hero-content-mask-end')).toBe('92px');
+      expect(maskedContent!.style.getPropertyValue('--mobile-hero-content-mask-end')).toBe('96px');
     });
   });
 });
