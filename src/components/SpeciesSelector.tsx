@@ -24,6 +24,7 @@ interface SpeciesSelectorProps {
   placeholder?: string;
   excludeSpeciesIds?: string[];
   presentation?: 'popover' | 'inline';
+  inputAction?: React.ReactNode;
 }
 
 export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
@@ -32,6 +33,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
   placeholder = 'Search for a species...',
   excludeSpeciesIds = [],
   presentation = 'popover',
+  inputAction,
 }) => {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -194,31 +196,34 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <div className="relative">
-        <Search
-          size={16}
-          className="
-            pointer-events-none absolute top-1/2 left-3 -translate-y-1/2
-            text-text-muted
-          "
-        />
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={handleInputChange}
-          onFocus={handleInputFocus}
-          placeholder={selectedSpecies ? selectedSpecies.displayName : placeholder}
-          aria-controls={resultsId}
-          aria-expanded={isInline || isOpen}
-          aria-autocomplete="list"
-          role="combobox"
-          className="
-            w-full rounded-2xl border border-border bg-white/55 px-3 py-3 pl-10
-            type-body outline-none transition-smooth
-            focus:border-brand/40 focus:ring-3 focus:ring-brand/10
-          "
-        />
+      <div className="flex items-center gap-2">
+        <div className="relative min-w-0 flex-1">
+          <Search
+            size={16}
+            className="
+              pointer-events-none absolute top-1/2 left-3 -translate-y-1/2
+              text-text-muted
+            "
+          />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            placeholder={selectedSpecies ? selectedSpecies.displayName : placeholder}
+            aria-controls={resultsId}
+            aria-expanded={isInline || isOpen}
+            aria-autocomplete="list"
+            role="combobox"
+            className="
+              w-full rounded-2xl border border-border bg-white/55 px-3 py-3 pl-10
+              type-body outline-none transition-smooth
+              focus:border-brand/40 focus:ring-3 focus:ring-brand/10
+            "
+          />
+        </div>
+        {inputAction}
       </div>
 
       {isInline ? (

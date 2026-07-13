@@ -131,27 +131,26 @@ const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <h2 id="add-fish-title" className="sr-only">Add fish</h2>
-        <div className="flex justify-end px-3 pt-3">
-          <GlassIconButton
-            size="sm"
-            label="Close add fish"
-            onClick={onClose}
-            className="
-              shrink-0 border-none! bg-transparent! shadow-none!
-              backdrop-blur-none! hover:bg-transparent!
-            "
-          >
-            <X size={18} />
-          </GlassIconButton>
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-2 pb-5">
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 pt-3 pb-5">
           <SpeciesSelector
             selectedSpeciesId={null}
             onSelect={onSpeciesSelect}
             placeholder="Search common or scientific name"
             excludeSpeciesIds={fishList.map((fish) => fish.speciesId)}
             presentation="inline"
+            inputAction={(
+              <GlassIconButton
+                size="sm"
+                label="Close add fish"
+                onClick={onClose}
+                className="
+                  shrink-0 border-none! bg-transparent! shadow-none!
+                  backdrop-blur-none! hover:bg-transparent!
+                "
+              >
+                <X size={18} />
+              </GlassIconButton>
+            )}
           />
         </div>
       </div>
