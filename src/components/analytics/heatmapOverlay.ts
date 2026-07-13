@@ -7,6 +7,44 @@ export interface HeatmapCenter {
   species: string;
 }
 
+export interface ObjectCoverRect {
+  width: number;
+  height: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+/** Match the centered crop produced by CSS `object-fit: cover`. */
+export function calculateObjectCoverRect(
+  sourceWidth: number,
+  sourceHeight: number,
+  containerWidth: number,
+  containerHeight: number,
+): ObjectCoverRect {
+  if (
+    sourceWidth <= 0 ||
+    sourceHeight <= 0 ||
+    containerWidth <= 0 ||
+    containerHeight <= 0
+  ) {
+    return { width: 0, height: 0, offsetX: 0, offsetY: 0 };
+  }
+
+  const scale = Math.max(
+    containerWidth / sourceWidth,
+    containerHeight / sourceHeight,
+  );
+  const width = sourceWidth * scale;
+  const height = sourceHeight * scale;
+
+  return {
+    width,
+    height,
+    offsetX: (containerWidth - width) / 2,
+    offsetY: (containerHeight - height) / 2,
+  };
+}
+
 function jetColor(t: number): [number, number, number] {
   const c = Math.max(0, Math.min(1, t));
   if (c < 0.125) {

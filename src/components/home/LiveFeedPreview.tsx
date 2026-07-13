@@ -86,8 +86,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
           )}
           {overlay && (
             <div className="
-              pointer-events-none absolute top-0 left-0 h-[var(--mobile-hero-height)]
-              w-full
+              pointer-events-none absolute inset-0 size-full
             ">
               {overlay}
             </div>

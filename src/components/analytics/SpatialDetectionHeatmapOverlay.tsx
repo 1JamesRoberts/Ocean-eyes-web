@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatSpeciesName } from '../../utils/formatters';
-import { buildHeatmapOverlay, debounce, type HeatmapCenter } from './heatmapOverlay';
+import {
+  buildHeatmapOverlay,
+  calculateObjectCoverRect,
+  debounce,
+  type HeatmapCenter,
+} from './heatmapOverlay';
 
 interface SpatialDetectionHeatmapOverlayProps {
   records: AIDetectionResult[];
@@ -12,6 +17,7 @@ interface SpatialDetectionHeatmapOverlayProps {
 }
 
 const MAX_RENDER_WIDTH = 800;
+const DEFAULT_SOURCE_SIZE = { width: 16, height: 9 };
 
 export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmapOverlayProps>(
   ({
@@ -63,6 +69,17 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
       [allCenters, selectedSpecies],
     );
 
+    const sourceSize = useMemo(() => {
+      for (let index = records.length - 1; index >= 0; index -= 1) {
+        const dimensions = records[index].image_dimensions;
+        if (dimensions && dimensions.width > 0 && dimensions.height > 0) {
+          return dimensions;
+        }
+      }
+
+      return DEFAULT_SOURCE_SIZE;
+    }, [records]);
+
     useEffect(() => {
       if (!containerRef.current) return;
 
@@ -109,7 +126,19 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
       if (!ctx) return;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(texture, 0, 0, canvas.width, canvas.height);
+      const coverRect = calculateObjectCoverRect(
+        texture.width,
+        texture.height,
+        canvas.width,
+        canvas.height,
+      );
+      ctx.drawImage(
+        texture,
+        coverRect.offsetX,
+        coverRect.offsetY,
+        coverRect.width,
+        coverRect.height,
+      );
     }, []);
 
     useEffect(() => {
@@ -122,12 +151,15 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
       const { width, height } = containerSize;
       if (width === 0 || height === 0) return;
 
-      const workW = Math.min(MAX_RENDER_WIDTH, Math.round(width));
-      const workH = Math.round(workW * (height / width));
+      const workW = Math.min(MAX_RENDER_WIDTH, Math.max(1, Math.round(width)));
+      const workH = Math.max(
+        1,
+        Math.round(workW * (sourceSize.height / sourceSize.width)),
+      );
 
       heatmapTextureRef.current = buildHeatmapOverlay(centers, workW, workH);
       drawOverlay();
-    }, [centers, containerSize, drawOverlay]);
+    }, [centers, containerSize, drawOverlay, sourceSize]);
 
     return (
       <div
@@ -135,7 +167,8 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
         aria-hidden={!visible}
         className={`
           pointer-events-none absolute inset-0 size-full transition-opacity
-          duration-500 ease-in-out motion-reduce:transition-none
+          duration-500 ease-in-out
+          motion-reduce:transition-none
           ${visible ? 'opacity-100' : 'opacity-0'}
         `}
       >
@@ -144,11 +177,14 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
           className="absolute inset-0 z-1 size-full"
         />
         <div
-          className={`absolute right-4 bottom-3 z-20 ${
+          className={`
+            absolute top-[calc(var(--mobile-hero-height)-2.75rem)] right-4 z-20
+            ${
             visible ? 'pointer-events-auto' : 'pointer-events-none'
-          }`}
+          }
+          `}
         >
-          <label className="relative cursor-pointer hero-overlay-pill">
+          <label className="relative hero-overlay-pill cursor-pointer">
             <span className="pointer-events-none">
               {selectedSpecies === 'all'
                 ? 'All Species'
@@ -158,7 +194,7 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
               value={selectedSpecies}
               onClick={(event) => event.stopPropagation()}
               onChange={(event) => onSelectedSpeciesChange(event.target.value)}
-              className="absolute inset-0 opacity-0 cursor-pointer"
+              className="absolute inset-0 cursor-pointer opacity-0"
             >
               <option value="all">All Species</option>
               {speciesList.map((species) => (
