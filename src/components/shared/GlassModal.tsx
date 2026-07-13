@@ -25,7 +25,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
     if (!isOpen) return;
 
     restoreFocusRef.current = document.activeElement as HTMLElement | null;
-    const scrollContainer = document.querySelector<HTMLElement>('.phone-content');
+    const scrollContainer = document.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
     const previousOverflow = scrollContainer?.style.overflow;
     if (scrollContainer) scrollContainer.style.overflow = 'hidden';
 

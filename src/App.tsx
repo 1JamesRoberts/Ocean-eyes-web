@@ -7,21 +7,21 @@ import { PhoneFrame, PillNavigation } from './components/shared';
 import { ViewerApp } from './pages/ViewerApp';
 import { useTank } from './hooks/useTank';
 
-const OceanEyesDashboard: React.FC = () => {
+export const OceanEyesDashboard: React.FC = () => {
   const { activeTab } = useNavigation();
   const { tankId } = useTank();
 
-  // All tab screens share the phone-content scroll container, so reset it when
+  // All tab screens share the stationary screen scroll container, so reset it when
   // the destination changes instead of carrying the previous screen's position.
   useLayoutEffect(() => {
-    document.querySelector<HTMLElement>('.phone-content')?.scrollTo(0, 0);
+    document.querySelector<HTMLElement>('[data-mobile-screen-scroll]')?.scrollTo(0, 0);
   }, [activeTab]);
 
   return (
     <PhoneFrame navigation={<PillNavigation />}>
       <main
         id="main-content"
-        className="flex flex-1 flex-col gap-4 p-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]"
+        className="flex min-h-0 flex-1 flex-col gap-4 px-4 pt-4"
       >
         <LiveFeedProvider tankId={tankId}>
           <AnalyticsControlsProvider active={activeTab === 'analytics'}>

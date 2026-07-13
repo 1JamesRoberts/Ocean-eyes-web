@@ -83,16 +83,21 @@ export const ViewerApp: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full flex-1 flex-col">
+    <div className="flex min-h-0 w-full flex-1 flex-col">
       {tankId === null ? (
-        <div className="
-          rounded-[20px] border border-border-subtle bg-surface p-6 shadow-card
-          transition-smooth
-        ">
-          <RootGateOnboarding />
+        <div
+          data-mobile-screen-scroll
+          className="-mx-4 -mt-4 flex min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]"
+        >
+          <div className="
+            rounded-[20px] border border-border-subtle bg-surface p-6 shadow-card
+            transition-smooth
+          ">
+            <RootGateOnboarding />
+          </div>
         </div>
       ) : (
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col">
           <ScreenWithHeroVideo hero={defaultHero} showHero={showHero}>
             <Suspense fallback={<ScreenLoadingFallback />}>
               {renderActiveScreen()}

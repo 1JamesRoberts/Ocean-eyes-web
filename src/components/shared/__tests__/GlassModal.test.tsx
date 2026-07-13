@@ -10,6 +10,7 @@ const ModalHarness: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
+      <div data-mobile-screen-scroll style={{ overflow: 'auto' }}>Scrollable content</div>
       <button type="button" onClick={() => setIsOpen(true)}>Add fish</button>
       <GlassModal
         isOpen={isOpen}
@@ -52,5 +53,16 @@ describe('GlassModal bottom placement', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add fish' }));
 
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Save fish' }));
+  });
+
+  it('locks and restores the stationary screen scroller', () => {
+    render(<ModalHarness />);
+    const scrollContainer = document.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add fish' }));
+    expect(scrollContainer?.style.overflow).toBe('hidden');
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(scrollContainer?.style.overflow).toBe('auto');
   });
 });
