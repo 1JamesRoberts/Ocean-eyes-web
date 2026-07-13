@@ -84,7 +84,14 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               displayFishCount={displayFishCount}
             />
           )}
-          {overlay}
+          {overlay && (
+            <div className="
+              pointer-events-none absolute top-0 left-0 h-[var(--mobile-hero-height)]
+              w-full
+            ">
+              {overlay}
+            </div>
+          )}
       </div>
     );
   }

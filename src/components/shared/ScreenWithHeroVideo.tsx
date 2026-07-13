@@ -30,24 +30,31 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
           {hero}
           <div
             ref={setHeroActionLayer}
-            className="pointer-events-none absolute inset-0 z-30"
+            className="
+              pointer-events-none absolute top-0 right-0 left-0 z-30
+              h-[var(--mobile-hero-height)]
+            "
           />
-        </section>
-        {showHero && (
-          <div className="mobile-hero-corner-overlay">
-            <div
-              aria-hidden="true"
-              className="mobile-hero-corner mobile-hero-corner-left"
-            />
-            <div
-              aria-hidden="true"
-              className="mobile-hero-corner mobile-hero-corner-right"
-            />
-          </div>
-        )}
-        <div className="relative z-10 -mx-4 flex flex-1 flex-col bg-gradient-mint px-4">
           {showHero && (
-            <div className="h-5 translate-y-1" aria-hidden="true" />
+            <>
+              <div className="mobile-hero-blend" aria-hidden="true" />
+              <div className="mobile-hero-seam-cap" aria-hidden="true" />
+            </>
+          )}
+        </section>
+        <div
+          data-mobile-hero-scroll-layer
+          className={`
+            relative z-30 -mx-4 flex flex-1 flex-col px-4
+            ${showHero ? 'bg-transparent' : 'bg-gradient-mint'}
+          `}
+        >
+          {showHero && (
+            <div
+              data-mobile-hero-content-spacer
+              className="h-5 translate-y-1"
+              aria-hidden="true"
+            />
           )}
           {children}
         </div>
