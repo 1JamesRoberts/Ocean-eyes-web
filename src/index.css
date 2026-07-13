@@ -928,6 +928,30 @@
   background: #000;
 }
 
+@utility mobile-hero-content-mask {
+  --mobile-hero-content-mask-start: 0px;
+  --mobile-hero-content-mask-end: 0px;
+  clip-path: inset(var(--mobile-hero-content-mask-start) 0 0 0);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--mobile-hero-content-mask-start),
+    #000 var(--mobile-hero-content-mask-end),
+    #000 100%
+  );
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--mobile-hero-content-mask-start),
+    #000 var(--mobile-hero-content-mask-end),
+    #000 100%
+  );
+}
+
 @utility mobile-hero-blend {
   pointer-events: none;
   position: absolute;
