@@ -166,7 +166,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
           <div className="flex items-center gap-2">
             {isRefreshing && (
               <span
-                className="flex items-center gap-1.5 rounded-full bg-surface/75 px-2 py-1 type-caption text-text-muted shadow-card"
+                className="pointer-events-none hero-overlay-pill"
                 role="status"
               >
                 <Loader2 size={12} className="animate-spin text-info" aria-hidden="true" />
@@ -177,6 +177,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
               value={range}
               onChange={setRange}
               collapseToIcon
+              heroOverlay
             />
           </div>
         )}

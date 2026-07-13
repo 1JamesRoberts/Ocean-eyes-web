@@ -31,7 +31,7 @@ export const AlertsScreen: React.FC = () => {
       <ScreenHeader
         eyebrow="Alerts"
         action={(
-          <BackButton onClick={onBack} />
+          <BackButton onClick={onBack} heroOverlay />
         )}
       />
 

@@ -12,7 +12,7 @@ export const HistoryDetailScreen: React.FC = () => {
       <ScreenHeader
         eyebrow="Clarity analytics"
         action={(
-          <BackButton onClick={onBack} />
+          <BackButton onClick={onBack} heroOverlay />
         )}
       />
 

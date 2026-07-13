@@ -25,16 +25,14 @@ export const HeroBadges: React.FC<HeroBadgesProps> = ({
       <div className="absolute top-3 left-4 z-10 flex gap-2">
         <span
           className="
-            rounded-full bg-black/40 px-2.5 py-1 text-2xs font-semibold
-            text-white backdrop-blur-md
+            pointer-events-none hero-overlay-pill
           "
         >
           Live
         </span>
         <span
           className="
-            rounded-full bg-black/40 px-2.5 py-1 text-2xs text-white
-            backdrop-blur-md
+            pointer-events-none hero-overlay-pill
           "
         >
           {displayFishCount} fish

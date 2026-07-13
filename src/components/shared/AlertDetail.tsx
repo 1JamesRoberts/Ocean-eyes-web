@@ -18,7 +18,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     <ScreenHeader
       eyebrow="Alert diagnostics"
       action={(
-        <BackButton onClick={onBack} />
+        <BackButton onClick={onBack} heroOverlay />
       )}
     />
 

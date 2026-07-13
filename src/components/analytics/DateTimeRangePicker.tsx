@@ -20,6 +20,8 @@ interface DateTimeRangePickerProps {
   onChange: (range: DateRange) => void;
   /** Start as a calendar-only control and reveal the range on activation. */
   collapseToIcon?: boolean;
+  /** Match controls rendered over the shared hero video. */
+  heroOverlay?: boolean;
 }
 
 interface OpenState {
@@ -31,6 +33,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   value,
   onChange,
   collapseToIcon = false,
+  heroOverlay = false,
 }) => {
   const [open, setOpen] = useState<OpenState | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -204,24 +207,26 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         aria-expanded={isExpanded}
         aria-controls="date-range-editor"
         aria-label={showSummary ? 'Edit date range' : isExpanded ? 'Collapse date range' : 'Expand date range'}
-        className={`
-          flex w-full cursor-pointer items-center justify-center rounded-full
-          border-0
-          bg-white/30 backdrop-blur-[6px]
-          type-body whitespace-nowrap
-          transition-colors
-          hover:bg-white/50
-          ${showSummary ? 'gap-2 px-4 py-2.5' : 'gap-1.5 px-3 py-1.5 min-h-11 type-caption'}
-        `}
+        className={heroOverlay
+          ? 'hero-overlay-pill w-full cursor-pointer'
+          : `
+            flex w-full cursor-pointer items-center justify-center rounded-full
+            border-0 bg-white/30 type-body whitespace-nowrap backdrop-blur-[6px]
+            transition-colors hover:bg-white/50
+            ${showSummary ? 'gap-2 px-4 py-2.5' : 'min-h-11 gap-1.5 px-3 py-1.5 type-caption'}
+          `}
         style={{
-          boxShadow:
-            'var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05)',
+          boxShadow: heroOverlay
+            ? undefined
+            : 'var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05)',
         }}
         onMouseEnter={(e) => {
+          if (heroOverlay) return;
           e.currentTarget.style.boxShadow =
             'var(--shadow-glass), 0 6px 24px 0 rgba(0, 67, 73, 0.08)';
         }}
         onMouseLeave={(e) => {
+          if (heroOverlay) return;
           e.currentTarget.style.boxShadow =
             'var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05)';
         }}

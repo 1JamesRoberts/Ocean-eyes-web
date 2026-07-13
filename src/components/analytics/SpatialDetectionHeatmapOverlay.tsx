@@ -134,7 +134,7 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
           className="absolute inset-0 z-1 size-full"
         />
         <div className="pointer-events-auto absolute right-4 bottom-3 z-20">
-          <label className="relative inline-flex cursor-pointer items-center rounded-full bg-black/40 px-2.5 py-1 text-2xs text-white backdrop-blur-md">
+          <label className="relative cursor-pointer hero-overlay-pill">
             <span className="pointer-events-none">
               {selectedSpecies === 'all'
                 ? 'All Species'

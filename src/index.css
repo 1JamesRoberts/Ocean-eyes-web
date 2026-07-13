@@ -856,6 +856,44 @@
   background: #f2fdff;
 }
 
+@utility hero-overlay-pill {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border: 0;
+  border-radius: var(--glass-radius-pill);
+  background: transparent;
+  padding: 0 0.5rem;
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  font-weight: 400;
+  letter-spacing: var(--letter-spacing-base);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-glass), 0 4px 20px rgba(0, 67, 73, 0.05);
+  backdrop-filter: blur(var(--glass-blur-sm));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+  transition: var(--transition-smooth);
+
+  & svg {
+    width: 0.8125rem;
+    height: 0.8125rem;
+    flex-shrink: 0;
+    color: var(--color-text-inverse);
+  }
+
+  &:hover {
+    background: rgba(0, 67, 73, 0.06);
+    box-shadow: var(--shadow-glass), 0 6px 24px rgba(0, 67, 73, 0.08);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
 /* ─── Mobile Hero Shell ─── */
 @utility mobile-hero-video {
   position: sticky;

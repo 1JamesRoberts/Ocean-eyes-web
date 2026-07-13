@@ -194,10 +194,10 @@ export const MyFishScreen: React.FC = () => {
               size="sm"
               onClick={onToggleAddForm}
               aria-label="Add fish"
-              className="gap-1.5 rounded-full px-3"
+              className="hero-overlay-pill !min-h-8 gap-1 rounded-full !px-2 !py-0"
             >
-              <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
-              <span className="font-semibold">Add fish</span>
+              <Plus size={13} strokeWidth={2.5} aria-hidden="true" />
+              <span className="type-caption !text-xs !font-normal !text-white">Add fish</span>
             </GlassButton>
           </div>
         )}
