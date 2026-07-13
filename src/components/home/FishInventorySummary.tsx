@@ -33,7 +33,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
         )}
       />
 
-      <div className="space-y-2">
+      <div>
         {fishList.length === 0 ? (
           <div className="rounded-2xl border border-white/20 bg-white/20">
             <ScreenState
@@ -50,9 +50,11 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
               <div
                 key={fish.id}
                 className="
-                  flex items-center justify-between rounded-2xl border
-                  border-white/10 bg-white/20 p-3 transition-colors
-                  hover:bg-white/60
+                  flex items-center justify-between pb-3
+                  [&:first-child]:border-t [&:first-child]:border-text-muted/20
+                  [&:first-child]:pt-3
+                  [&:not(:last-child)]:mb-3
+                  [&:not(:last-child)]:border-b [&:not(:last-child)]:border-text-muted/20
                 "
               >
                 <div className="flex items-center gap-3">

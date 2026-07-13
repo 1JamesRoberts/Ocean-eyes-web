@@ -4,7 +4,6 @@ import { useHome } from '../../hooks/pages/useHome';
 import { CardSectionHeader, ScreenHeader, ScreenState } from '../../components/shared';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
-import { WaterClarityCard } from '../../components/home/WaterClarityCard';
 import { WaterChemistryGrid } from '../../components/home/WaterChemistryGrid';
 import { ActiveAlertsList } from '../../components/home/ActiveAlertsList';
 
@@ -14,7 +13,6 @@ export const HomeScreen: React.FC = () => {
     latestReading,
     displayClarity,
     hasReadingData,
-    readings,
     alerts,
     onManageFish,
     onViewHistory,
@@ -52,6 +50,7 @@ export const HomeScreen: React.FC = () => {
           <div className="glass-card p-5">
             <CardSectionHeader
               icon={FlaskConical}
+              iconClassName="text-brand"
               title="Parameters"
               detail="Current water conditions"
               action={(
@@ -60,19 +59,15 @@ export const HomeScreen: React.FC = () => {
                   aria-label="View water parameter history"
                   className="cursor-pointer border-none bg-transparent p-0 transition-opacity hover:opacity-80"
                 >
-                  <ChevronRight size={18} className="text-brand" />
+                  <ChevronRight size={18} className="text-[#00C3D0]" />
                 </button>
               )}
             />
-            <div className="space-y-3">
-              <WaterClarityCard
-                displayClarity={displayClarity}
-                readings={readings}
-                onClick={onViewHistory}
-                compact
-              />
-              <WaterChemistryGrid reading={latestReading} />
-            </div>
+            <WaterChemistryGrid
+              reading={latestReading}
+              displayClarity={displayClarity}
+              onViewHistory={onViewHistory}
+            />
           </div>
 
           <ActiveAlertsList

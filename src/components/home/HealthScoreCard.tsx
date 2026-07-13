@@ -1,6 +1,12 @@
 import React from 'react';
 import { Droplets, FlaskConical, Thermometer } from 'lucide-react';
-import { calculateHealthScore, getHealthHeading, getHealthMessage, type HealthReading } from '../../models/services/healthService';
+import {
+  calculateHealthScore,
+  getHealthColor,
+  getHealthHeading,
+  getHealthMessage,
+  type HealthReading,
+} from '../../models/services/healthService';
 
 interface HealthScoreCardProps {
   reading: HealthReading;
@@ -10,6 +16,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
   const healthScore = calculateHealthScore(reading);
   const healthMessage = getHealthMessage(healthScore);
   const healthHeading = getHealthHeading(healthScore);
+  const healthColor = getHealthColor(healthScore);
   const strokeWidth = 8;
   const radius = 48;
   const circumference = 2 * Math.PI * radius;
@@ -40,8 +47,8 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
         <svg className="size-28" height="112" width="112" viewBox="0 0 112 112">
           <defs>
             <linearGradient id="healthRingGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#004349" />
-              <stop offset="100%" stopColor="#196a59" />
+              <stop offset="0%" stopColor="#00A9CC" />
+              <stop offset="100%" stopColor="#009D8D" />
             </linearGradient>
           </defs>
           <circle
@@ -75,7 +82,14 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
       </div>
 
       <div className="flex-1">
-        <span className="block type-caption">{healthHeading}</span>
+        <div className="flex items-center gap-1.5">
+          <span
+            aria-hidden="true"
+            className="size-2 shrink-0 rounded-full"
+            style={{ backgroundColor: healthColor }}
+          />
+          <span className="block type-caption" style={{ color: healthColor }}>{healthHeading}</span>
+        </div>
         <h3 className="whitespace-nowrap text-[17px] font-bold leading-tight text-brand sm:text-2xl">
           Aquarium Health
         </h3>
@@ -85,11 +99,11 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             <div
               key={parameter.label}
               className="
-                flex min-w-0 items-center gap-1.5 rounded-full border
-                border-white/20 bg-white/25 px-2.5 py-1.5
+                flex min-w-0 items-center gap-1.5 rounded-full
+                bg-[#00A9CC]/5 px-2.5 py-1.5
               "
             >
-              <parameter.icon aria-hidden="true" className="size-3.5 shrink-0 text-brand-bright" />
+              <parameter.icon aria-hidden="true" className="size-3.5 shrink-0 text-brand-bright" style={{ color: '#00A9CC' }} />
               <span className="sr-only">{parameter.label}: </span>
               <span className="whitespace-nowrap text-[11px] font-semibold text-brand sm:text-xs">
                 {parameter.value}
