@@ -14,7 +14,8 @@ describe('ScreenWithHeroVideo transition', () => {
     );
 
     expect(container.querySelector('.mobile-hero-blend')).not.toBeNull();
-    expect(container.querySelector('.mobile-hero-seam-cap')).not.toBeNull();
+    expect(container.querySelector('.mobile-hero-media')).not.toBeNull();
+    expect(container.querySelector('.mobile-hero-surface')).not.toBeNull();
     expect(container.querySelector('[data-mobile-hero-scroll-layer]')?.classList.contains('bg-transparent')).toBe(true);
     expect(container.querySelector('[data-mobile-hero-content-spacer]')).not.toBeNull();
   });
@@ -29,7 +30,8 @@ describe('ScreenWithHeroVideo transition', () => {
     expect(getByText('Live video')).toBeTruthy();
     expect(container.querySelector('.mobile-hero-video')?.classList.contains('hidden')).toBe(true);
     expect(container.querySelector('.mobile-hero-blend')).toBeNull();
-    expect(container.querySelector('.mobile-hero-seam-cap')).toBeNull();
+    expect(container.querySelector('.mobile-hero-media')).not.toBeNull();
+    expect(container.querySelector('.mobile-hero-surface')).toBeNull();
     expect(container.querySelector('[data-mobile-hero-scroll-layer]')?.classList.contains('bg-gradient-mint')).toBe(true);
     expect(container.querySelector('[data-mobile-hero-content-spacer]')).toBeNull();
   });

@@ -62,6 +62,10 @@
   --mobile-status-bar-height: 54px;
   --mobile-hero-height: 221px;
   --mobile-hero-blend-extension: 56px;
+  --mobile-hero-backdrop-height: max(
+    calc(100dvh - var(--mobile-status-bar-height)),
+    calc(var(--mobile-hero-height) + var(--mobile-hero-blend-extension))
+  );
   --mobile-content-radius: 20px;
   --mobile-content-gutter: 1rem;
 
@@ -900,13 +904,26 @@
   position: sticky;
   top: 0;
   z-index: 20;
+  isolation: isolate;
   width: calc(100% + (var(--mobile-content-gutter) * 2));
-  height: calc(var(--mobile-hero-height) + var(--mobile-hero-blend-extension));
+  height: var(--mobile-hero-backdrop-height);
   margin-top: calc(var(--mobile-content-gutter) * -1);
-  margin-bottom: calc(var(--mobile-hero-blend-extension) * -1);
+  margin-bottom: calc(
+    var(--mobile-hero-height) - var(--mobile-hero-backdrop-height)
+  );
   margin-left: calc(var(--mobile-content-gutter) * -1);
   margin-right: calc(var(--mobile-content-gutter) * -1);
   cursor: pointer;
+  overflow: hidden;
+  background: #f2fdff;
+}
+
+@utility mobile-hero-media {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: calc(var(--mobile-hero-height) + var(--mobile-hero-blend-extension));
   overflow: hidden;
   background: #000;
 }
@@ -915,18 +932,17 @@
   pointer-events: none;
   position: absolute;
   right: 0;
-  bottom: 12px;
   left: 0;
   z-index: 10;
-  height: calc(var(--mobile-hero-blend-extension) + 32px);
+  top: calc(var(--mobile-hero-height) - 44px);
+  height: calc(var(--mobile-hero-blend-extension) + 44px);
   background: linear-gradient(
     to bottom,
     rgba(242, 253, 255, 0) 0%,
     rgba(242, 253, 255, 0.04) 18%,
     rgba(242, 253, 255, 0.2) 44%,
     rgba(242, 253, 255, 0.58) 72%,
-    rgba(242, 253, 255, 0.9) 90%,
-    #f2fdff 100%
+    rgba(242, 253, 255, 0.82) 100%
   );
   backdrop-filter: blur(18px) saturate(0.9);
   -webkit-backdrop-filter: blur(18px) saturate(0.9);
@@ -946,20 +962,24 @@
   );
 }
 
-@utility mobile-hero-seam-cap {
+@utility mobile-hero-surface {
   pointer-events: none;
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 11;
-  height: 32px;
+  z-index: 20;
+  top: calc(var(--mobile-hero-height) - 4px);
+  /* Continue one painted surface past the media edge so glass cards never
+     reveal a sticky/compositor boundary while they scroll. */
   background: linear-gradient(
     to bottom,
-    rgba(242, 253, 255, 0) 0%,
-    rgba(242, 253, 255, 0.45) 30%,
-    rgba(242, 253, 255, 0.94) 58%,
-    #f2fdff 72% 100%
+    rgba(242, 253, 255, 0) 0,
+    rgba(242, 253, 255, 0.08) 8px,
+    rgba(242, 253, 255, 0.32) 18px,
+    rgba(242, 253, 255, 0.72) 30px,
+    #f2fdff 40px,
+    #f2fdff 100%
   );
 }
 

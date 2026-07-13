@@ -27,7 +27,9 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
             ${showHero ? 'block' : 'hidden'}
           `}
         >
-          {hero}
+          <div className="mobile-hero-media">
+            {hero}
+          </div>
           <div
             ref={setHeroActionLayer}
             className="
@@ -38,7 +40,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
           {showHero && (
             <>
               <div className="mobile-hero-blend" aria-hidden="true" />
-              <div className="mobile-hero-seam-cap" aria-hidden="true" />
+              <div className="mobile-hero-surface" aria-hidden="true" />
             </>
           )}
         </section>
