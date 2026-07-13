@@ -61,7 +61,7 @@
   /* Font */
   --font-main: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
   --type-ink: rgb(5 30 50);
-  --type-ink-muted: rgb(5 30 50 / 60%);
+  --type-ink-muted: rgb(5 30 50 / 50%);
   --type-ink-inverse: rgb(255 255 255);
   --type-ink-inverse-muted: rgb(255 255 255 / 70%);
 
@@ -88,11 +88,11 @@
 
   /* ─── Text ─── */
   --color-text: #051e32;
-  --color-text-muted: rgb(5 30 50 / 60%);
+  --color-text-muted: rgb(5 30 50 / 50%);
   --color-text-subtle: #6f797a;
   --color-text-inverse: #ffffff;
   --color-type-ink: rgb(5 30 50);
-  --color-type-ink-muted: rgb(5 30 50 / 60%);
+  --color-type-ink-muted: rgb(5 30 50 / 50%);
   --color-type-ink-inverse: rgb(255 255 255);
   --color-type-ink-inverse-muted: rgb(255 255 255 / 70%);
 

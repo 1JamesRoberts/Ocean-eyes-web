@@ -61,29 +61,29 @@ describe('healthService', () => {
 
   describe('getHealthMessage', () => {
     it('returns optimal message for high scores', () => {
-      expect(getHealthMessage(8.5)).toBe('System is optimal.');
+      expect(getHealthMessage(8.5)).toBe('Your tank is thriving.');
     });
 
     it('returns caution message for medium scores', () => {
-      expect(getHealthMessage(6.5)).toContain('Mild');
+      expect(getHealthMessage(6.5)).toBe('Some conditions need watching.');
     });
 
     it('returns critical message for low scores', () => {
-      expect(getHealthMessage(3)).toContain('Critical');
+      expect(getHealthMessage(3)).toBe('Your tank needs attention.');
     });
   });
 
   describe('getHealthHeading', () => {
     it('returns short optimal heading for high scores', () => {
-      expect(getHealthHeading(8.5)).toBe('System is optimal.');
+      expect(getHealthHeading(8.5)).toBe('Excellent');
     });
 
     it('returns short caution heading for medium scores', () => {
-      expect(getHealthHeading(6.5)).toBe('Mild fluctuation.');
+      expect(getHealthHeading(6.5)).toBe('Attention');
     });
 
     it('returns short critical heading for low scores', () => {
-      expect(getHealthHeading(3)).toBe('Critical violation!');
+      expect(getHealthHeading(3)).toBe('Critical');
     });
   });
 });

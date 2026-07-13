@@ -37,6 +37,7 @@ export const HomeScreen: React.FC = () => {
           <HealthScoreCard
             reading={{
               ph: latestReading.ph,
+              temp: latestReading.temp,
               clarity: displayClarity,
               ammonia: latestReading.ammonia,
               nitrite: latestReading.nitrite

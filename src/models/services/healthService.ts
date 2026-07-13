@@ -12,6 +12,7 @@ import {
 
 export interface HealthReading {
   ph?: number;
+  temp?: number;
   clarity: number;
   ammonia?: number;
   nitrite?: number;
@@ -42,20 +43,20 @@ export function getHealthColor(score: number): string {
 
 export function getHealthHeading(score: number): string {
   if (score >= 8) {
-    return 'System is optimal.';
+    return 'Excellent';
   }
   if (score >= 6) {
-    return 'Mild fluctuation.';
+    return 'Attention';
   }
-  return 'Critical violation!';
+  return 'Critical';
 }
 
 export function getHealthMessage(score: number): string {
   if (score >= 8) {
-    return 'System is optimal.';
+    return 'Your tank is thriving.';
   }
   if (score >= 6) {
-    return 'Mild parameter fluctuations detected. Observe filters and run water test diagnostics closely.';
+    return 'Some conditions need watching.';
   }
-  return 'Critical metric violation! Immediate action required to check filter sponge and adjust tank chemistry.';
+  return 'Your tank needs attention.';
 }
