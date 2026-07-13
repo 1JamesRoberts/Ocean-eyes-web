@@ -36,15 +36,15 @@ export const ViewerApp: React.FC = () => {
   const showHero = SCREENS_WITH_HERO.includes(activeTab);
 
   const analyticsHeroOverlay = useMemo(
-    () =>
-      activeTab === 'analytics' ? (
-        <SpatialDetectionHeatmapOverlay
-          records={analyticsData.detectionRecords}
-          inventorySpeciesIds={analyticsData.inventorySpeciesIds}
-          selectedSpecies={analyticsData.selectedSpecies}
-          onSelectedSpeciesChange={analyticsData.setSelectedSpecies}
-        />
-      ) : null,
+    () => (
+      <SpatialDetectionHeatmapOverlay
+        records={analyticsData.detectionRecords}
+        inventorySpeciesIds={analyticsData.inventorySpeciesIds}
+        selectedSpecies={analyticsData.selectedSpecies}
+        onSelectedSpeciesChange={analyticsData.setSelectedSpecies}
+        visible={activeTab === 'analytics'}
+      />
+    ),
     [
       activeTab,
       analyticsData.detectionRecords,

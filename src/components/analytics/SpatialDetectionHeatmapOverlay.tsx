@@ -8,6 +8,7 @@ interface SpatialDetectionHeatmapOverlayProps {
   inventorySpeciesIds?: Set<string>;
   selectedSpecies: string;
   onSelectedSpeciesChange: (species: string) => void;
+  visible?: boolean;
 }
 
 const MAX_RENDER_WIDTH = 800;
@@ -18,6 +19,7 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
     inventorySpeciesIds,
     selectedSpecies,
     onSelectedSpeciesChange,
+    visible = true,
   }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -128,12 +130,24 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
     }, [centers, containerSize, drawOverlay]);
 
     return (
-      <div ref={containerRef} className="pointer-events-none absolute inset-0 size-full">
+      <div
+        ref={containerRef}
+        aria-hidden={!visible}
+        className={`
+          pointer-events-none absolute inset-0 size-full transition-opacity
+          duration-500 ease-in-out motion-reduce:transition-none
+          ${visible ? 'opacity-100' : 'opacity-0'}
+        `}
+      >
         <canvas
           ref={overlayCanvasRef}
           className="absolute inset-0 z-1 size-full"
         />
-        <div className="pointer-events-auto absolute right-4 bottom-3 z-20">
+        <div
+          className={`absolute right-4 bottom-3 z-20 ${
+            visible ? 'pointer-events-auto' : 'pointer-events-none'
+          }`}
+        >
           <label className="relative cursor-pointer hero-overlay-pill">
             <span className="pointer-events-none">
               {selectedSpecies === 'all'
