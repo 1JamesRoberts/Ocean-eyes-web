@@ -46,7 +46,7 @@ export const ScreenState: React.FC<ScreenStateProps> = ({
       <Icon size={22} aria-hidden="true" />
     </span>
     <div className="max-w-sm">
-      <Heading className="type-strong">{title}</Heading>
+      <Heading className="type-title">{title}</Heading>
       <p className="mt-1 type-caption">{description}</p>
     </div>
     {action && <div className="mt-1">{action}</div>}

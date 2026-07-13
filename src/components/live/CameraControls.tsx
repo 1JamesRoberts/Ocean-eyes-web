@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   Camera,
-  Square,
-  Video,
   Eye,
   Brain,
   Loader2,
@@ -16,7 +14,6 @@ import {
 type BackendStatus = 'unknown' | 'checking' | 'online' | 'offline';
 
 interface CameraControlsProps {
-  isRecording: boolean;
   isStreaming: boolean;
   isAIActive: boolean;
   aiLoading: boolean;
@@ -27,7 +24,6 @@ interface CameraControlsProps {
   isFullscreen: boolean;
   showFsInventory: boolean;
   onTakeSnapshot: () => void;
-  onToggleRecording: () => void;
   onMeasureTurbidity: () => void;
   onToggleAI: () => void;
   onManualDiagnose: () => void;
@@ -36,7 +32,6 @@ interface CameraControlsProps {
 }
 
 export const CameraControls: React.FC<CameraControlsProps> = ({
-  isRecording,
   isStreaming,
   isAIActive,
   aiLoading,
@@ -47,7 +42,6 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   isFullscreen,
   showFsInventory,
   onTakeSnapshot,
-  onToggleRecording,
   onMeasureTurbidity,
   onToggleAI,
   onManualDiagnose,
@@ -106,14 +100,6 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         title="Capture Snapshot"
       >
         <Camera size={14} />
-      </button>
-
-      <button
-        className={getBtnClasses(isRecording, false, 'text-critical animate-pulse-recording')}
-        onClick={onToggleRecording}
-        title={isRecording ? "Stop Recording" : "Start Recording"}
-      >
-        {isRecording ? <Square size={12} /> : <Video size={14} />}
       </button>
 
       <button

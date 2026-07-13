@@ -8,7 +8,6 @@ import { useViewportSize } from '../../hooks/live/useViewportSize';
 import { useMediaCapture } from '../../hooks/live/useMediaCapture';
 import { useAIAnalytics } from '../../hooks/live/useAIAnalytics';
 
-import { formatDuration } from '../../utils/formatters';
 import { AIBoundingBoxes } from '../live/AIBoundingBoxes';
 import { CameraControls } from '../live/CameraControls';
 import { CameraFeed } from '../live/CameraFeed';
@@ -24,18 +23,6 @@ interface LiveVideoSectionProps {
   temperatureOverlay: { backgroundColor: string; opacity: number } | null;
   tintOverlay: { backgroundColor: string; opacity: number } | null;
 }
-
-const RecordingBadge: React.FC<{ recordingSeconds: number }> = ({ recordingSeconds }) => (
-  <div className="
-    absolute top-4 left-1/2 z-10 flex -translate-x-1/2 items-center
-    gap-1.5 rounded-[20px] border border-[rgba(255,255,255,0.08)]
-    bg-[rgba(239,68,68,0.85)] px-3 py-1.5 type-caption
-    text-white backdrop-blur-md
-  ">
-    <div className="size-2 animate-recording-blink rounded-full bg-critical" />
-    <span>REC {formatDuration(recordingSeconds)}</span>
-  </div>
-);
 
 const TurbidityErrorBadge: React.FC<{ error: string }> = ({ error }) => (
   <div
@@ -78,10 +65,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
 
   const {
     flashActive,
-    isRecording,
-    recordingSeconds,
     takeSnapshot,
-    toggleRecording,
   } = useMediaCapture({
     cameraFeedRef,
     isStreaming,
@@ -116,7 +100,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
 
   const cameraControls = (
     <CameraControls
-      isRecording={isRecording}
       isStreaming={isStreaming}
       isAIActive={isAIActive}
       aiLoading={aiLoading}
@@ -127,7 +110,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
       isFullscreen={isFullscreen}
       showFsInventory={showFsInventory}
       onTakeSnapshot={() => takeSnapshot(currentFishCount, currentClarity)}
-      onToggleRecording={() => toggleRecording(currentFishCount, currentClarity)}
       onMeasureTurbidity={measureTurbidity}
       onToggleAI={toggleAI}
       onManualDiagnose={manualDiagnose}
@@ -227,10 +209,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
               showFsInventory={showFsInventory}
               onClose={() => setShowFsInventory(false)}
             />
-          )}
-
-          {isRecording && (
-            <RecordingBadge recordingSeconds={recordingSeconds} />
           )}
 
           {isFullscreen && cameraControls}

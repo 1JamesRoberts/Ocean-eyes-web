@@ -104,10 +104,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
           />
           <span className="text-sm font-semibold" style={{ color: healthColor }}>{healthHeading}</span>
         </div>
-        <h3 className="
-          mt-2 text-xl leading-none font-bold tracking-tight whitespace-nowrap
-          text-text
-        ">
+        <h3 className="mt-2 type-title whitespace-nowrap">
           Aquarium Health
         </h3>
         <p className="mt-2 text-sm/tight text-text-muted">{healthMessage}</p>

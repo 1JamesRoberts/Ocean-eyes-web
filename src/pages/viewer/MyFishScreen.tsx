@@ -243,9 +243,7 @@ export const MyFishScreen: React.FC = () => {
                   <Fish size={29} className="text-brand" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="
-                    block truncate type-strong
-                  ">Fish Overview</span>
+                  <span className="block truncate type-title">Fish Overview</span>
                   <span className="mt-0.5 block type-caption italic">
                     {stats.uniqueSpecies} species
                   </span>
