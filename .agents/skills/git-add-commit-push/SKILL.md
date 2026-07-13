@@ -1,3 +1,5 @@
+())
+
 ---
 name: git-add-commit-push
 description: 'Use when: staging files, creating commits, pushing to remote, or running any git write command. Handles the Windows git auto-gc "n/n/n/n" prompt problem by setting GIT_ASK_YESNO=false.'
@@ -65,7 +67,7 @@ The variable only affects the current PowerShell session — no global side effe
    git push
    ```
 
-If `git push` is rejected due to non-fast-forward, rebase first (step 4), then push again. Push the current branch, preferrably origin.
+If `git push` is rejected due to non-fast-forward, rebase first (step 4), then push again. Push the current branch, preferrably origin (do not push to fork)
 
 ## Common Mistakes
 
