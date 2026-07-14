@@ -236,7 +236,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
           <>
             <span className="min-w-0 truncate">{summaryText}</span>
             <ChevronDown
-              size={16}
+              size={18}
               className={`
                 shrink-0 text-text-muted transition-transform duration-300 ease-in-out
                 ${isExpanded ? 'rotate-180' : ''}

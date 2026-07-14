@@ -93,11 +93,15 @@ describe('MyFishScreen add flow', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Add fish' }));
 
-    expect(screen.getByRole('dialog', { name: 'Add fish' })).toBeTruthy();
-    expect(screen.getByRole('dialog', { name: 'Add fish' }).className)
+    const dialog = screen.getByRole('dialog', { name: 'Add fish' });
+    expect(dialog).toBeTruthy();
+    expect(dialog.className)
       .toContain('top-[calc(var(--mobile-status-bar-height)+var(--mobile-hero-height))]');
-    expect(screen.getByRole('dialog', { name: 'Add fish' }).lastElementChild?.className)
+    expect(dialog.lastElementChild?.className)
       .toContain('motion-safe:animate-sheet-enter');
+    const results = screen.getByRole('listbox', { name: 'Species results' });
+    expect(results.parentElement?.className).toContain('flex-1');
+    expect(results.className).toContain('pb-[calc(4.75rem+env(safe-area-inset-bottom))]');
     expect(screen.queryByText('Choose one species')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Add selected species' })).toBeNull();
   });

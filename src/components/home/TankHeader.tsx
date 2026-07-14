@@ -57,7 +57,7 @@ export const TankHeader: React.FC<TankHeaderProps> = ({
             >
               <span>{currentTankName}</span>
               <ChevronDown
-                size={22}
+                size={18}
                 className="
                   mt-1 text-text-muted transition-transform duration-200
                 "

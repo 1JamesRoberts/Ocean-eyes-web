@@ -198,7 +198,8 @@
   --animate-fade-in: fadeIn 0.2s ease-out;
   --animate-slide-up: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
   --animate-slide-down: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-  --animate-sheet-enter: sheetEnter 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-sheet-enter: sheetEnter 0.18s ease-out both;
+  --animate-sheet-backdrop: sheetBackdrop 0.18s ease-out both;
   --animate-donut-enter: donutEnter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-donut-detail-enter: donutDetailEnter 0.3s ease-out both;
 }
@@ -1036,11 +1037,23 @@
 
 @keyframes sheetEnter {
   from {
-    transform: translateY(100%);
+    opacity: 0;
+    transform: translateY(12px);
   }
 
   to {
+    opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes sheetBackdrop {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 

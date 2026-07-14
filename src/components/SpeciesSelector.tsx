@@ -1,10 +1,9 @@
-import React, { useState, useRef, useEffect, useId, useMemo } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useId, useMemo, useState } from 'react';
 import { Search, Check } from 'lucide-react';
 import { SPECIES_CATALOG, searchSpecies, getSpeciesByName, type SpeciesInfo } from '../data/speciesCatalog';
 import { SpeciesAvatar } from './fish/SpeciesAvatar';
 
-const MAX_INLINE_RESULTS = 60;
+const MAX_RESULTS = 60;
 
 /** Small coloured badge showing the creature type (shrimp/snail/crab) */
 const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
@@ -23,7 +22,6 @@ interface SpeciesSelectorProps {
   onSelect: (species: SpeciesInfo | null, customName?: string) => void;
   placeholder?: string;
   excludeSpeciesIds?: string[];
-  presentation?: 'popover' | 'inline';
   inputAction?: React.ReactNode;
 }
 
@@ -32,17 +30,10 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
   onSelect,
   placeholder = 'Search for a species...',
   excludeSpeciesIds = [],
-  presentation = 'popover',
   inputAction,
 }) => {
   const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
-  const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const resultsId = useId();
-  const isInline = presentation === 'inline';
 
   const selectedSpecies = selectedSpeciesId ? SPECIES_CATALOG.find((s: SpeciesInfo) => s.id === selectedSpeciesId) : null;
   const filteredSpecies = useMemo(() => {
@@ -50,78 +41,32 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
     return results.filter(s => !excludeSpeciesIds.includes(s.id));
   }, [query, excludeSpeciesIds]);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(target) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(target)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    if (!isInline) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isInline]);
-
-  useEffect(() => {
-    const updatePosition = () => {
-      if (!inputRef.current) return;
-      const rect = inputRef.current.getBoundingClientRect();
-      setDropdownStyle({
-        position: 'fixed',
-        top: rect.bottom + 4,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 9999
-      });
-    };
-
-    if (isOpen && !isInline) {
-      updatePosition();
-      window.addEventListener('resize', updatePosition);
-      window.addEventListener('scroll', updatePosition, true);
-      return () => {
-        window.removeEventListener('resize', updatePosition);
-        window.removeEventListener('scroll', updatePosition, true);
-      };
-    }
-  }, [isInline, isOpen]);
-
   const handleSelect = (species: SpeciesInfo) => {
     onSelect(species);
     setQuery('');
-    setIsOpen(false);
   };
 
   const handleCustomSelect = () => {
     if (query.trim()) {
       onSelect(null, query.trim());
       setQuery('');
-      setIsOpen(false);
     }
-  };
-
-  const handleInputFocus = () => {
-    setIsOpen(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
-    setIsOpen(true);
   };
 
   const showCustomOption = query.trim() && !getSpeciesByName(query.trim());
-  const visibleSpecies = isInline
-    ? filteredSpecies.slice(0, MAX_INLINE_RESULTS)
-    : filteredSpecies;
+  const visibleSpecies = filteredSpecies.slice(0, MAX_RESULTS);
 
   const results = (
-    <div className="py-1.5" role="listbox" id={resultsId} aria-label="Species results">
+    <div
+      className="pb-[calc(4.75rem+env(safe-area-inset-bottom))]"
+      role="listbox"
+      id={resultsId}
+      aria-label="Species results"
+    >
       {visibleSpecies.map((species) => (
         <button
           key={species.id}
@@ -156,7 +101,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
         </button>
       ))}
 
-      {isInline && filteredSpecies.length > MAX_INLINE_RESULTS && (
+      {filteredSpecies.length > MAX_RESULTS && (
         <p className="px-4 py-3 text-center type-caption">
           Keep typing to narrow {filteredSpecies.length} matches.
         </p>
@@ -195,8 +140,8 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
   );
 
   return (
-    <div ref={containerRef} className="relative w-full">
-      <div className="flex items-center gap-2">
+    <div className="flex min-h-0 w-full flex-1 flex-col">
+      <div className="flex shrink-0 items-center gap-2">
         <div className="relative min-w-0 flex-1">
           <Search
             size={16}
@@ -206,14 +151,12 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             "
           />
           <input
-            ref={inputRef}
             type="text"
             value={query}
             onChange={handleInputChange}
-            onFocus={handleInputFocus}
             placeholder={selectedSpecies ? selectedSpecies.displayName : placeholder}
             aria-controls={resultsId}
-            aria-expanded={isInline || isOpen}
+            aria-expanded="true"
             aria-autocomplete="list"
             role="combobox"
             className="
@@ -226,22 +169,9 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
         {inputAction}
       </div>
 
-      {isInline ? (
-        <div className="mt-3 max-h-[42dvh] overflow-y-auto rounded-2xl border border-white/35 bg-white/28">
-          {results}
-        </div>
-      ) : isOpen && createPortal(
-        <div
-          ref={dropdownRef}
-          className="
-            max-h-[280px] overflow-y-auto rounded-lg border border-border
-            bg-surface shadow-[0_4px_12px_rgba(0,0,0,0.1)]
-          "
-          style={dropdownStyle}
-        >
-          {results}
-        </div>
-        , document.body)}
+      <div className="mt-2 min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y">
+        {results}
+      </div>
     </div>
   );
 };

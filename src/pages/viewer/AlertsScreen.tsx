@@ -58,7 +58,7 @@ export const AlertsScreen: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <h4 className="type-strong text-text">{alert.title}</h4>
-              <ChevronRight size={16} className="text-text-muted" />
+              <ChevronRight size={18} className="text-text-muted" />
             </div>
             <p className="mt-1 type-caption">
               {alert.message}

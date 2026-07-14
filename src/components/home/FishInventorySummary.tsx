@@ -28,7 +28,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
               hover:opacity-80
             "
           >
-            <ChevronRight size={18} className="text-brand" />
+            <ChevronRight size={18} className="text-text-muted" />
           </button>
         )}
       />

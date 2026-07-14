@@ -65,4 +65,27 @@ describe('GlassModal bottom placement', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(scrollContainer?.style.overflow).toBe('auto');
   });
+
+  it('renders below-hero sheets in the phone frame so the hero clip cannot crop them', () => {
+    const phoneFrame = document.createElement('div');
+    phoneFrame.className = 'phone-frame';
+    document.body.append(phoneFrame);
+
+    try {
+      render(
+        <GlassModal isOpen onClose={() => undefined} placement="below-hero" labelledBy="sheet-title">
+          <h2 id="sheet-title">Add a new fish</h2>
+        </GlassModal>,
+      );
+
+      const dialog = screen.getByRole('dialog', { name: 'Add a new fish' });
+      expect(phoneFrame.contains(dialog)).toBe(true);
+      expect(dialog.className).toContain('absolute');
+      expect(dialog.lastElementChild?.className).toContain('max-w-none');
+      expect(dialog.firstElementChild?.className).toContain('motion-safe:animate-sheet-backdrop');
+      expect(dialog.lastElementChild?.className).toContain('motion-safe:animate-sheet-enter');
+    } finally {
+      phoneFrame.remove();
+    }
+  });
 });

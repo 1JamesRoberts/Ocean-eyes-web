@@ -59,7 +59,7 @@ export const HomeScreen: React.FC = () => {
                   aria-label="View water parameter history"
                   className="cursor-pointer border-none bg-transparent p-0 transition-opacity hover:opacity-80"
                 >
-                  <ChevronRight size={18} className="text-[#00C3D0]" />
+                  <ChevronRight size={18} className="text-text-muted" />
                 </button>
               )}
             />

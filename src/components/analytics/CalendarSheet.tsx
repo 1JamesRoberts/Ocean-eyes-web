@@ -42,7 +42,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
           <span className="type-title">
             {formatUTCDate(viewMonth, 'MMMM yyyy')}
           </span>
-          <ChevronDown size={16} className="text-text-muted" />
+          <ChevronDown size={18} className="text-text-muted" />
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -55,7 +55,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             "
             aria-label="Previous month"
           >
-            <ChevronLeft size={22} />
+            <ChevronLeft size={18} className="text-text-muted" />
           </button>
           <button
             type="button"
@@ -67,7 +67,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             "
             aria-label="Next month"
           >
-            <ChevronRight size={22} />
+            <ChevronRight size={18} className="text-text-muted" />
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 // GlassModal.tsx — Glass modal with scrim overlay
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface GlassModalProps {
   isOpen: boolean;
@@ -20,7 +21,6 @@ export const GlassModal: React.FC<GlassModalProps> = ({
 }) => {
   const restoreFocusRef = useRef<HTMLElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
-
   useEffect(() => {
     if (!isOpen) return;
 
@@ -75,11 +75,16 @@ export const GlassModal: React.FC<GlassModalProps> = ({
 
   const isBottomSheet = placement === 'bottom' || placement === 'below-hero';
   const isBelowHero = placement === 'below-hero';
+  // The hero's scroll layer uses clip-path for its stationary rounded transition.
+  // Render this sheet beside that layer so the clip cannot trim its top or sides.
+  const phoneFrame = isBelowHero
+    ? document.querySelector<HTMLElement>('.phone-frame')
+    : null;
 
-  return (
+  const modal = (
     <div
       className={`
-        fixed right-0 bottom-0 left-0 z-[70] flex justify-center
+        ${isBelowHero ? 'absolute z-50' : 'fixed z-[70]'} right-0 bottom-0 left-0 flex justify-center
         ${isBelowHero
           ? 'top-[calc(var(--mobile-status-bar-height)+var(--mobile-hero-height))]'
           : 'top-0'
@@ -92,7 +97,12 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       aria-labelledby={labelledBy}
     >
       {/* Scrim */}
-      <div className="absolute inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-xs" />
+      <div
+        className={`
+          absolute inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-xs
+          ${isBelowHero ? 'motion-safe:animate-sheet-backdrop' : ''}
+        `}
+      />
 
       {/* Content */}
       <div
@@ -102,7 +112,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
           relative z-10 w-full glass-card
           ${isBottomSheet
             ? `
-              max-w-(--mobile-frame-width) overflow-hidden
+              max-w-none overflow-hidden
               rounded-t-[28px]! rounded-b-none! p-0
               ${isBelowHero ? 'h-full motion-safe:animate-sheet-enter' : 'max-h-[85dvh]'}
             `
@@ -116,4 +126,6 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       </div>
     </div>
   );
+
+  return phoneFrame ? createPortal(modal, phoneFrame) : modal;
 };

@@ -144,8 +144,8 @@ const SettingsDisclosureButton: React.FC<SettingsDisclosureButtonProps> = ({
   >
     {label}
     <ChevronDown
-      size={15}
-      className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
+      size={18}
+      className={`text-text-muted transition-transform ${expanded ? 'rotate-180' : ''}`}
     />
   </button>
 );
@@ -636,7 +636,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
         detail="Pair or review monitor hardware"
         onClick={onNavigateToMonitor}
         highlight
-        action={<ChevronRight size={18} className="text-brand" />}
+        action={<ChevronRight size={18} className="text-text-muted" />}
       />
 
       {filters && onFilterChange && (
@@ -660,7 +660,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
           detail="Remove this tank from the active dashboard"
           onClick={onRequestUnlink}
           danger
-          action={<ChevronRight size={18} className="text-critical" />}
+          action={<ChevronRight size={18} className="text-text-muted" />}
         />
       )}
     </div>
