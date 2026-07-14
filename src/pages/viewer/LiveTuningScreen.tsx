@@ -28,7 +28,7 @@ export const LiveTuningScreen: React.FC = () => {
         />
       </section>
 
-      <section className="flex flex-col gap-6">
+      <section className="flex flex-col gap-4">
         <AquariumPanelCard
           activeTank={settings.activeTank}
           editing={settings.editing}

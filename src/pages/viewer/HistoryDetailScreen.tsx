@@ -44,7 +44,7 @@ export const HistoryDetailScreen: React.FC = () => {
         detail="Latest water quality snapshots"
         className="mb-0"
       />
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-4">
         {recentReadings.map(reading => {
           const date = new Date(reading.timestamp);
           const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

@@ -205,7 +205,7 @@ export const MyFishScreen: React.FC = () => {
       />
 
       {/* ─── Layout ─── */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         {/* Chart & Stats */}
         <div className="flex flex-col gap-4">
           <GlassCard
@@ -339,7 +339,7 @@ export const MyFishScreen: React.FC = () => {
         </div>
 
         {/* Right Column — Fish Cards */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {fishList.length === 0 && (
             <GlassCard className="p-0">
               <ScreenState

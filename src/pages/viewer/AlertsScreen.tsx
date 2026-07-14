@@ -35,7 +35,7 @@ export const AlertsScreen: React.FC = () => {
         )}
       />
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {alerts.length === 0 ? (
           <div className="glass-card">
             <ScreenState
