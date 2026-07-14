@@ -1,7 +1,7 @@
 import React from 'react';
 import { FishSymbol, ChevronRight } from 'lucide-react';
 import { SpeciesAvatar } from '../fish/SpeciesAvatar';
-import { CardSectionHeader, ScreenState } from '../shared';
+import { HeadedCard, ScreenState } from '../shared';
 import type { FishEntry } from '../../types/aquarium';
 
 interface FishInventorySummaryProps {
@@ -14,12 +14,11 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
   onManageFish
 }) => {
   return (
-    <section className="glass-card p-5 pb-4">
-      <CardSectionHeader
-        icon={FishSymbol}
-        title="My Fish"
-        detail="Your aquarium residents"
-        action={(
+    <HeadedCard
+      as="section"
+      icon={FishSymbol}
+      title="My Fish"
+      action={(
           <button
             onClick={onManageFish}
             aria-label="Manage fish list"
@@ -30,8 +29,8 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
           >
             <ChevronRight size={18} className="text-text-muted" />
           </button>
-        )}
-      />
+      )}
+    >
 
       <div>
         {fishList.length === 0 ? (
@@ -51,7 +50,6 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                 key={fish.id}
                 className="
                   flex items-center justify-between pb-3
-                  [&:first-child]:border-t [&:first-child]:border-text-muted/15
                   [&:first-child]:pt-3
                   [&:not(:last-child)]:mb-3
                   [&:not(:last-child)]:border-b [&:not(:last-child)]:border-text-muted/15
@@ -85,7 +83,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
           })
         )}
       </div>
-    </section>
+    </HeadedCard>
   );
 });
 

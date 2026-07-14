@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronRight, FlaskConical, Radio } from 'lucide-react';
 import { useHome } from '../../hooks/pages/useHome';
-import { CardSectionHeader, ScreenHeader, ScreenState } from '../../components/shared';
+import { HeadedCard, ScreenHeader, ScreenState } from '../../components/shared';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
 import { WaterChemistryGrid } from '../../components/home/WaterChemistryGrid';
@@ -47,13 +47,11 @@ export const HomeScreen: React.FC = () => {
             onManageFish={onManageFish}
           />
 
-          <div className="glass-card p-5 pb-4">
-            <CardSectionHeader
-              icon={FlaskConical}
-              iconClassName="text-text"
-              title="Parameters"
-              detail="Current water conditions"
-              action={(
+          <HeadedCard
+            icon={FlaskConical}
+            iconClassName="text-text"
+            title="Parameters"
+            action={(
                 <button
                   onClick={onViewHistory}
                   aria-label="View water parameter history"
@@ -61,14 +59,14 @@ export const HomeScreen: React.FC = () => {
                 >
                   <ChevronRight size={18} className="text-text-muted" />
                 </button>
-              )}
-            />
+            )}
+          >
             <WaterChemistryGrid
               reading={latestReading}
               displayClarity={displayClarity}
               onViewHistory={onViewHistory}
             />
-          </div>
+          </HeadedCard>
 
           <ActiveAlertsList
             alerts={alerts}

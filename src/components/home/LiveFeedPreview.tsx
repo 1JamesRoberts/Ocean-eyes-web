@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Maximize2 } from "lucide-react";
 import { useLiveFeed } from "../../hooks/useLiveFeed";
-import { CardHeader } from "../shared";
+import { HeadedCard } from "../shared";
 import { CameraFeed } from "../live/CameraFeed";
 import { HeroBadges } from "./HeroBadges";
 import type { TankBrief } from "../../types/aquarium";
@@ -96,15 +96,14 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   }
 
   return (
-    <section
-      className="cursor-pointer overflow-hidden glass-card"
+    <HeadedCard
+      as="section"
+      icon="videocam"
+      title="Live Feed Monitor"
+      headerVariant="edge"
+      className="cursor-pointer"
       onClick={onViewAdvanced}
-    >
-      <CardHeader
-        icon="videocam"
-        title="Live Feed Monitor"
-        detail="Watch your aquarium in real time"
-      >
+      action={(
         <div className="flex gap-2">
           <span
             className="
@@ -119,7 +118,8 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             1080p
           </span>
         </div>
-      </CardHeader>
+      )}
+    >
 
       <div
         ref={videoContainerRef}
@@ -236,6 +236,6 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
           </div>
         )}
       </div>
-    </section>
+    </HeadedCard>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Brain } from 'lucide-react';
-import { CardSectionHeader, GlassCard, GlassPanel } from '../shared';
+import { GlassPanel, HeadedCard } from '../shared';
 import { getSpeciesById } from '../../data/speciesCatalog';
 import { resolveCropUrl } from '../../models/api/aiApi';
 import type { AIDetectionResult, AITurbidityResult } from '../../types/aquarium';
@@ -23,19 +23,17 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
     ? Object.entries(lastPrediction.summary.species_counts)
     : [];
   return (
-    <GlassCard className="p-5">
-      <CardSectionHeader
-        icon={Brain}
-        title="AI Analysis"
-        detail="Latest computer vision and water quality readings"
-        action={(
+    <HeadedCard
+      icon={Brain}
+      title="AI Analysis"
+      action={(
           <span className="type-caption">
             {lastPrediction
               ? new Date(lastPrediction.timestamp).toLocaleTimeString()
               : '—'}
           </span>
-        )}
-      />
+      )}
+    >
 
       <div className="
         mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3
@@ -167,6 +165,6 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           </p>
         )}
       </GlassPanel>
-    </GlassCard>
+    </HeadedCard>
   );
 };

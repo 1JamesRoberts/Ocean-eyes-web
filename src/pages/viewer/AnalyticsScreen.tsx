@@ -6,7 +6,7 @@ import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePic
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
-import { CardSectionHeader, GlassButton, GlassCard, GlassPanel, ScreenHeader, ScreenState } from '../../components/shared';
+import { GlassButton, GlassCard, GlassPanel, HeadedCard, ScreenHeader, ScreenState } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
 
 type AnalyticsScreenProps = ReturnType<typeof useAnalytics>;
@@ -190,60 +190,44 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             lg:grid-cols-2
           ">
             {/* Fish Count Timeline */}
-            <GlassCard className="
-              flex min-h-0 flex-col gap-3 overflow-hidden p-5
-              lg:col-span-2
-            ">
-              <CardSectionHeader
-                icon={Fish}
-                title="Fish Count Over Time"
-                detail="Detected fish across the selected range"
-                className="mb-0"
-              />
+            <HeadedCard
+              icon={Fish}
+              title="Fish Count Over Time"
+              headerClassName="mb-0"
+              className="flex min-h-0 flex-col gap-3 overflow-hidden lg:col-span-2"
+            >
               <div className="
                 -mx-2 min-h-0 flex-1
                 sm:mx-0
               ">
                 <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
-            </GlassCard>
+            </HeadedCard>
 
-            <GlassCard
-              className="
-                flex min-h-0 flex-col gap-3 overflow-hidden p-5
-                lg:col-span-2
-              "
+            <HeadedCard
+              icon={Activity}
+              title="Fish Spread Over Time"
+              headerClassName="mb-0"
+              className="flex min-h-0 flex-col gap-3 overflow-hidden lg:col-span-2"
             >
-              <CardSectionHeader
-                icon={Activity}
-                title="Fish Spread Over Time"
-                detail="How evenly fish are distributed in the frame"
-                className="mb-0"
-              />
               <div className="
                 -mx-2 min-h-0 flex-1
                 sm:mx-0
               ">
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
-            </GlassCard>
+            </HeadedCard>
 
             {/* Water Clarity Trend */}
-          <GlassCard
-            className="
-              cursor-pointer p-5
-              lg:col-span-2
-            "
+          <HeadedCard
+            icon={Waves}
+            title="Water Clarity Trend"
+            className="cursor-pointer lg:col-span-2"
             onClick={onViewHistory}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter') onViewHistory(); }}
           >
-            <CardSectionHeader
-              icon={Waves}
-              title="Water Clarity Trend"
-              detail={`${(readings.length > 0 ? readings.length : turbidityRecords.length) || 'No'} readings recorded`}
-            />
             <ClarityTrendChart
               records={turbidityRecords}
               readings={readings}
@@ -253,21 +237,15 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 </GlassButton>
               }
             />
-          </GlassCard>
+          </HeadedCard>
 
           {/* AI Health Diagnostics Log */}
-          <GlassCard className="
-            p-5
-            lg:col-span-2
-          ">
-            <div className="flex items-start justify-between gap-3">
-              <CardSectionHeader
-                icon={Brain}
-                title="Fish Diagnostics"
-                detail="Diagnoses from this period"
-                className="mb-0"
-              />
-            </div>
+          <HeadedCard
+            icon={Brain}
+            title="Fish Diagnostics"
+            headerClassName="mb-0"
+            className="lg:col-span-2"
+          >
             {diagnoses.length === 0 ? (
               <div className="
                 flex flex-col items-center justify-center p-6 type-body-muted
@@ -285,7 +263,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 ))}
               </div>
             )}
-          </GlassCard>
+          </HeadedCard>
         </div>
       </>
     )}

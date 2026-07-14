@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronRight, ShieldAlert, ShieldCheck } from 'lucide-react';
-import { CardSectionHeader, ScreenState } from '../shared';
+import { HeadedCard, ScreenState } from '../shared';
 import type { AlertItem } from '../../types/aquarium';
 
 interface ActiveAlertsListProps {
@@ -26,14 +26,9 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
   }
 
   return (
-    <section className="glass-card p-5 pb-4">
-      <CardSectionHeader
-        icon={ShieldAlert}
-        title="Alerts"
-        detail="Needs your attention"
-      />
+    <HeadedCard as="section" icon={ShieldAlert} title="Alerts">
 
-      <div className="space-y-3 border-t border-text-muted/15 pt-3">
+      <div className="space-y-3">
         {activeAlerts.map(alert => (
           <button
             key={alert.id}
@@ -59,7 +54,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
           </button>
         ))}
       </div>
-    </section>
+    </HeadedCard>
   );
 });
 

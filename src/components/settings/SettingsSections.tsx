@@ -19,12 +19,11 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import {
-  CardSectionHeader,
   GlassButton,
-  GlassCard,
   GlassDisclosurePanel,
   GlassInput,
   GlassPanel,
+  HeadedCard,
 } from '../shared';
 import { StreamAdjustments } from '../live/StreamAdjustments';
 import type {
@@ -36,27 +35,6 @@ import type {
 } from '../../types/aquarium';
 
 type RangeParser = 'int' | 'float' | 'percent';
-
-interface SettingsCardTitleProps {
-  icon: LucideIcon;
-  title: string;
-  eyebrow?: string;
-  action?: React.ReactNode;
-}
-
-const SettingsCardTitle: React.FC<SettingsCardTitleProps> = ({
-  icon: Icon,
-  title,
-  eyebrow,
-  action,
-}) => (
-  <CardSectionHeader
-    icon={Icon}
-    title={title}
-    detail={eyebrow}
-    action={action}
-  />
-);
 
 interface SettingsPanelRowProps {
   icon?: LucideIcon;
@@ -228,18 +206,16 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
   ];
 
   return (
-    <GlassCard className="p-5">
-      <SettingsCardTitle
-        icon={SlidersHorizontal}
-        eyebrow="Adjust camera image"
-        title="Camera Filters"
-        action={(
+    <HeadedCard
+      icon={SlidersHorizontal}
+      title="Camera Filters"
+      action={(
           <GlassButton variant="outline" size="sm" onClick={resetToDefaults} className="px-2.5">
             <RotateCcw size={12} />
             Reset
           </GlassButton>
-        )}
-      />
+      )}
+    >
 
       <div className="grid grid-cols-2 gap-2.5 type-body">
         {metrics.map((metric) => (
@@ -286,7 +262,7 @@ export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
         onClick={() => setExpanded((current) => !current)}
         label={expanded ? 'Hide presets' : 'Show presets'}
       />
-    </GlassCard>
+    </HeadedCard>
   );
 };
 
@@ -307,8 +283,7 @@ export const MediaStorageCard: React.FC<MediaStorageCardProps> = ({
   ];
 
   return (
-    <GlassCard className="p-5">
-      <SettingsCardTitle icon={FolderOpen} eyebrow="Manage saved media" title="Media Storage" />
+    <HeadedCard icon={FolderOpen} title="Media Storage">
       <div className="flex flex-col gap-3">
         {rows.map((row) => (
           <SettingsPanelRow
@@ -325,7 +300,7 @@ export const MediaStorageCard: React.FC<MediaStorageCardProps> = ({
           />
         ))}
       </div>
-    </GlassCard>
+    </HeadedCard>
   );
 };
 
@@ -346,8 +321,7 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
   handleNameChange,
   onStartRename,
 }) => (
-  <GlassCard className="p-5">
-    <SettingsCardTitle icon={ShieldCheck} eyebrow="View tank details" title="Tank Identity" />
+  <HeadedCard icon={ShieldCheck} title="Tank Identity">
     <GlassPanel className="mb-3 type-caption">
       <span>Tank Reference Code: </span>
       <code className="ml-1 align-baseline type-caption">
@@ -379,7 +353,7 @@ export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
         )}
       />
     )}
-  </GlassCard>
+  </HeadedCard>
 );
 
 interface SafetyThresholdsCardProps {
@@ -414,8 +388,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
   const percentValue = (value: number) => Math.round(value * 100);
 
   return (
-    <GlassCard className="p-5">
-      <SettingsCardTitle icon={ShieldCheck} eyebrow="Set safety limits" title="Alerts & Thresholds" />
+    <HeadedCard icon={ShieldCheck} title="Alerts & Thresholds">
       <div className="flex flex-col gap-3">
         <GlassDisclosurePanel
           icon={Bell}
@@ -529,7 +502,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
           />
         </GlassDisclosurePanel>
       </div>
-    </GlassCard>
+    </HeadedCard>
   );
 };
 
@@ -549,8 +522,7 @@ export const DisconnectTankCard: React.FC<DisconnectTankCardProps> = ({
   onConfirmUnlink,
 }) => (
   showConfirmUnlink ? (
-    <GlassCard className="border-critical/30 p-5">
-      <SettingsCardTitle icon={X} eyebrow="Disconnect this tank" title="Remove Active Tank" />
+    <HeadedCard icon={X} title="Remove Active Tank" className="border-critical/30">
       <p className="m-0 type-caption">
         This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
       </p>
@@ -558,7 +530,7 @@ export const DisconnectTankCard: React.FC<DisconnectTankCardProps> = ({
         <GlassButton variant="outline" size="sm" onClick={onCancelUnlink}>Cancel</GlassButton>
         <GlassButton variant="danger" size="sm" onClick={onConfirmUnlink}>Yes, Disconnect</GlassButton>
       </div>
-    </GlassCard>
+    </HeadedCard>
   ) : (
     <GlassButton
       variant="outline"
@@ -592,8 +564,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
   filters,
   onFilterChange,
 }) => (
-  <GlassCard className="p-5">
-    <SettingsCardTitle icon={ShieldAlert} eyebrow="Manage this aquarium" title="Tank Management" />
+  <HeadedCard icon={ShieldAlert} title="Tank Management">
 
     <div className="flex flex-col gap-3">
       {editing ? (
@@ -664,5 +635,5 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
         />
       )}
     </div>
-  </GlassCard>
+  </HeadedCard>
 );

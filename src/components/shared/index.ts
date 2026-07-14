@@ -1,7 +1,7 @@
 export { GlassCard } from "./GlassCard";
 export { GlassDisclosurePanel } from "./GlassDisclosurePanel";
-export { CardHeader } from "./CardHeader";
 export { CardSectionHeader } from "./CardSectionHeader";
+export { HeadedCard } from "./HeadedCard";
 export { ScreenHeader } from "./ScreenHeader";
 export { ScreenState } from "./ScreenState";
 export { BackButton } from "./BackButton";
@@ -12,7 +12,6 @@ export { GlassIconButton } from "./GlassIconButton";
 export { GlassInput } from "./GlassInput";
 export { GlassSelect } from "./GlassSelect";
 export { GlassModal } from "./GlassModal";
-export { DashboardCard } from "./DashboardCard";
 export { AlertDetail } from "./AlertDetail";
 export { PhoneFrame } from "./PhoneFrame";
 export { StatusBar } from "./StatusBar";
