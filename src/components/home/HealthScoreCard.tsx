@@ -43,7 +43,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
   return (
     <section className="
       shimmer mx-auto grid w-full max-w-sm grid-cols-[7.25rem_minmax(0,1fr)]
-      items-center gap-4 glass-card rounded-[2.5rem] px-4 py-6
+      items-center gap-4 glass-card rounded-[2.5rem] px-4 py-6 -mt-2
     ">
       <div className="
         relative flex size-29 shrink-0 items-center justify-center
@@ -62,8 +62,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             cx="56"
             cy="56"
             r={radius}
-            className="text-brand-bright/10"
-            stroke="currentColor"
+            stroke="var(--color-health-parameter-bg)"
             strokeWidth={strokeWidth}
             fill="none"
           />
