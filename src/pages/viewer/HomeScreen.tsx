@@ -47,7 +47,7 @@ export const HomeScreen: React.FC = () => {
             onManageFish={onManageFish}
           />
 
-          <div className="glass-card p-5">
+          <div className="glass-card p-5 pb-4">
             <CardSectionHeader
               icon={FlaskConical}
               iconClassName="text-text"

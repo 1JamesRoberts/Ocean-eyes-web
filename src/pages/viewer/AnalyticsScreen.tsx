@@ -1,6 +1,6 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React from 'react';
-import { Activity, Brain, Calendar, Fish, Loader2, TriangleAlert, Trash2, Waves } from 'lucide-react';
+import { Activity, Brain, Calendar, Fish, Loader2, TriangleAlert, Waves } from 'lucide-react';
 import type { useAnalytics } from '../../hooks/pages/useAnalytics';
 import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
@@ -27,7 +27,7 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
   return (
     <GlassPanel
       className={`
-        flex flex-col gap-2 p-3.5
+        flex flex-col gap-2 p-3.5 pb-2.5
         ${isErr ? 'border-critical' : isHealthy ? 'border-good' : 'border-warning'}
       `}
     >
@@ -122,42 +122,10 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   isRefreshing,
   error,
   refetch,
-  isClearing,
-  onConfirmClear,
   onViewHistory,
   resolveCropUrl,
-  isFallback,
+  isFallback: _isFallback,
 }) => {
-  const [isClearButtonExpanded, setIsClearButtonExpanded] = React.useState(false);
-  const clearButtonRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    if (!isClearButtonExpanded) return;
-
-    const onPointerDown = (event: PointerEvent) => {
-      if (!clearButtonRef.current?.contains(event.target as Node)) {
-        setIsClearButtonExpanded(false);
-      }
-    };
-
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [isClearButtonExpanded]);
-
-  const onClearButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (!isClearButtonExpanded) {
-      setIsClearButtonExpanded(true);
-      return;
-    }
-
-    if ((event.target as Element).closest('[data-clear-history-icon]')) {
-      onConfirmClear();
-      return;
-    }
-
-    setIsClearButtonExpanded(false);
-  };
-
   return (
     <div className="flex flex-col gap-4">
       <ScreenHeader
@@ -299,22 +267,6 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 detail="Diagnoses from this period"
                 className="mb-0"
               />
-              {diagnoses.length > 0 && !isFallback && (
-                <div ref={clearButtonRef}>
-                  <GlassButton variant="outline" size="sm" className="
-                    justify-start overflow-hidden border-critical px-3 text-critical
-                    transition-[width,background-color] duration-200
-                    ${isClearButtonExpanded ? 'w-36 bg-critical/10' : 'w-11'}
-                  " onClick={onClearButtonClick} disabled={isClearing} aria-label="Clear history" aria-expanded={isClearButtonExpanded}>
-                    <span data-clear-history-icon>
-                      <Trash2 size={14} aria-hidden="true" />
-                    </span>
-                    <span className={`overflow-hidden whitespace-nowrap transition-[width,opacity] duration-200 ${isClearButtonExpanded ? 'w-20 opacity-100' : 'w-0 opacity-0'}`}>
-                      {isClearing ? 'Clearing…' : 'Clear history'}
-                    </span>
-                  </GlassButton>
-                </div>
-              )}
             </div>
             {diagnoses.length === 0 ? (
               <div className="

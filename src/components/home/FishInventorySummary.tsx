@@ -14,7 +14,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
   onManageFish
 }) => {
   return (
-    <section className="glass-card p-5">
+    <section className="glass-card p-5 pb-4">
       <CardSectionHeader
         icon={FishSymbol}
         title="My Fish"

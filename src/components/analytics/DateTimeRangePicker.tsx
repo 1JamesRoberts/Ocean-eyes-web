@@ -252,7 +252,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       {createPortal(<div
         ref={editorRef}
         id="date-range-editor"
-        className="overflow-hidden glass-card p-3 transition-all duration-300 ease-in-out"
+        className="overflow-hidden glass-card p-3 pb-2 transition-all duration-300 ease-in-out"
         style={editorStyle}
         aria-label="Date range editor"
       >

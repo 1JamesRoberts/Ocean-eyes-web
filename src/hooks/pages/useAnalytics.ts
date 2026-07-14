@@ -5,11 +5,7 @@ import { useFish } from '../useFish';
 import { useLiveFeed } from '../useLiveFeed';
 import { useAnalyticsControls } from '../../context/AnalyticsControlsContext';
 import { useNavigation } from '../../context/NavigationContext';
-import {
-  resolveCropUrl,
-  clearDetectionHistoryRange,
-  clearTurbidityHistoryRange,
-} from '../../models/api/aiApi';
+import { resolveCropUrl } from '../../models/api/aiApi';
 import {
   selectDiagnoses,
   selectHeatmapRecords,
@@ -63,7 +59,6 @@ export const useAnalytics = () => {
   );
 
   const [selectedSpecies, setSelectedSpecies] = useState<string>('all');
-  const [isClearing, setIsClearing] = useState(false);
 
   const onRangeChange = useCallback(
     (next: DateRange) => setRange(next),
@@ -71,21 +66,6 @@ export const useAnalytics = () => {
   );
 
   const onRefetch = useCallback(() => refetch(), [refetch]);
-
-  const onConfirmClear = useCallback(async () => {
-    setIsClearing(true);
-    try {
-      await Promise.all([
-        clearDetectionHistoryRange(range.startDate, range.endDate),
-        clearTurbidityHistoryRange(range.startDate, range.endDate),
-      ]);
-      refetch();
-    } catch (err) {
-      console.error('Failed to clear history:', err);
-    } finally {
-      setIsClearing(false);
-    }
-  }, [range, refetch]);
 
   const onViewHistory = useCallback(
     () => navigation.setActiveTab('history'),
@@ -111,8 +91,6 @@ export const useAnalytics = () => {
     isRefreshing,
     error,
     refetch: onRefetch,
-    isClearing,
-    onConfirmClear,
     onViewHistory,
     resolveCropUrl,
     isFallback,

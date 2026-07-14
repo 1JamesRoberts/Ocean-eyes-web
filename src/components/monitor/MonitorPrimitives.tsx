@@ -48,7 +48,7 @@ interface MonitorMetricProps {
 
 export const MonitorMetric: React.FC<MonitorMetricProps> = ({ label, value }) => (
   <div className="
-    rounded-xl border border-monitor-border bg-monitor-surface p-3
+    rounded-xl border border-monitor-border bg-monitor-surface p-3 pb-2
   ">
     <span className="
       block text-2xs font-semibold tracking-[0.07em] text-monitor-text-muted

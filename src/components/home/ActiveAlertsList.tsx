@@ -26,7 +26,7 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
   }
 
   return (
-    <section className="glass-card p-5">
+    <section className="glass-card p-5 pb-4">
       <CardSectionHeader
         icon={ShieldAlert}
         title="Alerts"

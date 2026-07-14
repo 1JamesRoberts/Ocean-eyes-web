@@ -20,7 +20,7 @@ interface ParameterTileProps {
 
 const tileClassName = `
   flex flex-col items-center gap-1.5 rounded-2xl border
-  border-white/20 bg-white/20 p-2 text-center transition-colors
+  border-white/20 bg-white/20 p-2 pb-1 text-center transition-colors
   hover:bg-white/60
 `;
 

@@ -50,7 +50,7 @@ export const AlertsScreen: React.FC = () => {
             type="button"
             key={alert.id}
             className={`
-              p-4
+              p-4 pb-3
               ${alert.resolved ? `opacity-60` : ''}
               ${alert.resolved ? 'border-l-4 border-l-good' : alert.severity === 'critical' ? 'border-l-4 border-l-critical' : 'border-l-4 border-l-warning'}
             `}

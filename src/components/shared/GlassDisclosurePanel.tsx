@@ -26,7 +26,7 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
   iconClassName = 'text-text-muted',
   chevronClassName = 'text-brand',
 }) => (
-  <div className={`rounded-2xl border border-white/20 bg-white/20 p-3 ${className}`}>
+  <div className={`rounded-2xl border border-white/20 bg-white/20 p-3 pb-2 ${className}`}>
     <button
       type="button"
       onClick={onToggle}
