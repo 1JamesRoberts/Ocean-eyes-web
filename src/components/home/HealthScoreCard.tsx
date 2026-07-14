@@ -49,7 +49,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
         relative flex size-29 shrink-0 items-center justify-center
       ">
         <svg
-          className="size-full -rotate-90 drop-shadow-[0_1px_2px_rgba(0,169,204,0.18)]"
+          className="size-full -rotate-90"
           viewBox="0 0 112 112"
         >
           <defs>
