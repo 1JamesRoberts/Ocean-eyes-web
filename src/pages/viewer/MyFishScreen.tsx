@@ -240,7 +240,7 @@ export const MyFishScreen: React.FC = () => {
                 <div className="
                   flex size-10 shrink-0 items-center justify-center rounded-lg
                 ">
-                  <Fish size={29} className="text-brand" />
+                  <Fish size={29} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <span className="block truncate type-title">Fish Overview</span>
