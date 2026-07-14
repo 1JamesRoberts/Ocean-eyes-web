@@ -97,7 +97,7 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
           </span>
         )}
         <span className="min-w-0">
-          <span className={`block type-strong ${danger ? 'text-critical' : highlight ? 'text-brand' : ''}`}>
+          <span className={`block type-strong ${danger ? 'text-critical' : 'text-text'}`}>
             {title}
           </span>
           {detail && (

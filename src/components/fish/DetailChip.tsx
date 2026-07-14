@@ -5,20 +5,18 @@ interface DetailChipProps {
   icon?: React.ReactNode;
   label: string;
   value: string;
-  colorClass?: string;
 }
 
 export const DetailChip: React.FC<DetailChipProps> = ({
   icon,
   label,
   value,
-  colorClass,
 }) => (
   <GlassBadge
-    className={`
+    color="parameter"
+    className="
       w-full min-w-0 justify-between gap-2 rounded-xl px-3 py-1.5 type-caption
-      ${colorClass || ''}
-    `}
+    "
   >
     {icon && <span className="shrink-0">{icon}</span>}
     <span className="min-w-0 flex-1 break-words leading-tight type-caption">

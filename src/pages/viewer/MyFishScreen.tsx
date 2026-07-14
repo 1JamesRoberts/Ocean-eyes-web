@@ -282,7 +282,6 @@ export const MyFishScreen: React.FC = () => {
                       icon={<Maximize2 size={14} />}
                       label="Ideal Tank Min"
                       value={stats.idealTankSizeL != null ? `${stats.idealTankSizeL} L` : '—'}
-                      colorClass="bg-[rgba(16,185,129,0.08)]"
                     />
                     <DetailChip
                       icon={<Thermometer size={14} />}
@@ -292,7 +291,6 @@ export const MyFishScreen: React.FC = () => {
                           ? formatRange(stats.tempResult.range[0], stats.tempResult.range[1], '°C')
                           : '—'
                       }
-                      colorClass="bg-[rgba(245,158,11,0.08)]"
                     />
                     <DetailChip
                       icon={<Droplets size={14} />}
@@ -302,7 +300,6 @@ export const MyFishScreen: React.FC = () => {
                           ? formatRange(stats.phResult.range[0], stats.phResult.range[1], '', 1)
                           : '—'
                       }
-                      colorClass="bg-[rgba(147,112,219,0.08)]"
                     />
                   </div>
 
@@ -469,14 +466,14 @@ export const MyFishScreen: React.FC = () => {
                             mb-3.5 grid grid-cols-1 gap-3
                             sm:grid-cols-2
                           ">
-                            <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} colorClass="bg-[rgba(59,130,246,0.08)]" />
-                            <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} colorClass="bg-[rgba(16,185,129,0.08)]" />
-                            <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} colorClass="bg-[rgba(245,158,11,0.08)]" />
-                            <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} colorClass="bg-[rgba(147,112,219,0.08)]" />
-                            <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} colorClass="bg-[rgba(16,185,129,0.08)]" />
-                            <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} colorClass="bg-[rgba(239,68,68,0.08)]" />
-                            <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} colorClass="bg-[rgba(59,130,246,0.08)]" />
-                            <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} colorClass="bg-[rgba(147,112,219,0.08)]" />
+                            <DetailChip icon={<Ruler size={14} />} label="Size" value={`${species.sizeCm} cm`} />
+                            <DetailChip icon={<Maximize2 size={14} />} label="Tank Min" value={`${species.minTankSizeL} L`} />
+                            <DetailChip icon={<Thermometer size={14} />} label="Temp" value={`${species.tempMin}–${species.tempMax} °C`} />
+                            <DetailChip icon={<Droplets size={14} />} label="pH" value={`${species.phMin}–${species.phMax}`} />
+                            <DetailChip icon={<CheckCircle size={14} />} label="Availability" value={availabilityLabel[species.availability ?? 'common']} />
+                            <DetailChip icon={<AlertTriangle size={14} />} label="Aggression" value={aggressionLabel[species.aggression ?? 'peaceful']} />
+                            <DetailChip icon={<Fish size={14} />} label="Behavior" value={behaviorLabel[species.behavior ?? 'social']} />
+                            <DetailChip icon={<Fish size={14} />} label="Swim Zone" value={swimLabel[species.swimLocation ?? 'middle']} />
                           </div>
 
                           {/* Compatibility section */}

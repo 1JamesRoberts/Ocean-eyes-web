@@ -51,7 +51,7 @@ const DetectionVisibilityRing: React.FC<DetectionVisibilityRingProps> = ({
             cy={center}
             r={radius}
             fill="none"
-            stroke="var(--color-border)"
+            stroke="var(--color-health-parameter-bg)"
             strokeWidth={strokeWidth}
           />
           <circle

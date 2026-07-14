@@ -44,7 +44,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <span className="block type-caption">
             Fish Detected
           </span>
-          <strong className="mt-1 block type-title text-brand">
+          <strong className="mt-1 block type-title text-text">
             {lastPrediction ? lastPrediction.summary.total_detections : '—'}
           </strong>
         </GlassPanel>
@@ -53,7 +53,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <span className="block type-caption">
             FNU
           </span>
-          <strong className="mt-1 block type-title text-brand">
+          <strong className="mt-1 block type-title text-text">
             {lastTurbidityResult ? lastTurbidityResult.turbidity.fnu.toFixed(2) : '—'}
           </strong>
         </GlassPanel>
@@ -79,7 +79,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                 ">
                   <div className="size-2 rounded-full" style={{ backgroundColor: color }} />
                   <span className="text-text">{displayName}</span>
-                  <span className="text-brand">{count}</span>
+                  <span className="text-text">{count}</span>
                 </div>
               );
             })}

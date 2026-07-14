@@ -30,7 +30,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
         </div>
         <div className="flex-1">
           <span className="block type-caption">Clarity</span>
-          <span className="type-title text-brand">
+          <span className="type-title text-text">
             {displayClarity.toFixed(2)} FNU
           </span>
         </div>
@@ -59,7 +59,7 @@ export const WaterClarityCard = React.memo<WaterClarityCardProps>(({ displayClar
         </div>
         <div>
           <span className="block type-caption">Clarity</span>
-          <span className="type-title text-brand">
+          <span className="type-title text-text">
             {displayClarity.toFixed(2)} FNU
           </span>
         </div>
