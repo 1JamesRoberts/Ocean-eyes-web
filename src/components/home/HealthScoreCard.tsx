@@ -114,7 +114,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
               key={parameter.label}
               className="
                 flex min-w-0 items-center justify-center gap-1 rounded-2xl
-                bg-[#00A9CC]/5 px-1.5 py-2
+                bg-(--color-health-parameter-bg) px-1.5 py-2
               "
             >
               <parameter.icon aria-hidden="true" className="

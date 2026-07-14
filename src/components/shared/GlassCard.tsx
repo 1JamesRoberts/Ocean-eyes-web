@@ -28,7 +28,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       ${clickable ? 'cursor-pointer' : ''}
       ${hover ? `
         transition-smooth
-        hover:bg-white/50
+        hover:bg-[#f6feff]
       ` : ''}
       ${className}
     `}

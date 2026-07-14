@@ -7,7 +7,7 @@ import { ScreenWithHeroVideo } from '../ScreenWithHeroVideo';
 afterEach(cleanup);
 
 describe('ScreenWithHeroVideo stationary scroller', () => {
-  it('renders the surface and content spacer without a blend when the hero is visible', () => {
+  it('renders the rounded content clip, surface, and spacer when the hero is visible', () => {
     const { container } = render(
       <ScreenWithHeroVideo hero={<div>Live video</div>}>
         <div>Screen content</div>
@@ -19,6 +19,7 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     expect(container.querySelector('.mobile-hero-surface')).not.toBeNull();
     const scrollContainer = container.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
     expect(scrollContainer?.classList.contains('overflow-y-auto')).toBe(true);
+    // The shared utility owns the stationary cutoff and its rounded top corners.
     expect(scrollContainer?.classList.contains('mobile-hero-content-clip')).toBe(true);
     expect(scrollContainer?.classList.contains('mobile-hero-content-mask')).toBe(false);
     expect(scrollContainer?.classList.contains('bg-transparent')).toBe(true);

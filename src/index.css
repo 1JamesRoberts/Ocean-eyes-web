@@ -18,10 +18,11 @@
   --glass-bg-card: rgba(255, 255, 255, 0.4);
   --glass-bg-card-gradient: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.48) 0%,
-    rgba(255, 255, 255, 0.32) 100%
+    #f6feff 0%,
+    #f6feff 100%
   );
   --glass-bg-inline: rgba(255, 255, 255, 0.3);
+  --color-health-parameter-bg: #eafafc;
   --glass-blur-lg: 20px;
   --glass-blur-md: 12px;
   --glass-blur-sm: 6px;
@@ -769,7 +770,7 @@
   padding-top: var(--mobile-status-bar-height);
   border-top-left-radius: var(--mobile-content-radius);
   border-top-right-radius: var(--mobile-content-radius);
-  background: #f2fdff;
+  background: var(--color-health-parameter-bg);
 }
 
 [data-mobile-screen-scroll]::-webkit-scrollbar {
@@ -941,7 +942,11 @@
   --mobile-hero-content-clip-start: calc(
     var(--mobile-hero-heading-bottom) + var(--mobile-hero-content-clearance)
   );
-  clip-path: inset(var(--mobile-hero-content-clip-start) 0 0 0);
+  clip-path: inset(
+    var(--mobile-hero-content-clip-start) var(--mobile-content-gutter) 0
+      var(--mobile-content-gutter) round var(--glass-radius-card)
+      var(--glass-radius-card) 0 0
+  );
 }
 
 @utility mobile-hero-surface {
