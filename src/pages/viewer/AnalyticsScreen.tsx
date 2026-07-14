@@ -8,6 +8,7 @@ import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
 import { GlassButton, GlassCard, GlassPanel, HeadedCard, ScreenHeader, ScreenState } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
+import { createDetectionTimeAxis } from '../../utils/detectionTimeAxis';
 
 type AnalyticsScreenProps = ReturnType<typeof useAnalytics>;
 type DiagnosisRecord = AnalyticsScreenProps['diagnoses'][number];
@@ -126,6 +127,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   resolveCropUrl,
   isFallback: _isFallback,
 }) => {
+  const detectionTimeAxis = React.useMemo(
+    () => createDetectionTimeAxis(detectionRecords),
+    [detectionRecords],
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <ScreenHeader
@@ -200,7 +206,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 -mx-2 min-h-0 flex-1
                 sm:mx-0
               ">
-                <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
+                <FishCountChart
+                  records={detectionRecords}
+                  selectedSpecies={selectedSpecies}
+                  timeAxis={detectionTimeAxis}
+                />
               </div>
             </HeadedCard>
 
@@ -214,7 +224,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 -mx-2 min-h-0 flex-1
                 sm:mx-0
               ">
-                <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
+                <MeanNNDChart
+                  records={detectionRecords}
+                  selectedSpecies={selectedSpecies}
+                  timeAxis={detectionTimeAxis}
+                />
               </div>
             </HeadedCard>
 

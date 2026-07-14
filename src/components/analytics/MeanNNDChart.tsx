@@ -10,13 +10,14 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { AIDetection, AIDetectionResult } from '../../types/aquarium';
-import { formatTimeShort } from '../../utils/formatters';
+import { formatChartTimestamp, type DetectionTimeAxis } from '../../utils/detectionTimeAxis';
 import { calculateMeanNND } from '../../utils/geometry';
 import { ChartEmptyState } from './ChartEmptyState';
 
 interface Props {
   records: AIDetectionResult[];
   selectedSpecies?: string;
+  timeAxis: DetectionTimeAxis;
 }
 
 const MAX_CHART_POINTS = 80;
@@ -28,7 +29,7 @@ function filterDetectionsBySpecies(record: AIDetectionResult, selectedSpecies?: 
   return record.detections.filter((d) => d.species === selectedSpecies);
 }
 
-export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
+export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies, timeAxis }) => {
   const data = useMemo(() => {
     const sampledRecords = records.length <= MAX_CHART_POINTS
       ? records
@@ -40,7 +41,7 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
         });
 
     return sampledRecords.map((r) => ({
-      time: formatTimeShort(r.timestamp),
+      time: Date.parse(r.timestamp),
       nnd: calculateMeanNND(
         filterDetectionsBySpecies(r, selectedSpecies),
         r.image_dimensions,
@@ -66,6 +67,11 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
         <XAxis
           dataKey="time"
+          type="number"
+          scale="time"
+          domain={timeAxis.domain}
+          ticks={timeAxis.ticks}
+          tickFormatter={formatChartTimestamp}
           tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
           axisLine={{ stroke: 'var(--color-border)' }}
           tickLine={{ stroke: 'var(--color-border)' }}
@@ -87,6 +93,7 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
             fontSize: 13,
           }}
           formatter={(value) => [Number(value).toFixed(3), 'Mean NND']}
+          labelFormatter={(label) => formatChartTimestamp(Number(label))}
         />
         <Area
           type="monotone"

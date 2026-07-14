@@ -19,7 +19,7 @@ describe('CardSectionHeader', () => {
     expect(header?.classList.contains('border-b')).toBe(true);
     expect(header?.classList.contains('border-text-muted/15')).toBe(true);
     expect(header?.classList.contains('pb-2.5')).toBe(true);
-    expect(header?.classList.contains('mb-2.5')).toBe(true);
+    expect(header?.classList.contains('mb-1')).toBe(true);
   });
 
   it('can omit the divider for standalone section headings', () => {

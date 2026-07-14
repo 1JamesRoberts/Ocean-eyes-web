@@ -104,7 +104,7 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
   };
 
   return (
-    <GlassCard className="w-[320px]">
+    <GlassCard className="w-full max-w-[320px]">
       <div className="relative flex rounded-2xl bg-surface-hover px-2 py-1">
         {/* Center highlight bar */}
         <div

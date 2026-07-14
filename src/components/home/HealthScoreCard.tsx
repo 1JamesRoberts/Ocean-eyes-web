@@ -43,7 +43,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
   return (
     <section className="
       shimmer mx-auto grid w-full max-w-sm grid-cols-[7.25rem_minmax(0,1fr)]
-      items-center gap-4 glass-card rounded-(--glass-radius-card) px-4 py-4 -mt-2
+      items-center gap-4 glass-card rounded-(--glass-radius-card) px-4 py-3 -mt-2
     ">
       <div className="
         relative flex size-29 shrink-0 items-center justify-center
@@ -112,8 +112,8 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             <div
               key={parameter.label}
               className="
-                flex min-w-0 items-center justify-center gap-1 rounded-2xl
-                bg-(--color-health-parameter-bg) px-1.5 py-2
+                flex min-w-0 items-center justify-center gap-1 rounded-[0.625rem]
+                bg-(--color-health-parameter-bg) px-1.5 py-1.5
               "
             >
               <parameter.icon aria-hidden="true" className="

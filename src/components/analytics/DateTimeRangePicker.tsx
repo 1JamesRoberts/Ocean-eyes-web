@@ -15,6 +15,9 @@ import { TimeWheelSheet } from './TimeWheelSheet';
 
 type ActiveField = 'startDate' | 'startTime' | 'endDate' | 'endTime' | null;
 
+const POPOVER_EDGE_GUTTER = 16;
+const POPOVER_MAX_WIDTH = 320;
+
 interface DateTimeRangePickerProps {
   value: DateRange;
   onChange: (range: DateRange) => void;
@@ -26,7 +29,6 @@ interface DateTimeRangePickerProps {
 
 interface OpenState {
   field: ActiveField;
-  anchorRect: DOMRect;
 }
 
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
@@ -76,15 +78,30 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
     return timeStr;
   }, [activeField, value]);
 
+  const isCalendar = activeField === 'startDate' || activeField === 'endDate';
+  const isTimeWheel = activeField === 'startTime' || activeField === 'endTime';
+
   const popoverStyle = useMemo<React.CSSProperties>(() => {
     if (!open) return {};
-    return {
-      position: 'fixed',
-      top: open.anchorRect.bottom + 8,
-      left: open.anchorRect.left,
-      zIndex: 1000,
-    };
-  }, [open]);
+    const width = Math.min(
+      POPOVER_MAX_WIDTH,
+      window.innerWidth - POPOVER_EDGE_GUTTER * 2,
+    );
+
+    if (isCalendar || isTimeWheel) {
+      return {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        width,
+        maxHeight: 'calc(100dvh - 32px)',
+        overflowY: 'auto',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 1000,
+      };
+    }
+    return {};
+  }, [isCalendar, isTimeWheel, open]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -112,12 +129,11 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
 
   const handlePillClick = useCallback(
     (field: ActiveField) =>
-      (event: React.MouseEvent<HTMLButtonElement>) => {
-        const rect = event.currentTarget.getBoundingClientRect();
+      () => {
         setOpen((prev) =>
           prev?.field === field
             ? null
-            : { field, anchorRect: rect },
+            : { field },
         );
       },
     [],
@@ -159,9 +175,6 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
     },
     [activeField, onChange, value, handleClose],
   );
-
-  const isCalendar = activeField === 'startDate' || activeField === 'endDate';
-  const isTimeWheel = activeField === 'startTime' || activeField === 'endTime';
 
   const toggleExpanded = useCallback(() => {
     setIsExpanded((previous) => !previous);

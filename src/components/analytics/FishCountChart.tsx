@@ -10,12 +10,13 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { AIDetectionResult } from '../../types/aquarium';
-import { formatTimeShort } from '../../utils/formatters';
+import { formatChartTimestamp, type DetectionTimeAxis } from '../../utils/detectionTimeAxis';
 import { ChartEmptyState } from './ChartEmptyState';
 
 interface Props {
   records: AIDetectionResult[];
   selectedSpecies?: string;
+  timeAxis: DetectionTimeAxis;
 }
 
 const MAX_HISTOGRAM_BINS = 20;
@@ -27,11 +28,11 @@ function countBySpecies(record: AIDetectionResult, selectedSpecies?: string): nu
   return record.detections.filter((d) => d.species === selectedSpecies).length;
 }
 
-export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) => {
+export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies, timeAxis }) => {
   const data = useMemo(() => {
     if (records.length <= MAX_HISTOGRAM_BINS) {
       return records.map((record) => ({
-        time: formatTimeShort(record.timestamp),
+        time: Date.parse(record.timestamp),
         count: countBySpecies(record, selectedSpecies),
       }));
     }
@@ -54,7 +55,7 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
     });
 
     return bins.map((bin) => ({
-      time: formatTimeShort(bin.timestamp),
+      time: Date.parse(bin.timestamp),
       count: Math.round(bin.total / bin.samples),
     }));
   }, [records, selectedSpecies]);
@@ -84,6 +85,11 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
         />
         <XAxis
           dataKey="time"
+          type="number"
+          scale="time"
+          domain={timeAxis.domain}
+          ticks={timeAxis.ticks}
+          tickFormatter={formatChartTimestamp}
           tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
           axisLine={{ stroke: 'var(--color-border)' }}
           tickLine={{ stroke: 'var(--color-border)' }}
@@ -107,6 +113,7 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies }) =>
             fontSize: 13,
           }}
           formatter={(value) => [`${value as number} fish`, 'Count']}
+          labelFormatter={(label) => formatChartTimestamp(Number(label))}
         />
         <Bar
           dataKey="count"
