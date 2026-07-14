@@ -1,6 +1,6 @@
 // TimeWheelSheet.tsx - Apple-style hour/minute/AM-PM scroll wheel
 import React, { useMemo, useRef, useState } from 'react';
-import { GlassCard, GlassButton } from '../shared';
+import { GlassButton } from '../shared';
 
 interface TimeWheelSheetProps {
   selectedTime: string; // HH:mm (24-hour)
@@ -76,7 +76,7 @@ const WheelColumn: React.FC<WheelColumnProps> = ({ items, selected, onSelect }) 
                 flex h-[44px] w-full cursor-pointer items-center justify-center
                 border-none bg-transparent type-body
                 transition-colors
-                ${isSelected ? 'text-text' : 'text-text-muted/45'}
+                ${isSelected ? 'type-strong text-text' : 'text-text-muted/60'}
               `}
             >
               {String(item).padStart(2, '0')}
@@ -104,12 +104,12 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
   };
 
   return (
-    <GlassCard className="w-full max-w-[320px]">
-      <div className="relative flex rounded-2xl bg-surface-hover px-2 py-1">
+    <div className="w-full max-w-[320px] p-4 pb-3 text-text">
+      <div className="relative flex rounded-2xl px-2 py-1">
         {/* Center highlight bar */}
         <div
           className="
-            pointer-events-none absolute inset-x-2 rounded-xl bg-surface
+            pointer-events-none absolute inset-x-2 rounded-xl border fish-count-teal-outline
           "
           style={{ top: SNAP_TOP, height: ITEM_HEIGHT }}
         />
@@ -134,6 +134,6 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
       <GlassButton variant="primary" size="sm" className="mt-3 w-full" onClick={handleDone}>
         Done
       </GlassButton>
-    </GlassCard>
+    </div>
   );
 };

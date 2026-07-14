@@ -244,14 +244,15 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
             'var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05)';
         }}
       >
-        <History size={16} className="text-text-muted" />
+        <History size={16} className={heroOverlay ? 'text-white/70' : 'text-text-muted'} />
         {showSummary ? (
           <>
             <span className="min-w-0 truncate">{summaryText}</span>
             <ChevronDown
               size={18}
               className={`
-                shrink-0 text-text-muted transition-transform duration-300 ease-in-out
+                shrink-0 transition-transform duration-300 ease-in-out
+                ${heroOverlay ? 'text-white/70' : 'text-text-muted'}
                 ${isExpanded ? 'rotate-180' : ''}
               `}
             />
@@ -265,14 +266,14 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       {createPortal(<div
         ref={editorRef}
         id="date-range-editor"
-        className="overflow-hidden glass-card p-3 pb-2 transition-all duration-300 ease-in-out"
+        className="overflow-hidden overlay-glass-surface p-3 pb-2 text-white transition-all duration-300 ease-in-out"
         style={editorStyle}
         aria-label="Date range editor"
       >
         <div className="flex flex-col gap-2">
           {/* Starts row */}
           <div className="flex items-center gap-2">
-            <span className="w-14 type-strong">Starts</span>
+            <span className="w-14 type-strong-inverse">Starts</span>
             <DateTimePill
               label={formatDateForDisplay(value.startDate)}
               isActive={activeField === 'startDate'}
@@ -287,7 +288,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
 
           {/* Ends row */}
           <div className="flex items-center gap-2">
-            <span className="w-14 type-strong">Ends</span>
+            <span className="w-14 type-strong-inverse">Ends</span>
             <DateTimePill
               label={formatDateForDisplay(value.endDate)}
               isActive={activeField === 'endDate'}
@@ -306,7 +307,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         createPortal(
           <div
             ref={popoverRef}
-            className="animate-fade-in glass-card"
+            className={`animate-fade-in ${isCalendar ? 'glass-card-overlay' : 'overlay-glass-surface'} text-text`}
             style={popoverStyle}
           >
             {isCalendar && (

@@ -35,7 +35,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
   }, [viewMonth]);
 
   return (
-    <div className="glass-card w-full max-w-[320px] p-4 pb-3">
+    <div className="w-full max-w-[320px] p-4 pb-3 text-text">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
@@ -49,9 +49,9 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             type="button"
             onClick={() => setViewMonth((m) => subUTCMonths(m, 1))}
             className="
-              cursor-pointer rounded-full border-none bg-transparent p-2
-              text-text-muted transition-smooth
-              hover:bg-surface-hover hover:text-text
+              overlay-glass-control flex size-9 items-center justify-center rounded-full
+              p-0 text-text-muted hover:text-text
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
             "
             aria-label="Previous month"
           >
@@ -61,9 +61,9 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             type="button"
             onClick={() => setViewMonth((m) => addUTCMonths(m, 1))}
             className="
-              cursor-pointer rounded-full border-none bg-transparent p-2
-              text-text-muted transition-smooth
-              hover:bg-surface-hover hover:text-text
+              overlay-glass-control flex size-9 items-center justify-center rounded-full
+              p-0 text-text-muted hover:text-text
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
             "
             aria-label="Next month"
           >
@@ -75,7 +75,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
       {/* Weekday labels */}
       <div className="mb-2 grid grid-cols-7 text-center">
         {WEEKDAYS.map((day) => (
-          <span key={day} className="type-caption">
+          <span key={day} className="type-caption text-text-muted">
             {day}
           </span>
         ))}
@@ -94,21 +94,19 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
               onClick={() => onSelect(day)}
               className={`
                 relative mx-auto flex size-9 cursor-pointer items-center
-                justify-center rounded-full border-none type-body
-                transition-smooth
+                justify-center rounded-full type-body overlay-glass-control
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
                 ${selected
-                  ? `glass-button-primary bg-primary-gradient text-text-inverse`
+                  ? 'fish-count-teal-outline type-strong text-white'
                   : today
                     ? `
-                      bg-transparent type-strong text-brand
-                      hover:bg-white/30
+                      bg-transparent type-strong text-text
                     `
                     : inMonth
                       ? `
                         bg-transparent text-text
-                        hover:bg-white/30
                       `
-                      : 'bg-transparent text-text-muted/40'
+                      : 'bg-transparent text-text-muted/60 hover:text-text-muted'
                 }
               `}
             >
@@ -117,7 +115,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 <span
                   className="
                     absolute bottom-1.5 left-1/2 size-1 -translate-x-1/2
-                    rounded-full bg-brand
+                    rounded-full bg-brand-bright
                   "
                 />
               )}
