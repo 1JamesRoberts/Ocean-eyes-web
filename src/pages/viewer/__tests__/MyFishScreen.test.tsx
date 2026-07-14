@@ -96,7 +96,7 @@ describe('MyFishScreen add flow', () => {
     const dialog = screen.getByRole('dialog', { name: 'Add fish' });
     expect(dialog).toBeTruthy();
     expect(dialog.className)
-      .toContain('top-[calc(var(--mobile-status-bar-height)+var(--mobile-hero-height))]');
+      .toContain('top-[calc(var(--mobile-status-bar-height)+var(--mobile-hero-height)-1rem)]');
     expect(dialog.lastElementChild?.className)
       .toContain('motion-safe:animate-sheet-enter');
     const results = screen.getByRole('listbox', { name: 'Species results' });

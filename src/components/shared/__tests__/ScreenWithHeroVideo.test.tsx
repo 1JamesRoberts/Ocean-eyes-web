@@ -26,6 +26,9 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     expect(scrollContainer?.classList.contains('mobile-hero-content-mask')).toBe(false);
     expect(scrollContainer?.classList.contains('bg-transparent')).toBe(true);
     expect(container.querySelector('[data-mobile-hero-content-spacer]')).not.toBeNull();
+    const bottomSpacer = container.querySelector<HTMLElement>('[data-mobile-screen-bottom-spacer]');
+    expect(bottomSpacer?.classList.contains('h-[var(--mobile-bottom-navigation-clearance)]')).toBe(true);
+    expect(bottomSpacer?.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('keeps the hero mounted without rendering its transition when hidden', () => {
@@ -44,6 +47,7 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     expect(scrollContainer?.classList.contains('mobile-hero-content-clip')).toBe(false);
     expect(scrollContainer?.classList.contains('bg-gradient-mint')).toBe(true);
     expect(container.querySelector('[data-mobile-hero-content-spacer]')).toBeNull();
+    expect(container.querySelector('[data-mobile-screen-bottom-spacer]')).not.toBeNull();
   });
 
   it('keeps the hard clip stationary during large and repeated scroll jumps', () => {

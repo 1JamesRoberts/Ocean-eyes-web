@@ -86,7 +86,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       className={`
         ${isBelowHero ? 'absolute z-50' : 'fixed z-[70]'} right-0 bottom-0 left-0 flex justify-center
         ${isBelowHero
-          ? 'top-[calc(var(--mobile-status-bar-height)+var(--mobile-hero-height))]'
+          ? 'top-[calc(var(--mobile-status-bar-height)+var(--mobile-hero-height)-1rem)]'
           : 'top-0'
         }
         ${isBottomSheet ? 'items-end p-0' : 'items-center p-4'}
@@ -109,7 +109,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         ref={contentRef}
         tabIndex={-1}
         className={`
-          relative z-10 w-full glass-card
+          relative z-10 w-full ${isBelowHero ? 'glass-card-overlay' : 'glass-card'}
           ${isBottomSheet
             ? `
               max-w-none overflow-hidden

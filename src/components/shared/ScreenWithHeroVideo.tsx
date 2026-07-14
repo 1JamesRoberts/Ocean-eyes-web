@@ -53,7 +53,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
         >
           <div
             data-mobile-hero-clipped-content
-            className="flex min-h-full flex-col pb-[calc(6.5rem+env(safe-area-inset-bottom))]"
+            className="flex min-h-full flex-col"
           >
             {showHero && (
               <div
@@ -63,6 +63,11 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
               />
             )}
             {children}
+            <div
+              data-mobile-screen-bottom-spacer
+              className="h-[var(--mobile-bottom-navigation-clearance)] shrink-0"
+              aria-hidden="true"
+            />
           </div>
         </div>
       </div>

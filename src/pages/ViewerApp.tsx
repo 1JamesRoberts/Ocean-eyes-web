@@ -87,7 +87,7 @@ export const ViewerApp: React.FC = () => {
       {tankId === null ? (
         <div
           data-mobile-screen-scroll
-          className="-mx-4 -mt-4 flex min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]"
+          className="-mx-4 -mt-4 flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-4"
         >
           <div className="
             rounded-[20px] border border-border-subtle bg-surface p-6 pb-5 shadow-card
@@ -95,6 +95,11 @@ export const ViewerApp: React.FC = () => {
           ">
             <RootGateOnboarding />
           </div>
+          <div
+            data-mobile-screen-bottom-spacer
+            className="h-[var(--mobile-bottom-navigation-clearance)] shrink-0"
+            aria-hidden="true"
+          />
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
