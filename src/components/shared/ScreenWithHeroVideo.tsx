@@ -37,7 +37,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
             "
           />
           {showHero && (
-            <div className="mobile-hero-surface" aria-hidden="true" />
+            <div className="mobile-hero-surface bg-gradient-mint" aria-hidden="true" />
           )}
         </section>
         <div

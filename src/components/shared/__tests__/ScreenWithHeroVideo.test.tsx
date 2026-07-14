@@ -16,7 +16,9 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
 
     expect(container.querySelector('.mobile-hero-blend')).toBeNull();
     expect(container.querySelector('.mobile-hero-media')).not.toBeNull();
-    expect(container.querySelector('.mobile-hero-surface')).not.toBeNull();
+    const heroSurface = container.querySelector('.mobile-hero-surface');
+    expect(heroSurface).not.toBeNull();
+    expect(heroSurface?.classList.contains('bg-gradient-mint')).toBe(true);
     const scrollContainer = container.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
     expect(scrollContainer?.classList.contains('overflow-y-auto')).toBe(true);
     // The shared utility owns the stationary cutoff and its rounded top corners.
