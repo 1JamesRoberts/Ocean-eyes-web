@@ -56,7 +56,7 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
 
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+      <AreaChart data={data} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="meanNNDGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="var(--color-warning)" stopOpacity={0.25} />
@@ -74,6 +74,7 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies }) => {
           tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
           axisLine={{ stroke: 'var(--color-border)' }}
           tickLine={{ stroke: 'var(--color-border)' }}
+          width={32}
         />
         <Tooltip
           contentStyle={{

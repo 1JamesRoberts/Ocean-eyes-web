@@ -232,7 +232,10 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 detail="Detected fish across the selected range"
                 className="mb-0"
               />
-              <div className="min-h-0 flex-1">
+              <div className="
+                -mx-2 min-h-0 flex-1
+                sm:mx-0
+              ">
                 <FishCountChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
             </GlassCard>
@@ -249,7 +252,10 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 detail="How evenly fish are distributed in the frame"
                 className="mb-0"
               />
-              <div className="min-h-0 flex-1">
+              <div className="
+                -mx-2 min-h-0 flex-1
+                sm:mx-0
+              ">
                 <MeanNNDChart records={detectionRecords} selectedSpecies={selectedSpecies} />
               </div>
             </GlassCard>
