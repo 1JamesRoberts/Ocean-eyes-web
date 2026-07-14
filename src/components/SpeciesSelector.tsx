@@ -169,7 +169,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
         {inputAction}
       </div>
 
-      <div className="mt-2 min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y">
+      <div className="mt-6 min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y">
         {results}
       </div>
     </div>
