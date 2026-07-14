@@ -7,7 +7,7 @@ import {
   Maximize,
   Minimize,
   Fish,
-  Stethoscope
+  Stethoscope,
 } from 'lucide-react';
 
 
@@ -46,20 +46,32 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   onToggleAI,
   onManualDiagnose,
   onToggleFullscreen,
-  onToggleFsInventory
+  onToggleFsInventory,
 }) => {
   const isChecking = backendStatus === 'checking';
   const isOnline = backendStatus === 'online';
 
-  const getBtnClasses = (active: boolean, disabled: boolean, isPulseClass = ''): string => {
-    const base = "relative flex size-7 items-center justify-center rounded-full border-0 bg-black/40 p-0 text-white/85 shadow-[0_1px_3px_rgba(0,0,0,0.28)] backdrop-blur-md transition-smooth";
-    if (active) {
-      return `${base} cursor-pointer text-brand-bright hover:text-white ${isPulseClass}`;
-    }
+  const getButtonClasses = ({
+    active = false,
+    disabled = false,
+    pulse = false,
+  }: {
+    active?: boolean;
+    disabled?: boolean;
+    pulse?: boolean;
+  } = {}): string => {
+    const base = `
+      hero-overlay-pill size-8 shrink-0 cursor-pointer p-0
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white
+    `;
+
     if (disabled) {
-      return `${base} text-white/35 cursor-not-allowed`;
+      return `${base} cursor-not-allowed opacity-35`;
     }
-    return `${base} cursor-pointer hover:text-white active:scale-95`;
+    if (active) {
+      return `${base} text-brand-bright [&_svg]:!text-brand-bright ${pulse ? 'animate-pulse-ai' : ''}`;
+    }
+    return base;
   };
 
   const getAIButtonTitle = (): string => {
@@ -85,66 +97,97 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   };
 
   return (
-    <div 
+    <div
       className="
-        pointer-events-auto absolute bottom-3 z-20 flex items-center gap-3
+        pointer-events-auto absolute bottom-3 z-20 flex items-center gap-2
         transition-[right] duration-300
       "
       style={{
         right: isFullscreen && showFsInventory ? '332px' : '16px',
       }}
     >
-      <button 
-        className={getBtnClasses(false, false)} 
-        onClick={onTakeSnapshot} 
+      <button
+        type="button"
+        className={getButtonClasses()}
+        onClick={onTakeSnapshot}
         title="Capture Snapshot"
+        aria-label="Capture Snapshot"
       >
         <Camera size={14} />
       </button>
 
       <button
+        type="button"
         onClick={onMeasureTurbidity}
         disabled={turbidityLoading || isChecking || !isStreaming || !hasImageSource}
         title={getTurbidityButtonTitle()}
-        className={getBtnClasses(false, turbidityLoading || isChecking || !isStreaming || !hasImageSource)}
+        aria-label={getTurbidityButtonTitle()}
+        className={getButtonClasses({
+          disabled: turbidityLoading || isChecking || !isStreaming || !hasImageSource,
+        })}
       >
-        {turbidityLoading || isChecking ? <Loader2 size={14} className="
-          animate-spin
-        " /> : <Eye size={14} />}
+        {turbidityLoading || isChecking ? (
+          <Loader2
+            size={14}
+            className="
+              animate-spin
+            "
+          />
+        ) : (
+          <Eye size={14} />
+        )}
       </button>
 
       <button
+        type="button"
         onClick={onToggleAI}
         disabled={aiLoading || isChecking || !isStreaming}
         title={getAIButtonTitle()}
-        className={getBtnClasses(isAIActive, aiLoading || isChecking || !isStreaming, 'animate-pulse-ai')}
+        aria-label={getAIButtonTitle()}
+        className={getButtonClasses({
+          active: isAIActive,
+          disabled: aiLoading || isChecking || !isStreaming,
+          pulse: isAIActive,
+        })}
       >
         {aiLoading || isChecking ? <Loader2 size={14} className="animate-spin" /> : <Brain size={14} />}
       </button>
 
       <button
+        type="button"
         onClick={onManualDiagnose}
         disabled={manualDiagnoseLoading || aiLoading || isChecking || !isStreaming}
         title={getDiagnoseButtonTitle()}
-        className={getBtnClasses(false, manualDiagnoseLoading || aiLoading || isChecking || !isStreaming)}
+        aria-label={getDiagnoseButtonTitle()}
+        className={getButtonClasses({
+          disabled: manualDiagnoseLoading || aiLoading || isChecking || !isStreaming,
+        })}
       >
-        {manualDiagnoseLoading ? <Loader2 size={14} className="animate-spin" /> : <Stethoscope size={14} />}
+        {manualDiagnoseLoading ? (
+          <Loader2 size={14} className="animate-spin" />
+        ) : (
+          <Stethoscope size={14} />
+        )}
       </button>
 
       {isFullscreen && (
         <button
+          type="button"
           onClick={onToggleFsInventory}
-          title={showFsInventory ? "Hide Fish Inventory" : "Show Fish Inventory"}
-          className={getBtnClasses(showFsInventory, false)}
+          title={showFsInventory ? 'Hide Fish Inventory' : 'Show Fish Inventory'}
+          aria-label={showFsInventory ? 'Hide Fish Inventory' : 'Show Fish Inventory'}
+          className={getButtonClasses({ active: showFsInventory })}
         >
           <Fish size={14} />
         </button>
       )}
 
       <button
+        type="button"
         onClick={onToggleFullscreen}
-        title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-        className={getBtnClasses(false, false)}
+        title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+        aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+        className={getButtonClasses()}
       >
         {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
       </button>
