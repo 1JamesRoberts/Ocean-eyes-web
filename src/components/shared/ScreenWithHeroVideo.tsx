@@ -37,10 +37,7 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
             "
           />
           {showHero && (
-            <>
-              <div className="mobile-hero-blend" aria-hidden="true" />
-              <div className="mobile-hero-surface" aria-hidden="true" />
-            </>
+            <div className="mobile-hero-surface" aria-hidden="true" />
           )}
         </section>
         <div
@@ -50,12 +47,12 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
             relative z-30 -mx-4 flex min-h-0 flex-1
             flex-col overflow-y-auto px-4
             ${showHero
-              ? '-mt-4 bg-transparent mobile-hero-content-mask'
+              ? '-mt-4 bg-transparent mobile-hero-content-clip'
               : 'bg-gradient-mint'}
           `}
         >
           <div
-            data-mobile-hero-masked-content
+            data-mobile-hero-clipped-content
             className="flex min-h-full flex-col pb-[calc(6.5rem+env(safe-area-inset-bottom))]"
           >
             {showHero && (
