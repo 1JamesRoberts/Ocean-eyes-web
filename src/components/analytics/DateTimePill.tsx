@@ -16,8 +16,8 @@ export const DateTimePill: React.FC<DateTimePillProps> = ({
     type="button"
     onClick={onClick}
     className={`
-      overlay-glass-control inline-flex items-center justify-center rounded-full
-      px-4 py-2.5 type-body
+      overlay-glass-control inline-flex w-full min-w-0 items-center justify-center whitespace-nowrap rounded-full
+      px-2 py-2.5 type-body
       focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
       ${isActive
         ? 'fish-count-teal-outline text-white'

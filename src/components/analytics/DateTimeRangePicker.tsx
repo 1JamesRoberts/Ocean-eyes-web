@@ -270,9 +270,9 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         style={editorStyle}
         aria-label="Date range editor"
       >
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,0.8fr)] items-center gap-x-2 gap-y-2">
           {/* Starts row */}
-          <div className="flex items-center gap-2">
+          <div className="contents">
             <span className="w-14 type-strong-inverse">Starts</span>
             <DateTimePill
               label={formatDateForDisplay(value.startDate)}
@@ -287,7 +287,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
           </div>
 
           {/* Ends row */}
-          <div className="flex items-center gap-2">
+          <div className="contents">
             <span className="w-14 type-strong-inverse">Ends</span>
             <DateTimePill
               label={formatDateForDisplay(value.endDate)}
