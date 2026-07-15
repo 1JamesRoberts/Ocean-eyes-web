@@ -1,8 +1,7 @@
 // AnalyticsScreen.tsx - AI inference history analytics dashboard
 import React from 'react';
-import { Activity, Brain, Calendar, Fish, Loader2, TriangleAlert, Waves } from 'lucide-react';
+import { Activity, Brain, Calendar, Fish, TriangleAlert, Waves } from 'lucide-react';
 import type { useAnalytics } from '../../hooks/pages/useAnalytics';
-import { DateTimeRangePicker } from '../../components/analytics/DateTimeRangePicker';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
@@ -110,7 +109,6 @@ const AnalyticsLoadingSkeleton: React.FC = () => (
 export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   tankId: _tankId,
   range,
-  setRange,
   readings,
   detectionRecords,
   turbidityRecords,
@@ -120,7 +118,6 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
   setSelectedSpecies: _setSelectedSpecies,
   hasAnyData,
   isInitialLoading,
-  isRefreshing,
   error,
   refetch,
   onViewHistory,
@@ -134,28 +131,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <ScreenHeader
-        eyebrow="Aquarium intelligence"
-        action={(
-          <div className="flex items-center gap-2">
-            {isRefreshing && (
-              <span
-                className="pointer-events-none hero-overlay-pill"
-                role="status"
-              >
-                <Loader2 size={12} className="animate-spin text-sky-surge" aria-hidden="true" />
-                Updating
-              </span>
-            )}
-            <DateTimeRangePicker
-              value={range}
-              onChange={setRange}
-              collapseToIcon
-              heroOverlay
-            />
-          </div>
-        )}
-      />
+      <ScreenHeader eyebrow="Aquarium intelligence" />
       {/* Error banner */}
       {error && (
         <GlassCard className="border-critical bg-critical/10 p-0">

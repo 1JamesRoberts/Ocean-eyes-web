@@ -6,6 +6,7 @@ import { useAnalytics } from '../hooks/pages/useAnalytics';
 import { ScreenWithHeroVideo } from '../components/shared';
 import { HeroLiveFeedSection } from '../components/home/HeroLiveFeedSection';
 import { SpatialDetectionHeatmapOverlay } from '../components/analytics/SpatialDetectionHeatmapOverlay';
+import { DateTimeRangePicker } from '../components/analytics/DateTimeRangePicker';
 import { RootGateOnboarding } from './viewer/RootGateOnboarding';
 import { HomeScreen } from './viewer/HomeScreen';
 
@@ -42,6 +43,14 @@ export const ViewerApp: React.FC = () => {
         selectedSpecies={analyticsData.selectedSpecies}
         onSelectedSpeciesChange={analyticsData.setSelectedSpecies}
         visible={activeTab === 'analytics'}
+        leadingControl={(
+          <DateTimeRangePicker
+            value={analyticsData.range}
+            onChange={analyticsData.setRange}
+            collapseToIcon
+            heroOverlay
+          />
+        )}
       />
     ),
     [
@@ -50,6 +59,8 @@ export const ViewerApp: React.FC = () => {
       analyticsData.inventorySpeciesIds,
       analyticsData.selectedSpecies,
       analyticsData.setSelectedSpecies,
+      analyticsData.range,
+      analyticsData.setRange,
     ],
   );
 

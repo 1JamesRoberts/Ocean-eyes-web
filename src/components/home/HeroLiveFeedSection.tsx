@@ -6,7 +6,9 @@ interface HeroLiveFeedSectionProps {
   overlay?: React.ReactNode;
 }
 
-export const HeroLiveFeedSection: React.FC<HeroLiveFeedSectionProps> = ({ overlay }) => {
+export const HeroLiveFeedSection: React.FC<HeroLiveFeedSectionProps> = ({
+  overlay,
+}) => {
   const {
     activeTank,
     displayClarity,

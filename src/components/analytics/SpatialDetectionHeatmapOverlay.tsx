@@ -14,6 +14,7 @@ interface SpatialDetectionHeatmapOverlayProps {
   selectedSpecies: string;
   onSelectedSpeciesChange: (species: string) => void;
   visible?: boolean;
+  leadingControl?: React.ReactNode;
 }
 
 const MAX_RENDER_WIDTH = 800;
@@ -26,6 +27,7 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
     selectedSpecies,
     onSelectedSpeciesChange,
     visible = true,
+    leadingControl,
   }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -181,10 +183,11 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
         {visible && (
           <div
             className="
-              pointer-events-auto absolute top-[calc(var(--mobile-hero-height)-2.75rem)] right-4
-              z-20
+              pointer-events-auto absolute top-[calc(var(--mobile-hero-height)-2.75rem)]
+              right-4 z-20 flex gap-2
             "
           >
+            {leadingControl}
             <label className="relative hero-overlay-pill cursor-pointer">
               <span className="pointer-events-none">
                 {selectedSpecies === 'all'
