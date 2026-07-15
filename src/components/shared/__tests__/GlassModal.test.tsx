@@ -6,7 +6,9 @@ import { GlassModal } from '../GlassModal';
 
 afterEach(cleanup);
 
-const ModalHarness: React.FC = () => {
+const ModalHarness: React.FC<{ placement?: 'bottom' | 'below-hero' }> = ({
+  placement = 'bottom',
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
@@ -15,7 +17,7 @@ const ModalHarness: React.FC = () => {
       <GlassModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        placement="bottom"
+        placement={placement}
         labelledBy="sheet-title"
       >
         <h2 id="sheet-title">Add a new fish</h2>
@@ -48,11 +50,37 @@ describe('GlassModal bottom placement', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('keeps below-hero sheets dismissible through their transparent click-away layer', () => {
+    const phoneFrame = document.createElement('div');
+    phoneFrame.className = 'phone-frame';
+    document.body.append(phoneFrame);
+
+    try {
+      render(<ModalHarness placement="below-hero" />);
+      fireEvent.click(screen.getByRole('button', { name: 'Add fish' }));
+
+      fireEvent.click(screen.getByRole('dialog', { name: 'Add a new fish' }));
+
+      expect(screen.queryByRole('dialog')).toBeNull();
+    } finally {
+      phoneFrame.remove();
+    }
+  });
+
   it('moves focus into the dialog when it opens', () => {
     render(<ModalHarness />);
     fireEvent.click(screen.getByRole('button', { name: 'Add fish' }));
 
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Save fish' }));
+  });
+
+  it('keeps the dimmed, blurred backdrop for standard bottom sheets', () => {
+    render(<ModalHarness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Add fish' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Add a new fish' });
+    expect(dialog.firstElementChild?.className).toContain('bg-[rgba(15,23,42,0.5)]');
+    expect(dialog.firstElementChild?.className).toContain('backdrop-blur-xs');
   });
 
   it('locks and restores the stationary screen scroller', () => {
@@ -82,6 +110,9 @@ describe('GlassModal bottom placement', () => {
       expect(phoneFrame.contains(dialog)).toBe(true);
       expect(dialog.className).toContain('absolute');
       expect(dialog.lastElementChild?.className).toContain('max-w-none');
+      expect(dialog.lastElementChild?.className).toContain('glass-card-overlay');
+      expect(dialog.firstElementChild?.className).toContain('bg-transparent');
+      expect(dialog.firstElementChild?.className).toContain('backdrop-blur-none');
       expect(dialog.firstElementChild?.className).toContain('motion-safe:animate-sheet-backdrop');
       expect(dialog.lastElementChild?.className).toContain('motion-safe:animate-sheet-enter');
     } finally {

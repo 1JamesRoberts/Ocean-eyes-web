@@ -94,7 +94,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
               onClick={() => onSelect(day)}
               className={`
                 relative mx-auto flex size-9 cursor-pointer items-center
-                justify-center type-body
+                justify-center type-body ${selected ? 'overlay-glass-control' : ''}
                 ${selected
                   ? `rounded-full fish-count-teal-outline type-strong text-white`
                   : `rounded-md type-body ${today

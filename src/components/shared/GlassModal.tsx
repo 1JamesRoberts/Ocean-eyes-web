@@ -96,10 +96,14 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       aria-modal="true"
       aria-labelledby={labelledBy}
     >
-      {/* Scrim */}
+      {/* Below-hero sheets keep their click-away layer without tinting or blurring
+          the page beneath the shared translucent glass surface. */}
       <div
         className={`
-          absolute inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-xs
+          absolute inset-0 ${isBelowHero
+            ? 'bg-transparent backdrop-blur-none'
+            : 'bg-[rgba(15,23,42,0.5)] backdrop-blur-xs'
+          }
           ${isBelowHero ? 'motion-safe:animate-sheet-backdrop' : ''}
         `}
       />
