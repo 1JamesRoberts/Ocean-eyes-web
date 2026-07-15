@@ -28,6 +28,9 @@ dist-ssr
 ai/models/*.onnx
 ai/models/web/*.onnx
 ai/models/web/*.onnx.part-*
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
 
 # Python cache
 __pycache__/

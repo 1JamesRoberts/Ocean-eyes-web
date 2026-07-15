@@ -4,7 +4,7 @@ Last updated: 2026-07-15
 
 ## Status
 
-P0 on-device AI inference is implemented on the `mobile-deploy` branch and passes local automated validation. The new version is not deployed yet because Sites rejects individual static assets larger than 25 MiB.
+P0 on-device AI inference is implemented on the `mobile-deploy` branch and passes local automated validation. The deployment implementation has been migrated to Firebase Hosting, which accepts the complete optimized model files. A Firebase preview deployment is available at <https://ocean-eyes-webapp--prototype-vw2jtjzu.web.app> until 2026-07-22.
 
 The existing production URL, `https://oceaneyes-prototype.thammatorn-j.chatgpt.site`, should therefore not be treated as containing this inference implementation.
 
@@ -19,7 +19,8 @@ The existing production URL, `https://oceaneyes-prototype.thammatorn-j.chatgpt.s
 - Disease diagnosis is explicitly disabled for P0.
 - Cross-origin isolation, camera permissions, content security policy, and immutable model caching headers are configured.
 - Model hashes and sizes are verified during the build.
-- The build supports reconstructing model files from deployment chunks, although the current worker still requests each reconstructed model as one static file.
+- The Firebase build copies complete model files into `dist/models` after verifying their hashes and sizes.
+- Firebase supplies SPA routing, cross-origin isolation, security headers, camera permissions, and immutable model caching without a production application server.
 
 ## Browser models
 
@@ -42,7 +43,7 @@ The generated `.onnx` files and deployment chunks are ignored by Git on the user
 - Turbidity quantization produced the same class in the test comparison with a maximum absolute output difference of about 0.00025.
 - Detection quantization produced 12 detections versus 11 for FP32 on the mock comparison at a 0.35 threshold, with similar top confidences.
 - Species FP16 produced the same species decision for all 11 tested detection crops, with confidence differences below roughly 0.001.
-- A build using only chunked model inputs passes and reconstructs files matching the manifest.
+- A build using only chunked source inputs passes and reconstructs complete files matching the manifest.
 
 Real-device performance, memory use, camera behavior, and result parity have not yet been validated on an iPhone.
 
@@ -66,14 +67,14 @@ Sites version 2 was saved and a private production deployment was started:
 
 The deployment failed before publishing, so it did not replace the existing production version.
 
-## Recommended next implementation step
+## Firebase migration
 
-Keep each model chunk as a separate static asset instead of reconstructing full ONNX files in the deployed output. The inference worker should fetch the versioned chunks sequentially, copy them into one preallocated in-memory byte array, and pass that byte array to `InferenceSession.create`. This keeps every hosted file below 25 MiB while preserving on-device inference and limiting temporary memory overhead.
+The Cloudflare Vite plugin, Worker entry point, and `.openai/hosting.json` have been removed. The application now builds as a conventional static Vite application. `firebase.json` defines the `dist` publish directory, SPA fallback, security headers, cross-origin isolation, and long-lived caching for hashed application assets and ONNX models.
 
-After that change:
+The remaining deployment steps are:
 
-1. Build and test both full-model and chunk-only source layouts.
-2. Save and deploy a new private Sites version.
-3. Verify model requests, camera permission, WebGPU/WASM selection, memory pressure, thermals, and inference latency on a real iPhone.
-4. Add visible model-download progress and confirm offline behavior after the first successful download.
+1. Verify camera permission, WebGPU/WASM selection, memory pressure, thermals, and inference latency on a real iPhone.
+2. Add visible model-download progress and confirm offline behavior after the first successful download.
+3. Promote the tested build to the Firebase live channel.
 
+The remote preview check confirmed SPA routing, HTTPS model availability, the expected ONNX content type, immutable model caching, camera permission policy, and the required COOP/COEP headers.

@@ -14,6 +14,12 @@ interface ModelManifest {
   models: Record<string, { bytes: number; sha256: string }>;
 }
 
+interface ModelSource {
+  bytes: number;
+  digest: string;
+  paths: string[];
+}
+
 function sha256(path: string): Promise<string> {
   return new Promise((resolveHash, rejectHash) => {
     const hash = createHash('sha256');
@@ -24,10 +30,14 @@ function sha256(path: string): Promise<string> {
   });
 }
 
-interface ModelSource {
-  bytes: number;
-  digest: string;
-  paths: string[];
+async function exists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false;
+    throw error;
+  }
 }
 
 async function inspectModel(sourceDirectory: string, filename: string): Promise<ModelSource> {
@@ -68,38 +78,6 @@ async function copyModel(source: ModelSource, destination: string): Promise<void
   }
 }
 
-async function exists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false;
-    throw error;
-  }
-}
-
-export function sites(): Plugin {
-  let root = process.cwd();
-
-  return {
-    name: 'sites',
-    apply: 'build',
-    configResolved(config) {
-      root = config.root;
-    },
-    async closeBundle() {
-      const outputDirectory = resolve(root, 'dist', '.openai');
-      const hostingConfig = resolve(root, '.openai', 'hosting.json');
-
-      await rm(outputDirectory, { recursive: true, force: true });
-      await mkdir(outputDirectory, { recursive: true });
-      if (await exists(hostingConfig)) {
-        await cp(hostingConfig, resolve(outputDirectory, 'hosting.json'));
-      }
-    },
-  };
-}
-
 export function onDeviceModels(): Plugin {
   let root = process.cwd();
 
@@ -137,8 +115,7 @@ export function onDeviceModels(): Plugin {
       const manifest = JSON.parse(
         await readFile(resolve(modelDirectory, 'model-manifest.json'), 'utf8')
       ) as ModelManifest;
-      const staleRootOutput = resolve(root, 'dist', 'models');
-      const outputDirectories = [resolve(root, 'dist', 'client', 'models')];
+      const outputDirectory = resolve(root, 'dist', 'models');
 
       const modelSources = await Promise.all(
         MODEL_FILES.map(async (filename) => {
@@ -151,13 +128,10 @@ export function onDeviceModels(): Plugin {
         })
       );
 
-      await rm(staleRootOutput, { recursive: true, force: true });
+      await rm(outputDirectory, { recursive: true, force: true });
+      await mkdir(outputDirectory, { recursive: true });
       await Promise.all(
-        outputDirectories.map(async (outputDirectory) => {
-          await rm(outputDirectory, { recursive: true, force: true });
-          await mkdir(outputDirectory, { recursive: true });
-          await Promise.all(modelSources.map(([filename, source]) => copyModel(source, resolve(outputDirectory, filename))));
-        })
+        modelSources.map(([filename, source]) => copyModel(source, resolve(outputDirectory, filename)))
       );
     },
   };

@@ -9,18 +9,17 @@ Deploy OceanEyes as a mobile-first prototype that invited testers can open on
 their phones, grant access to their own camera, and eventually use for private,
 on-device aquarium inference.
 
-The current Sites deployment is available at
+The legacy Sites deployment is available at
 <https://oceaneyes-prototype.thammatorn-j.chatgpt.site>. It is owner-only and
-requires the permitted OpenAI account to sign in. The deployed UI and camera
-flow are functional, but AI inference still depends on the local FastAPI
-backend and is therefore not yet a complete P0 release.
+requires the permitted OpenAI account to sign in. It does not contain the P0
+on-device inference implementation and is no longer the deployment target.
 
 ## Accepted Decisions
 
 | Area | Decision |
 | --- | --- |
 | Audience | Begin with private testers rather than public anonymous access or full application accounts. |
-| Initial access | The requested distribution method was an unlisted URL. The current Sites deployment is more restrictive: owner-only access. Tester sharing still needs an explicit access-policy decision. |
+| Initial access | The requested distribution method is an unlisted Firebase preview URL. Preview URLs are public to anyone who receives the URL, so stricter tester authentication remains a separate decision. |
 | Camera | Support the user's phone or computer camera through browser permission. Remote IP/IoT aquarium cameras are outside P0. |
 | AI location | Run fish detection, species classification, and turbidity estimation on the user's device. |
 | Disease diagnosis | Disable disease diagnosis for P0. The existing vision-LLM diagnosis uploads a crop and is not local. |
@@ -30,8 +29,8 @@ backend and is therefore not yet a complete P0 release.
 | Device support | Target modern phones and desktop browsers, using WebGPU when available and WebAssembly as the compatibility fallback. |
 | Slow devices | Allow inference to run slowly instead of disabling AI or uploading frames to a cloud fallback. Never queue stale frames. |
 | Model distribution | Model files may be downloaded, inspected, and copied by testers; this is an accepted tradeoff of browser inference. |
-| Model size | No hard first-download size limit was selected. The current three ONNX models total approximately 300 MB, so the UI must disclose size and show download progress. |
-| Hosting | No provider was selected during planning. The current prototype was subsequently deployed through OpenAI Sites. |
+| Model size | No hard first-download size limit was selected. The optimized browser models total approximately 86 MB, so the UI must disclose size and show download progress. |
+| Hosting | Use classic Firebase Hosting for the Vite static application and complete ONNX assets. Retire the Sites/Cloudflare deployment integration. |
 
 ## P0 Architecture
 
@@ -103,8 +102,8 @@ before calling P0 release-ready:
    loading.
 3. Browser release matrix: Chrome-first, mobile Chrome plus Safari, or all
    major browsers.
-4. Tester access: keep owner-only Sites access, add named testers, or move to a
-   public/unlisted deployment.
+4. Tester access: accept an unlisted public preview URL or add a separate
+   authentication layer before wider testing.
 
 ## Out of Scope for P0
 

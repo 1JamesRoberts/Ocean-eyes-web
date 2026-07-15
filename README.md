@@ -84,6 +84,22 @@ Compile, optimize, and bundle the application into static assets for production 
 npm run build
 ```
 
+### 5. Firebase Hosting
+
+The mobile prototype is deployed as a static Vite application on classic Firebase Hosting. After authenticating and selecting a Firebase project, create a temporary tester URL with:
+
+```bash
+npm run firebase:preview
+```
+
+Promote a verified build to the live channel with:
+
+```bash
+npm run firebase:deploy
+```
+
+See `docs/firebase-hosting.md` for initial project setup, model generation, local emulation, headers, and privacy notes.
+
 ---
 
 ## 🩺 AI Disease Diagnosis Setup

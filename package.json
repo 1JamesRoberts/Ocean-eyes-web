@@ -8,6 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "firebase:emulate": "npm run build && firebase emulators:start --only hosting",
+    "firebase:preview": "npm run build && firebase hosting:channel:deploy prototype",
+    "firebase:deploy": "npm run build && firebase deploy --only hosting",
     "build:species": "node scripts/build-species-catalog.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -21,7 +24,6 @@
     "recharts": "^3.8.1"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.37.1",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.3.0",
     "@testing-library/react": "^16.3.2",
@@ -33,13 +35,13 @@
     "eslint-plugin-better-tailwindcss": "^4.6.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "firebase-tools": "^15.23.0",
     "globals": "^17.6.0",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12",
-    "vitest": "^4.1.9",
-    "wrangler": "^4.92.0"
+    "vitest": "^4.1.9"
   }
 }
