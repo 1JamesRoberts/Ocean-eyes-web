@@ -237,7 +237,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
               onClick={() => onAutoConnectChange(!preferences.autoConnect)}
               className={`
                 relative inline-flex h-6 w-11 cursor-pointer rounded-full border-none transition-colors
-                ${preferences.autoConnect ? 'bg-pine-teal' : 'bg-prussian-blue/20'}
+                ${preferences.autoConnect ? 'bg-pine-teal' : 'bg-slate-grey/20'}
               `}
             >
               <span

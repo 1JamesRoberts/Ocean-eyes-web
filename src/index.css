@@ -85,7 +85,7 @@
   --font-main: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
   --letter-spacing-base: -0.01em;
   --type-ink: var(--color-prussian-blue);
-  --type-ink-muted: color-mix(in srgb, var(--color-prussian-blue) 50%, transparent);
+  --type-ink-muted: var(--color-slate-grey);
   --type-ink-inverse: var(--color-white);
   --type-ink-inverse-muted: color-mix(in srgb, var(--color-white) 70%, transparent);
 
@@ -111,7 +111,7 @@
 
   /* Typography utilities retain their role-based names. */
   --color-type-ink: var(--color-prussian-blue);
-  --color-type-ink-muted: color-mix(in srgb, var(--color-prussian-blue) 50%, transparent);
+  --color-type-ink-muted: var(--color-slate-grey);
   --color-type-ink-inverse: var(--color-white);
   --color-type-ink-inverse-muted: color-mix(in srgb, var(--color-white) 70%, transparent);
 
