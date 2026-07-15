@@ -78,6 +78,32 @@ describe('date picker glass styling', () => {
     expect(document.getElementById('date-range-editor')?.style.pointerEvents).toBe('auto');
   });
 
+  it('positions the hero editor below the Live badge and centers it', () => {
+    render(
+      <>
+        <span data-hero-live-badge>Live</span>
+        <DateTimeRangePicker
+          value={{ startDate: '2026-07-14', startTime: '00:00', endDate: '2026-07-14', endTime: '23:55' }}
+          onChange={() => undefined}
+          collapseToIcon
+          heroOverlay
+        />
+      </>,
+    );
+    const liveBadge = screen.getByText('Live');
+    Object.defineProperty(liveBadge, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ bottom: 86 }),
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Expand date range' }));
+
+    const editor = document.getElementById('date-range-editor');
+    expect(editor?.style.top).toBe('94px');
+    expect(editor?.style.left).toBe('50%');
+    expect(editor?.style.transform).toBe('translateX(-50%)');
+  });
+
   it('uses the fish-search glass card treatment for the calendar popover', () => {
     render(
       <DateTimeRangePicker

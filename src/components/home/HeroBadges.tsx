@@ -24,6 +24,7 @@ export const HeroBadges: React.FC<HeroBadgesProps> = ({
       />
       <div className="absolute top-3 left-4 z-10 flex gap-2">
         <span
+          data-hero-live-badge
           className="
             pointer-events-none hero-overlay-pill
           "

@@ -18,6 +18,8 @@ type ActiveField = 'startDate' | 'startTime' | 'endDate' | 'endTime' | null;
 const POPOVER_EDGE_GUTTER = 16;
 const POPOVER_MAX_WIDTH = 320;
 const POPOVER_TRIGGER_GAP = 12;
+const EDITOR_TRIGGER_GAP = 8;
+const HERO_LIVE_BADGE_SELECTOR = '[data-hero-live-badge]';
 
 interface DateTimeRangePickerProps {
   value: DateRange;
@@ -206,10 +208,15 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       ? Math.min(288, window.innerWidth - 32)
       : rect.width;
     const nextIsExpanded = !isExpanded;
+    const heroLiveBadge = heroOverlay
+      ? document.querySelector<HTMLElement>(HERO_LIVE_BADGE_SELECTOR)
+      : null;
+    const editorAnchorBottom = heroLiveBadge?.getBoundingClientRect().bottom
+      ?? rect.bottom;
 
     setEditorStyle({
       position: 'fixed',
-      top: rect.bottom + 8,
+      top: editorAnchorBottom + EDITOR_TRIGGER_GAP,
       left: '50%',
       width,
       transform: 'translateX(-50%)',
@@ -219,7 +226,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       pointerEvents: nextIsExpanded ? 'auto' : 'none',
     });
     setIsExpanded(nextIsExpanded);
-  }, [collapseToIcon, isExpanded]);
+  }, [collapseToIcon, heroOverlay, isExpanded]);
 
   const showSummary = !collapseToIcon;
 
