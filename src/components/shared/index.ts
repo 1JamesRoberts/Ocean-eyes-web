@@ -1,4 +1,5 @@
 export { GlassCard } from "./GlassCard";
+export { CollapsibleContent } from "./CollapsibleContent";
 export { GlassDisclosurePanel } from "./GlassDisclosurePanel";
 export { CardSectionHeader } from "./CardSectionHeader";
 export { HeadedCard } from "./HeadedCard";
@@ -10,7 +11,6 @@ export { GlassButton } from "./GlassButton";
 export { GlassBadge } from "./GlassBadge";
 export { GlassIconButton } from "./GlassIconButton";
 export { GlassInput } from "./GlassInput";
-export { GlassSelect } from "./GlassSelect";
 export { GlassModal } from "./GlassModal";
 export { AlertDetail } from "./AlertDetail";
 export { PhoneFrame } from "./PhoneFrame";

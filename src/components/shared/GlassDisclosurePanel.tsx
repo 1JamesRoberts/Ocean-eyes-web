@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
+import { CollapsibleContent } from './CollapsibleContent';
 
 interface GlassDisclosurePanelProps {
   icon: LucideIcon;
@@ -52,23 +53,8 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
       />
     </button>
 
-    <div
-      className={`
-        grid transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
-        ${expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}
-      `}
-    >
-      <div className="overflow-hidden">
-        <div
-          className={`
-            ${contentClassName}
-            transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)]
-            ${expanded ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'}
-          `}
-        >
-          {children}
-        </div>
-      </div>
-    </div>
+    <CollapsibleContent expanded={expanded} className={contentClassName}>
+      {children}
+    </CollapsibleContent>
   </div>
 );

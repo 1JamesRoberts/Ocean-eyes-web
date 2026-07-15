@@ -13,6 +13,7 @@ import { SpeciesSelector } from '../../components/SpeciesSelector';
 import {
   GlassButton,
   GlassCard,
+  CollapsibleContent,
   GlassIconButton,
   GlassModal,
   ScreenHeader,
@@ -259,19 +260,10 @@ export const MyFishScreen: React.FC = () => {
               </div>
             </div>
 
-            <div className={`
-              grid
-              transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
-              ${aquariumOverviewExpanded ? `grid-rows-[1fr]` : `grid-rows-[0fr]`}
-            `}>
-              <div className="overflow-hidden">
-                <div className={`
-                  p-[0_12px_16px_12px]
-                  transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)]
-                  ${aquariumOverviewExpanded ? 'translate-y-0 opacity-100' : `
-                    -translate-y-3 opacity-0
-                  `}
-                `}>
+            <CollapsibleContent
+              expanded={aquariumOverviewExpanded}
+              className="p-[0_12px_16px_12px]"
+            >
                   <div className="grid grid-cols-1 gap-3">
                     <DetailChip
                       icon={<Maximize2 size={14} />}
@@ -332,9 +324,7 @@ export const MyFishScreen: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
+            </CollapsibleContent>
           </GlassCard>
         </div>
 
@@ -441,19 +431,10 @@ export const MyFishScreen: React.FC = () => {
                 </div>
 
                 {/* ─── Expanded Detail Panel ─── */}
-                <div className={`
-                  grid
-                  transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
-                  ${isActive && species ? `grid-rows-[1fr]` : `grid-rows-[0fr]`}
-                `}>
-                  <div className="overflow-hidden">
-                    <div className={`
-                      p-[0_12px_16px_12px]
-                      transition-[opacity_0.3s_ease,transform_0.35s_cubic-bezier(0.4,0,0.2,1)]
-                      ${isActive && species ? 'translate-y-0 opacity-100' : `
-                        -translate-y-3 opacity-0
-                      `}
-                    `}>
+                <CollapsibleContent
+                  expanded={isActive && species !== undefined}
+                  className="p-[0_12px_16px_12px]"
+                >
                       {species && (
                         <>
                           {/* Parameter chips — 2-column grid */}
@@ -508,9 +489,7 @@ export const MyFishScreen: React.FC = () => {
                           No detailed species data available for this entry.
                         </p>
                       )}
-                    </div>
-                  </div>
-                </div>
+                </CollapsibleContent>
               </GlassCard>
             );
           })}

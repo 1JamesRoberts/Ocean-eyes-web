@@ -2,19 +2,13 @@ import React, { useState } from 'react';
 import {
   Bell,
   Brain,
-  ChevronDown,
   ChevronRight,
   Fish,
-  FolderOpen,
   Monitor,
   Pencil,
-  RotateCcw,
   Save,
   ShieldAlert,
   ShieldCheck,
-  SlidersHorizontal,
-  Trash2,
-  Video,
   X,
   type LucideIcon,
 } from 'lucide-react';
@@ -29,7 +23,6 @@ import { StreamAdjustments } from '../live/StreamAdjustments';
 import type {
   AIPreferences,
   CameraFilters,
-  FilterPreset,
   LivePreferences,
   TankBrief,
 } from '../../types/aquarium';
@@ -103,31 +96,6 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
   );
 };
 
-interface SettingsDisclosureButtonProps {
-  expanded: boolean;
-  onClick: () => void;
-  label: string;
-}
-
-const SettingsDisclosureButton: React.FC<SettingsDisclosureButtonProps> = ({
-  expanded,
-  onClick,
-  label,
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/20 px-3 py-2.5 type-caption transition-smooth hover:bg-white/45"
-    aria-expanded={expanded}
-  >
-    {label}
-    <ChevronDown
-      size={18}
-      className={`text-text-muted transition-transform ${expanded ? 'rotate-180' : ''}`}
-    />
-  </button>
-);
-
 interface SettingsRangeControlProps {
   label: string;
   value: number;
@@ -146,7 +114,7 @@ const parseRangeValue = (value: string, parser: RangeParser) => {
   return parser === 'percent' ? parsed / 100 : parsed;
 };
 
-export const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
+const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
   label,
   value,
   displayValue,
@@ -182,179 +150,6 @@ export const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
     </div>
   );
 };
-
-interface CameraFiltersCardProps {
-  defaultFilters: CameraFilters;
-  filterPresets: FilterPreset[];
-  onDeleteFilterPreset: (id: string) => void;
-  resetToDefaults: () => void;
-}
-
-export const CameraFiltersCard: React.FC<CameraFiltersCardProps> = ({
-  defaultFilters,
-  filterPresets,
-  onDeleteFilterPreset,
-  resetToDefaults,
-}) => {
-  const [expanded, setExpanded] = useState(false);
-  const metrics = [
-    { label: 'Contrast', value: `${defaultFilters.contrast}%` },
-    { label: 'Brightness', value: `${defaultFilters.brightness}%` },
-    { label: 'Saturation', value: `${defaultFilters.saturation}%` },
-    { label: 'Temperature', value: defaultFilters.temperature },
-    { label: 'Tint', value: defaultFilters.tint },
-  ];
-
-  return (
-    <HeadedCard
-      icon={SlidersHorizontal}
-      title="Camera Filters"
-      action={(
-          <GlassButton variant="outline" size="sm" onClick={resetToDefaults} className="px-2.5">
-            <RotateCcw size={12} />
-            Reset
-          </GlassButton>
-      )}
-    >
-
-      <div className="grid grid-cols-2 gap-2.5 type-body">
-        {metrics.map((metric) => (
-          <GlassPanel key={metric.label}>
-            <span className="block type-caption">{metric.label}</span>
-            <strong className="text-text">{metric.value}</strong>
-          </GlassPanel>
-        ))}
-      </div>
-
-      {expanded && (
-        <div className="mt-4">
-          <h5 className="mb-2 type-caption">Saved Presets</h5>
-          {filterPresets.length === 0 ? (
-            <p className="type-body-muted">No custom presets saved.</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {filterPresets.map((preset) => (
-                <div
-                  key={preset.id}
-                  className="flex items-center gap-2 rounded-full bg-surface px-3 py-1.5 type-caption"
-                >
-                  <span>{preset.name}</span>
-                  <button
-                    onClick={() => onDeleteFilterPreset(preset.id)}
-                    className="cursor-pointer border-none bg-transparent p-0 text-critical"
-                    title="Delete preset"
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <p className="mt-3 type-caption">
-            Adjust filters in the live preview above, then save the current look as a preset or as the default filter.
-          </p>
-        </div>
-      )}
-
-      <SettingsDisclosureButton
-        expanded={expanded}
-        onClick={() => setExpanded((current) => !current)}
-        label={expanded ? 'Hide presets' : 'Show presets'}
-      />
-    </HeadedCard>
-  );
-};
-
-interface MediaStorageCardProps {
-  mediaCounts: { snapshots: number; recordings: number };
-  clearSnapshots: () => void;
-  clearRecordings: () => void;
-}
-
-export const MediaStorageCard: React.FC<MediaStorageCardProps> = ({
-  mediaCounts,
-  clearSnapshots,
-  clearRecordings,
-}) => {
-  const rows = [
-    { label: 'Snapshots', count: mediaCounts.snapshots, onClear: clearSnapshots },
-    { label: 'Recordings', count: mediaCounts.recordings, onClear: clearRecordings },
-  ];
-
-  return (
-    <HeadedCard icon={FolderOpen} title="Media Storage">
-      <div className="flex flex-col gap-3">
-        {rows.map((row) => (
-          <SettingsPanelRow
-            key={row.label}
-            icon={Video}
-            title={row.label}
-            detail={`${row.count} saved`}
-            action={(
-              <GlassButton variant="outline" size="sm" onClick={row.onClear} disabled={row.count === 0}>
-                <Trash2 size={12} />
-                Clear
-              </GlassButton>
-            )}
-          />
-        ))}
-      </div>
-    </HeadedCard>
-  );
-};
-
-interface TankIdentityCardProps {
-  activeTank?: TankBrief | null;
-  editing: boolean;
-  name: string;
-  setName: (name: string) => void;
-  handleNameChange: (event: React.FormEvent) => void;
-  onStartRename: () => void;
-}
-
-export const TankIdentityCard: React.FC<TankIdentityCardProps> = ({
-  activeTank,
-  editing,
-  name,
-  setName,
-  handleNameChange,
-  onStartRename,
-}) => (
-  <HeadedCard icon={ShieldCheck} title="Tank Identity">
-    <GlassPanel className="mb-3 type-caption">
-      <span>Tank Reference Code: </span>
-      <code className="ml-1 align-baseline type-caption">
-        {activeTank?.id}
-      </code>
-    </GlassPanel>
-    {editing ? (
-      <form onSubmit={handleNameChange} className="flex items-end gap-2.5">
-        <GlassInput
-          id="tank-name"
-          label="Tank name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-        <GlassButton variant="primary" size="sm" type="submit">
-          <Save size={12} />
-          Save
-        </GlassButton>
-      </form>
-    ) : (
-      <SettingsPanelRow
-        title={activeTank?.name}
-        detail="Tank name"
-        action={(
-          <GlassButton variant="outline" size="sm" onClick={onStartRename}>
-            <Pencil size={12} />
-            Rename
-          </GlassButton>
-        )}
-      />
-    )}
-  </HeadedCard>
-);
 
 interface SafetyThresholdsCardProps {
   maxTurbidity: number;
@@ -506,45 +301,18 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
   );
 };
 
-interface DisconnectTankCardProps {
+interface AquariumPanelCardProps {
   activeTank?: TankBrief | null;
+  editing: boolean;
+  name: string;
+  setName: (name: string) => void;
+  handleNameChange: (event: React.FormEvent) => void;
+  onStartRename: () => void;
+  onNavigateToMonitor: () => void;
   showConfirmUnlink: boolean;
   onRequestUnlink: () => void;
   onCancelUnlink: () => void;
   onConfirmUnlink: () => void;
-}
-
-export const DisconnectTankCard: React.FC<DisconnectTankCardProps> = ({
-  activeTank,
-  showConfirmUnlink,
-  onRequestUnlink,
-  onCancelUnlink,
-  onConfirmUnlink,
-}) => (
-  showConfirmUnlink ? (
-    <HeadedCard icon={X} title="Remove Active Tank" className="border-critical/30">
-      <p className="m-0 type-caption">
-        This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
-      </p>
-      <div className="mt-4 flex gap-2.5">
-        <GlassButton variant="outline" size="sm" onClick={onCancelUnlink}>Cancel</GlassButton>
-        <GlassButton variant="danger" size="sm" onClick={onConfirmUnlink}>Yes, Disconnect</GlassButton>
-      </div>
-    </HeadedCard>
-  ) : (
-    <GlassButton
-      variant="outline"
-      className="border-critical/20 text-critical hover:bg-critical/5"
-      fullWidth
-      onClick={onRequestUnlink}
-    >
-    Disconnect from Tank
-  </GlassButton>
-  )
-);
-
-interface AquariumPanelCardProps extends TankIdentityCardProps, DisconnectTankCardProps {
-  onNavigateToMonitor: () => void;
   filters?: CameraFilters;
   onFilterChange?: (filters: Partial<CameraFilters>) => void;
 }
