@@ -9,22 +9,17 @@ import {
 } from 'react';
 import type { CameraFeedConfig, LiveState, TankBrief, AIDetectionResult, AIPreferences } from '../../types/aquarium';
 import type { CameraFeedHandle } from '../../components/live/CameraFeed';
-import { sendFrameForDetection } from '../../models/api/aiApi';
+import { detectFishOnDevice } from '../../models/inference/aquariumInference';
 import {
   isVideoReady,
   captureVideoFrame,
-  shouldDiagnose,
-  recordDiagnosisTime,
 } from '../../models/services/inferenceHelpers';
-import { buildDiseaseAlert } from '../../models/services/alertBuilder';
 import { recordFeedReading } from '../../models/services/readingRecorder';
-import { useAlerts } from '../useAlerts';
 import { useReadings } from '../useReadings';
 import { useFish } from '../useFish';
 import {
   AI_POLL_INTERVAL_MS,
   DETECTION_CONFIDENCE,
-  DIAGNOSIS_MIN_CONF,
   BACKEND_OFFLINE_MESSAGE,
 } from '../../utils/constants';
 import type { BackendStatus } from './useBackendStatus';
@@ -65,7 +60,6 @@ export const useAIPolling = ({
   tankId,
   aiPreferences,
 }: UseAIPollingViewModelOptions): UseAIPollingViewModelResult => {
-  const { addAlert } = useAlerts();
   const { writeReading } = useReadings();
   const { fishList, saveFish } = useFish(tankId);
 
@@ -79,7 +73,6 @@ export const useAIPolling = ({
   const aiAbortControllerRef = useRef<AbortController | null>(null);
   const aiMountedRef = useRef(false);
   const fishListRef = useRef(fishList);
-  const addAlertRef = useRef(addAlert);
   const writeReadingRef = useRef(writeReading);
   const saveFishRef = useRef(saveFish);
   const activeTankRef = useRef(activeTank);
@@ -94,7 +87,7 @@ export const useAIPolling = ({
         pollingIntervalMs: AI_POLL_INTERVAL_MS,
         detectionConfidenceThreshold: DETECTION_CONFIDENCE,
         speciesConfidenceThreshold: DETECTION_CONFIDENCE,
-        diagnosisMinConfidence: DIAGNOSIS_MIN_CONF,
+        diagnosisMinConfidence: 0.6,
         autoStart: false,
       },
     [aiPreferences]
@@ -132,7 +125,6 @@ export const useAIPolling = ({
   }, [aiLoading, backendStatus, isStreaming, isAIActive, checkBackend]);
 
   useEffect(() => { fishListRef.current = fishList; }, [fishList]);
-  useEffect(() => { addAlertRef.current = addAlert; }, [addAlert]);
   useEffect(() => { writeReadingRef.current = writeReading; }, [writeReading]);
   useEffect(() => { saveFishRef.current = saveFish; }, [saveFish]);
 
@@ -167,27 +159,14 @@ export const useAIPolling = ({
         aiAbortControllerRef.current = controller;
         const blob = await captureVideoFrame(video);
 
-        const diagnose = shouldDiagnose();
-
-        const result = await sendFrameForDetection(
+        const result = await detectFishOnDevice(
           blob,
           preferences.detectionConfidenceThreshold,
-          diagnose,
-          preferences.diagnosisMinConfidence,
           controller.signal
         );
 
         if (!aiMountedRef.current) return;
         setLastPrediction(result);
-
-        if (diagnose) {
-          recordDiagnosisTime();
-
-          const diagnosedFish = result.detections.find((d) => d.diagnosis);
-          if (diagnosedFish?.diagnosis && !diagnosedFish.diagnosis.healthy) {
-            addAlertRef.current(buildDiseaseAlert(diagnosedFish));
-          }
-        }
 
         if (activeTankRef.current && liveStateRef.current) {
           const totalFish = result.summary.total_detections;

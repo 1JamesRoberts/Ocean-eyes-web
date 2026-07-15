@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { sites } from './build/sites-vite-plugin'
+import { onDeviceModels, sites } from './build/sites-vite-plugin'
 
 // https://vite.dev/config/
 export default defineConfig(async () => {
@@ -18,6 +18,7 @@ export default defineConfig(async () => {
     plugins: [
       react(),
       tailwindcss(),
+      onDeviceModels(),
       sites(),
       cloudflare({
         viteEnvironment: { name: 'server' },

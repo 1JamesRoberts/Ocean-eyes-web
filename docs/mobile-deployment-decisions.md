@@ -35,6 +35,18 @@ backend and is therefore not yet a complete P0 release.
 
 ## P0 Architecture
 
+### Implementation status
+
+The first on-device inference slice is implemented on the `mobile-deploy`
+branch. Detection, species classification, and turbidity now run through ONNX
+Runtime Web in a dedicated worker. The worker prefers WebGPU and falls back to
+WASM, loads model groups only on first use, and preserves the existing API
+response shape consumed by the UI. Disease diagnosis remains disabled.
+
+Remaining P0 work includes browser-versus-Python parity measurement on the
+agreed device matrix, model size/performance optimization, explicit download
+progress and consent UX, and durable offline/history storage.
+
 Introduce one inference seam used by the live-camera hooks:
 
 ```ts

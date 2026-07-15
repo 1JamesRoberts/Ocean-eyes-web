@@ -61,7 +61,6 @@ export const useAIAnalytics = ({
     aiLoading,
     aiError,
     lastPrediction,
-    setLastPrediction,
     toggleAI,
   } = useAIPolling({
     cameraFeedRef,
@@ -98,14 +97,7 @@ export const useAIAnalytics = ({
     manualDiagnosisError,
     lastManualDiagnosis,
     manualDiagnose,
-  } = useManualDiagnosis({
-    cameraFeedRef,
-    isStreaming,
-    backendStatus,
-    checkBackend,
-    aiLoading,
-    setLastPrediction,
-  });
+  } = useManualDiagnosis();
 
   const activeTankRef = useRef(activeTank);
   const liveStateRef = useRef(liveState);

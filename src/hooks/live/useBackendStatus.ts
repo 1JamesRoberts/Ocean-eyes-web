@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { isBackendAvailable } from '../../models/api/aiApi';
+import { isOnDeviceInferenceSupported } from '../../models/inference/aquariumInference';
 import { BACKEND_HEALTH_CHECK_INTERVAL_MS } from '../../utils/constants';
 
 export type BackendStatus = 'unknown' | 'checking' | 'online' | 'offline';
@@ -16,7 +16,7 @@ export const useBackendStatus = (isStreaming: boolean): UseBackendStatusViewMode
     if (!isStreaming) return;
 
     const check = async () => {
-      const ok = await isBackendAvailable();
+      const ok = isOnDeviceInferenceSupported();
       setBackendStatus((prev) => (prev === 'checking' ? prev : ok ? 'online' : 'offline'));
     };
 
@@ -28,7 +28,7 @@ export const useBackendStatus = (isStreaming: boolean): UseBackendStatusViewMode
   const checkBackend = useCallback(
     async (signal?: AbortSignal): Promise<boolean> => {
       setBackendStatus('checking');
-      const ok = await isBackendAvailable(signal);
+      const ok = !signal?.aborted && isOnDeviceInferenceSupported();
       setBackendStatus(ok ? 'online' : 'offline');
       return ok;
     },

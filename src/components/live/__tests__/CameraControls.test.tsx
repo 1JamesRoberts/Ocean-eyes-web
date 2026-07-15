@@ -38,9 +38,18 @@ describe('CameraControls', () => {
       'Capture Snapshot',
       'Measure Water Clarity',
       'Start AI Analysis',
-      'Run LLM Fish Health Diagnosis',
+      'Disease diagnosis is disabled in the on-device prototype',
       'Enter Fullscreen',
     ].forEach((label) => expectSharedOverlayStyle(screen.getByRole('button', { name: label })));
+  });
+
+  it('keeps cloud disease diagnosis disabled for the on-device prototype', () => {
+    render(<CameraControls {...defaultProps} />);
+
+    const diagnosisButton = screen.getByRole('button', {
+      name: 'Disease diagnosis is disabled in the on-device prototype',
+    });
+    expect(diagnosisButton.hasAttribute('disabled')).toBe(true);
   });
 
   it('includes the same shared treatment for the fullscreen inventory control', () => {

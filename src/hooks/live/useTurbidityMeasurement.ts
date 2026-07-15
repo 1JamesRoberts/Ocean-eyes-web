@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { CameraFeedConfig, LiveState, TankBrief, AITurbidityResult } from '../../types/aquarium';
 import type { CameraFeedHandle } from '../../components/live/CameraFeed';
-import { sendFrameForTurbidity } from '../../models/api/aiApi';
+import { measureTurbidityOnDevice } from '../../models/inference/aquariumInference';
 import { isVideoReady, captureVideoFrame } from '../../models/services/inferenceHelpers';
 import { recordFeedReading } from '../../models/services/readingRecorder';
 import { useReadings } from '../useReadings';
@@ -84,7 +84,7 @@ export const useTurbidityMeasurement = ({
 
     try {
       const blob = await captureVideoFrame(video);
-      const result = await sendFrameForTurbidity(blob, controller.signal);
+      const result = await measureTurbidityOnDevice(blob, controller.signal);
       setLastTurbidityResult(result);
 
       if (activeTank && liveState) {

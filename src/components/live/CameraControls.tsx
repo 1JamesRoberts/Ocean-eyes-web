@@ -76,23 +76,20 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
 
   const getAIButtonTitle = (): string => {
     if (!isStreaming) return 'Start stream to enable AI Analysis';
-    if (isChecking) return 'Checking AI Backend…';
-    if (!isOnline) return 'AI Backend Offline - Click to retry';
+    if (isChecking) return 'Checking on-device AI…';
+    if (!isOnline) return 'On-device AI unavailable - Click to retry';
     return isAIActive ? 'Stop AI Analysis' : 'Start AI Analysis';
   };
 
   const getDiagnoseButtonTitle = (): string => {
-    if (!isStreaming) return 'Start stream to enable LLM diagnosis';
-    if (isChecking) return 'Checking AI Backend…';
-    if (!isOnline) return 'AI Backend Offline';
-    return 'Run LLM Fish Health Diagnosis';
+    return 'Disease diagnosis is disabled in the on-device prototype';
   };
 
   const getTurbidityButtonTitle = (): string => {
     if (!isStreaming) return 'Start stream to measure turbidity';
     if (!hasImageSource) return 'No image source available';
-    if (isChecking) return 'Checking AI Backend…';
-    if (!isOnline) return 'AI Backend Offline - Click to retry';
+    if (isChecking) return 'Checking on-device AI…';
+    if (!isOnline) return 'On-device AI unavailable - Click to retry';
     return 'Measure Water Clarity';
   };
 
@@ -157,11 +154,11 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       <button
         type="button"
         onClick={onManualDiagnose}
-        disabled={manualDiagnoseLoading || aiLoading || isChecking || !isStreaming}
+        disabled
         title={getDiagnoseButtonTitle()}
         aria-label={getDiagnoseButtonTitle()}
         className={getButtonClasses({
-          disabled: manualDiagnoseLoading || aiLoading || isChecking || !isStreaming,
+          disabled: true,
         })}
       >
         {manualDiagnoseLoading ? (

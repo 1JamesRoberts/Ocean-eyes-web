@@ -13,7 +13,7 @@ export const DEFAULT_CONFIDENCE_THRESHOLD = 0.35;
 export const DETECTION_CONFIDENCE = 0.35;
 export const DIAGNOSIS_MIN_CONF = 0.6;
 export const BACKEND_OFFLINE_MESSAGE =
-  'AI Backend is offline. Please start it first: cd ai && python api_server.py';
+  'On-device AI is not supported by this browser. Update your browser and try again.';
 
 // ─── Health Score ───────────────────────────────────────────────────────────
 export const HEALTH_IDEAL_PH = 7.2;
