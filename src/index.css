@@ -402,9 +402,6 @@
     background: rgba(255, 255, 255, 0.5);
   }
 
-  &:active {
-    transform: scale(0.98);
-  }
 }
 
 @utility glass-button-primary {
@@ -426,9 +423,6 @@
   transition: var(--transition-smooth);
   white-space: nowrap;
 
-  &:active {
-    transform: scale(0.98);
-  }
 }
 
 @utility glass-button-outline {
@@ -457,9 +451,6 @@
     box-shadow: var(--shadow-glass), 0 6px 24px 0 rgba(0, 67, 73, 0.08);
   }
 
-  &:active {
-    transform: scale(0.98);
-  }
 }
 
 @utility glass-icon-button {
@@ -483,9 +474,6 @@
     box-shadow: var(--shadow-glass), 0 6px 24px 0 rgba(0, 67, 73, 0.08);
   }
 
-  &:active {
-    transform: scale(0.95);
-  }
 }
 
 @utility glass-pill {
@@ -874,9 +862,6 @@
     box-shadow: var(--shadow-glass), 0 6px 24px rgba(0, 67, 73, 0.08);
   }
 
-  &:active {
-    transform: scale(0.98);
-  }
 }
 
 /* Transparent material for panels that float over the live-video surface. */
@@ -904,9 +889,6 @@
     box-shadow: var(--shadow-glass), 0 6px 24px rgba(0, 67, 73, 0.08);
   }
 
-  &:active {
-    transform: scale(0.98);
-  }
 }
 
 /* Matches the vertical teal ramp used by the Fish Count Over Time bars. */
@@ -1065,10 +1047,6 @@
 
 .pill-nav-item:hover {
   color: var(--color-brand);
-}
-
-.pill-nav-item:active {
-  transform: scale(0.96);
 }
 
 .pill-nav-active {

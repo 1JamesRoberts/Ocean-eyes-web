@@ -29,7 +29,6 @@ export const MonitorButton: React.FC<MonitorButtonProps> = ({
       rounded-xl border px-5 py-3 type-strong-inverse transition-smooth
       focus-visible:outline-2 focus-visible:outline-offset-2
       focus-visible:outline-monitor-accent
-      active:scale-[0.98]
       disabled:cursor-not-allowed disabled:opacity-50
       ${variantStyles[variant]}
       ${fullWidth ? 'w-full' : ''}

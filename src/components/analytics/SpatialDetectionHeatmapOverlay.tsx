@@ -162,50 +162,52 @@ export const SpatialDetectionHeatmapOverlay = React.memo<SpatialDetectionHeatmap
     }, [centers, containerSize, drawOverlay, sourceSize]);
 
     return (
-      <div
-        ref={containerRef}
-        aria-hidden={!visible}
-        className={`
-          pointer-events-none absolute inset-0 size-full transition-opacity
-          duration-500 ease-in-out
-          motion-reduce:transition-none
-          ${visible ? 'opacity-100' : 'opacity-0'}
-        `}
-      >
-        <canvas
-          ref={overlayCanvasRef}
-          className="absolute inset-0 z-1 size-full"
-        />
+      <>
         <div
+          ref={containerRef}
+          aria-hidden={!visible}
           className={`
-            absolute top-[calc(var(--mobile-hero-height)-2.75rem)] right-4 z-20
-            ${
-            visible ? 'pointer-events-auto' : 'pointer-events-none'
-          }
+            pointer-events-none absolute inset-0 size-full transition-opacity
+            duration-500 ease-in-out
+            motion-reduce:transition-none
+            ${visible ? 'opacity-100' : 'opacity-0'}
           `}
         >
-          <label className="relative hero-overlay-pill cursor-pointer">
-            <span className="pointer-events-none">
-              {selectedSpecies === 'all'
-                ? 'All Species'
-                : formatSpeciesName(selectedSpecies)}
-            </span>
-            <select
-              value={selectedSpecies}
-              onClick={(event) => event.stopPropagation()}
-              onChange={(event) => onSelectedSpeciesChange(event.target.value)}
-              className="absolute inset-0 cursor-pointer opacity-0"
-            >
-              <option value="all">All Species</option>
-              {speciesList.map((species) => (
-                <option key={species} value={species}>
-                  {formatSpeciesName(species)}
-                </option>
-              ))}
-            </select>
-          </label>
+          <canvas
+            ref={overlayCanvasRef}
+            className="absolute inset-0 z-1 size-full"
+          />
         </div>
-      </div>
+        {visible && (
+          <div
+            className="
+              pointer-events-auto absolute top-[calc(var(--mobile-hero-height)-2.75rem)] right-4
+              z-20
+            "
+          >
+            <label className="relative hero-overlay-pill cursor-pointer">
+              <span className="pointer-events-none">
+                {selectedSpecies === 'all'
+                  ? 'All Species'
+                  : formatSpeciesName(selectedSpecies)}
+              </span>
+              <select
+                value={selectedSpecies}
+                onClick={(event) => event.stopPropagation()}
+                onChange={(event) => onSelectedSpeciesChange(event.target.value)}
+                className="absolute inset-0 cursor-pointer opacity-0"
+              >
+                <option value="all">All Species</option>
+                {speciesList.map((species) => (
+                  <option key={species} value={species}>
+                    {formatSpeciesName(species)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
+      </>
     );
   },
 );

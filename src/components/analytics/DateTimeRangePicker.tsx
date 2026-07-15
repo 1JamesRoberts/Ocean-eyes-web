@@ -17,6 +17,7 @@ type ActiveField = 'startDate' | 'startTime' | 'endDate' | 'endTime' | null;
 
 const POPOVER_EDGE_GUTTER = 16;
 const POPOVER_MAX_WIDTH = 320;
+const POPOVER_TRIGGER_GAP = 12;
 
 interface DateTimeRangePickerProps {
   value: DateRange;
@@ -39,6 +40,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
 }) => {
   const [open, setOpen] = useState<OpenState | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [popoverTop, setPopoverTop] = useState<number | null>(null);
+  const [editorStyle, setEditorStyle] = useState<React.CSSProperties>({
+    visibility: 'hidden',
+  });
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -89,19 +94,21 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
     );
 
     if (isCalendar || isTimeWheel) {
+      const top = popoverTop ?? POPOVER_EDGE_GUTTER + POPOVER_TRIGGER_GAP;
+
       return {
         position: 'fixed',
-        top: '50%',
+        top,
         left: '50%',
         width,
-        maxHeight: 'calc(100dvh - 32px)',
+        maxHeight: Math.max(0, window.innerHeight - top - POPOVER_EDGE_GUTTER),
         overflowY: 'auto',
-        transform: 'translate(-50%, -50%)',
+        transform: 'translateX(-50%)',
         zIndex: 1000,
       };
     }
     return {};
-  }, [isCalendar, isTimeWheel, open]);
+  }, [isCalendar, isTimeWheel, open, popoverTop]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -112,11 +119,13 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         !popoverRef.current?.contains(target)
       ) {
         setOpen(null);
+        setPopoverTop(null);
       }
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setOpen(null);
+        setPopoverTop(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -130,16 +139,24 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   const handlePillClick = useCallback(
     (field: ActiveField) =>
       () => {
-        setOpen((prev) =>
-          prev?.field === field
-            ? null
-            : { field },
-        );
+        if (activeField === field) {
+          setOpen(null);
+          setPopoverTop(null);
+          return;
+        }
+
+        const editorBottom = editorRef.current?.getBoundingClientRect().bottom
+          ?? POPOVER_EDGE_GUTTER;
+        setPopoverTop(editorBottom + POPOVER_TRIGGER_GAP);
+        setOpen({ field });
       },
-    [],
+    [activeField],
   );
 
-  const handleClose = useCallback(() => setOpen(null), []);
+  const handleClose = useCallback(() => {
+    setOpen(null);
+    setPopoverTop(null);
+  }, []);
 
   const handleDateSelect = useCallback(
     (date: Date) => {
@@ -177,31 +194,30 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   );
 
   const toggleExpanded = useCallback(() => {
-    setIsExpanded((previous) => !previous);
-  }, []);
-
-  const showSummary = !collapseToIcon;
-
-  const editorStyle = useMemo<React.CSSProperties>(() => {
     const trigger = triggerRef.current;
-    if (!trigger) return { visibility: 'hidden' };
+    if (!trigger) return;
 
     const rect = trigger.getBoundingClientRect();
     const width = collapseToIcon
       ? Math.min(288, window.innerWidth - 32)
       : rect.width;
+    const nextIsExpanded = !isExpanded;
 
-    return {
+    setEditorStyle({
       position: 'fixed',
       top: rect.bottom + 8,
-      left: Math.max(16, Math.min(rect.right - width, window.innerWidth - width - 16)),
+      left: '50%',
       width,
+      transform: 'translateX(-50%)',
       zIndex: 1000,
-      maxHeight: isExpanded ? 200 : 0,
-      opacity: isExpanded ? 1 : 0,
-      pointerEvents: isExpanded ? 'auto' : 'none',
-    };
+      maxHeight: nextIsExpanded ? 200 : 0,
+      opacity: nextIsExpanded ? 1 : 0,
+      pointerEvents: nextIsExpanded ? 'auto' : 'none',
+    });
+    setIsExpanded(nextIsExpanded);
   }, [collapseToIcon, isExpanded]);
+
+  const showSummary = !collapseToIcon;
 
   return (
     <div
@@ -266,14 +282,14 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       {createPortal(<div
         ref={editorRef}
         id="date-range-editor"
-        className="overflow-hidden glass-card-overlay p-3 pb-2 text-white transition-all duration-300 ease-in-out"
+        className="hero-overlay-pill !block overflow-hidden rounded-[var(--glass-radius-card)] p-3 pb-2 text-white transition-all duration-300 ease-in-out"
         style={editorStyle}
         aria-label="Date range editor"
       >
         <div className="grid grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,0.8fr)] items-center gap-x-2 gap-y-2">
           {/* Starts row */}
           <div className="contents">
-            <span className="w-14 type-strong-inverse">Starts</span>
+            <span className="w-14 text-center type-strong-inverse">Starts</span>
             <DateTimePill
               label={formatDateForDisplay(value.startDate)}
               isActive={activeField === 'startDate'}
@@ -288,7 +304,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
 
           {/* Ends row */}
           <div className="contents">
-            <span className="w-14 type-strong-inverse">Ends</span>
+            <span className="w-14 text-center type-strong-inverse">Ends</span>
             <DateTimePill
               label={formatDateForDisplay(value.endDate)}
               isActive={activeField === 'endDate'}

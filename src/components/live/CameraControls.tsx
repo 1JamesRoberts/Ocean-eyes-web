@@ -113,7 +113,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         title="Capture Snapshot"
         aria-label="Capture Snapshot"
       >
-        <Camera size={14} />
+        <Camera size={14} strokeWidth={2.5} />
       </button>
 
       <button
@@ -129,12 +129,13 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         {turbidityLoading || isChecking ? (
           <Loader2
             size={14}
+            strokeWidth={2.5}
             className="
               animate-spin
             "
           />
         ) : (
-          <Eye size={14} />
+          <Eye size={14} strokeWidth={2.5} />
         )}
       </button>
 
@@ -150,7 +151,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
           pulse: isAIActive,
         })}
       >
-        {aiLoading || isChecking ? <Loader2 size={14} className="animate-spin" /> : <Brain size={14} />}
+        {aiLoading || isChecking ? <Loader2 size={14} strokeWidth={2.5} className="animate-spin" /> : <Brain size={14} strokeWidth={2.5} />}
       </button>
 
       <button
@@ -164,9 +165,9 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         })}
       >
         {manualDiagnoseLoading ? (
-          <Loader2 size={14} className="animate-spin" />
+          <Loader2 size={14} strokeWidth={2.5} className="animate-spin" />
         ) : (
-          <Stethoscope size={14} />
+          <Stethoscope size={14} strokeWidth={2.5} />
         )}
       </button>
 
@@ -178,7 +179,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
           aria-label={showFsInventory ? 'Hide Fish Inventory' : 'Show Fish Inventory'}
           className={getButtonClasses({ active: showFsInventory })}
         >
-          <Fish size={14} />
+          <Fish size={14} strokeWidth={2.5} />
         </button>
       )}
 
@@ -189,7 +190,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
         className={getButtonClasses()}
       >
-        {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
+        {isFullscreen ? <Minimize size={14} strokeWidth={2.5} /> : <Maximize size={14} strokeWidth={2.5} />}
       </button>
     </div>
   );

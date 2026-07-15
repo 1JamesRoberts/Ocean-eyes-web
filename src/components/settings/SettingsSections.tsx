@@ -50,7 +50,7 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
 }) => {
   const className = `
     flex items-center justify-between gap-3 text-left
-    ${onClick ? 'cursor-pointer hover:bg-white/55 active:scale-[0.99]' : ''}
+    ${onClick ? 'cursor-pointer hover:bg-white/55' : ''}
     ${highlight ? 'border-brand/20 bg-brand/8' : ''}
     ${danger ? 'border-critical/20 bg-critical/8' : ''}
   `;

@@ -13,6 +13,6 @@ describe('MonitorButton', () => {
     expect(button.classList.contains('shadow-primary-glow')).toBe(true);
     expect(button.classList.contains('hover:bg-primary-hover-gradient')).toBe(false);
     expect(button.classList.contains('focus-visible:outline-monitor-accent')).toBe(true);
-    expect(button.classList.contains('active:scale-[0.98]')).toBe(true);
+    expect(button.classList.contains('active:scale-[0.98]')).toBe(false);
   });
 });

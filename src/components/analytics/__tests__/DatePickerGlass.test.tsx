@@ -9,6 +9,14 @@ import { formatTimeForDisplay } from '../../../utils/formatters';
 
 afterEach(cleanup);
 
+function setEditorBottom(bottom: number) {
+  const editor = document.getElementById('date-range-editor');
+  Object.defineProperty(editor, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => ({ bottom }),
+  });
+}
+
 describe('date picker glass styling', () => {
   it('marks the selected calendar day with the Fish Count teal gradient outline', () => {
     render(
@@ -58,9 +66,14 @@ describe('date picker glass styling', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit date range' }));
+    setEditorBottom(144);
     fireEvent.click(screen.getAllByRole('button', { name: 'Jul 14, 2026' })[0]);
 
-    expect(document.querySelector('.glass-card-overlay')).toBeTruthy();
+    const popover = document.querySelector<HTMLElement>('.glass-card-overlay');
+    expect(popover).toBeTruthy();
+    expect(popover?.style.top).toBe('156px');
+    expect(popover?.style.left).toBe('50%');
+    expect(popover?.style.transform).toBe('translateX(-50%)');
   });
 
   it('uses the fish-search glass card treatment for the time wheel popover', () => {
@@ -72,19 +85,20 @@ describe('date picker glass styling', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit date range' }));
+    setEditorBottom(144);
     fireEvent.click(
       screen.getAllByRole('button', { name: formatTimeForDisplay('00:00') })[0],
     );
 
-    // After clicking the time pill we expect two glass-card-overlay surfaces:
-    // the expanded editor (still open) and the time-wheel popover.
+    // The time-wheel popover retains the glass-card-overlay treatment.
     const overlays = document.querySelectorAll('.glass-card-overlay');
-    expect(overlays.length).toBeGreaterThanOrEqual(2);
+    expect(overlays.length).toBeGreaterThanOrEqual(1);
+    expect(overlays[0].getAttribute('style')).toContain('top: 156px');
     // Time wheel is rendered (Done button is unique to TimeWheelSheet).
     expect(screen.getByRole('button', { name: 'Done' })).toBeTruthy();
   });
 
-  it('uses the fish-search glass card treatment for the expanded Starts/Ends editor', () => {
+  it('uses the hero overlay treatment for the expanded Starts/Ends editor', () => {
     render(
       <DateTimeRangePicker
         value={{ startDate: '2026-07-14', startTime: '00:00', endDate: '2026-07-14', endTime: '23:55' }}
@@ -96,7 +110,7 @@ describe('date picker glass styling', () => {
 
     const editor = document.getElementById('date-range-editor');
     expect(editor).toBeTruthy();
-    expect(editor?.classList.contains('glass-card-overlay')).toBe(true);
+    expect(editor?.classList.contains('hero-overlay-pill')).toBe(true);
   });
 
   it('uses a teal outline for the time-wheel selection window', () => {

@@ -26,14 +26,14 @@ const variantStyles: Record<GlassVariant, string> = {
     border border-solid border-critical/30 bg-critical/8
     rounded-3xl type-strong text-critical
     transition-smooth whitespace-nowrap
-    hover:bg-critical/15 active:scale-[0.98]
+    hover:bg-critical/15
   `,
   ghost: `
     inline-flex items-center justify-center gap-2 cursor-pointer
     border-none bg-transparent rounded-3xl
     type-strong text-text-muted
     transition-smooth whitespace-nowrap
-    hover:text-brand active:scale-[0.98]
+    hover:text-brand
   `,
 };
 
