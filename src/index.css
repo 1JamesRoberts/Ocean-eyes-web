@@ -741,6 +741,19 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* ─── Slider Track (inactive) ─── */
+.slider-mint-track::-webkit-slider-runnable-track {
+  background: var(--color-health-parameter-bg);
+  border-radius: 9999px;
+  height: 8px;
+}
+
+.slider-mint-track::-moz-range-track {
+  background: var(--color-health-parameter-bg);
+  border-radius: 9999px;
+  height: 8px;
+}
+
 /* ─── Status Bar ─── */
 .status-bar {
   position: absolute;
