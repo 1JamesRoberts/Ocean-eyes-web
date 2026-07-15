@@ -47,6 +47,11 @@ Remaining P0 work includes browser-versus-Python parity measurement on the
 agreed device matrix, model size/performance optimization, explicit download
 progress and consent UX, and durable offline/history storage.
 
+The deployable browser artifacts use dynamic int8 weight quantization for the
+detection and turbidity models while retaining the float32 species classifier.
+This reduces the model download from about 299 MB to about 103 MB. The build
+verifies every generated artifact against the tracked size and SHA-256 manifest.
+
 Introduce one inference seam used by the live-camera hooks:
 
 ```ts

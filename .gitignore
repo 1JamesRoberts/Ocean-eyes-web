@@ -26,6 +26,7 @@ dist-ssr
 
 # AI model files (too large for GitHub)
 ai/models/*.onnx
+ai/models/web/*.onnx
 
 # Python cache
 __pycache__/

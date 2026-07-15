@@ -55,13 +55,13 @@ function modelUrl(path: string): string {
   return url.href;
 }
 
-async function createSession(path: string): Promise<LoadedSession> {
+async function createSession(path: string, preferWebGpu: boolean): Promise<LoadedSession> {
   const commonOptions: ort.InferenceSession.SessionOptions = {
     executionMode: 'sequential',
     graphOptimizationLevel: 'all',
   };
 
-  if ('gpu' in workerScope.navigator) {
+  if (preferWebGpu && 'gpu' in workerScope.navigator) {
     try {
       const session = await ort.InferenceSession.create(modelUrl(path), {
         ...commonOptions,
@@ -81,17 +81,17 @@ async function createSession(path: string): Promise<LoadedSession> {
 }
 
 function getDetectionSession(): Promise<LoadedSession> {
-  detectionSessionPromise ??= createSession(MODEL_PATHS.detection);
+  detectionSessionPromise ??= createSession(MODEL_PATHS.detection, false);
   return detectionSessionPromise;
 }
 
 function getSpeciesSession(): Promise<LoadedSession> {
-  speciesSessionPromise ??= createSession(MODEL_PATHS.species);
+  speciesSessionPromise ??= createSession(MODEL_PATHS.species, true);
   return speciesSessionPromise;
 }
 
 function getTurbiditySession(): Promise<LoadedSession> {
-  turbiditySessionPromise ??= createSession(MODEL_PATHS.turbidity);
+  turbiditySessionPromise ??= createSession(MODEL_PATHS.turbidity, false);
   return turbiditySessionPromise;
 }
 

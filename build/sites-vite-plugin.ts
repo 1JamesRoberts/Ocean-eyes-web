@@ -73,7 +73,7 @@ export function onDeviceModels(): Plugin {
           return;
         }
 
-        const source = resolve(root, 'ai', 'models', filename);
+        const source = resolve(root, 'ai', 'models', 'web', filename);
         try {
           const modelStat = await stat(source);
           response.statusCode = 200;
@@ -88,9 +88,10 @@ export function onDeviceModels(): Plugin {
       });
     },
     async closeBundle() {
-      const sourceDirectory = resolve(root, 'ai', 'models');
+      const modelDirectory = resolve(root, 'ai', 'models');
+      const sourceDirectory = resolve(modelDirectory, 'web');
       const manifest = JSON.parse(
-        await readFile(resolve(sourceDirectory, 'model-manifest.json'), 'utf8')
+        await readFile(resolve(modelDirectory, 'model-manifest.json'), 'utf8')
       ) as ModelManifest;
       const staleRootOutput = resolve(root, 'dist', 'models');
       const outputDirectories = [resolve(root, 'dist', 'client', 'models')];
