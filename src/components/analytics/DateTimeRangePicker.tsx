@@ -266,7 +266,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       {createPortal(<div
         ref={editorRef}
         id="date-range-editor"
-        className="overflow-hidden overlay-glass-surface p-3 pb-2 text-white transition-all duration-300 ease-in-out"
+        className="overflow-hidden glass-card-overlay p-3 pb-2 text-white transition-all duration-300 ease-in-out"
         style={editorStyle}
         aria-label="Date range editor"
       >
@@ -307,7 +307,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         createPortal(
           <div
             ref={popoverRef}
-            className={`animate-fade-in ${isCalendar ? 'glass-card-overlay' : 'overlay-glass-surface'} text-text`}
+            className="animate-fade-in glass-card-overlay text-text"
             style={popoverStyle}
           >
             {isCalendar && (

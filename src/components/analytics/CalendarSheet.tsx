@@ -94,20 +94,15 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
               onClick={() => onSelect(day)}
               className={`
                 relative mx-auto flex size-9 cursor-pointer items-center
-                justify-center rounded-full type-body overlay-glass-control
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
+                justify-center type-body
                 ${selected
-                  ? 'fish-count-teal-outline type-strong text-white'
-                  : today
-                    ? `
-                      bg-transparent type-strong text-text
-                    `
-                    : inMonth
-                      ? `
-                        bg-transparent text-text
-                      `
-                      : 'bg-transparent text-text-muted/60 hover:text-text-muted'
-                }
+                  ? `rounded-full fish-count-teal-outline type-strong text-white`
+                  : `rounded-md type-body ${today
+                      ? 'type-strong text-text'
+                      : inMonth
+                        ? 'text-text hover:text-brand'
+                        : 'text-text-muted/60 hover:text-text-muted'}`}
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
               `}
             >
               {formatUTCDate(day, 'd')}

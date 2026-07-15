@@ -7,8 +7,8 @@
 :root {
   /* ─── OceanEyes Design Tokens ─── */
   /* Gradients (not supported in @theme --color-*) */
-  --color-primary: linear-gradient(135deg, #004349 0%, #196a59 100%);
-  --color-primary-hover: linear-gradient(135deg, #196a59 0%, #004349 100%);
+  --color-primary: linear-gradient(180deg, #009d8d 0%, #00584e 100%);
+  --color-primary-hover: var(--color-primary);
   --color-primary-soft: linear-gradient(90deg, rgba(171, 246, 235, 0.493) 0%, rgba(206, 250, 255, 0.2) 40%);
   --logo-gradient: linear-gradient(135deg, #196a59 0%, #004349 100%);
   --camera-placeholder: linear-gradient(180deg, #0d5c63 0%, #004349 50%, #002f33 100%);
@@ -427,10 +427,6 @@
   box-shadow: var(--shadow-primary-glow);
   transition: var(--transition-smooth);
   white-space: nowrap;
-
-  &:hover {
-    background: var(--color-primary-hover);
-  }
 
   &:active {
     transform: scale(0.98);

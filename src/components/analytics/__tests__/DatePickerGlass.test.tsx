@@ -5,6 +5,7 @@ import { CalendarSheet } from '../CalendarSheet';
 import { DateTimePill } from '../DateTimePill';
 import { DateTimeRangePicker } from '../DateTimeRangePicker';
 import { TimeWheelSheet } from '../TimeWheelSheet';
+import { formatTimeForDisplay } from '../../../utils/formatters';
 
 afterEach(cleanup);
 
@@ -60,6 +61,42 @@ describe('date picker glass styling', () => {
     fireEvent.click(screen.getAllByRole('button', { name: 'Jul 14, 2026' })[0]);
 
     expect(document.querySelector('.glass-card-overlay')).toBeTruthy();
+  });
+
+  it('uses the fish-search glass card treatment for the time wheel popover', () => {
+    render(
+      <DateTimeRangePicker
+        value={{ startDate: '2026-07-14', startTime: '00:00', endDate: '2026-07-14', endTime: '23:55' }}
+        onChange={() => undefined}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit date range' }));
+    fireEvent.click(
+      screen.getAllByRole('button', { name: formatTimeForDisplay('00:00') })[0],
+    );
+
+    // After clicking the time pill we expect two glass-card-overlay surfaces:
+    // the expanded editor (still open) and the time-wheel popover.
+    const overlays = document.querySelectorAll('.glass-card-overlay');
+    expect(overlays.length).toBeGreaterThanOrEqual(2);
+    // Time wheel is rendered (Done button is unique to TimeWheelSheet).
+    expect(screen.getByRole('button', { name: 'Done' })).toBeTruthy();
+  });
+
+  it('uses the fish-search glass card treatment for the expanded Starts/Ends editor', () => {
+    render(
+      <DateTimeRangePicker
+        value={{ startDate: '2026-07-14', startTime: '00:00', endDate: '2026-07-14', endTime: '23:55' }}
+        onChange={() => undefined}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit date range' }));
+
+    const editor = document.getElementById('date-range-editor');
+    expect(editor).toBeTruthy();
+    expect(editor?.classList.contains('glass-card-overlay')).toBe(true);
   });
 
   it('uses a teal outline for the time-wheel selection window', () => {

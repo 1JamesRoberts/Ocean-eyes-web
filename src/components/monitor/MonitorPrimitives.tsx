@@ -8,7 +8,7 @@ interface MonitorButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variantStyles: Record<MonitorButtonVariant, string> = {
-  primary: 'border-transparent bg-primary-gradient text-white shadow-primary-glow hover:bg-primary-hover-gradient',
+  primary: 'border-transparent bg-primary-gradient text-white shadow-primary-glow',
   secondary: 'border-monitor-border bg-monitor-elevated text-monitor-text hover:bg-monitor-border',
   ghost: 'border-monitor-border bg-transparent text-monitor-text hover:bg-white/5',
   danger: 'border-critical/50 bg-critical/15 text-monitor-critical hover:bg-critical/25',

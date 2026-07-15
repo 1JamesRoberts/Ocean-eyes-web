@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI/UX Simplifier"
+  short_description: "Consolidate UI patterns and remove dead UI code"
+  default_prompt: "Use $ui-ux-simplifier to consolidate duplicated UI components and safely remove dead presentation code."
