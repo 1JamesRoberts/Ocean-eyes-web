@@ -67,7 +67,6 @@
     100dvh,
     calc(var(--mobile-hero-height) + var(--mobile-hero-blend-extension))
   );
-  --mobile-content-radius: 20px;
   --mobile-content-gutter: 1rem;
   --mobile-bottom-navigation-clearance: calc(
     4rem + max(0.75rem, env(safe-area-inset-bottom)) + 1rem
@@ -694,8 +693,6 @@
   overflow: hidden;
   position: relative;
   z-index: 10;
-  border-top-left-radius: var(--mobile-content-radius);
-  border-top-right-radius: var(--mobile-content-radius);
   background: var(--color-health-parameter-bg);
 }
 
