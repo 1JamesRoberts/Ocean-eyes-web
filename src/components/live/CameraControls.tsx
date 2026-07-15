@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Camera,
   Eye,
   Brain,
   Loader2,
@@ -28,7 +27,6 @@ interface CameraControlsProps {
   canSwitchCamera: boolean;
   isFullscreen: boolean;
   showFsInventory: boolean;
-  onTakeSnapshot: () => void;
   onSwitchCamera: () => void;
   onMeasureTurbidity: () => void;
   onToggleAI: () => void;
@@ -50,7 +48,6 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   canSwitchCamera,
   isFullscreen,
   showFsInventory,
-  onTakeSnapshot,
   onSwitchCamera,
   onMeasureTurbidity,
   onToggleAI,
@@ -119,16 +116,6 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         right: isFullscreen && showFsInventory ? '332px' : '16px',
       }}
     >
-      <button
-        type="button"
-        className={getButtonClasses()}
-        onClick={onTakeSnapshot}
-        title="Capture Snapshot"
-        aria-label="Capture Snapshot"
-      >
-        <Camera size={14} strokeWidth={2.5} />
-      </button>
-
       <button
         type="button"
         className={getButtonClasses({

@@ -5,7 +5,6 @@ import { useLiveFeed } from '../../hooks/useLiveFeed';
 import { useFish } from '../../hooks/useFish';
 import { useFullscreen } from '../../hooks/live/useFullscreen';
 import { useViewportSize } from '../../hooks/live/useViewportSize';
-import { useMediaCapture } from '../../hooks/live/useMediaCapture';
 import { useAIAnalytics } from '../../hooks/live/useAIAnalytics';
 
 import { AIBoundingBoxes } from '../live/AIBoundingBoxes';
@@ -14,15 +13,39 @@ import { CameraFeed } from '../live/CameraFeed';
 import type { CameraFeedHandle } from '../live/CameraFeed';
 import { FullscreenInventory } from '../live/FullscreenInventory';
 import { AIAnalysisPanel } from '../live/AIAnalysisPanel';
-import { useHeroActionLayer } from '../shared/HeroActionLayerContext';
-import type { CameraFilters } from '../../types/aquarium';
+import {
+  useHeroActionLayer,
+  useHeroMediaLayer,
+} from '../shared/HeroActionLayerContext';
+import type { AIDetectionResult, CameraFilters } from '../../types/aquarium';
 
 interface LiveVideoSectionProps {
   tankId?: string | null;
   filters: CameraFilters;
   temperatureOverlay: { backgroundColor: string; opacity: number } | null;
   tintOverlay: { backgroundColor: string; opacity: number } | null;
+  showPreviewDetections: boolean;
 }
+
+const PreviewBoundingBoxes: React.FC<{
+  lastPrediction: AIDetectionResult;
+  imageNaturalSize: { width: number; height: number };
+}> = ({ lastPrediction, imageNaturalSize }) => {
+  const { imageContainerRef, containerSize } = useViewportSize();
+
+  return (
+    <div
+      ref={imageContainerRef}
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+    >
+      <AIBoundingBoxes
+        lastPrediction={lastPrediction}
+        containerSize={containerSize}
+        imageNaturalSize={imageNaturalSize}
+      />
+    </div>
+  );
+};
 
 const TurbidityErrorBadge: React.FC<{ error: string }> = ({ error }) => (
   <div
@@ -43,6 +66,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
   filters,
   temperatureOverlay,
   tintOverlay,
+  showPreviewDetections,
 }) => {
   const { activeTank, tankId: activeTankId } = useTank();
   const tankId = propTankId ?? activeTankId;
@@ -62,19 +86,11 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
 
   const cameraFeedRef = useRef<CameraFeedHandle>(null);
   const heroActionLayer = useHeroActionLayer();
+  const heroMediaLayer = useHeroMediaLayer();
 
   const { viewportRef, isFullscreen, showFsInventory, setShowFsInventory, toggleFullscreen } = useFullscreen();
 
   const { imageContainerRef, containerSize, imageNaturalSize, handleDimensions } = useViewportSize();
-
-  const {
-    flashActive,
-    takeSnapshot,
-  } = useMediaCapture({
-    cameraFeedRef,
-    isStreaming,
-    filters,
-  });
 
   const {
     isAIActive,
@@ -89,8 +105,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
     toggleAI,
     measureTurbidity,
     manualDiagnose,
-    currentClarity,
-    currentFishCount,
   } = useAIAnalytics({
     cameraFeedRef,
     isStreaming,
@@ -116,7 +130,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
       canSwitchCamera={canSwitchCamera}
       isFullscreen={isFullscreen}
       showFsInventory={showFsInventory}
-      onTakeSnapshot={() => takeSnapshot(currentFishCount, currentClarity)}
       onSwitchCamera={switchCamera}
       onMeasureTurbidity={measureTurbidity}
       onToggleAI={toggleAI}
@@ -190,13 +203,6 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
 
           {isFullscreen && (
             <>
-              <div
-                className={`
-                  camera-flash-overlay
-                  ${flashActive ? 'flash-active' : ''}
-                `}
-              />
-
               {isAIActive && lastPrediction && (
                 <AIBoundingBoxes
                   lastPrediction={lastPrediction}
@@ -224,6 +230,20 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
       )}
 
       {isStreaming && !isFullscreen && heroActionLayer && createPortal(cameraControls, heroActionLayer)}
+
+      {isStreaming
+        && !isFullscreen
+        && showPreviewDetections
+        && isAIActive
+        && lastPrediction
+        && heroMediaLayer
+        && createPortal(
+          <PreviewBoundingBoxes
+            lastPrediction={lastPrediction}
+            imageNaturalSize={imageNaturalSize}
+          />,
+          heroMediaLayer,
+        )}
 
       {isStreaming && (
         <>

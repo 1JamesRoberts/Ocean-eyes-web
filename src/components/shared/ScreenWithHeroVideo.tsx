@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { HeroActionLayerContext } from './HeroActionLayerContext';
+import {
+  HeroActionLayerContext,
+  HeroMediaLayerContext,
+} from './HeroActionLayerContext';
 
 interface ScreenWithHeroVideoProps {
   /** Hero content rendered inside the stationary background layer. */
@@ -16,17 +19,19 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
   children,
 }) => {
   const [heroActionLayer, setHeroActionLayer] = useState<HTMLElement | null>(null);
+  const [heroMediaLayer, setHeroMediaLayer] = useState<HTMLElement | null>(null);
 
   return (
     <HeroActionLayerContext.Provider value={heroActionLayer}>
-      <div className="bg-gradient-mint relative flex min-h-0 w-full flex-1 flex-col">
+      <HeroMediaLayerContext.Provider value={heroMediaLayer}>
+        <div className="bg-gradient-mint relative flex min-h-0 w-full flex-1 flex-col">
         <section
           className={`
             mobile-hero-video
             ${showHero ? 'block' : 'hidden'}
           `}
         >
-          <div className="mobile-hero-media">
+          <div ref={setHeroMediaLayer} className="mobile-hero-media">
             {hero}
           </div>
           <div
@@ -70,7 +75,8 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
             />
           </div>
         </div>
-      </div>
+        </div>
+      </HeroMediaLayerContext.Provider>
     </HeroActionLayerContext.Provider>
   );
 };

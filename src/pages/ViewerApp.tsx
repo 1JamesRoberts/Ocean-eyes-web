@@ -3,6 +3,7 @@ import React, { lazy, Suspense, useMemo } from 'react';
 import { useNavigation, type ViewerTab } from '../context/NavigationContext';
 import { useTank } from '../hooks/useTank';
 import { useAnalytics } from '../hooks/pages/useAnalytics';
+import { useCameraFilters } from '../hooks/live/useCameraFilters';
 import { ScreenWithHeroVideo } from '../components/shared';
 import { HeroLiveFeedSection } from '../components/home/HeroLiveFeedSection';
 import { SpatialDetectionHeatmapOverlay } from '../components/analytics/SpatialDetectionHeatmapOverlay';
@@ -29,6 +30,12 @@ const ScreenLoadingFallback = () => (
 export const ViewerApp: React.FC = () => {
   const tankId = useTank().tankId;
   const { activeTab } = useNavigation();
+  const {
+    filters,
+    temperatureOverlay,
+    tintOverlay,
+    handleFilterChange,
+  } = useCameraFilters({ tankId });
 
   // Hoisted once so the hero and AnalyticsScreen share the same selectedSpecies state
   const analyticsData = useAnalytics();
@@ -66,8 +73,15 @@ export const ViewerApp: React.FC = () => {
 
   // Mounted once above routed screens so the top video element survives every tab switch.
   const defaultHero = useMemo(
-    () => <HeroLiveFeedSection overlay={analyticsHeroOverlay} />,
-    [analyticsHeroOverlay],
+    () => (
+      <HeroLiveFeedSection
+        overlay={analyticsHeroOverlay}
+        filters={filters}
+        temperatureOverlay={temperatureOverlay}
+        tintOverlay={tintOverlay}
+      />
+    ),
+    [analyticsHeroOverlay, filters, temperatureOverlay, tintOverlay],
   );
 
   const renderActiveScreen = () => {
@@ -76,7 +90,16 @@ export const ViewerApp: React.FC = () => {
         return <HomeScreen />;
       case 'live':
       case 'settings':
-        return <LiveTuningScreen />;
+        return (
+          <LiveTuningScreen
+            tankId={tankId}
+            filters={filters}
+            temperatureOverlay={temperatureOverlay}
+            tintOverlay={tintOverlay}
+            onFilterChange={handleFilterChange}
+            showPreviewDetections
+          />
+        );
       case 'alerts':
         return <AlertsScreen />;
       case 'history':

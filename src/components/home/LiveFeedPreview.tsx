@@ -4,7 +4,7 @@ import { useLiveFeed } from "../../hooks/useLiveFeed";
 import { HeadedCard } from "../shared";
 import { CameraFeed } from "../live/CameraFeed";
 import { HeroBadges } from "./HeroBadges";
-import type { TankBrief } from "../../types/aquarium";
+import type { CameraFilters, TankBrief } from "../../types/aquarium";
 
 interface LiveFeedPreviewProps {
   activeTank?: TankBrief | undefined;
@@ -13,6 +13,9 @@ interface LiveFeedPreviewProps {
   onViewAdvanced: () => void;
   onGoFullscreen?: () => void;
   overlay?: React.ReactNode;
+  filters?: CameraFilters;
+  temperatureOverlay?: React.CSSProperties | null;
+  tintOverlay?: React.CSSProperties | null;
   hero?: boolean;
 }
 
@@ -22,6 +25,9 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
   onViewAdvanced,
   onGoFullscreen,
   overlay,
+  filters,
+  temperatureOverlay,
+  tintOverlay,
   hero = false,
 }) => {
   const { activeFeed, isWebcam, isStreaming, videoRef, startStream } =
@@ -44,6 +50,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             isStreaming={isStreaming}
             isWebcam={isWebcam}
             videoRef={videoRef}
+            filters={filters}
             className="size-full"
             videoClassName="h-full w-full object-cover"
             idlePlaceholder={
@@ -75,7 +82,20 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                 </button>
               </div>
             }
-          />
+          >
+            {temperatureOverlay && (
+              <div
+                className="pointer-events-none absolute inset-0 z-4 mix-blend-color"
+                style={temperatureOverlay}
+              />
+            )}
+            {tintOverlay && (
+              <div
+                className="pointer-events-none absolute inset-0 z-5 mix-blend-color"
+                style={tintOverlay}
+              />
+            )}
+          </CameraFeed>
 
           {isStreaming && (
             <HeroBadges

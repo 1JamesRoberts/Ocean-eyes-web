@@ -18,7 +18,6 @@ const defaultProps = {
   canSwitchCamera: true,
   isFullscreen: false,
   showFsInventory: false,
-  onTakeSnapshot: vi.fn(),
   onSwitchCamera: vi.fn(),
   onMeasureTurbidity: vi.fn(),
   onToggleAI: vi.fn(),
@@ -39,13 +38,18 @@ describe('CameraControls', () => {
     render(<CameraControls {...defaultProps} />);
 
     [
-      'Capture Snapshot',
       'Switch to Front Camera',
       'Measure Water Clarity',
       'Start AI Analysis',
       'Disease diagnosis is disabled in the on-device prototype',
       'Enter Fullscreen',
     ].forEach((label) => expectSharedOverlayStyle(screen.getByRole('button', { name: label })));
+  });
+
+  it('does not offer a snapshot action', () => {
+    render(<CameraControls {...defaultProps} />);
+
+    expect(screen.queryByRole('button', { name: 'Capture Snapshot' })).toBeNull();
   });
 
   it('describes and disables the camera switch while reacquiring a stream', () => {

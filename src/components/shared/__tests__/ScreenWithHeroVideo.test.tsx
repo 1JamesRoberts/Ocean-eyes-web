@@ -3,6 +3,12 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ScreenHeader } from '../ScreenHeader';
 import { ScreenWithHeroVideo } from '../ScreenWithHeroVideo';
+import { useHeroMediaLayer } from '../HeroActionLayerContext';
+
+const HeroMediaLayerProbe = () => {
+  const mediaLayer = useHeroMediaLayer();
+  return <span data-testid="media-layer-class">{mediaLayer?.className}</span>;
+};
 
 afterEach(cleanup);
 
@@ -48,6 +54,16 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     expect(scrollContainer?.classList.contains('bg-gradient-mint')).toBe(true);
     expect(container.querySelector('[data-mobile-hero-content-spacer]')).toBeNull();
     expect(container.querySelector('[data-mobile-screen-bottom-spacer]')).not.toBeNull();
+  });
+
+  it('exposes the full media layer as the target for video-bound overlays', () => {
+    const { getByTestId } = render(
+      <ScreenWithHeroVideo hero={<div>Live video</div>}>
+        <HeroMediaLayerProbe />
+      </ScreenWithHeroVideo>,
+    );
+
+    expect(getByTestId('media-layer-class').textContent).toContain('mobile-hero-media');
   });
 
   it('keeps the hard clip stationary during large and repeated scroll jumps', () => {

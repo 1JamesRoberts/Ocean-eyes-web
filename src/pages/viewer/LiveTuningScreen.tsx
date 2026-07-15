@@ -1,20 +1,31 @@
 import React from 'react';
 import { useSettings } from '../../hooks/pages/useSettings';
-import { useTank } from '../../hooks/useTank';
-import { useCameraFilters } from '../../hooks/live/useCameraFilters';
 import { LiveVideoSection } from '../../components/settings/LiveVideoSection';
 import {
   AquariumPanelCard,
   SafetyThresholdsCard,
 } from '../../components/settings/SettingsSections';
 import { ScreenHeader } from '../../components/shared';
+import type { CameraFilters } from '../../types/aquarium';
 
-export const LiveTuningScreen: React.FC = () => {
+interface LiveTuningScreenProps {
+  tankId: string | null;
+  filters: CameraFilters;
+  temperatureOverlay: { backgroundColor: string; opacity: number } | null;
+  tintOverlay: { backgroundColor: string; opacity: number } | null;
+  onFilterChange: (partial: Partial<CameraFilters>) => void;
+  showPreviewDetections: boolean;
+}
+
+export const LiveTuningScreen: React.FC<LiveTuningScreenProps> = ({
+  tankId,
+  filters,
+  temperatureOverlay,
+  tintOverlay,
+  onFilterChange,
+  showPreviewDetections,
+}) => {
   const settings = useSettings();
-  const { tankId: activeTankId } = useTank();
-  const tankId = activeTankId ?? null;
-  const { filters, temperatureOverlay, tintOverlay, handleFilterChange } =
-    useCameraFilters({ tankId });
 
   return (
     <div className="flex flex-col gap-4">
@@ -25,6 +36,7 @@ export const LiveTuningScreen: React.FC = () => {
           filters={filters}
           temperatureOverlay={temperatureOverlay}
           tintOverlay={tintOverlay}
+          showPreviewDetections={showPreviewDetections}
         />
       </section>
 
@@ -41,7 +53,7 @@ export const LiveTuningScreen: React.FC = () => {
           onCancelUnlink={settings.onCancelUnlink}
           onConfirmUnlink={settings.onConfirmUnlink}
           filters={filters}
-          onFilterChange={handleFilterChange}
+          onFilterChange={onFilterChange}
         />
 
         <SafetyThresholdsCard
