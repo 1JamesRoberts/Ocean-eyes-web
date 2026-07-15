@@ -4,7 +4,6 @@ import {
   Brain,
   ChevronRight,
   Fish,
-  Monitor,
   Pencil,
   Save,
   ShieldAlert,
@@ -308,7 +307,6 @@ interface AquariumPanelCardProps {
   setName: (name: string) => void;
   handleNameChange: (event: React.FormEvent) => void;
   onStartRename: () => void;
-  onNavigateToMonitor: () => void;
   showConfirmUnlink: boolean;
   onRequestUnlink: () => void;
   onCancelUnlink: () => void;
@@ -324,7 +322,6 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
   setName,
   handleNameChange,
   onStartRename,
-  onNavigateToMonitor,
   showConfirmUnlink,
   onRequestUnlink,
   onCancelUnlink,
@@ -368,15 +365,6 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
           )}
         />
       )}
-
-      <SettingsPanelRow
-        icon={Monitor}
-        title="IoT Scanner Console"
-        detail="Pair or review monitor hardware"
-        onClick={onNavigateToMonitor}
-        highlight
-        action={<ChevronRight size={18} className="text-text-muted" />}
-      />
 
       {filters && onFilterChange && (
         <StreamAdjustments filters={filters} onFilterChange={onFilterChange} />

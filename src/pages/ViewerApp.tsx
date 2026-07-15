@@ -14,7 +14,6 @@ const AlertsScreen = lazy(() => import('./viewer/AlertsScreen').then((module) =>
 const HistoryDetailScreen = lazy(() => import('./viewer/HistoryDetailScreen').then((module) => ({ default: module.HistoryDetailScreen })));
 const MyFishScreen = lazy(() => import('./viewer/MyFishScreen').then((module) => ({ default: module.MyFishScreen })));
 const AnalyticsScreen = lazy(() => import('./viewer/AnalyticsScreen').then((module) => ({ default: module.AnalyticsScreen })));
-const IoTMonitor = lazy(() => import('./IoTMonitor').then((module) => ({ default: module.IoTMonitor })));
 
 const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'live', 'settings', 'my_fish', 'analytics', 'alerts', 'history'];
 
@@ -71,8 +70,6 @@ export const ViewerApp: React.FC = () => {
         return <AlertsScreen />;
       case 'history':
         return <HistoryDetailScreen />;
-      case 'monitor':
-        return <IoTMonitor />;
       case 'my_fish':
         return <MyFishScreen />;
       case 'analytics':

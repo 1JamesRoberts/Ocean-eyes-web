@@ -160,10 +160,6 @@ export const useSettings = () => {
     () => navigation.setActiveTab('alerts'),
     [navigation]
   );
-  const onNavigateToMonitor = useCallback(
-    () => navigation.setActiveTab('monitor'),
-    [navigation]
-  );
 
   return {
     activeTank,
@@ -193,7 +189,6 @@ export const useSettings = () => {
     onNavigateToFish,
     onNavigateToHistory,
     onNavigateToAlerts,
-    onNavigateToMonitor,
   };
 };
 

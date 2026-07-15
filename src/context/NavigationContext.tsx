@@ -1,7 +1,7 @@
 // src/context/NavigationContext.tsx - Global navigation & tab state
 import React, { createContext, useContext, useState } from 'react';
 
-export type ViewerTab = 'home' | 'live' | 'settings' | 'alerts' | 'history' | 'my_fish' | 'monitor' | 'analytics';
+export type ViewerTab = 'home' | 'live' | 'settings' | 'alerts' | 'history' | 'my_fish' | 'analytics';
 
 interface NavigationContextType {
   activeTab: ViewerTab;

@@ -36,7 +36,6 @@ export const LiveTuningScreen: React.FC = () => {
           setName={settings.setName}
           handleNameChange={settings.handleNameChange}
           onStartRename={settings.onStartRename}
-          onNavigateToMonitor={settings.onNavigateToMonitor}
           showConfirmUnlink={settings.showConfirmUnlink}
           onRequestUnlink={settings.onRequestUnlink}
           onCancelUnlink={settings.onCancelUnlink}
