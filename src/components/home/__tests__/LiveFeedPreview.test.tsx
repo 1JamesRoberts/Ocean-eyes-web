@@ -73,13 +73,20 @@ describe('LiveFeedPreview hero', () => {
         }}
         temperatureOverlay={{ backgroundColor: '#00a0ff', opacity: 0.1 }}
         tintOverlay={{ backgroundColor: '#ff00bb', opacity: 0.2 }}
+        overlay={<div data-testid="analytics-overlay" />}
         hero
       />,
     );
 
-    expect(container.querySelector('video')?.style.filter).toBe(
+    const video = container.querySelector('video');
+    const cameraLayer = video?.parentElement;
+    const analyticsOverlay = screen.getByTestId('analytics-overlay');
+
+    expect(video?.style.filter).toBe(
       'contrast(105%) brightness(95%) saturate(110%)',
     );
-    expect(container.querySelectorAll('.mix-blend-color')).toHaveLength(2);
+    expect(cameraLayer?.classList.contains('isolate')).toBe(true);
+    expect(cameraLayer?.querySelectorAll('.mix-blend-color')).toHaveLength(2);
+    expect(cameraLayer?.contains(analyticsOverlay)).toBe(false);
   });
 });

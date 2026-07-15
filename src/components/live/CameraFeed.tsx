@@ -39,7 +39,7 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
   return (
     <div
       className={`
-        shimmer w-full
+        isolate shimmer w-full
         ${className}
       `}
       style={style}
