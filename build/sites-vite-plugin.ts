@@ -1,6 +1,6 @@
 import { createReadStream } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { access, cp, mkdir, readFile, rm, stat } from 'node:fs/promises';
+import { access, appendFile, cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type { Plugin } from 'vite';
 
@@ -22,6 +22,50 @@ function sha256(path: string): Promise<string> {
       .on('error', rejectHash)
       .on('end', () => resolveHash(hash.digest('hex')));
   });
+}
+
+interface ModelSource {
+  bytes: number;
+  digest: string;
+  paths: string[];
+}
+
+async function inspectModel(sourceDirectory: string, filename: string): Promise<ModelSource> {
+  const path = resolve(sourceDirectory, filename);
+  if (await exists(path)) {
+    const [modelStat, digest] = await Promise.all([stat(path), sha256(path)]);
+    return { bytes: modelStat.size, digest, paths: [path] };
+  }
+
+  const partPrefix = `${filename}.part-`;
+  const parts = (await readdir(sourceDirectory))
+    .filter((entry) => entry.startsWith(partPrefix))
+    .sort()
+    .map((entry) => resolve(sourceDirectory, entry));
+  if (parts.length === 0) {
+    throw new Error(`AI model ${filename} and its deployment chunks are missing`);
+  }
+
+  const hash = createHash('sha256');
+  let bytes = 0;
+  for (const part of parts) {
+    const contents = await readFile(part);
+    bytes += contents.byteLength;
+    hash.update(contents);
+  }
+  return { bytes, digest: hash.digest('hex'), paths: parts };
+}
+
+async function copyModel(source: ModelSource, destination: string): Promise<void> {
+  if (source.paths.length === 1 && !source.paths[0].includes('.part-')) {
+    await cp(source.paths[0], destination);
+    return;
+  }
+
+  await writeFile(destination, new Uint8Array());
+  for (const part of source.paths) {
+    await appendFile(destination, await readFile(part));
+  }
 }
 
 async function exists(path: string): Promise<boolean> {
@@ -96,14 +140,14 @@ export function onDeviceModels(): Plugin {
       const staleRootOutput = resolve(root, 'dist', 'models');
       const outputDirectories = [resolve(root, 'dist', 'client', 'models')];
 
-      await Promise.all(
+      const modelSources = await Promise.all(
         MODEL_FILES.map(async (filename) => {
-          const path = resolve(sourceDirectory, filename);
-          const [modelStat, digest] = await Promise.all([stat(path), sha256(path)]);
+          const source = await inspectModel(sourceDirectory, filename);
           const expected = manifest.models[filename];
-          if (!expected || modelStat.size !== expected.bytes || digest !== expected.sha256) {
+          if (!expected || source.bytes !== expected.bytes || source.digest !== expected.sha256) {
             throw new Error(`AI model ${filename} does not match ai/models/model-manifest.json`);
           }
+          return [filename, source] as const;
         })
       );
 
@@ -112,9 +156,7 @@ export function onDeviceModels(): Plugin {
         outputDirectories.map(async (outputDirectory) => {
           await rm(outputDirectory, { recursive: true, force: true });
           await mkdir(outputDirectory, { recursive: true });
-          await Promise.all(
-            MODEL_FILES.map((filename) => cp(resolve(sourceDirectory, filename), resolve(outputDirectory, filename)))
-          );
+          await Promise.all(modelSources.map(([filename, source]) => copyModel(source, resolve(outputDirectory, filename))));
         })
       );
     },
