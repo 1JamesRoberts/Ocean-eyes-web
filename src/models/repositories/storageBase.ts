@@ -115,11 +115,11 @@ export const safeSetItem = (key: string, value: string): StorageWriteResult => {
 };
 
 export const getOrDefault = <T>(key: string, defaultValue: T): T => {
-  const data = localStorage.getItem(key);
-  if (data === null) {
-    return defaultValue;
-  }
   try {
+    const data = localStorage.getItem(key);
+    if (data === null) {
+      return defaultValue;
+    }
     return JSON.parse(data) as T;
   } catch {
     return defaultValue;

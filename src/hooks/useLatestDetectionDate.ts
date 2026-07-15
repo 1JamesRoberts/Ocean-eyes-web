@@ -1,7 +1,10 @@
-// useLatestDetectionDate.ts - Fetch the latest date with detection history from the backend.
-import { useEffect, useState, useRef } from 'react';
-import { fetchAvailableDetectionDates } from '../models/api/aiApi';
-import { isNetworkError } from '../models/api/errorHelpers';
+// useLatestDetectionDate.ts - Select the latest date from on-device inference history
+import { useCallback, useSyncExternalStore } from 'react';
+import {
+  getLatestInferenceDate,
+  subscribeInferenceHistory,
+} from '../models/repositories/inferenceHistoryRepository';
+import { DEMO_TANK_ID } from '../models/repositories/storageBase';
 import { todayUTC } from '../utils/formatters';
 
 export interface UseLatestDetectionDateResult {
@@ -11,54 +14,28 @@ export interface UseLatestDetectionDateResult {
   isFallback: boolean;
 }
 
-export const useLatestDetectionDate = (enabled = true): UseLatestDetectionDateResult => {
-  const [latestDate, setLatestDate] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isFallback, setIsFallback] = useState(false);
-  const fetchedRef = useRef(false);
+export const useLatestDetectionDate = (
+  enabled = true,
+  tankId = DEMO_TANK_ID
+): UseLatestDetectionDateResult => {
+  const subscribeHistory = useCallback(
+    (callback: () => void) => subscribeInferenceHistory(tankId, callback),
+    [tankId]
+  );
+  const getLatestDate = useCallback(
+    () => getLatestInferenceDate(tankId),
+    [tankId]
+  );
+  const latestStoredDate = useSyncExternalStore(
+    subscribeHistory,
+    getLatestDate,
+    () => null
+  );
 
-  useEffect(() => {
-    if (!enabled) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoading(false);
-      return;
-    }
-    if (fetchedRef.current) return;
-    let cancelled = false;
-    const controller = new AbortController();
-
-    (async () => {
-      setLoading(true);
-      setError(null);
-      setIsFallback(false);
-      try {
-        const data = await fetchAvailableDetectionDates(controller.signal);
-        if (!cancelled) {
-          setLatestDate(data.latest);
-          fetchedRef.current = true;
-        }
-      } catch (err) {
-        if (cancelled) return;
-        if (err instanceof Error && err.name === 'AbortError') return;
-        if (isNetworkError(err)) {
-          setLatestDate(todayUTC());
-          setIsFallback(true);
-        } else {
-          setError(err instanceof Error ? err.message : 'Failed to fetch available detection dates');
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [enabled]);
-
-  return { latestDate, loading, error, isFallback };
+  return {
+    latestDate: enabled ? latestStoredDate ?? todayUTC() : null,
+    loading: false,
+    error: null,
+    isFallback: false,
+  };
 };

@@ -15,6 +15,7 @@ import {
   captureVideoFrame,
 } from '../../models/services/inferenceHelpers';
 import { recordFeedReading } from '../../models/services/readingRecorder';
+import { appendDetectionHistory } from '../../models/repositories/inferenceHistoryRepository';
 import { useReadings } from '../useReadings';
 import { useFish } from '../useFish';
 import {
@@ -170,6 +171,7 @@ export const useAIPolling = ({
 
         if (activeTankRef.current && liveStateRef.current) {
           const totalFish = result.summary.total_detections;
+          appendDetectionHistory(activeTankRef.current.id, result);
 
           recordFeedReading({
             tankId: activeTankRef.current.id,

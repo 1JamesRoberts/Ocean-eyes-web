@@ -4,6 +4,8 @@ import React, { createContext, useContext, useEffect, useMemo, useRef, useState 
 import { useDateRangeFromUrl } from '../hooks/useDateRangeFromUrl';
 import { useHistory } from '../hooks/useHistory';
 import { useLatestDetectionDate } from '../hooks/useLatestDetectionDate';
+import { useTank } from '../hooks/useTank';
+import { DEMO_TANK_ID } from '../models/repositories/storageBase';
 import type {
   DateRange,
   HistoryDetectionResponse,
@@ -49,10 +51,12 @@ export const AnalyticsControlsProvider: React.FC<AnalyticsControlsProviderProps>
   active,
   children,
 }) => {
+  const { tankId } = useTank();
+  const historyTankId = tankId ?? DEMO_TANK_ID;
   const hasUrlParams = hasUrlRangeParams();
   // Warm the default date for a future Analytics visit, but never wait on it
   // when the URL already defines the requested range.
-  const { latestDate, loading: latestDateLoading, error: latestDateError, isFallback: latestDateIsFallback } = useLatestDetectionDate(!hasUrlParams);
+  const { latestDate, loading: latestDateLoading, error: latestDateError, isFallback: latestDateIsFallback } = useLatestDetectionDate(!hasUrlParams, historyTankId);
   const initialDateRef = useRef<string | null>(null);
   const [initialRangeReady, setInitialRangeReady] = useState(hasUrlParams);
 
@@ -86,7 +90,7 @@ export const AnalyticsControlsProvider: React.FC<AnalyticsControlsProviderProps>
     detectionData,
     turbidityData,
     isFallback: historyIsFallback,
-  } = useHistory(range, active && (hasUrlParams || initialRangeReady));
+  } = useHistory(range, active && (hasUrlParams || initialRangeReady), historyTankId);
 
   useEffect(() => {
     if (!active || !latestDate || hasUrlParams) return;

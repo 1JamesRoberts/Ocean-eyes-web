@@ -1,48 +1,51 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { useLatestDetectionDate } from '../useLatestDetectionDate';
+import { appendDetectionHistory } from '../../models/repositories/inferenceHistoryRepository';
+import { todayUTC } from '../../utils/formatters';
+import type { AIDetectionResult } from '../../types/aquarium';
 
-const mockFetch = vi.fn();
-(globalThis as unknown as { fetch: typeof mockFetch }).fetch = mockFetch;
+function detectionRecord(timestamp: string): AIDetectionResult {
+  return {
+    timestamp,
+    models: {
+      detection: { provider: 'wasm' },
+      species: { provider: 'webgpu' },
+    },
+    detections: [],
+    summary: { total_detections: 0, species_counts: {} },
+  };
+}
 
 describe('useLatestDetectionDate', () => {
-  it('returns null, loading=false, and error when disabled', () => {
-    const { result } = renderHook(() => useLatestDetectionDate(false));
+  it('returns null without loading or errors when disabled', () => {
+    const { result } = renderHook(() =>
+      useLatestDetectionDate(false, 'disabled-latest-tank')
+    );
     expect(result.current.latestDate).toBeNull();
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
     expect(result.current.isFallback).toBe(false);
   });
 
-  it('fetches and returns the latest date', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ dates: ['2026-06-17', '2026-07-03'], latest: '2026-07-03' }),
-    });
-    const { result } = renderHook(() => useLatestDetectionDate(true));
-    expect(result.current.loading).toBe(true);
-    await waitFor(() => expect(result.current.loading).toBe(false));
+  it('uses today when the device has no inference history', () => {
+    const { result } = renderHook(() =>
+      useLatestDetectionDate(true, 'empty-latest-tank')
+    );
+    expect(result.current.latestDate).toBe(todayUTC());
+  });
+
+  it('selects the latest stored inference date and reacts to new records', () => {
+    const tankId = 'latest-history-tank';
+    appendDetectionHistory(tankId, detectionRecord('2026-07-03T12:00:00.000Z'));
+    const { result } = renderHook(() => useLatestDetectionDate(true, tankId));
     expect(result.current.latestDate).toBe('2026-07-03');
-    expect(result.current.error).toBeNull();
-    expect(result.current.isFallback).toBe(false);
-  });
 
-  it('falls back to today on network error', async () => {
-    mockFetch.mockRejectedValueOnce(new TypeError('Failed to fetch'));
-    const { result } = renderHook(() => useLatestDetectionDate(true));
-    await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.latestDate).not.toBeNull();
-    expect(result.current.error).toBeNull();
-    expect(result.current.isFallback).toBe(true);
-  });
+    act(() => {
+      appendDetectionHistory(tankId, detectionRecord('2026-07-05T12:00:00.000Z'));
+    });
 
-  it('returns error on non-network fetch failure', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Unexpected parser failure'));
-    const { result } = renderHook(() => useLatestDetectionDate(true));
-    await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.latestDate).toBeNull();
-    expect(result.current.error).toBe('Unexpected parser failure');
-    expect(result.current.isFallback).toBe(false);
+    expect(result.current.latestDate).toBe('2026-07-05');
   });
 });

@@ -15,6 +15,7 @@ The existing production URL, `https://oceaneyes-prototype.thammatorn-j.chatgpt.s
 - Models load lazily, inference is serialized to limit peak resource use, and the turbidity session is released after each measurement.
 - Camera frames and inference results stay on the user's device. There is no cloud inference fallback.
 - Mobile camera capture requests the rear-facing camera by default and provides a control to switch safely between rear and front cameras.
+- Detection and turbidity results are recorded in versioned, tank-scoped on-device history and immediately drive the Analytics heatmap and charts without a backend request.
 - Existing detection and turbidity result contracts remain unchanged, so the UI and local history code can consume the new results.
 - Browser capability replaces the former FastAPI backend-health check.
 - Disease diagnosis is explicitly disabled for P0.
@@ -47,6 +48,8 @@ The generated `.onnx` files and deployment chunks are ignored by Git on the user
 - A build using only chunked source inputs passes and reconstructs complete files matching the manifest.
 
 Real-device performance, memory use, camera behavior, and result parity have not yet been validated on an iPhone.
+
+The prototype retains the latest 300 detection records and 100 turbidity records in local storage to stay within mobile-browser quotas. Moving inference history to IndexedDB remains P0 hardening work for longer retention.
 
 ## Relevant commits
 

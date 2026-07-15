@@ -4,6 +4,7 @@ import type { CameraFeedHandle } from '../../components/live/CameraFeed';
 import { measureTurbidityOnDevice } from '../../models/inference/aquariumInference';
 import { isVideoReady, captureVideoFrame } from '../../models/services/inferenceHelpers';
 import { recordFeedReading } from '../../models/services/readingRecorder';
+import { appendTurbidityHistory } from '../../models/repositories/inferenceHistoryRepository';
 import { useReadings } from '../useReadings';
 import { BACKEND_OFFLINE_MESSAGE } from '../../utils/constants';
 import type { BackendStatus } from './useBackendStatus';
@@ -90,6 +91,7 @@ export const useTurbidityMeasurement = ({
       if (activeTank && liveState) {
         const fnuValue = result.turbidity.fnu;
         const clarity = parseFloat(fnuValue.toFixed(2));
+        appendTurbidityHistory(activeTank.id, result);
 
         recordFeedReading({
           tankId: activeTank.id,
