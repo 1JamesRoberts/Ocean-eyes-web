@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  calculateObjectCoverRect,
-  getHeatmapPixelAlpha,
-} from '../heatmapOverlay';
+import { calculateObjectCoverRect } from '../heatmapOverlay';
 
 describe('calculateObjectCoverRect', () => {
   it('center-crops a wide frame to match a taller video container', () => {
@@ -21,16 +18,5 @@ describe('calculateObjectCoverRect', () => {
     expect(rect.height).toBeCloseTo(698.67);
     expect(rect.offsetX).toBeCloseTo(0);
     expect(rect.offsetY).toBeCloseTo(-238.83);
-  });
-});
-
-describe('getHeatmapPixelAlpha', () => {
-  it('keeps empty heatmap pixels transparent', () => {
-    expect(getHeatmapPixelAlpha(0)).toBe(0);
-  });
-
-  it('makes every nonzero heatmap pixel opaque', () => {
-    expect(getHeatmapPixelAlpha(Number.MIN_VALUE)).toBe(255);
-    expect(getHeatmapPixelAlpha(1)).toBe(255);
   });
 });

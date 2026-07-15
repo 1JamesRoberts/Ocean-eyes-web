@@ -1,3 +1,4 @@
+const HEATMAP_ALPHA = 0.55;
 const BLUR_SIGMA_PROP = 0.05;
 
 export interface HeatmapCenter {
@@ -71,11 +72,6 @@ const JET_LUT: readonly (readonly [number, number, number])[] = Array.from(
   { length: 256 },
   (_, i) => jetColor(i / 255),
 );
-
-/** Keep heatmap colors independent from the adjusted video beneath them. */
-export function getHeatmapPixelAlpha(density: number): number {
-  return density > 0 ? 255 : 0;
-}
 
 function gaussianBlur(src: Float32Array, w: number, h: number, sigma: number): Float32Array {
   const radius = Math.ceil(sigma * 3);
@@ -152,6 +148,7 @@ export function buildHeatmapOverlay(
   const pixels = imageData.data;
 
   if (maxVal > 0) {
+    const alpha255 = Math.round(HEATMAP_ALPHA * 255);
     for (let i = 0; i < blurred.length; i++) {
       const lutIdx = Math.round((blurred[i] / maxVal) * 255);
       const [r, g, b] = JET_LUT[lutIdx];
@@ -159,7 +156,7 @@ export function buildHeatmapOverlay(
       pixels[off] = r;
       pixels[off + 1] = g;
       pixels[off + 2] = b;
-      pixels[off + 3] = getHeatmapPixelAlpha(blurred[i]);
+      pixels[off + 3] = alpha255;
     }
   }
 
