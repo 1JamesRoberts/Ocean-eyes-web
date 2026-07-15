@@ -16,8 +16,8 @@ describe('GlassButton', () => {
     const button = screen.getByRole('button', { name: 'Add fish' });
 
     expect(button.classList.contains('glass-button-primary')).toBe(true);
-    expect(button.classList.contains('text-text-inverse')).toBe(true);
-    expect(button.classList.contains('focus-visible:outline-brand')).toBe(true);
+    expect(button.classList.contains('text-white')).toBe(true);
+    expect(button.classList.contains('focus-visible:outline-pine-teal')).toBe(true);
     expect(button.querySelector('svg')).toBeTruthy();
   });
 });

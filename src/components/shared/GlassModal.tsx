@@ -102,7 +102,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         className={`
           absolute inset-0 ${isBelowHero
             ? 'bg-transparent backdrop-blur-none'
-            : 'bg-[rgba(15,23,42,0.5)] backdrop-blur-xs'
+            : 'bg-prussian-blue/50 backdrop-blur-xs'
           }
           ${isBelowHero ? 'motion-safe:animate-sheet-backdrop' : ''}
         `}

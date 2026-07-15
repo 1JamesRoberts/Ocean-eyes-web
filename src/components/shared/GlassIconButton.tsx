@@ -30,10 +30,10 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({
     aria-label={label}
     title={label}
     className={`
-      glass-icon-button focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
+      glass-icon-button focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
       ${sizeStyles[size]}
       ${active ? `
-        border-none bg-primary-gradient text-text-inverse
+        border-none bg-primary-gradient text-white
         hover:bg-primary-hover-gradient
       ` : ''}
       ${className}

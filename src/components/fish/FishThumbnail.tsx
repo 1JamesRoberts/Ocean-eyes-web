@@ -22,14 +22,14 @@ export const FishThumbnail: React.FC<FishThumbnailProps> = ({
         className="
           flex shrink-0 items-center justify-center rounded-lg border
           border-white/20 font-bold text-white
-          shadow-[0_1px_2px_rgba(0,0,0,0.3)]
+          shadow-sm
         "
         style={{
           width: s,
           height: s,
           backgroundColor: color,
           fontSize: Math.round(s * 0.3),
-          textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+          textShadow: '0 1px 2px color-mix(in srgb, var(--color-prussian-blue) 30%, transparent)',
         }}
       >
         {initials}

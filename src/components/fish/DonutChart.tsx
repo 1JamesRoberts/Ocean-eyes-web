@@ -70,7 +70,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
   const renderSpeciesLabel = (species: SpeciesSlice, side: 'left' | 'right') => (
     <li
       key={species.name}
-      className={`flex max-w-full min-w-0 items-center gap-1 overflow-hidden text-[11px] font-medium leading-tight text-text-muted motion-safe:animate-donut-detail-enter ${
+      className={`flex max-w-full min-w-0 items-center gap-1 overflow-hidden text-[11px] font-medium leading-tight text-slate-grey motion-safe:animate-donut-detail-enter ${
         side === 'left' ? 'justify-end text-right' : 'justify-start text-left'
       }`}
       style={{ animationDelay: '120ms' }}
@@ -133,8 +133,8 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
           className="absolute top-1/2 left-1/2 -translate-1/2 text-center motion-safe:animate-donut-detail-enter"
           style={{ animationDelay: '90ms' }}
         >
-          <div className="text-3xl font-extrabold leading-none text-text">{total}</div>
-          <div className="text-[11px] leading-tight font-normal text-text-muted">Total Fish</div>
+          <div className="text-3xl font-extrabold leading-none text-prussian-blue">{total}</div>
+          <div className="text-[11px] leading-tight font-normal text-slate-grey">Total Fish</div>
         </div>
       </div>
 

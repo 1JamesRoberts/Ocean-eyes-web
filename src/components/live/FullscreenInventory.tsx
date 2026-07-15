@@ -25,7 +25,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
       className={`
         absolute inset-y-0 right-0 z-30 flex w-[min(320px,100%)]
         flex-col overflow-hidden
-        bg-black/55 text-left text-white shadow-2xl
+        bg-prussian-blue/55 text-left text-white shadow-2xl
         backdrop-blur-xl transition-transform duration-300 ease-in-out
         ${showFsInventory ? 'translate-x-0' : 'translate-x-full'}
       `}

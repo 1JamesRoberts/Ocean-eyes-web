@@ -14,10 +14,10 @@ const colorStyles: Record<BadgeColor, string> = {
   good: 'bg-good/10 text-good',
   warning: 'bg-warning/10 text-warning',
   critical: 'bg-critical/12 text-critical',
-  info: 'bg-info/10 text-info',
-  neutral: 'bg-brand/10 text-brand',
-  live: 'bg-brand-bright/10 text-brand-bright',
-  parameter: 'bg-(--color-health-parameter-bg) text-text',
+  info: 'bg-sky-surge/10 text-sky-surge',
+  neutral: 'bg-pine-teal/10 text-pine-teal',
+  live: 'bg-verdigris/10 text-verdigris',
+  parameter: 'bg-(--color-health-parameter-bg) text-prussian-blue',
 };
 
 export const GlassBadge: React.FC<GlassBadgeProps> = ({

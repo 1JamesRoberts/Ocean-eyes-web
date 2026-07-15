@@ -120,8 +120,8 @@ describe('date picker glass styling', () => {
     const picker = within(container);
 
     expect(container.querySelector('.fish-count-teal-outline')).toBeTruthy();
-    expect(picker.getByRole('button', { name: '01' }).classList.contains('text-text')).toBe(true);
-    expect(picker.getByRole('button', { name: 'PM' }).classList.contains('text-text')).toBe(true);
-    expect(container.querySelectorAll('button.text-text')).toHaveLength(3);
+    expect(picker.getByRole('button', { name: '01' }).classList.contains('text-prussian-blue')).toBe(true);
+    expect(picker.getByRole('button', { name: 'PM' }).classList.contains('text-prussian-blue')).toBe(true);
+    expect(container.querySelectorAll('button.text-prussian-blue')).toHaveLength(3);
   });
 });

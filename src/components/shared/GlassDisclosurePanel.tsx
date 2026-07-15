@@ -24,8 +24,8 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
   children,
   className = '',
   contentClassName = 'flex flex-col gap-4 pt-4',
-  iconClassName = 'text-text-muted',
-  chevronClassName = 'text-text-muted',
+  iconClassName = 'text-slate-grey',
+  chevronClassName = 'text-slate-grey',
 }) => (
   <div className={`rounded-2xl border border-white/20 bg-white/20 p-3 pb-2 ${className}`}>
     <button

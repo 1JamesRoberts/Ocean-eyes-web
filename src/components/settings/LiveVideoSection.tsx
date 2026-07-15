@@ -29,7 +29,7 @@ const TurbidityErrorBadge: React.FC<{ error: string }> = ({ error }) => (
     className="
       absolute top-11 left-1/2 z-16 flex -translate-x-1/2 items-center
       gap-1.5 rounded-[20px] border border-critical
-      bg-[rgba(15,23,42,0.85)] px-3 py-1.5 type-caption-inverse
+      bg-prussian-blue/85 px-3 py-1.5 type-caption-inverse
       text-white
     "
   >
@@ -136,7 +136,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
             className={`
               z-30 overflow-hidden transition-[height] duration-300
               ${isFullscreen
-                ? 'relative h-screen bg-black'
+                ? 'relative h-screen bg-prussian-blue'
                 : 'pointer-events-none fixed top-0 left-1/2 h-[var(--mobile-hero-height)] w-[var(--mobile-frame-width)] max-w-full -translate-x-1/2'
               }
             `}

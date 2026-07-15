@@ -138,9 +138,10 @@ export const useMediaCapture = ({
         ctx.drawImage(videoElement, 0, 0, SNAPSHOT_CANVAS_WIDTH, SNAPSHOT_CANVAS_HEIGHT);
       } else {
         const grad = ctx.createLinearGradient(0, 0, 0, SNAPSHOT_CANVAS_HEIGHT);
-        grad.addColorStop(0, '#0F766E');
-        grad.addColorStop(0.5, '#115E59');
-        grad.addColorStop(1, '#134E4A');
+        const palette = getComputedStyle(document.documentElement);
+        grad.addColorStop(0, palette.getPropertyValue('--color-verdigris').trim());
+        grad.addColorStop(0.5, palette.getPropertyValue('--color-pine-teal').trim());
+        grad.addColorStop(1, palette.getPropertyValue('--color-prussian-blue').trim());
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, SNAPSHOT_CANVAS_WIDTH, SNAPSHOT_CANVAS_HEIGHT);
       }

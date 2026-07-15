@@ -35,14 +35,14 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
   }, [viewMonth]);
 
   return (
-    <div className="w-full max-w-[320px] p-4 pb-3 text-text">
+    <div className="w-full max-w-[320px] p-4 pb-3 text-prussian-blue">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
           <span className="type-title">
             {formatUTCDate(viewMonth, 'MMMM yyyy')}
           </span>
-          <ChevronDown size={18} className="text-text-muted" />
+          <ChevronDown size={18} className="text-slate-grey" />
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -50,24 +50,24 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             onClick={() => setViewMonth((m) => subUTCMonths(m, 1))}
             className="
               overlay-glass-control flex size-9 items-center justify-center rounded-full
-              p-0 text-text-muted hover:text-text
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
+              p-0 text-slate-grey hover:text-prussian-blue
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
             "
             aria-label="Previous month"
           >
-            <ChevronLeft size={18} className="text-text-muted" />
+            <ChevronLeft size={18} className="text-slate-grey" />
           </button>
           <button
             type="button"
             onClick={() => setViewMonth((m) => addUTCMonths(m, 1))}
             className="
               overlay-glass-control flex size-9 items-center justify-center rounded-full
-              p-0 text-text-muted hover:text-text
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
+              p-0 text-slate-grey hover:text-prussian-blue
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
             "
             aria-label="Next month"
           >
-            <ChevronRight size={18} className="text-text-muted" />
+            <ChevronRight size={18} className="text-slate-grey" />
           </button>
         </div>
       </div>
@@ -75,7 +75,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
       {/* Weekday labels */}
       <div className="mb-2 grid grid-cols-7 text-center">
         {WEEKDAYS.map((day) => (
-          <span key={day} className="type-caption text-text-muted">
+          <span key={day} className="type-caption text-slate-grey">
             {day}
           </span>
         ))}
@@ -98,11 +98,11 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 ${selected
                   ? `rounded-full fish-count-teal-outline type-strong text-white`
                   : `rounded-md type-body ${today
-                      ? 'type-strong text-text'
+                      ? 'type-strong text-prussian-blue'
                       : inMonth
-                        ? 'text-text hover:text-brand'
-                        : 'text-text-muted/60 hover:text-text-muted'}`}
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
+                        ? 'text-prussian-blue hover:text-pine-teal'
+                        : 'text-slate-grey/60 hover:text-slate-grey'}`}
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
               `}
             >
               {formatUTCDate(day, 'd')}
@@ -110,7 +110,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                 <span
                   className="
                     absolute bottom-1.5 left-1/2 size-1 -translate-x-1/2
-                    rounded-full bg-brand-bright
+                    rounded-full bg-verdigris
                   "
                 />
               )}

@@ -19,7 +19,7 @@ interface GlassButtonProps {
 
 const variantStyles: Record<GlassVariant, string> = {
   default: 'glass-button',
-  primary: 'glass-button-primary text-text-inverse',
+  primary: 'glass-button-primary text-white',
   outline: 'glass-button-outline',
   danger: `
     inline-flex items-center justify-center gap-2 cursor-pointer
@@ -31,9 +31,9 @@ const variantStyles: Record<GlassVariant, string> = {
   ghost: `
     inline-flex items-center justify-center gap-2 cursor-pointer
     border-none bg-transparent rounded-3xl
-    type-strong text-text-muted
+    type-strong text-slate-grey
     transition-smooth whitespace-nowrap
-    hover:text-brand
+    hover:text-pine-teal
   `,
 };
 
@@ -64,7 +64,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
     aria-label={ariaLabel}
     aria-expanded={ariaExpanded}
     className={`
-      min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
+      min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
       ${variantStyles[variant]}
       ${sizeStyles[size]}
       ${fullWidth ? 'w-full' : ''}

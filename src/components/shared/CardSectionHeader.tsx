@@ -16,17 +16,17 @@ export const CardSectionHeader: React.FC<CardSectionHeaderProps> = ({
   action,
   divider = true,
   className = '',
-  iconClassName = 'text-text',
+  iconClassName = 'text-prussian-blue',
 }) => (
   <div className={`
     -mt-1 flex items-start justify-between gap-3
-    ${divider ? 'mb-1 border-b border-text-muted/15 pb-2.5' : 'mb-2'}
+    ${divider ? 'mb-1 border-b border-slate-grey/15 pb-2.5' : 'mb-2'}
     ${className}
   `}>
     <div className="flex min-w-0 items-start gap-2">
       <Icon size={16} strokeWidth={2.5} className={`mt-0.5 shrink-0 ${iconClassName}`} />
       <div className="min-w-0">
-        <h3 className="type-title text-text">
+        <h3 className="type-title text-prussian-blue">
           {title}
         </h3>
       </div>

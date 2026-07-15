@@ -79,7 +79,7 @@ describe('GlassModal bottom placement', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add fish' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Add a new fish' });
-    expect(dialog.firstElementChild?.className).toContain('bg-[rgba(15,23,42,0.5)]');
+    expect(dialog.firstElementChild?.className).toContain('bg-prussian-blue/50');
     expect(dialog.firstElementChild?.className).toContain('backdrop-blur-xs');
   });
 

@@ -4,6 +4,7 @@ import {
   Brain,
   ChevronRight,
   Fish,
+  Monitor,
   Pencil,
   Save,
   ShieldAlert,
@@ -50,7 +51,7 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
   const className = `
     flex items-center justify-between gap-3 text-left
     ${onClick ? 'cursor-pointer hover:bg-white/55' : ''}
-    ${highlight ? 'border-brand/20 bg-brand/8' : ''}
+    ${highlight ? 'border-pine-teal/20 bg-pine-teal/8' : ''}
     ${danger ? 'border-critical/20 bg-critical/8' : ''}
   `;
   const content = (
@@ -60,14 +61,14 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
           <span
             className={`
               grid size-9 shrink-0 place-items-center rounded-full
-              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'text-brand' : 'text-text-muted'}
+              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'text-pine-teal' : 'text-slate-grey'}
             `}
           >
             <Icon size={17} />
           </span>
         )}
         <span className="min-w-0">
-          <span className={`block type-strong ${danger ? 'text-critical' : 'text-text'}`}>
+          <span className={`block type-strong ${danger ? 'text-critical' : 'text-prussian-blue'}`}>
             {title}
           </span>
           {detail && (
@@ -133,7 +134,7 @@ const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
     <div className={variant === 'panel' ? 'rounded-2xl border border-white/20 bg-white/20 p-3 pb-2' : ''}>
       <div className="mb-1.5 flex items-baseline justify-between gap-3 type-body">
         <span className="min-w-0 type-body-muted">{label}</span>
-        <strong className="shrink-0 text-brand">{displayValue}</strong>
+        <strong className="shrink-0 text-pine-teal">{displayValue}</strong>
       </div>
       <input
         type="range"
@@ -144,7 +145,7 @@ const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
         onChange={(event) => onChange(parseRangeValue(event.target.value, parser))}
         onMouseUp={(event) => commitCurrentValue(event.currentTarget)}
         onTouchEnd={(event) => commitCurrentValue(event.currentTarget)}
-        className="w-full accent-brand-bright"
+        className="w-full accent-verdigris"
       />
     </div>
   );
@@ -220,7 +221,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
           title="Safety Alert Logs"
           detail="Warnings and event history"
           onClick={onNavigateToAlerts}
-          action={<ChevronRight size={18} className="text-text-muted" />}
+          action={<ChevronRight size={18} className="text-slate-grey" />}
         />
 
         <GlassDisclosurePanel
@@ -236,7 +237,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
               onClick={() => onAutoConnectChange(!preferences.autoConnect)}
               className={`
                 relative inline-flex h-6 w-11 cursor-pointer rounded-full border-none transition-colors
-                ${preferences.autoConnect ? 'bg-brand' : 'bg-text/20'}
+                ${preferences.autoConnect ? 'bg-pine-teal' : 'bg-prussian-blue/20'}
               `}
             >
               <span
@@ -366,6 +367,14 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
         />
       )}
 
+      <SettingsPanelRow
+        icon={Monitor}
+        title="IoT Scanner Console"
+        detail="Pair or review monitor hardware"
+        highlight
+        action={<ChevronRight size={18} className="text-slate-grey" />}
+      />
+
       {filters && onFilterChange && (
         <StreamAdjustments filters={filters} onFilterChange={onFilterChange} />
       )}
@@ -387,7 +396,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
           detail="Remove this tank from the active dashboard"
           onClick={onRequestUnlink}
           danger
-          action={<ChevronRight size={18} className="text-text-muted" />}
+          action={<ChevronRight size={18} className="text-slate-grey" />}
         />
       )}
     </div>

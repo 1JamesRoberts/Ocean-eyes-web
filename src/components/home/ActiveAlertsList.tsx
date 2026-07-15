@@ -45,8 +45,8 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
             onClick={() => onSelectAlert(alert.id)}
           >
             <div className="flex items-center justify-between">
-              <h4 className="type-strong text-text">{alert.title}</h4>
-              <ChevronRight size={16} className="text-text-muted" />
+              <h4 className="type-strong text-prussian-blue">{alert.title}</h4>
+              <ChevronRight size={16} className="text-slate-grey" />
             </div>
             <p className="mt-1 type-caption">
               {alert.message}

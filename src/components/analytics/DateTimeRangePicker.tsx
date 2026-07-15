@@ -247,20 +247,20 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         style={{
           boxShadow: heroOverlay
             ? undefined
-            : 'var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05)',
+            : 'var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--color-pine-teal) 5%, transparent)',
         }}
         onMouseEnter={(e) => {
           if (heroOverlay) return;
           e.currentTarget.style.boxShadow =
-            'var(--shadow-glass), 0 6px 24px 0 rgba(0, 67, 73, 0.08)';
+            'var(--shadow-glass), 0 6px 24px 0 color-mix(in srgb, var(--color-pine-teal) 8%, transparent)';
         }}
         onMouseLeave={(e) => {
           if (heroOverlay) return;
           e.currentTarget.style.boxShadow =
-            'var(--shadow-glass), 0 4px 20px 0 rgba(0, 67, 73, 0.05)';
+            'var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--color-pine-teal) 5%, transparent)';
         }}
       >
-        <History size={16} className={heroOverlay ? 'text-white/70' : 'text-text-muted'} />
+        <History size={16} className={heroOverlay ? 'text-white/70' : 'text-slate-grey'} />
         {showSummary ? (
           <>
             <span className="min-w-0 truncate">{summaryText}</span>
@@ -268,7 +268,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
               size={18}
               className={`
                 shrink-0 transition-transform duration-300 ease-in-out
-                ${heroOverlay ? 'text-white/70' : 'text-text-muted'}
+                ${heroOverlay ? 'text-white/70' : 'text-slate-grey'}
                 ${isExpanded ? 'rotate-180' : ''}
               `}
             />
@@ -323,7 +323,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         createPortal(
           <div
             ref={popoverRef}
-            className="animate-fade-in glass-card-overlay text-text"
+            className="animate-fade-in glass-card-overlay text-prussian-blue"
             style={popoverStyle}
           >
             {isCalendar && (

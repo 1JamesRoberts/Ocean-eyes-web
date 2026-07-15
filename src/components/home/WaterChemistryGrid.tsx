@@ -34,16 +34,16 @@ const ParameterTile: React.FC<ParameterTileProps> = ({
   onClick,
 }) => {
   const statusClassName = isUnavailable
-    ? 'bg-text-muted/35'
+    ? 'bg-slate-grey/35'
     : isCritical
       ? 'bg-critical'
       : 'bg-good';
 
   const content = (
     <>
-      <Icon aria-hidden="true" className="size-4 shrink-0 text-[#00A9CC]" />
-      <span className="type-caption text-[10px] font-semibold text-text-muted">{label}</span>
-      <div className={`flex items-baseline justify-center ${isCritical ? 'text-critical' : 'text-text'}`}>
+      <Icon aria-hidden="true" className="size-4 shrink-0 text-turquoise-surf" />
+      <span className="type-caption text-[10px] font-semibold text-slate-grey">{label}</span>
+      <div className={`flex items-baseline justify-center ${isCritical ? 'text-critical' : 'text-prussian-blue'}`}>
         <span className="text-[15px] leading-none font-bold">
           {value}
         </span>

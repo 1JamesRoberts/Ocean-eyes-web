@@ -49,7 +49,7 @@ export const HomeScreen: React.FC = () => {
 
           <HeadedCard
             icon={FlaskConical}
-            iconClassName="text-text"
+            iconClassName="text-prussian-blue"
             title="Parameters"
             action={(
                 <button
@@ -57,7 +57,7 @@ export const HomeScreen: React.FC = () => {
                   aria-label="View water parameter history"
                   className="cursor-pointer border-none bg-transparent p-0 transition-opacity hover:opacity-80"
                 >
-                  <ChevronRight size={18} className="text-text-muted" />
+                  <ChevronRight size={18} className="text-slate-grey" />
                 </button>
             )}
           >

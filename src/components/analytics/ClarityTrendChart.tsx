@@ -59,27 +59,27 @@ export const ClarityTrendChart: React.FC<Props> = ({ records, readings, emptyAct
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-azure-mist-2)" />
         <XAxis
           dataKey="time"
-          tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-border)' }}
-          tickLine={{ stroke: 'var(--color-border)' }}
+          tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
+          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
         />
         <YAxis
-          tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-border)' }}
-          tickLine={{ stroke: 'var(--color-border)' }}
+          tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
+          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
           domain={['auto', 'auto']}
         />
         <Tooltip
           contentStyle={{
-            background: 'rgba(255,255,255,0.7)',
+            background: 'color-mix(in srgb, var(--color-white) 70%, transparent)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.3)',
+            border: '1px solid color-mix(in srgb, var(--color-white) 30%, transparent)',
             borderRadius: '1rem',
-            color: 'var(--color-text-primary)',
+            color: 'var(--color-prussian-blue)',
             fontSize: 13,
           }}
           formatter={(value) => [`${Number(value).toFixed(2)} FNU`, 'Water Clarity']}
@@ -87,10 +87,10 @@ export const ClarityTrendChart: React.FC<Props> = ({ records, readings, emptyAct
         <Line
           type="monotone"
           dataKey="fnu"
-          stroke="var(--color-primary-dark)"
+          stroke="var(--color-pine-teal)"
           strokeWidth={2}
-          dot={{ r: 3, fill: 'var(--color-primary-dark)', strokeWidth: 0 }}
-          activeDot={{ r: 5, fill: 'var(--color-primary-dark)', stroke: 'var(--color-surface)', strokeWidth: 2 }}
+          dot={{ r: 3, fill: 'var(--color-pine-teal)', strokeWidth: 0 }}
+          activeDot={{ r: 5, fill: 'var(--color-pine-teal)', stroke: 'var(--color-white)', strokeWidth: 2 }}
         />
       </LineChart>
     </ResponsiveContainer>

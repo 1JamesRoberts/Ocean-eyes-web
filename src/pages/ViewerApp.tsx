@@ -19,7 +19,7 @@ const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'live', 'settings', 'my_fish', '
 
 const ScreenLoadingFallback = () => (
   <div className="flex flex-col gap-4" aria-label="Loading screen" aria-busy="true">
-    <div className="h-5 w-32 animate-pulse rounded-full bg-brand/10" />
+    <div className="h-5 w-32 animate-pulse rounded-full bg-pine-teal/10" />
     <div className="h-40 animate-pulse rounded-4xl bg-white/35" />
     <div className="h-28 animate-pulse rounded-4xl bg-white/25" />
   </div>
@@ -87,7 +87,7 @@ export const ViewerApp: React.FC = () => {
           className="-mx-4 -mt-4 flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-4"
         >
           <div className="
-            rounded-[20px] border border-border-subtle bg-surface p-6 pb-5 shadow-card
+            rounded-[20px] border border-azure-mist-2 bg-white p-6 pb-5 shadow-card
             transition-smooth
           ">
             <RootGateOnboarding />

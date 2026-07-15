@@ -33,7 +33,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
         <div key={key}>
           <div className="mb-1 flex justify-between type-caption">
             <span>{label}</span>
-            <span className="text-brand">
+            <span className="text-pine-teal">
               {key === 'temperature'
                 ? filters.temperature > 0 ? `Warm (+${filters.temperature})` : filters.temperature < 0 ? `Cool (${filters.temperature})` : 'Neutral'
                 : key === 'tint'
@@ -49,13 +49,13 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
               step="5"
               value={filters[key]}
               onChange={(e) => onFilterChange({ [key]: parseInt(e.target.value) })}
-              className="flex-1 accent-brand-bright"
+              className="flex-1 accent-verdigris"
             />
             <button
               onClick={() => onFilterChange({ [key]: key === 'temperature' || key === 'tint' ? 0 : 100 })}
               className="
                 cursor-pointer border-none bg-transparent type-caption
-                text-text-muted
+                text-slate-grey
               "
             >
             </button>

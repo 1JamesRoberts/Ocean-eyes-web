@@ -64,7 +64,7 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies, timeAx
             <stop offset="95%" stopColor="var(--color-warning)" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-azure-mist-2)" />
         <XAxis
           dataKey="time"
           type="number"
@@ -72,24 +72,24 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies, timeAx
           domain={timeAxis.domain}
           ticks={timeAxis.ticks}
           tickFormatter={formatChartTimestamp}
-          tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-border)' }}
-          tickLine={{ stroke: 'var(--color-border)' }}
+          tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
+          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
         />
         <YAxis
-          tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-border)' }}
-          tickLine={{ stroke: 'var(--color-border)' }}
+          tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
+          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
           width={32}
         />
         <Tooltip
           contentStyle={{
-            background: 'rgba(255,255,255,0.7)',
+            background: 'color-mix(in srgb, var(--color-white) 70%, transparent)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.3)',
+            border: '1px solid color-mix(in srgb, var(--color-white) 30%, transparent)',
             borderRadius: '1rem',
-            color: 'var(--color-text-primary)',
+            color: 'var(--color-prussian-blue)',
             fontSize: 13,
           }}
           formatter={(value) => [Number(value).toFixed(3), 'Mean NND']}
@@ -103,7 +103,7 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies, timeAx
           fill="url(#meanNNDGrad)"
           animationDuration={500}
           dot={{ r: 3, fill: 'var(--color-warning)', strokeWidth: 0 }}
-          activeDot={{ r: 5, fill: 'var(--color-warning)', stroke: 'var(--color-surface)', strokeWidth: 2 }}
+          activeDot={{ r: 5, fill: 'var(--color-warning)', stroke: 'var(--color-white)', strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>

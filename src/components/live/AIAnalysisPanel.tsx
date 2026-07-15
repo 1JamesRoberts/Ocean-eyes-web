@@ -42,7 +42,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <span className="block type-caption">
             Fish Detected
           </span>
-          <strong className="mt-1 block type-title text-text">
+          <strong className="mt-1 block type-title text-prussian-blue">
             {lastPrediction ? lastPrediction.summary.total_detections : '—'}
           </strong>
         </GlassPanel>
@@ -51,7 +51,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           <span className="block type-caption">
             FNU
           </span>
-          <strong className="mt-1 block type-title text-text">
+          <strong className="mt-1 block type-title text-prussian-blue">
             {lastTurbidityResult ? lastTurbidityResult.turbidity.fnu.toFixed(2) : '—'}
           </strong>
         </GlassPanel>
@@ -76,14 +76,14 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
                   flex items-center gap-1.5 px-3 py-1.5 type-caption
                 ">
                   <div className="size-2 rounded-full" style={{ backgroundColor: color }} />
-                  <span className="text-text">{displayName}</span>
-                  <span className="text-text">{count}</span>
+                  <span className="text-prussian-blue">{displayName}</span>
+                  <span className="text-prussian-blue">{count}</span>
                 </div>
               );
             })}
           </div>
         ) : (
-          <p className="m-0 type-caption text-text-muted">
+          <p className="m-0 type-caption text-slate-grey">
             Awaiting analysis…
           </p>
         )}
@@ -101,7 +101,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
           m-0 mb-2 flex items-center gap-1.5 type-caption
           ${diagnosis ? (diagnosis.error ? `text-critical` : diagnosis.healthy ? `
             text-good
-          ` : `text-warning`) : 'text-text-muted'}
+          ` : `text-warning`) : 'text-slate-grey'}
         `}>
           Fish Health Diagnosis
         </h4>
@@ -160,7 +160,7 @@ export const AIAnalysisPanel: React.FC<AIAnalysisPanelProps> = ({
             </>
           )
         ) : (
-          <p className="m-0 type-caption text-text-muted">
+          <p className="m-0 type-caption text-slate-grey">
             Awaiting diagnosis…
           </p>
         )}

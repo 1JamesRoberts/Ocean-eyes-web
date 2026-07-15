@@ -27,7 +27,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
               hover:opacity-80
             "
           >
-            <ChevronRight size={18} className="text-text-muted" />
+            <ChevronRight size={18} className="text-slate-grey" />
           </button>
       )}
     >
@@ -52,7 +52,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                   flex items-center justify-between pb-3
                   [&:first-child]:pt-3
                   [&:not(:last-child)]:mb-3
-                  [&:not(:last-child)]:border-b [&:not(:last-child)]:border-text-muted/15
+                  [&:not(:last-child)]:border-b [&:not(:last-child)]:border-slate-grey/15
                 "
               >
                 <div className="flex items-center gap-3">
@@ -72,7 +72,9 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                 <span
                   className="inline-flex items-center rounded-full px-2.5 py-1 leading-none type-caption"
                   style={{
-                    backgroundColor: isComplete ? 'rgba(25, 106, 89, 0.12)' : 'rgba(186, 26, 26, 0.12)',
+                    backgroundColor: isComplete
+                      ? 'color-mix(in srgb, var(--color-pine-teal) 12%, transparent)'
+                      : 'rgba(186, 26, 26, 0.12)',
                     color: isComplete ? 'var(--color-good)' : 'var(--color-critical)'
                   }}
                 >

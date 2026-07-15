@@ -18,7 +18,7 @@ export const DateTimePill: React.FC<DateTimePillProps> = ({
     className={`
       overlay-glass-control inline-flex w-full min-w-0 items-center justify-center whitespace-nowrap rounded-full
       px-2 py-2.5 type-body
-      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
       ${isActive
         ? 'fish-count-teal-outline text-white'
         : 'text-white hover:text-white'}

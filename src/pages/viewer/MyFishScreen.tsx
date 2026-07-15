@@ -293,12 +293,12 @@ export const MyFishScreen: React.FC = () => {
                   <div className="mt-4">
                     <div className="
                       mb-2 type-caption
-                      text-text-muted uppercase
+                      text-slate-grey uppercase
                     ">
                       Tank Compatibility
                     </div>
                     <div className="
-                      flex items-center gap-2 border-b border-border py-1.5
+                      flex items-center gap-2 border-b border-azure-mist-2 py-1.5
                       last:border-b-0
                     ">
                       <div
@@ -375,7 +375,7 @@ export const MyFishScreen: React.FC = () => {
                 <div className="flex items-center justify-between px-3 py-2.5">
                   <button
                     type="button"
-                    className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-xl border-none bg-transparent text-left focus-visible:outline-2 focus-visible:outline-brand"
+                    className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-xl border-none bg-transparent text-left focus-visible:outline-2 focus-visible:outline-pine-teal"
                     onClick={() => onToggleFish(fish.id)}
                     aria-expanded={isActive}
                   >
@@ -387,7 +387,7 @@ export const MyFishScreen: React.FC = () => {
                       {species?.scientificName && (
                         <span className="
                           mb-1 block truncate type-caption
-                          text-text-muted italic
+                          text-slate-grey italic
                         ">{species.scientificName}</span>
                       )}
                       {!isActive && (
@@ -457,7 +457,7 @@ export const MyFishScreen: React.FC = () => {
                             <div className="mt-4">
                               <div className="
                                 mb-2 type-caption
-                                text-text-muted uppercase
+                                text-slate-grey uppercase
                               ">
                                 Tank Compatibility
                               </div>
@@ -467,7 +467,7 @@ export const MyFishScreen: React.FC = () => {
                                 return (
                                   <div key={cr.speciesId} className="
                                     flex items-center gap-2 border-b
-                                    border-border py-1.5
+                                    border-azure-mist-2 py-1.5
                                     last:border-b-0
                                   ">
                                     <div className="

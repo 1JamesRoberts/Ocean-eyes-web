@@ -54,8 +54,8 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
         >
           <defs>
             <linearGradient id="healthRingGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#00A9CC" />
-              <stop offset="100%" stopColor="#009D8D" />
+              <stop offset="0%" stopColor="var(--color-turquoise-surf)" />
+              <stop offset="100%" stopColor="var(--color-verdigris)" />
             </linearGradient>
           </defs>
           <circle
@@ -83,9 +83,9 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
           absolute inset-0 flex flex-col items-center justify-center
         ">
           <span className="
-            text-[2.65rem] leading-none font-bold tracking-[-0.06em] text-text
+            text-[2.65rem] leading-none font-bold tracking-[-0.06em] text-prussian-blue
           ">{displayScore}</span>
-          <span className="mt-1 text-sm leading-none text-text-muted">/100</span>
+          <span className="mt-1 text-sm leading-none text-slate-grey">/100</span>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
         <ChevronRight
           aria-hidden="true"
           size={18}
-          className="absolute top-0 right-0 text-text-muted"
+          className="absolute top-0 right-0 text-slate-grey"
         />
         <div className="flex items-center gap-2 pr-7">
           <span
@@ -106,7 +106,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
         <h3 className="mt-2 type-title whitespace-nowrap">
           Aquarium Health
         </h3>
-        <p className="mt-2 text-sm/tight text-text-muted">{healthMessage}</p>
+        <p className="mt-2 text-sm/tight text-slate-grey">{healthMessage}</p>
         <div className="mt-4 grid grid-cols-3 gap-1.5">
           {parameters.map((parameter) => (
             <div
@@ -117,12 +117,12 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
               "
             >
               <parameter.icon aria-hidden="true" className="
-                size-4 shrink-0 text-[#00A9CC]
+                size-4 shrink-0 text-turquoise-surf
               " />
               <span className="sr-only">{parameter.label}: </span>
               <span className="
                 min-w-0 truncate text-2xs font-semibold whitespace-nowrap
-                text-text
+                text-prussian-blue
                 sm:text-xs
               ">
                 {parameter.value}

@@ -41,8 +41,8 @@ export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
           justifyContent: 'center',
           fontSize: `${Math.max(9, size * 0.34)}px`,
           fontWeight: 700,
-          color: '#fff',
-          textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+          color: 'var(--color-white)',
+          textShadow: '0 1px 2px color-mix(in srgb, var(--color-prussian-blue) 30%, transparent)',
         }}
       >
         {getSpeciesInitials(speciesId)}

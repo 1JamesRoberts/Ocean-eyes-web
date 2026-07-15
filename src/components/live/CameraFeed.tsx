@@ -71,7 +71,7 @@ export const CameraFeed = forwardRef<CameraFeedHandle, CameraFeedProps>(
       ) : (
         idlePlaceholder ?? (
           <div className="flex flex-col items-center justify-center gap-2 py-8">
-            <Video size={24} className="text-text-muted" />
+            <Video size={24} className="text-slate-grey" />
             <p className="type-caption">Feed is idle. Connect stream to monitor.</p>
           </div>
         )

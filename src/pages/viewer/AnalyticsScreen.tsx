@@ -77,7 +77,7 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
               <strong>Observation:</strong> {diagnosis.diagnosis.description}
             </p>
             {!isHealthy && diagnosis.diagnosis.treatment && (
-              <p className="mt-1 rounded-md border-l-3 border-warning bg-bg p-2 type-caption">
+              <p className="mt-1 rounded-md border-l-3 border-warning bg-azure-mist p-2 type-caption">
                 <strong>Recommended Treatment:</strong> {diagnosis.diagnosis.treatment}
               </p>
             )}
@@ -91,18 +91,18 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
 const AnalyticsLoadingSkeleton: React.FC = () => (
   <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-hidden="true">
     <GlassCard className="flex min-h-[468px] flex-col gap-5 overflow-hidden p-5 lg:col-span-2">
-      <div className="h-5 w-44 animate-pulse rounded bg-border-subtle/70" />
-      <div className="h-[180px] animate-pulse rounded-lg bg-bg/70" />
-      <div className="h-5 w-48 animate-pulse rounded bg-border-subtle/70" />
-      <div className="h-[180px] animate-pulse rounded-lg bg-bg/70" />
+      <div className="h-5 w-44 animate-pulse rounded bg-azure-mist-2/70" />
+      <div className="h-[180px] animate-pulse rounded-lg bg-azure-mist/70" />
+      <div className="h-5 w-48 animate-pulse rounded bg-azure-mist-2/70" />
+      <div className="h-[180px] animate-pulse rounded-lg bg-azure-mist/70" />
     </GlassCard>
     <GlassCard className="min-h-[320px] p-5 lg:col-span-2">
-      <div className="h-5 w-40 animate-pulse rounded bg-border-subtle/70" />
-      <div className="mt-5 h-[240px] animate-pulse rounded-lg bg-bg/70" />
+      <div className="h-5 w-40 animate-pulse rounded bg-azure-mist-2/70" />
+      <div className="mt-5 h-[240px] animate-pulse rounded-lg bg-azure-mist/70" />
     </GlassCard>
     <GlassCard className="min-h-[196px] p-5 lg:col-span-2">
-      <div className="h-5 w-64 animate-pulse rounded bg-border-subtle/70" />
-      <div className="mt-5 h-20 animate-pulse rounded-lg bg-bg/70" />
+      <div className="h-5 w-64 animate-pulse rounded bg-azure-mist-2/70" />
+      <div className="mt-5 h-20 animate-pulse rounded-lg bg-azure-mist/70" />
     </GlassCard>
   </div>
 );
@@ -143,7 +143,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
                 className="pointer-events-none hero-overlay-pill"
                 role="status"
               >
-                <Loader2 size={12} className="animate-spin text-info" aria-hidden="true" />
+                <Loader2 size={12} className="animate-spin text-sky-surge" aria-hidden="true" />
                 Updating
               </span>
             )}

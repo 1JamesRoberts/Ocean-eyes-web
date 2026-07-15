@@ -75,12 +75,12 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies, time
       >
         <defs>
           <linearGradient id="fishCountBarGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-brand-bright)" />
-            <stop offset="100%" stopColor="var(--color-brand)" />
+            <stop offset="0%" stopColor="var(--color-verdigris)" />
+            <stop offset="100%" stopColor="var(--color-pine-teal)" />
           </linearGradient>
         </defs>
         <CartesianGrid
-          stroke="var(--color-border)"
+          stroke="var(--color-azure-mist-2)"
           strokeDasharray="5 6"
         />
         <XAxis
@@ -90,26 +90,26 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies, time
           domain={timeAxis.domain}
           ticks={timeAxis.ticks}
           tickFormatter={formatChartTimestamp}
-          tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-border)' }}
-          tickLine={{ stroke: 'var(--color-border)' }}
+          tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
+          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
         />
         <YAxis
           allowDecimals={false}
           orientation="left"
-          tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+          tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
           axisLine={false}
           tickLine={false}
           width={32}
         />
         <Tooltip
           contentStyle={{
-            background: 'rgba(255,255,255,0.7)',
+            background: 'color-mix(in srgb, var(--color-white) 70%, transparent)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.3)',
+            border: '1px solid color-mix(in srgb, var(--color-white) 30%, transparent)',
             borderRadius: '1rem',
-            color: 'var(--color-text-primary)',
+            color: 'var(--color-prussian-blue)',
             fontSize: 13,
           }}
           formatter={(value) => [`${value as number} fish`, 'Count']}
