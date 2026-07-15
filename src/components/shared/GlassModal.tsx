@@ -86,7 +86,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       className={`
         ${isBelowHero ? 'absolute z-50' : 'fixed z-[70]'} right-0 bottom-0 left-0 flex justify-center
         ${isBelowHero
-          ? 'top-[calc(var(--mobile-status-bar-height)+var(--mobile-hero-height)-1rem)]'
+          ? 'top-[calc(var(--mobile-hero-height)-1rem)]'
           : 'top-0'
         }
         ${isBottomSheet ? 'items-end p-0' : 'items-center p-4'}

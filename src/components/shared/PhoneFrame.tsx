@@ -1,5 +1,4 @@
 import React from 'react';
-import { StatusBar } from './StatusBar';
 
 interface PhoneFrameProps {
   children: React.ReactNode;
@@ -16,8 +15,6 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({ children, navigation }) 
         >
           Skip to content
         </a>
-        <StatusBar />
-
         <div className="phone-content">
           {children}
         </div>

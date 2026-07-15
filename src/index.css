@@ -60,12 +60,11 @@
 
   /* Mobile shell geometry */
   --mobile-frame-width: 393px;
-  --mobile-status-bar-height: 54px;
   --mobile-hero-height: 221px;
   --mobile-hero-blend-extension: 56px;
   --mobile-hero-content-clearance: 8px;
   --mobile-hero-backdrop-height: max(
-    calc(100dvh - var(--mobile-status-bar-height)),
+    100dvh,
     calc(var(--mobile-hero-height) + var(--mobile-hero-blend-extension))
   );
   --mobile-content-radius: 20px;
@@ -695,7 +694,6 @@
   overflow: hidden;
   position: relative;
   z-index: 10;
-  padding-top: var(--mobile-status-bar-height);
   border-top-left-radius: var(--mobile-content-radius);
   border-top-right-radius: var(--mobile-content-radius);
   background: var(--color-health-parameter-bg);
@@ -723,89 +721,6 @@
   background: var(--color-health-parameter-bg);
   border-radius: 9999px;
   height: 8px;
-}
-
-/* ─── Status Bar ─── */
-.status-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 54px;
-  z-index: 50;
-  pointer-events: none;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 11px 15px 0;
-  background: #1a1a1a;
-}
-
-.status-bar-notch {
-  position: absolute;
-  left: 50%;
-  top: 11px;
-  transform: translateX(-50%);
-  width: 119px;
-  height: 35px;
-  border-radius: 17.5px;
-  background: #030303;
-}
-
-.status-bar-left {
-  position: relative;
-  z-index: 1;
-  padding-left: 2.5px;
-  padding-top: 5px;
-}
-
-.status-bar-time {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', system-ui, sans-serif;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--color-white);
-  line-height: 22px;
-  letter-spacing: -1px;
-}
-
-.status-bar-right {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding-top: 4px;
-}
-
-.status-bar-icon {
-  color: var(--color-white);
-}
-
-.status-bar-battery {
-  position: relative;
-  width: 25px;
-  height: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.status-bar-battery-icon {
-  color: var(--color-white);
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.status-bar-battery-fill {
-  position: absolute;
-  left: 2px;
-  top: 2px;
-  width: 19px;
-  height: 9px;
-  border-radius: 1px;
-  background: var(--color-white);
 }
 
 /* ─── Phone Background Gradient ─── */
