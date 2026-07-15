@@ -13,9 +13,8 @@ vi.mock('../../../hooks/useLiveFeed', () => ({
   }),
 }));
 
-describe('LiveFeedPreview notification button', () => {
+describe('LiveFeedPreview hero', () => {
   const onViewAdvanced = vi.fn();
-  const onOpenAlerts = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -23,38 +22,34 @@ describe('LiveFeedPreview notification button', () => {
 
   afterEach(cleanup);
 
-  const renderHero = (showNotifications: boolean) => render(
+  const renderHero = () => render(
     <LiveFeedPreview
       displayClarity={0}
       displayFishCount={0}
       onViewAdvanced={onViewAdvanced}
-      onOpenAlerts={onOpenAlerts}
-      showNotifications={showNotifications}
       hero
     />,
   );
 
-  it('shows an accessible icon-only notification button on the Dashboard hero', () => {
-    renderHero(true);
+  it('offers to connect the camera when the feed is idle', () => {
+    renderHero();
 
-    const button = screen.getByRole('button', { name: 'Open notifications' });
-
-    expect(button).toBeTruthy();
-    expect(button.querySelector('svg')?.classList.contains('size-4.5!')).toBe(true);
+    expect(screen.getByRole('button', { name: 'Connect Stream' })).toBeTruthy();
   });
 
-  it('opens alerts without triggering the hero navigation', () => {
-    renderHero(true);
+  it('opens the advanced live view when the hero is selected', () => {
+    renderHero();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Open notifications' }));
+    fireEvent.click(screen.getByText('Feed is idle. Connect stream to monitor.'));
 
-    expect(onOpenAlerts).toHaveBeenCalledOnce();
+    expect(onViewAdvanced).toHaveBeenCalledOnce();
+  });
+
+  it('does not open the advanced view when connecting the stream', () => {
+    renderHero();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Connect Stream' }));
+
     expect(onViewAdvanced).not.toHaveBeenCalled();
-  });
-
-  it('hides the notification button outside the Dashboard', () => {
-    renderHero(false);
-
-    expect(screen.queryByRole('button', { name: 'Open notifications' })).toBeNull();
   });
 });

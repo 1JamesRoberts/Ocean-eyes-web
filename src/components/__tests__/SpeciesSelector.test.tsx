@@ -12,7 +12,6 @@ describe('SpeciesSelector inline presentation', () => {
       <SpeciesSelector
         selectedSpeciesId={null}
         onSelect={onSelect}
-        presentation="inline"
       />,
     );
 
@@ -28,7 +27,6 @@ describe('SpeciesSelector inline presentation', () => {
         selectedSpeciesId={null}
         onSelect={vi.fn()}
         excludeSpeciesIds={['goldfish']}
-        presentation="inline"
       />,
     );
 
@@ -44,7 +42,6 @@ describe('SpeciesSelector inline presentation', () => {
       <SpeciesSelector
         selectedSpeciesId={null}
         onSelect={onSelect}
-        presentation="inline"
       />,
     );
 
