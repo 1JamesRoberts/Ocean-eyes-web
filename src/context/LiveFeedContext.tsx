@@ -21,6 +21,11 @@ import {
   updateCalibration as updateCalibrationInRepository,
 } from '../models/repositories/storageBase';
 import { useLivePreferences } from '../hooks/useLivePreferences';
+import {
+  buildCameraVideoConstraints,
+  oppositeCameraFacingMode,
+  type CameraFacingMode,
+} from '../models/services/cameraConstraints';
 import type {
   CameraFeedConfig,
   CameraSourcePreference,
@@ -51,8 +56,12 @@ export interface LiveFeedContextValue {
   isWebcam: boolean;
   isStreaming: boolean;
   webcamStream: MediaStream | null;
+  cameraFacingMode: CameraFacingMode;
+  isCameraSwitching: boolean;
+  canSwitchCamera: boolean;
   saveLiveState: (state: LiveState) => void;
   startStream: () => void;
+  switchCamera: () => void;
   updateCalibration: (waterLineY: number) => void;
 }
 
@@ -105,8 +114,14 @@ export const LiveFeedProvider: React.FC<LiveFeedProviderProps> = ({
   const isStreaming = liveState?.is_live ?? false;
 
   const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
+  const [cameraFacingMode, setCameraFacingMode] =
+    useState<CameraFacingMode>('environment');
+  const [isCameraSwitching, setIsCameraSwitching] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
   const preferenceAppliedRef = useRef(false);
+  const configuredDeviceId = activeFeed.stream_url.split(':')[1];
+  const canSwitchCamera =
+    isWebcam && (!configuredDeviceId || configuredDeviceId === 'default');
 
   const saveLiveState = useCallback(
     (state: LiveState) => {
@@ -164,32 +179,48 @@ export const LiveFeedProvider: React.FC<LiveFeedProviderProps> = ({
 
   // Webcam acquisition. Kept in the provider so the stream survives tab changes.
   useEffect(() => {
-    if (isStreaming && isWebcam) {
-      const deviceId = activeFeed.stream_url.split(':')[1];
-      navigator.mediaDevices
-        .getUserMedia({
-          video:
-            deviceId && deviceId !== 'default'
-              ? { deviceId: { exact: deviceId } }
-              : true,
-        })
-        .then((stream) => {
-          streamRef.current = stream;
-          setWebcamStream(stream);
-        })
-        .catch((err) => {
-          console.error('Failed to access webcam:', err);
-        });
-    }
+    if (!isStreaming || !isWebcam) return;
+
+    let disposed = false;
+
+    navigator.mediaDevices
+      .getUserMedia({
+        video: buildCameraVideoConstraints(
+          configuredDeviceId,
+          cameraFacingMode
+        ),
+      })
+      .then((stream) => {
+        if (disposed) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
+        streamRef.current = stream;
+        setWebcamStream(stream);
+        setIsCameraSwitching(false);
+      })
+      .catch((err) => {
+        if (disposed) return;
+        setIsCameraSwitching(false);
+        console.error('Failed to access webcam:', err);
+      });
 
     return () => {
+      disposed = true;
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
       }
       setWebcamStream(null);
     };
-  }, [isStreaming, isWebcam, activeFeed.stream_url]);
+  }, [isStreaming, isWebcam, configuredDeviceId, cameraFacingMode]);
+
+  const switchCamera = useCallback(() => {
+    if (!canSwitchCamera || isCameraSwitching) return;
+    setIsCameraSwitching(true);
+    setCameraFacingMode(oppositeCameraFacingMode);
+  }, [canSwitchCamera, isCameraSwitching]);
 
   const startStream = useCallback(() => {
     if (!liveState) return;
@@ -225,8 +256,12 @@ export const LiveFeedProvider: React.FC<LiveFeedProviderProps> = ({
         isWebcam,
         isStreaming,
         webcamStream,
+        cameraFacingMode,
+        isCameraSwitching,
+        canSwitchCamera,
         saveLiveState,
         startStream,
+        switchCamera,
         updateCalibration,
       }}
     >

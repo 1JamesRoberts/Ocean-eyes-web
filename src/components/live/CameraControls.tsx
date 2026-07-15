@@ -8,7 +8,9 @@ import {
   Minimize,
   Fish,
   Stethoscope,
+  SwitchCamera,
 } from 'lucide-react';
+import type { CameraFacingMode } from '../../models/services/cameraConstraints';
 
 
 type BackendStatus = 'unknown' | 'checking' | 'online' | 'offline';
@@ -21,9 +23,13 @@ interface CameraControlsProps {
   turbidityLoading: boolean;
   manualDiagnoseLoading: boolean;
   hasImageSource: boolean;
+  cameraFacingMode: CameraFacingMode;
+  isCameraSwitching: boolean;
+  canSwitchCamera: boolean;
   isFullscreen: boolean;
   showFsInventory: boolean;
   onTakeSnapshot: () => void;
+  onSwitchCamera: () => void;
   onMeasureTurbidity: () => void;
   onToggleAI: () => void;
   onManualDiagnose: () => void;
@@ -39,9 +45,13 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   turbidityLoading,
   manualDiagnoseLoading,
   hasImageSource,
+  cameraFacingMode,
+  isCameraSwitching,
+  canSwitchCamera,
   isFullscreen,
   showFsInventory,
   onTakeSnapshot,
+  onSwitchCamera,
   onMeasureTurbidity,
   onToggleAI,
   onManualDiagnose,
@@ -93,6 +103,12 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
     return 'Measure Water Clarity';
   };
 
+  const cameraSwitchTitle = isCameraSwitching
+    ? 'Switching camera…'
+    : cameraFacingMode === 'environment'
+      ? 'Switch to Front Camera'
+      : 'Switch to Rear Camera';
+
   return (
     <div
       className="
@@ -111,6 +127,23 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         aria-label="Capture Snapshot"
       >
         <Camera size={14} strokeWidth={2.5} />
+      </button>
+
+      <button
+        type="button"
+        className={getButtonClasses({
+          disabled: !isStreaming || !canSwitchCamera || isCameraSwitching,
+        })}
+        onClick={onSwitchCamera}
+        disabled={!isStreaming || !canSwitchCamera || isCameraSwitching}
+        title={cameraSwitchTitle}
+        aria-label={cameraSwitchTitle}
+      >
+        {isCameraSwitching ? (
+          <Loader2 size={14} strokeWidth={2.5} className="animate-spin" />
+        ) : (
+          <SwitchCamera size={14} strokeWidth={2.5} />
+        )}
       </button>
 
       <button

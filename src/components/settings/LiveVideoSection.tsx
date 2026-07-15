@@ -53,6 +53,10 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
     isWebcam,
     isStreaming,
     videoRef,
+    cameraFacingMode,
+    isCameraSwitching,
+    canSwitchCamera,
+    switchCamera,
   } = useLiveFeed();
   const { fishList } = useFish(tankId);
 
@@ -107,9 +111,13 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
       turbidityLoading={turbidityLoading}
       manualDiagnoseLoading={manualDiagnosisLoading}
       hasImageSource={isWebcam}
+      cameraFacingMode={cameraFacingMode}
+      isCameraSwitching={isCameraSwitching}
+      canSwitchCamera={canSwitchCamera}
       isFullscreen={isFullscreen}
       showFsInventory={showFsInventory}
       onTakeSnapshot={() => takeSnapshot(currentFishCount, currentClarity)}
+      onSwitchCamera={switchCamera}
       onMeasureTurbidity={measureTurbidity}
       onToggleAI={toggleAI}
       onManualDiagnose={manualDiagnose}

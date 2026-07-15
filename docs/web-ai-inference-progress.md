@@ -14,6 +14,7 @@ The existing production URL, `https://oceaneyes-prototype.thammatorn-j.chatgpt.s
 - WebGPU is preferred for the floating-point species model. WASM is used for the quantized detection and turbidity models and is also the fallback execution provider.
 - Models load lazily, inference is serialized to limit peak resource use, and the turbidity session is released after each measurement.
 - Camera frames and inference results stay on the user's device. There is no cloud inference fallback.
+- Mobile camera capture requests the rear-facing camera by default and provides a control to switch safely between rear and front cameras.
 - Existing detection and turbidity result contracts remain unchanged, so the UI and local history code can consume the new results.
 - Browser capability replaces the former FastAPI backend-health check.
 - Disease diagnosis is explicitly disabled for P0.

@@ -13,9 +13,13 @@ const defaultProps = {
   turbidityLoading: false,
   manualDiagnoseLoading: false,
   hasImageSource: true,
+  cameraFacingMode: 'environment' as const,
+  isCameraSwitching: false,
+  canSwitchCamera: true,
   isFullscreen: false,
   showFsInventory: false,
   onTakeSnapshot: vi.fn(),
+  onSwitchCamera: vi.fn(),
   onMeasureTurbidity: vi.fn(),
   onToggleAI: vi.fn(),
   onManualDiagnose: vi.fn(),
@@ -36,11 +40,26 @@ describe('CameraControls', () => {
 
     [
       'Capture Snapshot',
+      'Switch to Front Camera',
       'Measure Water Clarity',
       'Start AI Analysis',
       'Disease diagnosis is disabled in the on-device prototype',
       'Enter Fullscreen',
     ].forEach((label) => expectSharedOverlayStyle(screen.getByRole('button', { name: label })));
+  });
+
+  it('describes and disables the camera switch while reacquiring a stream', () => {
+    render(<CameraControls {...defaultProps} isCameraSwitching />);
+
+    const switchButton = screen.getByRole('button', { name: 'Switching camera…' });
+    expect(switchButton.hasAttribute('disabled')).toBe(true);
+    expect(switchButton.querySelector('.animate-spin')).not.toBeNull();
+  });
+
+  it('offers the rear camera when the front camera is active', () => {
+    render(<CameraControls {...defaultProps} cameraFacingMode="user" />);
+
+    expect(screen.getByRole('button', { name: 'Switch to Rear Camera' })).toBeTruthy();
   });
 
   it('keeps cloud disease diagnosis disabled for the on-device prototype', () => {

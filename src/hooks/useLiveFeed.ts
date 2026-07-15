@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLiveFeedContext } from '../context/LiveFeedContext';
+import type { CameraFacingMode } from '../models/services/cameraConstraints';
 import type { CameraFeedConfig, LiveState } from '../types/aquarium';
 
 export interface UseLiveFeedViewModelResult {
@@ -9,8 +10,12 @@ export interface UseLiveFeedViewModelResult {
   isStreaming: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   webcamStream: MediaStream | null;
+  cameraFacingMode: CameraFacingMode;
+  isCameraSwitching: boolean;
+  canSwitchCamera: boolean;
   saveLiveState: (state: LiveState) => void;
   startStream: () => void;
+  switchCamera: () => void;
   updateCalibration: (waterLineY: number) => void;
 }
 
@@ -33,8 +38,12 @@ export const useLiveFeed = (): UseLiveFeedViewModelResult => {
     isWebcam,
     isStreaming,
     webcamStream,
+    cameraFacingMode,
+    isCameraSwitching,
+    canSwitchCamera,
     saveLiveState,
     startStream,
+    switchCamera,
     updateCalibration,
   } = useLiveFeedContext();
 
@@ -53,8 +62,12 @@ export const useLiveFeed = (): UseLiveFeedViewModelResult => {
     isStreaming,
     videoRef,
     webcamStream,
+    cameraFacingMode,
+    isCameraSwitching,
+    canSwitchCamera,
     saveLiveState,
     startStream,
+    switchCamera,
     updateCalibration,
   };
 };
