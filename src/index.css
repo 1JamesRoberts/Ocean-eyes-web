@@ -487,7 +487,7 @@
   html {
     height: 100%;
     overflow: hidden;
-    background: var(--color-prussian-blue);
+    background: #1a1a1a;
   }
 
   select,
@@ -506,7 +506,7 @@
     font-family: var(--font-main);
     letter-spacing: var(--letter-spacing-base);
     height: 100dvh;
-    background: var(--color-prussian-blue);
+    background: #1a1a1a;
     color: var(--color-prussian-blue);
     min-height: 0;
     padding: 0;
@@ -665,14 +665,14 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  background: var(--color-prussian-blue);
+  background: #1a1a1a;
   overflow: hidden;
 }
 
 .phone-frame {
   width: min(100%, var(--mobile-frame-width));
   height: 100%;
-  background: var(--color-prussian-blue);
+  background: #000;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -738,7 +738,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 11px 15px 0;
-  background: var(--color-prussian-blue);
+  background: #1a1a1a;
 }
 
 .status-bar-notch {
@@ -749,7 +749,7 @@
   width: 119px;
   height: 35px;
   border-radius: 17.5px;
-  background: var(--color-prussian-blue);
+  background: #030303;
 }
 
 .status-bar-left {

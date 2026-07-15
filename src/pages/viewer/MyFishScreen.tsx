@@ -212,7 +212,6 @@ export const MyFishScreen: React.FC = () => {
           <GlassCard
             className="!p-5"
             clickable
-            hover
             role="button"
             tabIndex={0}
             onClick={onToggleAquariumOverview}
