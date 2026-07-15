@@ -158,6 +158,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
     setPopoverTop(null);
   }, []);
 
+  const stopHeroNavigation = useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+  }, []);
+
   const handleDateSelect = useCallback(
     (date: Date) => {
       const dateStr = toISODate(date);
@@ -222,6 +226,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
   return (
     <div
       ref={containerRef}
+      onClick={stopHeroNavigation}
       className={`relative transition-[width] duration-300 ease-in-out ${
         collapseToIcon
           ? 'w-auto'

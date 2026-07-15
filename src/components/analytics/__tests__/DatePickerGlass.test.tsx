@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CalendarSheet } from '../CalendarSheet';
 import { DateTimePill } from '../DateTimePill';
 import { DateTimeRangePicker } from '../DateTimeRangePicker';
@@ -55,6 +55,27 @@ describe('date picker glass styling', () => {
 
     expect(screen.getByText('Starts').classList.contains('type-strong-inverse')).toBe(true);
     expect(screen.getByText('Ends').classList.contains('type-strong-inverse')).toBe(true);
+  });
+
+  it('does not trigger the clickable hero when expanding the range editor', () => {
+    const onHeroClick = vi.fn();
+
+    render(
+      <div onClick={onHeroClick}>
+        <DateTimeRangePicker
+          value={{ startDate: '2026-07-14', startTime: '00:00', endDate: '2026-07-14', endTime: '23:55' }}
+          onChange={() => undefined}
+          collapseToIcon
+          heroOverlay
+        />
+      </div>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Expand date range' }));
+
+    expect(onHeroClick).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Collapse date range' })).toBeTruthy();
+    expect(document.getElementById('date-range-editor')?.style.pointerEvents).toBe('auto');
   });
 
   it('uses the fish-search glass card treatment for the calendar popover', () => {
