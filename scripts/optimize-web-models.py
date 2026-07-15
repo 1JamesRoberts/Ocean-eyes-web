@@ -1,8 +1,8 @@
 """Generate the reduced ONNX artifacts served to web browsers."""
 
 from pathlib import Path
-from shutil import copy2
-
+import onnx
+from onnxconverter_common import float16
 from onnxruntime.quantization import QuantType, quantize_dynamic
 
 
@@ -21,9 +21,13 @@ def main() -> None:
             weight_type=QuantType.QInt8,
         )
 
-    # Dynamic quantization changed too many species decisions in the reference
-    # aquarium frame, so P0 deliberately retains this smaller float32 model.
-    copy2(SOURCE / "species_classifier.onnx", OUTPUT / "species_classifier.onnx")
+    # Float16 preserves the reference crop decisions while halving this model.
+    species_model = onnx.load(SOURCE / "species_classifier.onnx")
+    species_float16 = float16.convert_float_to_float16(
+        species_model,
+        keep_io_types=True,
+    )
+    onnx.save(species_float16, OUTPUT / "species_classifier.onnx")
 
 
 if __name__ == "__main__":

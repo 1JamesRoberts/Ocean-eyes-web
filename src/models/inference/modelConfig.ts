@@ -4,7 +4,7 @@ export const MODEL_PATHS = {
   turbidity: '/models/turbidity.onnx',
 } as const;
 
-export const MODEL_VERSION = '2026-07-15-v2';
+export const MODEL_VERSION = '2026-07-15-v3';
 
 export const DETECTION_INPUT_SIZE = 576;
 export const SPECIES_INPUT_SIZE = 224;

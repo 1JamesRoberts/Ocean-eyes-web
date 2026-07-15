@@ -1,13 +1,13 @@
 {
-  "version": "2026-07-15-v2",
+  "version": "2026-07-15-v3",
   "models": {
     "fish_detection.onnx": {
       "bytes": 32849543,
       "sha256": "ee4b5a2624ef57040cd959441719a1a10e2641f9bc51c87cc75c671968dc5077"
     },
     "species_classifier.onnx": {
-      "bytes": 33762270,
-      "sha256": "e1627d87a85dc55a25e485b7a01ffaa1c206558753ed6d0268b5e1d34029c2c8"
+      "bytes": 16912125,
+      "sha256": "a732323cd8ffb433515136b704cf897803bfb132987bec04b8840a403f7dee67"
     },
     "turbidity.onnx": {
       "bytes": 36362120,
