@@ -57,10 +57,10 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
               >
                 <div className="flex items-center gap-3">
                   <div className="
-                    flex size-12 items-center justify-center overflow-hidden
+                    flex size-16 items-center justify-center overflow-hidden
                     rounded-xl
                   ">
-                    <SpeciesAvatar speciesId={fish.speciesId} size={40} radius={8} objectFit="contain" />
+                    <SpeciesAvatar speciesId={fish.speciesId} size={64} radius={14} objectFit="contain" />
                   </div>
                   <div>
                     <p className="type-strong">{fish.name}</p>

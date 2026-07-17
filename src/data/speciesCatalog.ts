@@ -224,7 +224,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'angelfish', name: "Angelfish", displayName: "Angelfish",
-    imageClass: 'species-angelfish', imagePath: '/fish_crops/angelfish.png',
+    imageClass: 'species-angelfish', imagePath: '/fish_crops/normalized/angelfish.png',
     initials: 'AF', color: '#E8D5B7',
     ...detail("Pterophyllum scalare", 15, 24, 30, 6, 7.5, 115, "3", "4", "2", "2", "2", "4", "South America", "1", "", "Cichlidae", "235", "", undefined),
   },
@@ -410,7 +410,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'betta', name: "Betta", displayName: "Betta",
-    imageClass: 'species-betta', imagePath: '/fish_crops/betta.png',
+    imageClass: 'species-betta', imagePath: '/fish_crops/normalized/betta.png',
     initials: 'BT', color: '#FFB6C1',
     ...detail("Betta splendens", 7.5, 22, 30, 6, 7.5, 25, "4", "4", "1", "2", "2", "4", "Thailand", "3", "Siamese fighting fish", "Osphronemidae", "344", "", true),
   },
@@ -770,7 +770,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'cardinal_tetra', name: "Cardinal tetra", displayName: "Cardinal tetra",
-    imageClass: 'species-cardinal_tetra', imagePath: '/fish_crops/cardinal_tetra.png',
+    imageClass: 'species-cardinal_tetra', imagePath: '/fish_crops/normalized/cardinal_tetra.png',
     initials: 'CT', color: '#4169E1',
     ...detail("Paracheirodon axelrodi", 4.5, 23, 29, 5, 7, 60, "3", "4", "3", "1", "2", "4", "Brazil", "1", "", "Characidae", "110", "", true),
   },
@@ -836,7 +836,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'cherry_barb', name: "Cherry barb", displayName: "Cherry barb",
-    imageClass: 'species-cherry_barb', imagePath: '/fish_crops/cherry_barb.png',
+    imageClass: 'species-cherry_barb', imagePath: '/fish_crops/normalized/cherry_barb.png',
     initials: 'CB', color: '#DC143C',
     ...detail("Puntius titteya", 5, 22, 27, 6, 8, 75, "4", "4", "3", "1", "2", "2", "Sri Lanka", "4", "", "Cyprinidae", "458", "", undefined),
   },
@@ -908,7 +908,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'clown_loach', name: "Clown loach", displayName: "Clown loach",
-    imageClass: 'species-clown_loach', imagePath: '/fish_crops/clown_loach.png',
+    imageClass: 'species-clown_loach', imagePath: '/fish_crops/normalized/clown_loach.png',
     initials: 'CL', color: '#FF8C00',
     ...detail("Chromobotia macracanthus", 30, 24, 30, 6, 7.5, 285, "2", "2", "3", "2", "1", "4", "Sumatra, Borneo", "3", "", "Botiidae", "295", "", undefined),
   },
@@ -956,7 +956,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'plecostomus', name: "Common pleco", displayName: "Common pleco",
-    imageClass: 'species-plecostomus', imagePath: '/fish_crops/plecotmus.png',
+    imageClass: 'species-plecostomus', imagePath: '/fish_crops/normalized/plecotmus.png',
     initials: 'PC', color: '#556B2F',
     ...detail("Hypostomus plecostomus", 40, 22, 30, 6.5, 7.5, 320, "3", "4", "1", "2", "1", "4", "Brazil, French Guiana, Guyana", "1", "suckermouth catfish", "Loricariidae", "239", "", undefined),
   },
@@ -992,7 +992,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'corydoras', name: "Corydoras", displayName: "Corydoras",
-    imageClass: 'species-corydoras', imagePath: '/fish_crops/corydoras.png',
+    imageClass: 'species-corydoras', imagePath: '/fish_crops/normalized/corydoras.png',
     initials: 'CR', color: '#DAA520',
     ...detail("Corydoras aeneus", 7.5, 21, 27, 6, 7.5, 75, "3", "4", "3", "1", "1", "3", "South America", "1", "Fairy cory", "Callichthyidae", "16", "", undefined),
   },
@@ -1076,7 +1076,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'discus', name: "Discus", displayName: "Discus",
-    imageClass: 'species-discus', imagePath: '/fish_crops/discus.png',
+    imageClass: 'species-discus', imagePath: '/fish_crops/normalized/discus.png',
     initials: 'DS', color: '#9370DB',
     ...detail("Symphysodon aequifasciatus", 20, 26, 32, 6, 7, 245, "1", "3", "3", "1", "2", "4", "Peru, Colombia, Brazil", "1", "", "Cichlidae", "238", "", undefined),
   },
@@ -1142,7 +1142,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'dwarf_gourami', name: "Dwarf gourami", displayName: "Dwarf gourami",
-    imageClass: 'species-dwarf_gourami', imagePath: '/fish_crops/dwarf_gourami.png',
+    imageClass: 'species-dwarf_gourami', imagePath: '/fish_crops/normalized/dwarf_gourami.png',
     initials: 'DG', color: '#20B2AA',
     ...detail("Trichogaster lalius", 7.5, 22, 27, 6, 7.5, 60, "2", "3", "2", "1", "2", "3", "Pakistan, India, Bangladesh", "4", "", "Osphronemidae", "339", "", undefined),
   },
@@ -1166,7 +1166,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'dwarf_rasbora', name: "Dwarf rasbora", displayName: "Dwarf rasbora",
-    imageClass: 'species-dwarf_rasbora', imagePath: '/fish_crops/dwarf_rasbora.png',
+    imageClass: 'species-dwarf_rasbora', imagePath: '/fish_crops/normalized/dwarf_rasbora.png',
     initials: 'DR', color: '#FF69B4',
     ...detail("Boraras maculatus", 2.5, 22, 28, 5, 7, 25, "2", "2", "3", "1", "2", "3", "Malaysia, Thailand, Sumatra", "3", "", "Cyprinidae", "261", "", true),
   },
@@ -1460,7 +1460,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'german_blue_ram', name: "German Blue Ram", displayName: "German Blue Ram",
-    imageClass: 'species-german_blue_ram', imagePath: '/fish_crops/german_blue_ram.png',
+    imageClass: 'species-german_blue_ram', imagePath: '/fish_crops/normalized/german_blue_ram.png',
     initials: 'GBR', color: '#1E90FF',
     ...detail("Mikrogeophagus ramirezi", 6, 27, 30, 5.5, 7, 70, "2", "3", "2", "1", "2", "3", "Colombia, Venezuela", "1", "German ram", "Cichlidae", "225", "", true),
   },
@@ -1568,7 +1568,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'otocinclus', name: "Golden dwarf sucker", displayName: "Golden dwarf sucker",
-    imageClass: 'species-otocinclus', imagePath: '/fish_crops/otocinclus.png',
+    imageClass: 'species-otocinclus', imagePath: '/fish_crops/normalized/otocinclus.png',
     initials: 'OT', color: '#A9A9A9',
     ...detail("Otocinclus macrospilus", 3.5, 21, 26, 6, 7.5, 40, "2", "3", "3", "1", "1", "4", "Peru, Colombia, Ecuador", "1", "golden oto", "Loricariidae", "59", "", true),
   },
@@ -1604,7 +1604,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'goldfish', name: "Goldfish", displayName: "Goldfish",
-    imageClass: 'species-goldfish', imagePath: '/fish_crops/goldfish.png',
+    imageClass: 'species-goldfish', imagePath: '/fish_crops/normalized/goldfish.png',
     initials: 'GF', color: '#FFD700',
     ...detail("Carassius auratus", 20, 4, 28, 6, 8, 90, "4", "4", "2", "1", "2", "2", "China", "6", "gold fish", "Cyprinidae", "277", "", undefined),
   },
@@ -1646,7 +1646,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'swordtail', name: "Green swordtail", displayName: "Green swordtail",
-    imageClass: 'species-swordtail', imagePath: '/fish_crops/swordtail.png',
+    imageClass: 'species-swordtail', imagePath: '/fish_crops/normalized/swordtail.png',
     initials: 'SW', color: '#FF8C00',
     ...detail("Xiphophorus hellerii", 15, 20, 28, 7, 8, 90, "4", "4", "2", "1", "2", "1", "Mexico, Central-America", "8", "", "Poeciliidae", "318", "", undefined),
   },
@@ -1676,7 +1676,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'guppy', name: "Guppy", displayName: "Guppy",
-    imageClass: 'species-guppy', imagePath: '/fish_crops/guppy.png',
+    imageClass: 'species-guppy', imagePath: '/fish_crops/normalized/guppy.png',
     initials: 'GP', color: '#FF69B4',
     ...detail("Poecilia reticulata", 6, 18, 28, 6.8, 7.8, 50, "4", "4", "2", "1", "2", "1", "Venezuela, The Guianas", "1", "millionfish", "Poeciliidae", "310", "", true),
   },
@@ -1700,7 +1700,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'harlequin_rasbora', name: "Harlequin rasbora", displayName: "Harlequin rasbora",
-    imageClass: 'species-harlequin_rasbora', imagePath: '/fish_crops/harlequin_rasbora.png',
+    imageClass: 'species-harlequin_rasbora', imagePath: '/fish_crops/normalized/harlequin_rasbora.png',
     initials: 'HR', color: '#FF6347',
     ...detail("Trigonostigma heteromorpha", 5, 22, 28, 6, 7, 55, "4", "3", "3", "1", "2", "2", "Thailand, Sunda Islands", "3", "", "Cyprinidae", "258", "", true),
   },
@@ -2114,7 +2114,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'molly', name: "Molly", displayName: "Molly",
-    imageClass: 'species-molly', imagePath: '/fish_crops/molly.png',
+    imageClass: 'species-molly', imagePath: '/fish_crops/normalized/molly.png',
     initials: 'ML', color: '#B0C4DE',
     ...detail("Poecilia sphenops", 12, 21, 28, 7, 8, 90, "3", "4", "2", "2", "2", "1", "Venezuela, Colombia, Mexico", "1", "", "Poeciliidae", "312", "", undefined),
   },
@@ -2156,7 +2156,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'neon_tetra', name: "Neon tetra", displayName: "Neon tetra",
-    imageClass: 'species-neon_tetra', imagePath: '/fish_crops/neon_tetra.png',
+    imageClass: 'species-neon_tetra', imagePath: '/fish_crops/normalized/neon_tetra.png',
     initials: 'NT', color: '#00CED1',
     ...detail("Paracheirodon innesi", 3.75, 21, 25, 5, 7.5, 40, "4", "4", "3", "1", "2", "3", "Peru, Colombia, Brazil", "1", "", "Characidae", "124", "", true),
   },
@@ -2252,7 +2252,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'oscar', name: "Oscar", displayName: "Oscar",
-    imageClass: 'species-oscar', imagePath: '/fish_crops/oscar.png',
+    imageClass: 'species-oscar', imagePath: '/fish_crops/normalized/oscar.png',
     initials: 'OS', color: '#8B4513',
     ...detail("Astronotus ocellatus", 35, 20, 28, 6, 7.5, 360, "2", "2", "1", "2", "2", "3", "South America", "1", "", "Cichlidae", "240", "", undefined),
   },
@@ -2660,7 +2660,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'rummy_nose_tetra', name: "Rummy-nose tetra", displayName: "Rummy-nose tetra",
-    imageClass: 'species-rummy_nose_tetra', imagePath: '/fish_crops/rummy_nose_tetra.png',
+    imageClass: 'species-rummy_nose_tetra', imagePath: '/fish_crops/normalized/rummy_nose_tetra.png',
     initials: 'RNT', color: '#FF0000',
     ...detail("Hemigrammus rhodostomus", 5, 24, 27, 5.5, 7, 75, "3", "3", "3", "1", "2", "3", "Brazil, Venezuela", "1", "", "Characidae", "131", "", true),
   },
@@ -2768,7 +2768,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'siamese_algae_eater', name: "Siamese algae eater", displayName: "Siamese algae eater",
-    imageClass: 'species-siamese_algae_eater', imagePath: '/fish_crops/siamese_algae_eater.png',
+    imageClass: 'species-siamese_algae_eater', imagePath: '/fish_crops/normalized/siamese_algae_eater.png',
     initials: 'SAE', color: '#C0C0C0',
     ...detail("Crossocheilus oblongus", 16, 20, 26, 6, 7.5, 140, "2", "3", "3", "1", "1", "4", "Thailand, Malaysia", "3", "", "Cyprinidae", "251", "", undefined),
   },
@@ -2828,7 +2828,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'platy', name: "Southern platy", displayName: "Southern platy",
-    imageClass: 'species-platy', imagePath: '/fish_crops/platy.png',
+    imageClass: 'species-platy', imagePath: '/fish_crops/normalized/platy.png',
     initials: 'PL', color: '#FF4500',
     ...detail("Xiphophorus maculatus", 7, 20, 26, 6.8, 8, 55, "4", "4", "2", "1", "2", "1", "Mexico, Central America", "8, 5", "", "Poeciliidae", "316", "", undefined),
   },
@@ -3062,7 +3062,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'tiger_barb', name: "Tiger barb", displayName: "Tiger barb",
-    imageClass: 'species-tiger_barb', imagePath: '/fish_crops/tiger_barb.png',
+    imageClass: 'species-tiger_barb', imagePath: '/fish_crops/normalized/tiger_barb.png',
     initials: 'TB', color: '#FF6347',
     ...detail("Puntigrus tetrazona", 7, 20, 26, 6, 8, 75, "4", "4", "3", "2", "2", "3", "Sumatra", "3", "Sumatra barb", "Cyprinidae", "457", "", true),
   },
@@ -3302,7 +3302,7 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
   },
   {
     id: 'zebra_danio', name: "Zebra danio", displayName: "Zebra danio",
-    imageClass: 'species-zebra_danio', imagePath: '/fish_crops/zebra_danio.png',
+    imageClass: 'species-zebra_danio', imagePath: '/fish_crops/normalized/zebra_danio.png',
     initials: 'ZD', color: '#4169E1',
     ...detail("Danio rerio", 5, 18, 24, 6, 7.5, 55, "4", "4", "3", "2", "2", "2", "Eastern India, Bangladesh", "4", "", "Cyprinidae", "276", "", true),
   },

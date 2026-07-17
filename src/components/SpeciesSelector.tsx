@@ -83,7 +83,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             }
           `}
         >
-          <SpeciesAvatar speciesId={species.id} size={38} radius={10} />
+          <SpeciesAvatar speciesId={species.id} size={64} radius={16} />
           <span className="min-w-0 flex-1">
             <span className="block truncate type-strong">{species.displayName}</span>
             {species.scientificName && (

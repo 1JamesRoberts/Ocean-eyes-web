@@ -51,15 +51,21 @@ export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
   }
 
   return (
-    <img
-      className={className}
-      src={species.imagePath}
-      alt={species.initials}
-      style={{
-        ...commonStyle,
-        objectFit,
-      }}
-      onError={() => setHasError(true)}
-    />
+    <div className={`relative ${className}`} style={commonStyle}>
+      <span
+        aria-hidden="true"
+        className="absolute bottom-[20%] left-1/2 h-[2%] w-[44%] -translate-x-1/2 rounded-[50%] bg-prussian-blue/[18%] blur-[3px]"
+      />
+      <img
+        className="relative h-full w-full"
+        src={species.imagePath}
+        alt={species.initials}
+        style={{
+          borderRadius: `${radius}px`,
+          objectFit,
+        }}
+        onError={() => setHasError(true)}
+      />
+    </div>
   );
 };

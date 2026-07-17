@@ -70,8 +70,8 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
               className="flex items-center justify-between gap-3 py-3.5"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <div className="grid size-11 shrink-0 place-items-center overflow-hidden">
-                  <SpeciesAvatar speciesId={fish.speciesId} size={38} radius={8} objectFit="contain" />
+                <div className="grid size-16 shrink-0 place-items-center overflow-hidden">
+                  <SpeciesAvatar speciesId={fish.speciesId} size={64} radius={14} objectFit="contain" />
                 </div>
                 <div className="min-w-0">
                   <span className="block truncate type-strong-inverse">{display.name}</span>

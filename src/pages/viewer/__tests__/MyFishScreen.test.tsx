@@ -40,7 +40,7 @@ vi.mock('../../../hooks/pages/useMyFish', () => ({
           id: 'fish-1',
           speciesId: 'cardinal_tetra',
           name: 'Cardinal tetra',
-          image: '/fish_crops/cardinal_tetra.png',
+          image: '/fish_crops/normalized/cardinal_tetra.png',
           count: 9,
           detected: 4,
         }]
@@ -66,7 +66,7 @@ vi.mock('../../../hooks/pages/useMyFish', () => ({
         initials: 'CT',
         color: '#DC2626',
         name: 'Cardinal tetra',
-        imagePath: '/fish_crops/cardinal_tetra.png',
+        imagePath: '/fish_crops/normalized/cardinal_tetra.png',
       }),
       onToggleAddForm,
       onCloseAddForm,

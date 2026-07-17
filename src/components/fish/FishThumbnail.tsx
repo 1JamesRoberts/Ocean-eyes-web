@@ -11,7 +11,7 @@ export const FishThumbnail: React.FC<FishThumbnailProps> = ({
   imagePath,
   initials,
   color,
-  size = 40,
+  size = 64,
 }) => {
   const [hasError, setHasError] = useState(false);
   const s = size;
@@ -38,12 +38,17 @@ export const FishThumbnail: React.FC<FishThumbnailProps> = ({
   }
 
   return (
-    <img
-      src={imagePath}
-      alt={initials}
-      className="shrink-0 rounded-lg object-contain"
-      style={{ width: s, height: s }}
-      onError={() => setHasError(true)}
-    />
+    <div className="relative shrink-0" style={{ width: s, height: s }}>
+      <span
+        aria-hidden="true"
+        className="absolute bottom-[20%] left-1/2 h-[2%] w-[44%] -translate-x-1/2 rounded-[50%] bg-prussian-blue/[18%] blur-[3px]"
+      />
+      <img
+        src={imagePath}
+        alt={initials}
+        className="relative h-full w-full rounded-lg object-contain"
+        onError={() => setHasError(true)}
+      />
+    </div>
   );
 };
