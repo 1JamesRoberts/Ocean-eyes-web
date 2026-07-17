@@ -49,9 +49,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
               <div
                 key={fish.id}
                 className="
-                  flex items-center justify-between pb-3
-                  [&:first-child]:pt-3
-                  [&:not(:last-child)]:mb-3
+                  flex items-center justify-between
                   [&:not(:last-child)]:border-b [&:not(:last-child)]:border-slate-grey/15
                 "
               >
@@ -65,7 +63,7 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                   <div>
                     <p className="type-strong">{fish.name}</p>
                     <p className="type-caption">
-                      {fish.detected} / {fish.count} detected
+                      {fish.detected} detected
                     </p>
                   </div>
                 </div>
