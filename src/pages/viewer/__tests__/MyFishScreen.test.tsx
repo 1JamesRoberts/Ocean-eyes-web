@@ -129,6 +129,9 @@ describe('MyFishScreen inventory controls', () => {
     render(<MyFishScreen />);
 
     const fishDisclosure = screen.getByRole('button', { name: /Cardinal tetra/i });
+    const fishCard = fishDisclosure.closest('[data-fish-card]');
+    expect(fishCard).toBeTruthy();
+    expect(fishCard?.classList.contains('h-24')).toBe(true);
     expect(fishDisclosure.getAttribute('aria-expanded')).toBe('false');
     expect(screen.getByText('44%')).toBeTruthy();
     expect(screen.getByText('Visible: 4 / 9')).toBeTruthy();
@@ -137,6 +140,7 @@ describe('MyFishScreen inventory controls', () => {
     fireEvent.click(fishDisclosure);
 
     expect(fishDisclosure.getAttribute('aria-expanded')).toBe('true');
+    expect(fishCard?.classList.contains('h-24')).toBe(false);
     expect(screen.queryByText('44%')).toBeNull();
     expect(screen.queryByText('Visible: 4 / 9')).toBeNull();
     expect(screen.getByRole('button', { name: 'Increase fish count' })).toBeTruthy();

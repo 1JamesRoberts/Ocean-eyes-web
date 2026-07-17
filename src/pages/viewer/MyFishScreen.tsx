@@ -210,7 +210,7 @@ export const MyFishScreen: React.FC = () => {
         {/* Chart & Stats */}
         <div className="flex flex-col gap-4">
           <GlassCard
-            className="!p-4"
+            className="!px-4 !py-[15px]"
             clickable
             role="button"
             tabIndex={0}
@@ -364,7 +364,7 @@ export const MyFishScreen: React.FC = () => {
                 key={fish.id}
                 data-fish-card
                 clickable
-                className="flex flex-col overflow-hidden px-3.5! py-2.5!"
+                className={`flex flex-col overflow-hidden px-3.5! py-2! ${isActive ? '' : 'h-24'}`}
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest('button')) return;
                   onToggleFish(fish.id);
