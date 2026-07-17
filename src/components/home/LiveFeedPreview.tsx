@@ -55,7 +55,8 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             videoClassName="h-full w-full object-cover"
             idlePlaceholder={
               <div className="
-                flex h-full flex-col items-center justify-center gap-2
+                relative z-10 flex h-full flex-col items-center justify-center
+                gap-2
               ">
                 <span
                   className="material-symbols-outlined text-2xl text-slate-grey"

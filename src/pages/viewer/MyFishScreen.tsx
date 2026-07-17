@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import DetectionVisibilityRing from '../../components/fish/DetectionVisibilityRing';
 import { DonutChart } from '../../components/fish/DonutChart';
+import { FishInventoryHeroOverlay } from '../../components/fish/FishInventoryHeroOverlay';
 import { FishThumbnail } from '../../components/fish/FishThumbnail';
 import { DetailChip } from '../../components/fish/DetailChip';
 import { SpeciesSelector } from '../../components/SpeciesSelector';
@@ -180,6 +181,8 @@ export const MyFishScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      <FishInventoryHeroOverlay fishList={fishList} />
+
       <ScreenHeader
         eyebrow="Aquarium inventory"
         action={(
