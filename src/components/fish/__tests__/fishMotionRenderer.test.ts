@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   calculateEdgeAlpha,
+  calculateFishBodyDimensions,
   calculateFishMotionPoint,
   calculateSwimPose,
+  SWIM_SPEED_MULTIPLIER,
 } from '../fishMotionRenderer';
 import type { FishMotionSprite } from '../../../models/services/fishMotionScene';
 
@@ -35,7 +37,7 @@ function crossingDuration(
   renderedBodyWidth = bodyWidth,
 ): number {
   return (targetViewport.width + renderedBodyWidth * 0.62 * 2)
-    / sprite.motion.cruiseSpeed;
+    / (sprite.motion.cruiseSpeed * SWIM_SPEED_MULTIPLIER);
 }
 
 function findNextEntryTime(
@@ -52,15 +54,46 @@ function findNextEntryTime(
 describe('fishMotionRenderer math', () => {
   it('matches the reference deformation field at fixed inputs', () => {
     expect(calculateFishMotionPoint(-1.25, 17)).toEqual({
-      x: expect.closeTo(-6.0688490042, 8),
-      y: expect.closeTo(-6.2605472971, 8),
-      depth: expect.closeTo(0.2632332067, 8),
+      x: expect.closeTo(-1.8267326821, 8),
+      y: expect.closeTo(0.1129347811, 8),
+      depth: expect.closeTo(0.2566292948, 8),
     });
     expect(calculateFishMotionPoint(-0.2, 120)).toEqual({
-      x: expect.closeTo(3.5688677518, 8),
-      y: expect.closeTo(7.0498486142, 8),
-      depth: expect.closeTo(0.0738088189, 8),
+      x: expect.closeTo(-1.4288495836, 8),
+      y: expect.closeTo(-1.6180907495, 8),
+      depth: expect.closeTo(0.0727954722, 8),
     });
+  });
+
+  it('scales fish from catalog length around the responsive ten-centimeter baseline', () => {
+    const mobileViewport = { width: 393, height: 221 };
+    const wideViewport = { width: 768, height: 432 };
+
+    for (const targetViewport of [mobileViewport, wideViewport]) {
+      const baseline = calculateFishBodyDimensions(targetViewport, 10);
+      const shortFish = calculateFishBodyDimensions(targetViewport, 2.5);
+      const longFish = calculateFishBodyDimensions(targetViewport, 40);
+
+      expect(baseline.width).toBeCloseTo(targetViewport.width === 393 ? 66.81 : 74);
+      expect(baseline.height).toBeCloseTo(baseline.width * 0.78);
+      expect(shortFish.width).toBeCloseTo(baseline.width * 0.5);
+      expect(longFish.width).toBeCloseTo(baseline.width * 2);
+    }
+  });
+
+  it('keeps length sizing monotonic and falls back to ten centimeters', () => {
+    const widths = [2.5, 5, 10, 20, 40].map(
+      (lengthCm) => calculateFishBodyDimensions(viewport, lengthCm).width,
+    );
+
+    for (let index = 1; index < widths.length; index += 1) {
+      expect(widths[index]).toBeGreaterThan(widths[index - 1]);
+    }
+
+    const baseline = calculateFishBodyDimensions(viewport, 10);
+    for (const invalidLength of [undefined, 0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(calculateFishBodyDimensions(viewport, invalidLength)).toEqual(baseline);
+    }
   });
 
   it('passes fully beyond both edges and wraps with the same facing', () => {
@@ -172,8 +205,8 @@ describe('fishMotionRenderer math', () => {
       previous = current;
     }
 
-    expect(Math.min(...speeds)).toBeGreaterThanOrEqual(8.49);
-    expect(Math.max(...speeds)).toBeLessThanOrEqual(11.51);
+    expect(Math.min(...speeds)).toBeGreaterThanOrEqual(16.99);
+    expect(Math.max(...speeds)).toBeLessThanOrEqual(23.01);
     expect(previous.x).toBeCloseTo(112.4);
   });
 
@@ -190,12 +223,11 @@ describe('fishMotionRenderer math', () => {
 
     for (const targetViewport of targetViewports) {
       for (const [index, lane] of (['top', 'middle', 'bottom'] as const).entries()) {
-        const scale = 0.78 + index * 0.15;
-        const renderedBodyWidth = Math.min(
-          74,
-          Math.max(42, targetViewport.width * 0.17 * scale),
-        );
-        const renderedBodyHeight = renderedBodyWidth * 0.78;
+        const lengthCm = [2.5, 10, 40][index];
+        const {
+          width: renderedBodyWidth,
+          height: renderedBodyHeight,
+        } = calculateFishBodyDimensions(targetViewport, lengthCm);
         const horizontalInset = renderedBodyWidth * 0.62;
         const verticalInset = renderedBodyHeight / 2 + renderedBodyWidth * 0.12;
         const laneTop = Math.max(targetViewport.height * laneBands[lane][0], verticalInset);
@@ -219,10 +251,10 @@ describe('fishMotionRenderer math', () => {
             renderedBodyWidth,
             renderedBodyHeight,
           );
-          expect(pose.x).toBeGreaterThanOrEqual(-horizontalInset);
-          expect(pose.x).toBeLessThanOrEqual(targetViewport.width + horizontalInset);
-          expect(pose.y).toBeGreaterThanOrEqual(laneTop);
-          expect(pose.y).toBeLessThanOrEqual(laneBottom);
+          expect(pose.x).toBeGreaterThanOrEqual(-horizontalInset - 0.000001);
+          expect(pose.x).toBeLessThanOrEqual(targetViewport.width + horizontalInset + 0.000001);
+          expect(pose.y).toBeGreaterThanOrEqual(laneTop - 0.000001);
+          expect(pose.y).toBeLessThanOrEqual(laneBottom + 0.000001);
           expect(Math.abs(pose.pitch)).toBeLessThanOrEqual(Math.PI / 15);
         }
       }

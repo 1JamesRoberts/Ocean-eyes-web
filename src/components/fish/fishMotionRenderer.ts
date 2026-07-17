@@ -1,6 +1,8 @@
 import type { FishMotionScene, FishMotionSprite } from '../../models/services/fishMotionScene';
 
 export const FISH_MOTION_FPS = 13;
+export const FISH_MOTION_PLAYBACK_RATE = 0.05;
+export const SWIM_SPEED_MULTIPLIER = 2;
 export const FISH_MOTION_FIRST_FRAME = 1;
 export const FISH_MOTION_LAST_FRAME = 278;
 export const FISH_MOTION_STILL_FRAME = 17;
@@ -10,16 +12,21 @@ const MESH_MAX_X = 0.1898954;
 const DRIVER_MULTIPLIER = -1;
 const TIME_OFFSET = 1;
 const TIME_DIVIDER = 48;
-const MOTION_DELAY = 0.1;
-const SCALE_X = 0.51;
-const MOVEMENT_SCALE = 16;
+const MOTION_DELAY = 0.05;
+const SCALE_X = 0.2;
+const MOVEMENT_SCALE = 2;
 const WAVE_FREQUENCY = 15;
-const WAVE_SCALE = 1;
+const WAVE_SCALE = 10;
 const ROTATION_CENTER_X = -2.5;
 const NOISE_GAP = 2;
 const DRIFT_STRENGTH = 0.57;
 const DEPTH_STRENGTH = 0.08;
 const SLICE_WIDTH_SCALE = 1.25;
+const REFERENCE_FISH_LENGTH_CM = 10;
+const BASE_BODY_WIDTH_VIEWPORT_RATIO = 0.17;
+const MIN_BASE_BODY_WIDTH = 42;
+const MAX_BASE_BODY_WIDTH = 74;
+const BODY_HEIGHT_RATIO = 0.78;
 const HORIZONTAL_BODY_INSET = 0.62;
 const VERTICAL_DRIFT_INSET = 0.12;
 const GAP_PATTERN_LENGTH = 8;
@@ -51,6 +58,11 @@ export interface FishMotionFrame {
   animateCaustics: boolean;
 }
 
+export interface FishBodyDimensions {
+  width: number;
+  height: number;
+}
+
 export interface FishSwimPose {
   x: number;
   y: number;
@@ -70,6 +82,28 @@ interface VerticalRoutePose {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+export function calculateFishBodyDimensions(
+  viewport: FishMotionViewport,
+  lengthCm: number | undefined,
+): FishBodyDimensions {
+  const resolvedLengthCm = lengthCm !== undefined
+    && Number.isFinite(lengthCm)
+    && lengthCm > 0
+    ? lengthCm
+    : REFERENCE_FISH_LENGTH_CM;
+  const baseWidth = clamp(
+    viewport.width * BASE_BODY_WIDTH_VIEWPORT_RATIO,
+    MIN_BASE_BODY_WIDTH,
+    MAX_BASE_BODY_WIDTH,
+  );
+  const width = baseWidth * Math.sqrt(resolvedLengthCm / REFERENCE_FISH_LENGTH_CM);
+
+  return {
+    width,
+    height: width * BODY_HEIGHT_RATIO,
+  };
 }
 
 function fract(value: number): number {
@@ -250,7 +284,8 @@ export function calculateSwimPose(
 ): FishSwimPose {
   const horizontalInset = Math.min(bodyWidth * HORIZONTAL_BODY_INSET, viewport.width / 2);
   const travelDistance = viewport.width + horizontalInset * 2;
-  const crossingDuration = travelDistance / Math.max(0.1, sprite.motion.cruiseSpeed);
+  const crossingDuration = travelDistance
+    / Math.max(0.1, sprite.motion.cruiseSpeed * SWIM_SPEED_MULTIPLIER);
   const leg = locateSwimLeg(sprite.motion, elapsedSeconds, crossingDuration);
   const direction = calculateLegDirection(sprite.motion, leg.index);
   const isCrossing = leg.elapsedSeconds < crossingDuration;
@@ -337,8 +372,10 @@ function drawFish(
   elapsedSeconds: number,
   frame: number,
 ): void {
-  const bodySpan = clamp(viewport.width * 0.17 * sprite.scale, 42, 74);
-  const baseHeight = bodySpan * 0.78;
+  const { width: bodySpan, height: baseHeight } = calculateFishBodyDimensions(
+    viewport,
+    sprite.lengthCm,
+  );
   const slices = Math.round(clamp(bodySpan * 0.5, 24, 40));
   const stripSourceWidth = image.naturalWidth / slices;
   const pxPerUnit = bodySpan / 30;

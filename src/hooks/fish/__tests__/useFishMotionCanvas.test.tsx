@@ -74,7 +74,7 @@ function scene(imagePath: string): FishMotionScene {
         reversalInterval: 7,
         reversalOffset: 2,
       },
-      scale: 1,
+      lengthCm: 10,
       bodyPhase: 0,
       depth: 0.5,
     }],

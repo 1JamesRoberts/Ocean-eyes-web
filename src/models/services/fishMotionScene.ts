@@ -19,7 +19,7 @@ export interface FishMotionSprite {
   imagePath: string;
   lane: SwimLocation;
   motion: FishMotionProfile;
-  scale: number;
+  lengthCm: number;
   bodyPhase: number;
   depth: number;
 }
@@ -35,6 +35,7 @@ interface SupportedInventoryEntry {
   count: number;
   imagePath: string;
   lane: SwimLocation;
+  lengthCm: number;
   allocated: number;
   index: number;
 }
@@ -113,7 +114,7 @@ function createSprite(entry: SupportedInventoryEntry, ordinal: number): FishMoti
       reversalInterval,
       reversalOffset: Math.floor(unitFromSeed(seed, 9) * reversalInterval),
     },
-    scale: 0.78 + unitFromSeed(seed, 3) * 0.3,
+    lengthCm: entry.lengthCm,
     bodyPhase: unitFromSeed(seed, 4) * Math.PI * 2,
     depth: unitFromSeed(seed, 7),
   };
@@ -142,6 +143,7 @@ export function buildFishMotionScene(
       count,
       imagePath: species.imagePath,
       lane: species.swimLocation ?? 'middle',
+      lengthCm: species.sizeCm ?? 10,
       allocated: 0,
       index,
     });

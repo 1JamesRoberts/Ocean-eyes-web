@@ -40,7 +40,7 @@ describe('buildFishMotionScene', () => {
     expect(scene.unsupportedCount).toBe(0);
   });
 
-  it('uses catalog swim locations and stable per-fish motion values', () => {
+  it('uses catalog swim locations, lengths, and stable per-fish motion values', () => {
     const inventory = [
       fish('guppies', 'guppy', 2),
       fish('cories', 'corydoras', 1),
@@ -57,6 +57,9 @@ describe('buildFishMotionScene', () => {
 
     const guppies = first.swimmers.filter((swimmer) => swimmer.speciesId === 'guppy');
     expect(guppies[0].motion).not.toEqual(guppies[1].motion);
+    expect(guppies.map((swimmer) => swimmer.lengthCm)).toEqual([6, 6]);
+    expect(first.swimmers.find((swimmer) => swimmer.speciesId === 'corydoras')?.lengthCm)
+      .toBe(7.5);
 
     for (const swimmer of first.swimmers) {
       expect(swimmer.motion.cruiseSpeed).toBeGreaterThanOrEqual(7);

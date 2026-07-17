@@ -4,6 +4,7 @@ import {
   FISH_MOTION_FIRST_FRAME,
   FISH_MOTION_FPS,
   FISH_MOTION_LAST_FRAME,
+  FISH_MOTION_PLAYBACK_RATE,
   FISH_MOTION_STILL_FRAME,
   type FishMotionViewport,
 } from '../../components/fish/fishMotionRenderer';
@@ -73,7 +74,10 @@ export function useFishMotionCanvas({
     const draw = (animate: boolean) => {
       if (!imagesReady || viewport.width === 0 || viewport.height === 0) return;
       const frame = animate
-        ? wrapFrame(FISH_MOTION_STILL_FRAME + elapsedSeconds * FISH_MOTION_FPS)
+        ? wrapFrame(
+          FISH_MOTION_STILL_FRAME
+          + elapsedSeconds * FISH_MOTION_FPS * FISH_MOTION_PLAYBACK_RATE,
+        )
         : FISH_MOTION_STILL_FRAME;
       drawFishMotionFrame(context, scene, images, viewport, {
         elapsedSeconds: animate ? elapsedSeconds : 0,
