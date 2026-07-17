@@ -5,27 +5,17 @@ import type { FishMotionScene } from '../../../models/services/fishMotionScene';
 import { useFishMotionCanvas } from '../useFishMotionCanvas';
 
 const context = {
-  beginPath: vi.fn(),
   clearRect: vi.fn(),
   drawImage: vi.fn(),
-  ellipse: vi.fn(),
-  fill: vi.fn(),
-  lineTo: vi.fn(),
-  moveTo: vi.fn(),
   restore: vi.fn(),
   rotate: vi.fn(),
   save: vi.fn(),
   scale: vi.fn(),
   setTransform: vi.fn(),
-  stroke: vi.fn(),
   translate: vi.fn(),
-  fillStyle: '',
-  filter: '',
   globalAlpha: 1,
   imageSmoothingEnabled: true,
   imageSmoothingQuality: 'high',
-  lineWidth: 1,
-  strokeStyle: '',
 } as unknown as CanvasRenderingContext2D;
 
 let mediaQueryMatches = false;
@@ -136,6 +126,17 @@ afterEach(() => {
 });
 
 describe('useFishMotionCanvas', () => {
+  it('caps high-density canvas rendering at 2x', async () => {
+    vi.stubGlobal('devicePixelRatio', 3);
+    const { container } = render(<Harness value={scene('/success-hook-density.png')} />);
+    await flushImages();
+
+    const canvas = container.querySelector('canvas');
+    expect(canvas?.width).toBe(786);
+    expect(canvas?.height).toBe(442);
+    expect(context.setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
+  });
+
   it('starts one loop and cleans up animation, resize, and media listeners', async () => {
     const { unmount } = render(<Harness value={scene('/success-hook-lifecycle.png')} />);
     await flushImages();

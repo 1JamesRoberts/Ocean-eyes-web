@@ -82,7 +82,6 @@ export function useFishMotionCanvas({
       drawFishMotionFrame(context, scene, images, viewport, {
         elapsedSeconds: animate ? elapsedSeconds : 0,
         frame,
-        animateCaustics: animate,
       });
     };
 

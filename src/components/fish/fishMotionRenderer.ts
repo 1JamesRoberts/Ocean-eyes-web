@@ -21,7 +21,7 @@ const ROTATION_CENTER_X = -2.5;
 const NOISE_GAP = 2;
 const DRIFT_STRENGTH = 0.57;
 const DEPTH_STRENGTH = 0.08;
-const SLICE_WIDTH_SCALE = 1.25;
+const SLICE_WIDTH_SCALE = 2;
 const REFERENCE_FISH_LENGTH_CM = 10;
 const BASE_BODY_WIDTH_VIEWPORT_RATIO = 0.17;
 const MIN_BASE_BODY_WIDTH = 42;
@@ -55,7 +55,6 @@ export interface FishMotionViewport {
 export interface FishMotionFrame {
   elapsedSeconds: number;
   frame: number;
-  animateCaustics: boolean;
 }
 
 export interface FishBodyDimensions {
@@ -337,33 +336,6 @@ export function calculateEdgeAlpha(
   return clamp(left * right, 0, 1);
 }
 
-function drawCaustics(
-  context: CanvasRenderingContext2D,
-  viewport: FishMotionViewport,
-  frame: number,
-): void {
-  const rowCount = 5;
-  const spacing = viewport.height / (rowCount + 0.5);
-  const amplitude = clamp(viewport.height * 0.018, 2.5, 4.5);
-
-  context.save();
-  context.strokeStyle = '#c8fff6';
-  context.globalAlpha = 0.055;
-  context.lineWidth = 1.1;
-  for (let row = 0; row < rowCount; row += 1) {
-    context.beginPath();
-    for (let x = -24; x <= viewport.width + 24; x += 14) {
-      const y = 36 + row * spacing + Math.sin(
-        x * 0.022 + row * 1.9 + frame / 24,
-      ) * amplitude;
-      if (x === -24) context.moveTo(x, y);
-      else context.lineTo(x, y);
-    }
-    context.stroke();
-  }
-  context.restore();
-}
-
 function drawFish(
   context: CanvasRenderingContext2D,
   image: HTMLImageElement,
@@ -403,23 +375,6 @@ function drawFish(
   const driftX = (anchor.x - ROTATION_CENTER_X) * pxPerUnit * DRIFT_STRENGTH;
   const driftY = -anchor.y * pxPerUnit * DRIFT_STRENGTH;
   const alpha = edgeAlpha * (0.86 + sprite.depth * 0.14);
-
-  context.save();
-  context.globalAlpha = alpha * 0.16;
-  context.filter = `blur(${Math.max(3, bodySpan * 0.08)}px)`;
-  context.fillStyle = '#031b2d';
-  context.beginPath();
-  context.ellipse(
-    centerX,
-    centerY + bodySpan * 0.27,
-    bodySpan * 0.31 * Math.max(0.25, Math.abs(pose.facingScale)),
-    Math.max(2, bodySpan * 0.045),
-    0,
-    0,
-    Math.PI * 2,
-  );
-  context.fill();
-  context.restore();
 
   context.save();
   context.globalAlpha = alpha;
@@ -466,12 +421,6 @@ export function drawFishMotionFrame(
   context.clearRect(0, 0, viewport.width, viewport.height);
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = 'high';
-
-  drawCaustics(
-    context,
-    viewport,
-    motion.animateCaustics ? motion.frame : FISH_MOTION_STILL_FRAME,
-  );
 
   const orderedSwimmers = [...scene.swimmers].sort((a, b) => a.depth - b.depth);
   for (const sprite of orderedSwimmers) {
