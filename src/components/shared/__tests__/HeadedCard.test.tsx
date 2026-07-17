@@ -22,9 +22,9 @@ describe('HeadedCard', () => {
     const card = container.querySelector('section');
     expect(card).toBeTruthy();
     expect(card?.classList.contains('glass-card')).toBe(true);
-    expect(card?.classList.contains('px-5!')).toBe(true);
-    expect(card?.classList.contains('pt-4.5!')).toBe(true);
-    expect(card?.classList.contains('pb-4!')).toBe(true);
+    expect(card?.classList.contains('px-4!')).toBe(true);
+    expect(card?.classList.contains('pt-4!')).toBe(true);
+    expect(card?.classList.contains('pb-3.5!')).toBe(true);
     expect(screen.getByRole('heading', { name: 'Alerts' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Open' })).toBeTruthy();
   });

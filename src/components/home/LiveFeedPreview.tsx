@@ -225,7 +225,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             )}
           </>
         ) : (
-          <div className="p-3 text-center">
+          <div className="p-2.5 text-center">
             <div className="mb-2 flex justify-center">
               <span
                 className="material-symbols-outlined text-2xl text-slate-grey"

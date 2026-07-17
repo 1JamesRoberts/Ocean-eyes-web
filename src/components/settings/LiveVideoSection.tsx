@@ -144,7 +144,7 @@ export const LiveVideoSection: React.FC<LiveVideoSectionProps> = ({
       {!activeTank && (
         <div className="
           mb-5 flex items-center gap-2.5 rounded-xl border border-warning
-          bg-warning/8 px-4 py-3 type-body text-warning
+          bg-warning/8 px-3.5 py-2.5 type-body text-warning
         ">
           <span className="type-strong text-warning">!</span>
           <span>No aquarium linked. Link a tank from the Dashboard to save camera feeds and enable AI detection.</span>

@@ -20,7 +20,7 @@ export const CardSectionHeader: React.FC<CardSectionHeaderProps> = ({
 }) => (
   <div className={`
     -mt-1 flex items-start justify-between gap-3
-    ${divider ? 'mb-1 border-b border-slate-grey/15 pb-2.5' : 'mb-2'}
+    ${divider ? 'mb-1 border-b border-slate-grey/15 pb-2' : 'mb-2'}
     ${className}
   `}>
     <div className="flex min-w-0 items-start gap-2">

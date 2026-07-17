@@ -104,7 +104,7 @@ export const TimeWheelSheet: React.FC<TimeWheelSheetProps> = ({
   };
 
   return (
-    <div className="w-full max-w-[320px] p-4 pb-3 text-prussian-blue">
+    <div className="w-full max-w-[320px] p-3.5 pb-2.5 text-prussian-blue">
       <div className="relative flex rounded-2xl px-2 py-1">
         {/* Center highlight bar */}
         <div

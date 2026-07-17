@@ -45,7 +45,7 @@ export const HistoryDetailScreen: React.FC = () => {
           const day = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 
           return (
-            <GlassPanel key={reading.id} className="flex items-center justify-between px-4 py-3">
+            <GlassPanel key={reading.id} className="flex items-center justify-between px-3.5 py-2.5">
               <div>
                 <strong className="type-strong">Clarity: {reading.clarity}/10</strong>
                 <span className="mt-0.5 block type-caption">

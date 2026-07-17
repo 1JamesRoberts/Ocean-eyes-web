@@ -36,7 +36,7 @@ export const HeadedCard: React.FC<HeadedCardProps> = ({
   return (
     <GlassCard
       className={`
-        ${isEdgeHeader ? 'overflow-hidden p-0!' : 'px-5! pt-4.5! pb-4!'}
+        ${isEdgeHeader ? 'overflow-hidden p-0!' : 'px-4! pt-4! pb-3.5!'}
         ${className}
       `}
       {...rest}

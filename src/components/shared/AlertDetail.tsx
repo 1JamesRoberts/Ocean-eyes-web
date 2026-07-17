@@ -25,7 +25,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     <div className="flex flex-col gap-6">
 
     <GlassCard
-      className="p-5"
+      className="p-4"
       style={{
         borderLeftWidth: '6px',
         borderLeftColor: alert.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)',
@@ -44,7 +44,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     {/* Diagnostic parameters before/after */}
     <div className="mb-5 grid grid-cols-2 gap-4">
       {alert.clarityBefore && (
-        <GlassCard className="p-5 text-center">
+        <GlassCard className="p-4 text-center">
           <span className="block type-caption">Clarity Shift</span>
           <strong className="mt-1.5 block type-title">
             {alert.clarityBefore} → {alert.clarityAfter}
@@ -53,7 +53,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
       )}
 
       {alert.fishBefore && (
-        <GlassCard className="p-5 text-center">
+        <GlassCard className="p-4 text-center">
           <span className="block type-caption">Fish Discrepancy</span>
           <strong className="mt-1.5 block type-title">
             {alert.fishBefore} → {alert.fishAfter}
@@ -63,7 +63,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
     </div>
 
     {/* Correction tip card */}
-    <GlassCard className="mb-6 p-5">
+    <GlassCard className="mb-6 p-4">
       <h4 className="mb-2 type-strong text-prussian-blue">Action Plan & Tips</h4>
       <p className="type-body-muted">
         {alert.tip}
@@ -84,7 +84,7 @@ export const AlertDetail: React.FC<AlertDetailProps> = ({ alert, onBack, onResol
       </GlassButton>
     ) : (
       <div className="
-        rounded-2xl bg-good/10 p-3 text-center type-strong text-good
+        rounded-2xl bg-good/10 p-2.5 text-center type-strong text-good
       ">
         ✓ Resolved Alert
       </div>

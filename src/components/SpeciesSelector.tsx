@@ -161,7 +161,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             role="combobox"
             className="
               w-full rounded-2xl border border-azure-mist-2 bg-white/55 px-3 py-3 pl-10
-              type-body outline-none transition-smooth
+              type-body text-base! outline-none transition-smooth
               focus:border-pine-teal/40 focus:ring-3 focus:ring-pine-teal/10
             "
           />

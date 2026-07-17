@@ -210,7 +210,7 @@ export const MyFishScreen: React.FC = () => {
         {/* Chart & Stats */}
         <div className="flex flex-col gap-4">
           <GlassCard
-            className="!p-5"
+            className="!p-4"
             clickable
             role="button"
             tabIndex={0}
@@ -228,7 +228,7 @@ export const MyFishScreen: React.FC = () => {
               data-aquarium-overview
               className="
                 mt-2 flex items-center justify-between rounded-xl
-                p-3
+                p-2.5
               "
             >
               <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -261,7 +261,7 @@ export const MyFishScreen: React.FC = () => {
 
             <CollapsibleContent
               expanded={aquariumOverviewExpanded}
-              className="p-[0_12px_16px_12px]"
+              className="p-[0_10px_14px_10px]"
             >
                   <div className="grid grid-cols-1 gap-3">
                     <DetailChip
@@ -364,14 +364,14 @@ export const MyFishScreen: React.FC = () => {
                 key={fish.id}
                 data-fish-card
                 clickable
-                className="flex flex-col overflow-hidden px-4! py-3!"
+                className="flex flex-col overflow-hidden px-3.5! py-2.5!"
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest('button')) return;
                   onToggleFish(fish.id);
                 }}
               >
                 {/* Main row — always visible */}
-                <div className="flex items-center justify-between px-3 py-2.5">
+                <div className="flex items-center justify-between px-2.5 py-2">
                   <button
                     type="button"
                     className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-xl border-none bg-transparent text-left focus-visible:outline-2 focus-visible:outline-pine-teal"
@@ -432,7 +432,7 @@ export const MyFishScreen: React.FC = () => {
                 {/* ─── Expanded Detail Panel ─── */}
                 <CollapsibleContent
                   expanded={isActive && species !== undefined}
-                  className="p-[0_12px_16px_12px]"
+                  className="p-[0_10px_14px_10px]"
                 >
                       {species && (
                         <>

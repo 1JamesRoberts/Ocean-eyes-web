@@ -35,7 +35,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
   }, [viewMonth]);
 
   return (
-    <div className="w-full max-w-[320px] p-4 pb-3 text-prussian-blue">
+    <div className="w-full max-w-[320px] p-3.5 pb-2.5 text-prussian-blue">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">

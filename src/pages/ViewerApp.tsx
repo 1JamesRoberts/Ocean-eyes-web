@@ -121,7 +121,7 @@ export const ViewerApp: React.FC = () => {
           className="-mx-4 -mt-4 flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-4"
         >
           <div className="
-            rounded-[20px] border border-azure-mist-2 bg-white p-6 pb-5 shadow-card
+            rounded-[20px] border border-azure-mist-2 bg-white p-5 pb-4 shadow-card
             transition-smooth
           ">
             <RootGateOnboarding />

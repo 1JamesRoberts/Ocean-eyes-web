@@ -23,16 +23,16 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
   onToggle,
   children,
   className = '',
-  contentClassName = 'flex flex-col gap-4 pt-4',
+  contentClassName = 'flex flex-col gap-4 pt-3',
   iconClassName = 'text-slate-grey',
   chevronClassName = 'text-slate-grey',
 }) => (
-  <div className={`rounded-2xl border border-white/20 bg-white/20 p-3 pb-2 ${className}`}>
+  <div className={`rounded-2xl border border-white/20 bg-white/20 p-2.5 pb-2 ${className}`}>
     <button
       type="button"
       onClick={onToggle}
       aria-expanded={expanded}
-      className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent p-0 text-left"
+      className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent p-0 text-left"
     >
       <span className="flex min-w-0 items-center gap-3">
         <span className={`grid size-9 shrink-0 place-items-center rounded-xl ${iconClassName}`}>

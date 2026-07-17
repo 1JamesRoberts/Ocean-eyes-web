@@ -131,7 +131,7 @@ const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
   };
 
   return (
-    <div className={variant === 'panel' ? 'rounded-2xl border border-white/20 bg-white/20 p-3 pb-2' : ''}>
+    <div className={variant === 'panel' ? 'rounded-2xl border border-white/20 bg-white/20 p-2.5 pb-2' : ''}>
       <div className="mb-1.5 flex items-baseline justify-between gap-3 type-body">
         <span className="min-w-0 type-body-muted">{label}</span>
         <strong className="shrink-0 text-pine-teal">{displayValue}</strong>
@@ -334,7 +334,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
 
     <div className="flex flex-col gap-3">
       {editing ? (
-        <form onSubmit={handleNameChange} className="flex items-end gap-2.5 rounded-2xl border border-white/20 bg-white/20 p-3 pb-2">
+        <form onSubmit={handleNameChange} className="flex items-end gap-2.5 rounded-2xl border border-white/20 bg-white/20 p-2.5 pb-2">
           <GlassInput
             id="tank-name"
             label="Tank name"
@@ -380,7 +380,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
       )}
 
       {showConfirmUnlink ? (
-        <div className="rounded-2xl border border-critical/20 bg-critical/8 p-3 pb-2">
+        <div className="rounded-2xl border border-critical/20 bg-critical/8 p-2.5 pb-2">
           <p className="m-0 type-caption">
             This will remove "{activeTank?.name}" from your active monitoring dashboard. You can reconnect it later using the reference code: <code>{activeTank?.id}</code>.
           </p>

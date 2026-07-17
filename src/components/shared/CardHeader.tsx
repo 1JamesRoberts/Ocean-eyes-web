@@ -15,8 +15,8 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
 }) => (
   <div
     className={`
-      flex min-h-[52px] items-center justify-between border-b border-white/20
-      bg-white/20 px-4 py-2.5
+      flex min-h-12 items-center justify-between border-b border-white/20
+      bg-white/20 px-3.5 py-2
       ${className}
     `}
   >

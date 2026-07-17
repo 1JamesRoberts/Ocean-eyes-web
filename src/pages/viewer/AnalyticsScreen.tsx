@@ -27,7 +27,7 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
   return (
     <GlassPanel
       className={`
-        flex flex-col gap-2 p-3.5 pb-2.5
+        flex flex-col gap-2 p-3 pb-2
         ${isErr ? 'border-critical' : isHealthy ? 'border-good' : 'border-warning'}
       `}
     >
@@ -89,17 +89,17 @@ const DiagnosisRecordCard: React.FC<DiagnosisRecordCardProps> = ({
 
 const AnalyticsLoadingSkeleton: React.FC = () => (
   <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-hidden="true">
-    <GlassCard className="flex min-h-[468px] flex-col gap-5 overflow-hidden p-5 lg:col-span-2">
+    <GlassCard className="flex min-h-[468px] flex-col gap-5 overflow-hidden p-4 lg:col-span-2">
       <div className="h-5 w-44 animate-pulse rounded bg-azure-mist-2/70" />
       <div className="h-[180px] animate-pulse rounded-lg bg-azure-mist/70" />
       <div className="h-5 w-48 animate-pulse rounded bg-azure-mist-2/70" />
       <div className="h-[180px] animate-pulse rounded-lg bg-azure-mist/70" />
     </GlassCard>
-    <GlassCard className="min-h-[320px] p-5 lg:col-span-2">
+    <GlassCard className="min-h-[320px] p-4 lg:col-span-2">
       <div className="h-5 w-40 animate-pulse rounded bg-azure-mist-2/70" />
       <div className="mt-5 h-[240px] animate-pulse rounded-lg bg-azure-mist/70" />
     </GlassCard>
-    <GlassCard className="min-h-[196px] p-5 lg:col-span-2">
+    <GlassCard className="min-h-[196px] p-4 lg:col-span-2">
       <div className="h-5 w-64 animate-pulse rounded bg-azure-mist-2/70" />
       <div className="mt-5 h-20 animate-pulse rounded-lg bg-azure-mist/70" />
     </GlassCard>
@@ -238,7 +238,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
           >
             {diagnoses.length === 0 ? (
               <div className="
-                flex flex-col items-center justify-center p-6 type-body-muted
+                flex flex-col items-center justify-center p-5 type-body-muted
               ">
                 No health diagnostic records found for {formatDateForDisplay(range.startDate)} – {formatDateForDisplay(range.endDate)}.
               </div>

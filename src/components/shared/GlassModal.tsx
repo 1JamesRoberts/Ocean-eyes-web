@@ -120,7 +120,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
               rounded-t-[28px]! rounded-b-none! p-0
               ${isBelowHero ? 'h-full motion-safe:animate-sheet-enter' : 'max-h-[85dvh]'}
             `
-            : 'max-w-md p-6 pb-5'
+            : 'max-w-md p-5 pb-4'
           }
           ${className}
         `}

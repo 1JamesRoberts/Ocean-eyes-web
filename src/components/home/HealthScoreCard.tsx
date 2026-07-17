@@ -43,7 +43,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
   return (
     <section className="
       shimmer mx-auto grid w-full max-w-sm grid-cols-[7.25rem_minmax(0,1fr)]
-      items-center gap-4 glass-card rounded-(--glass-radius-card) px-4 py-3 -mt-2
+      items-center gap-4 glass-card rounded-(--glass-radius-card) px-3.5 py-2.5 -mt-2
     ">
       <div className="
         relative flex size-29 shrink-0 items-center justify-center
@@ -83,9 +83,9 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
           absolute inset-0 flex flex-col items-center justify-center
         ">
           <span className="
-            text-[2.65rem] leading-none font-bold tracking-[-0.06em] text-prussian-blue
+            text-[2.5rem] leading-none font-bold tracking-[-0.06em] text-prussian-blue
           ">{displayScore}</span>
-          <span className="mt-1 text-sm leading-none text-slate-grey">/100</span>
+          <span className="mt-1 text-[13px] leading-none text-slate-grey">/100</span>
         </div>
       </div>
 
@@ -101,12 +101,12 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             className="size-2.5 shrink-0 rounded-full"
             style={{ backgroundColor: healthColor }}
           />
-          <span className="text-sm font-semibold" style={{ color: healthColor }}>{healthHeading}</span>
+          <span className="text-[13px] font-semibold" style={{ color: healthColor }}>{healthHeading}</span>
         </div>
         <h3 className="mt-2 type-title whitespace-nowrap">
           Aquarium Health
         </h3>
-        <p className="mt-2 text-sm/tight text-slate-grey">{healthMessage}</p>
+        <p className="mt-2 text-[13px]/tight text-slate-grey">{healthMessage}</p>
         <div className="mt-4 grid grid-cols-3 gap-1.5">
           {parameters.map((parameter) => (
             <div

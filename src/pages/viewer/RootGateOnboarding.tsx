@@ -45,7 +45,7 @@ export const RootGateOnboarding: React.FC = () => {
       </div>
 
       {!showCreate ? (
-        <GlassCard className="p-6">
+        <GlassCard className="p-5">
           <form onSubmit={handleLink} className="flex flex-col gap-4">
           <div className="relative">
             <GlassInput id="tank-id" placeholder="Enter Tank ID" value={qrInput} onChange={(e) => setQrInput(e.target.value)} />
@@ -71,7 +71,7 @@ export const RootGateOnboarding: React.FC = () => {
         </form>
         </GlassCard>
       ) : (
-        <GlassCard className="p-6">
+        <GlassCard className="p-5">
           <form onSubmit={handleCreate} className="flex flex-col gap-4">
           <GlassInput id="tank-name" placeholder="Virtual Tank Name (e.g. My Bedroom Reef)" value={tankName} onChange={(e) => setTankName(e.target.value)} />
 

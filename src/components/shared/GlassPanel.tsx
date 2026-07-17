@@ -18,7 +18,7 @@ export const GlassPanel: React.FC<GlassPanelProps> = ({
 }) => (
   <Tag
     className={`
-      rounded-2xl border border-white/20 bg-white/20 p-3 pb-2
+      rounded-2xl border border-white/20 bg-white/20 p-2.5 pb-2
       transition-colors
       ${Tag === 'button' ? 'min-h-11 w-full cursor-pointer text-left hover:bg-white/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal' : ''}
       ${className}
