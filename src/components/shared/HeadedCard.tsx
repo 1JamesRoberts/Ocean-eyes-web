@@ -2,7 +2,7 @@ import React from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { CardHeader } from './CardHeader';
 import { CardSectionHeader } from './CardSectionHeader';
-import { GlassCard, type GlassCardSurface } from './GlassCard';
+import { GlassCard } from './GlassCard';
 
 interface HeadedCardProps {
   children: React.ReactNode;
@@ -13,7 +13,6 @@ interface HeadedCardProps {
   iconClassName?: string;
   headerClassName?: string;
   headerVariant?: 'inset' | 'edge';
-  surface?: GlassCardSurface;
   as?: 'section' | 'div' | 'article';
   onClick?: React.MouseEventHandler<HTMLElement>;
   onKeyDown?: (event: React.KeyboardEvent) => void;
@@ -30,14 +29,12 @@ export const HeadedCard: React.FC<HeadedCardProps> = ({
   iconClassName,
   headerClassName = '',
   headerVariant = 'inset',
-  surface = 'solid',
   ...rest
 }) => {
   const isEdgeHeader = headerVariant === 'edge';
 
   return (
     <GlassCard
-      surface={surface}
       className={`
         ${isEdgeHeader ? 'overflow-hidden p-0!' : 'px-4! pt-4! pb-3.5!'}
         ${className}

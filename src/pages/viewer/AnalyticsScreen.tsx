@@ -175,7 +175,6 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             <HeadedCard
               icon={Fish}
               title="Fish Count Over Time"
-              surface="translucent"
               headerClassName="mb-0"
               className="flex min-h-0 flex-col gap-3 overflow-hidden lg:col-span-2"
             >
@@ -194,7 +193,6 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
             <HeadedCard
               icon={Activity}
               title="Fish Spread Over Time"
-              surface="translucent"
               headerClassName="mb-0"
               className="flex min-h-0 flex-col gap-3 overflow-hidden lg:col-span-2"
             >
@@ -214,7 +212,6 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
           <HeadedCard
             icon={Waves}
             title="Water Clarity Trend"
-            surface="translucent"
             className="cursor-pointer lg:col-span-2"
             onClick={onViewHistory}
             role="button"
