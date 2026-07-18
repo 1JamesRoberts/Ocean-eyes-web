@@ -39,7 +39,7 @@
   --shadow-glass-card: var(--shadow-glass);
 
   /* Video-derived dashboard atmosphere */
-  --mobile-canvas-background: #25292b;
+  --mobile-canvas-background: #bababa;
   --ambient-page-background: var(--mobile-canvas-background);
 
   /* Transitions */
@@ -880,6 +880,18 @@
   opacity: 0.38;
   filter: blur(24px);
   transform: scale(1.05);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 18%,
+    transparent 92%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 18%,
+    transparent 92%
+  );
 }
 
 @utility mobile-ambient-smoke {
