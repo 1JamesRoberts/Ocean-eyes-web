@@ -39,10 +39,8 @@
   --shadow-glass-card: var(--shadow-glass);
 
   /* Video-derived dashboard atmosphere */
-  --ambient-page-background:
-    radial-gradient(circle at 18% 8%, color-mix(in srgb, var(--color-sky-surge) 18%, transparent), transparent 42%),
-    radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--color-verdigris) 15%, transparent), transparent 48%),
-    linear-gradient(180deg, #c7e2e4 0%, #d9eaeb 48%, #e8f2f1 100%);
+  --mobile-canvas-background: #25292b;
+  --ambient-page-background: var(--mobile-canvas-background);
 
   /* Transitions */
   --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -77,13 +75,7 @@
   --mobile-bottom-navigation-clearance: calc(
     4rem + max(0.75rem, env(safe-area-inset-bottom)) + 1rem
   );
-  --mobile-page-background: linear-gradient(
-    to right,
-    var(--color-white) 0%,
-    var(--color-azure-mist-2) 5%,
-    var(--color-azure-mist-2) 95%,
-    var(--color-white) 100%
-  );
+  --mobile-page-background: var(--mobile-canvas-background);
 
   /* Font */
   --font-main: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
@@ -854,7 +846,7 @@
   margin-right: calc(var(--mobile-content-gutter) * -1);
   cursor: pointer;
   overflow: hidden;
-  background: var(--color-azure-mist);
+  background: var(--mobile-canvas-background);
 }
 
 @utility mobile-hero-media {
@@ -885,19 +877,20 @@
 @utility mobile-ambient-feed {
   position: absolute;
   inset: -32px;
-  opacity: 0.34;
-  filter: blur(28px) brightness(0.82) contrast(0.76) saturate(0.86);
+  opacity: 0.38;
+  filter: blur(24px);
   transform: scale(1.05);
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 28%, transparent 62%);
-  mask-image: linear-gradient(to bottom, black 0%, black 28%, transparent 62%);
 }
 
 @utility mobile-ambient-smoke {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--color-white) 22%, transparent), transparent 16% 84%, color-mix(in srgb, var(--color-white) 22%, transparent)),
-    linear-gradient(180deg, color-mix(in srgb, var(--color-prussian-blue) 10%, transparent), color-mix(in srgb, var(--color-azure-mist) 18%, transparent) 44%, color-mix(in srgb, var(--color-white) 36%, transparent));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-white) 10%, transparent),
+    color-mix(in srgb, var(--color-white) 12%, transparent) 44%,
+    color-mix(in srgb, var(--color-white) 8%, transparent)
+  );
 }
 
 @utility mobile-hero-content-clip {
