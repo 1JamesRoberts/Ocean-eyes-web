@@ -1,11 +1,15 @@
 // App.tsx - Phone-aspect OceanEyes dashboard coordinator
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { NavigationProvider, useNavigation } from './context/NavigationContext';
 import { LiveFeedProvider } from './context/LiveFeedContext';
 import { AnalyticsControlsProvider } from './context/AnalyticsControlsContext';
 import { PhoneFrame, PillNavigation } from './components/shared';
 import { ViewerApp } from './pages/ViewerApp';
 import { useTank } from './hooks/useTank';
+import { useMockGoogleAuth } from './hooks/useMockGoogleAuth';
+import { LoginScreen } from './pages/LoginScreen';
+
+const LOGIN_EXIT_DURATION_MS = 250;
 
 export const OceanEyesDashboard: React.FC = () => {
   const { activeTab } = useNavigation();
@@ -34,9 +38,33 @@ export const OceanEyesDashboard: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const { isAuthenticated, isLoading, signInWithGoogle } = useMockGoogleAuth();
+  const [showLogin, setShowLogin] = useState(() => !isAuthenticated);
+
+  useEffect(() => {
+    if (!isAuthenticated || !showLogin) return;
+
+    const exitTimer = window.setTimeout(() => {
+      setShowLogin(false);
+    }, LOGIN_EXIT_DURATION_MS);
+
+    return () => window.clearTimeout(exitTimer);
+  }, [isAuthenticated, showLogin]);
+
   return (
     <NavigationProvider>
-      <OceanEyesDashboard />
+      {isAuthenticated ? (
+        <div className="flex min-h-0 flex-1 animate-dashboard-enter flex-col">
+          <OceanEyesDashboard />
+        </div>
+      ) : null}
+      {showLogin ? (
+        <LoginScreen
+          isLoading={isLoading}
+          isExiting={isAuthenticated}
+          onSignIn={signInWithGoogle}
+        />
+      ) : null}
     </NavigationProvider>
   );
 };

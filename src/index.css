@@ -172,6 +172,9 @@
   --animate-sheet-backdrop: sheetBackdrop 0.18s ease-out both;
   --animate-donut-enter: donutEnter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-donut-detail-enter: donutDetailEnter 0.3s ease-out both;
+  --animate-login-enter: loginEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-login-exit: loginExit 0.25s ease-in both;
+  --animate-dashboard-enter: dashboardEnter 0.25s ease-out both;
 }
 
 @utility transition-smooth {
@@ -621,6 +624,38 @@
 }
 
 @keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loginEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes loginExit {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dashboardEnter {
   from {
     opacity: 0;
   }
