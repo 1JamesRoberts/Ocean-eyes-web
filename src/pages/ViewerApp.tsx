@@ -134,7 +134,11 @@ export const ViewerApp: React.FC = () => {
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
-          <ScreenWithHeroVideo hero={defaultHero} showHero={showHero}>
+          <ScreenWithHeroVideo
+            hero={defaultHero}
+            showHero={showHero}
+            ambientVideo={{ filters, temperatureOverlay, tintOverlay }}
+          >
             <Suspense fallback={<ScreenLoadingFallback />}>
               <div className={activeTab === 'home' ? undefined : '-mt-2'}>
                 {renderActiveScreen()}

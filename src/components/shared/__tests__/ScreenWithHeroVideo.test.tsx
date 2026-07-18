@@ -1,9 +1,13 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ScreenHeader } from '../ScreenHeader';
 import { ScreenWithHeroVideo } from '../ScreenWithHeroVideo';
 import { useHeroMediaLayer } from '../HeroActionLayerContext';
+
+vi.mock('../../../hooks/useLiveFeed', () => ({
+  useLiveFeed: () => ({ isStreaming: false }),
+}));
 
 const HeroMediaLayerProbe = () => {
   const mediaLayer = useHeroMediaLayer();
@@ -13,18 +17,17 @@ const HeroMediaLayerProbe = () => {
 afterEach(cleanup);
 
 describe('ScreenWithHeroVideo stationary scroller', () => {
-  it('renders the rounded content clip, surface, and spacer when the hero is visible', () => {
+  it('renders the rounded content clip, ambient backdrop, and spacer when the hero is visible', () => {
     const { container } = render(
-      <ScreenWithHeroVideo hero={<div>Live video</div>}>
+      <ScreenWithHeroVideo hero={<div>Live video</div>} ambientVideo={{}}>
         <div>Screen content</div>
       </ScreenWithHeroVideo>,
     );
 
     expect(container.querySelector('.mobile-hero-blend')).toBeNull();
     expect(container.querySelector('.mobile-hero-media')).not.toBeNull();
-    const heroSurface = container.querySelector('.mobile-hero-surface');
-    expect(heroSurface).not.toBeNull();
-    expect(heroSurface?.classList.contains('bg-gradient-mint')).toBe(true);
+    expect(container.querySelector('.mobile-hero-surface')).toBeNull();
+    expect(container.querySelector('[data-ambient-video-backdrop]')).not.toBeNull();
     const scrollContainer = container.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
     expect(scrollContainer?.classList.contains('overflow-y-auto')).toBe(true);
     // The shared utility owns the stationary cutoff and its rounded top corners.
@@ -49,6 +52,7 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     expect(container.querySelector('.mobile-hero-blend')).toBeNull();
     expect(container.querySelector('.mobile-hero-media')).not.toBeNull();
     expect(container.querySelector('.mobile-hero-surface')).toBeNull();
+    expect(container.querySelector('[data-ambient-video-backdrop]')).toBeNull();
     const scrollContainer = container.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
     expect(scrollContainer?.classList.contains('mobile-hero-content-clip')).toBe(false);
     expect(scrollContainer?.classList.contains('bg-gradient-mint')).toBe(true);

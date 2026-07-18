@@ -3,6 +3,14 @@ import {
   HeroActionLayerContext,
   HeroMediaLayerContext,
 } from './HeroActionLayerContext';
+import { AmbientVideoBackdrop } from './AmbientVideoBackdrop';
+import type { CameraFilters } from '../../types/aquarium';
+
+interface AmbientVideoSettings {
+  filters?: CameraFilters;
+  temperatureOverlay?: React.CSSProperties | null;
+  tintOverlay?: React.CSSProperties | null;
+}
 
 interface ScreenWithHeroVideoProps {
   /** Hero content rendered inside the stationary background layer. */
@@ -11,12 +19,15 @@ interface ScreenWithHeroVideoProps {
   showHero?: boolean;
   /** Screen-specific content rendered below the hero. */
   children: React.ReactNode;
+  /** Camera adjustments mirrored by the ambient video layer. */
+  ambientVideo?: AmbientVideoSettings;
 }
 
 export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
   hero,
   showHero = true,
   children,
+  ambientVideo,
 }) => {
   const [heroActionLayer, setHeroActionLayer] = useState<HTMLElement | null>(null);
   const [heroMediaLayer, setHeroMediaLayer] = useState<HTMLElement | null>(null);
@@ -34,6 +45,13 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
           <div ref={setHeroMediaLayer} className="mobile-hero-media">
             {hero}
           </div>
+          {showHero && ambientVideo && (
+            <AmbientVideoBackdrop
+              filters={ambientVideo?.filters}
+              temperatureOverlay={ambientVideo?.temperatureOverlay}
+              tintOverlay={ambientVideo?.tintOverlay}
+            />
+          )}
           <div
             ref={setHeroActionLayer}
             className="
@@ -41,9 +59,6 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
               h-[var(--mobile-hero-height)]
             "
           />
-          {showHero && (
-            <div className="mobile-hero-surface bg-gradient-mint" aria-hidden="true" />
-          )}
         </section>
         <div
           data-mobile-screen-scroll

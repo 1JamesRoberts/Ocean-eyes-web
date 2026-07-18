@@ -38,6 +38,12 @@
     inset -1px -1px 2px color-mix(in srgb, var(--color-pine-teal) 3%, transparent);
   --shadow-glass-card: var(--shadow-glass);
 
+  /* Video-derived dashboard atmosphere */
+  --ambient-page-background:
+    radial-gradient(circle at 18% 8%, color-mix(in srgb, var(--color-sky-surge) 18%, transparent), transparent 42%),
+    radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--color-verdigris) 15%, transparent), transparent 48%),
+    linear-gradient(180deg, #c7e2e4 0%, #d9eaeb 48%, #e8f2f1 100%);
+
   /* Transitions */
   --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -857,8 +863,41 @@
   right: 0;
   left: 0;
   height: calc(var(--mobile-hero-height) + var(--mobile-hero-blend-extension));
+  z-index: 10;
   overflow: hidden;
   background: var(--color-prussian-blue);
+}
+
+@utility mobile-ambient-backdrop {
+  pointer-events: none;
+  position: absolute;
+  top: calc(var(--mobile-hero-height) - 4px);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 15;
+  overflow: hidden;
+  background: var(--ambient-page-background);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 40px);
+  mask-image: linear-gradient(to bottom, transparent 0, black 40px);
+}
+
+@utility mobile-ambient-feed {
+  position: absolute;
+  inset: -32px;
+  opacity: 0.34;
+  filter: blur(28px) brightness(0.82) contrast(0.76) saturate(0.86);
+  transform: scale(1.05);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 28%, transparent 62%);
+  mask-image: linear-gradient(to bottom, black 0%, black 28%, transparent 62%);
+}
+
+@utility mobile-ambient-smoke {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--color-white) 22%, transparent), transparent 16% 84%, color-mix(in srgb, var(--color-white) 22%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-prussian-blue) 10%, transparent), color-mix(in srgb, var(--color-azure-mist) 18%, transparent) 44%, color-mix(in srgb, var(--color-white) 36%, transparent));
 }
 
 @utility mobile-hero-content-clip {
@@ -875,18 +914,10 @@
   );
 }
 
-@utility mobile-hero-surface {
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 20;
-  top: calc(var(--mobile-hero-height) - 4px);
-  /* Fade the shared page gradient over the media edge so cards never reveal
-     a sticky/compositor boundary while they scroll. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 40px);
-  mask-image: linear-gradient(to bottom, transparent 0, black 40px);
+@media (prefers-reduced-motion: reduce) {
+  .mobile-ambient-feed {
+    display: none;
+  }
 }
 
 /* ─── Pill Navigation ─── */
