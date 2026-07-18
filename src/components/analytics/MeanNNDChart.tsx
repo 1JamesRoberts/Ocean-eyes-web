@@ -13,6 +13,7 @@ import type { AIDetection, AIDetectionResult } from '../../types/aquarium';
 import { formatChartTimestamp, type DetectionTimeAxis } from '../../utils/detectionTimeAxis';
 import { calculateMeanNND } from '../../utils/geometry';
 import { ChartEmptyState } from './ChartEmptyState';
+import { analyticsTooltipMaterialStyle } from './analyticsTooltipMaterial';
 
 interface Props {
   records: AIDetectionResult[];
@@ -84,13 +85,8 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies, timeAx
         />
         <Tooltip
           contentStyle={{
-            background: 'color-mix(in srgb, var(--color-white) 70%, transparent)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid color-mix(in srgb, var(--color-white) 30%, transparent)',
-            borderRadius: '1rem',
+            ...analyticsTooltipMaterialStyle,
             color: 'var(--color-prussian-blue)',
-            fontSize: 13,
           }}
           formatter={(value) => [Number(value).toFixed(3), 'Mean NND']}
           labelFormatter={(label) => formatChartTimestamp(Number(label))}

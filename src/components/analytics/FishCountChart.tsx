@@ -12,6 +12,7 @@ import {
 import type { AIDetectionResult } from '../../types/aquarium';
 import { formatChartTimestamp, type DetectionTimeAxis } from '../../utils/detectionTimeAxis';
 import { ChartEmptyState } from './ChartEmptyState';
+import { analyticsTooltipMaterialStyle } from './analyticsTooltipMaterial';
 
 interface Props {
   records: AIDetectionResult[];
@@ -104,13 +105,8 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies, time
         />
         <Tooltip
           contentStyle={{
-            background: 'color-mix(in srgb, var(--color-white) 70%, transparent)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid color-mix(in srgb, var(--color-white) 30%, transparent)',
-            borderRadius: '1rem',
+            ...analyticsTooltipMaterialStyle,
             color: 'var(--color-prussian-blue)',
-            fontSize: 13,
           }}
           formatter={(value) => [`${value as number} fish`, 'Count']}
           labelFormatter={(label) => formatChartTimestamp(Number(label))}

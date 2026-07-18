@@ -13,6 +13,7 @@ import type { AITurbidityResult, ReadingItem } from '../../types/aquarium';
 import { formatTimeShort } from '../../utils/formatters';
 import { ChartEmptyState } from './ChartEmptyState';
 import { MiniClarityChart } from './MiniClarityChart';
+import { analyticsTooltipMaterialStyle } from './analyticsTooltipMaterial';
 
 interface Props {
   records: AITurbidityResult[];
@@ -74,13 +75,8 @@ export const ClarityTrendChart: React.FC<Props> = ({ records, readings, emptyAct
         />
         <Tooltip
           contentStyle={{
-            background: 'color-mix(in srgb, var(--color-white) 70%, transparent)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid color-mix(in srgb, var(--color-white) 30%, transparent)',
-            borderRadius: '1rem',
+            ...analyticsTooltipMaterialStyle,
             color: 'var(--color-prussian-blue)',
-            fontSize: 13,
           }}
           formatter={(value) => [`${Number(value).toFixed(2)} FNU`, 'Water Clarity']}
         />
