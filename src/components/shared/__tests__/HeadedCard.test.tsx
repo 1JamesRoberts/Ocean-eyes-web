@@ -22,11 +22,33 @@ describe('HeadedCard', () => {
     const card = container.querySelector('section');
     expect(card).toBeTruthy();
     expect(card?.classList.contains('glass-card')).toBe(true);
+    expect(card?.classList.contains('glass-card-translucent')).toBe(false);
     expect(card?.classList.contains('px-4!')).toBe(true);
     expect(card?.classList.contains('pt-4!')).toBe(true);
     expect(card?.classList.contains('pb-3.5!')).toBe(true);
     expect(screen.getByRole('heading', { name: 'Alerts' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Open' })).toBeTruthy();
+  });
+
+  it('supports a translucent surface without combining conflicting card materials', () => {
+    const { container } = render(
+      <HeadedCard
+        as="section"
+        icon={Bell}
+        title="Fish Count Over Time"
+        surface="translucent"
+      >
+        <p>Chart</p>
+      </HeadedCard>,
+    );
+
+    const card = container.querySelector('section');
+    expect(card?.classList.contains('glass-card-translucent')).toBe(true);
+    expect(card?.classList.contains('glass-card')).toBe(false);
+    expect(card?.classList.contains('px-4!')).toBe(true);
+    expect(card?.classList.contains('pt-4!')).toBe(true);
+    expect(card?.classList.contains('pb-3.5!')).toBe(true);
+    expect(screen.getByRole('heading', { name: 'Fish Count Over Time' })).toBeTruthy();
   });
 
   it('supports the edge-to-edge media header variant', () => {
