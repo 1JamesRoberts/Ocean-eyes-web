@@ -39,7 +39,7 @@
   --shadow-glass-card: var(--shadow-glass);
 
   /* Video-derived dashboard atmosphere */
-  --mobile-canvas-background: #bababa;
+  --mobile-canvas-background: #f0f0f0;
   --ambient-page-background: var(--mobile-canvas-background);
 
   /* Transitions */
