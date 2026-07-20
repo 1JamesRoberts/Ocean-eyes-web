@@ -382,8 +382,6 @@ export const searchSpecies = (query: string): SpeciesInfo[] => {
   });
 };
 
-export const DEFAULT_SPECIES_IMAGE = '/species-placeholder.png';
-
 export const getSpeciesImageClass = (speciesId: string): string => {
   const species = getSpeciesById(speciesId);
   return species ? species.imageClass : 'species-unknown';

@@ -1,8 +1,6 @@
 // constants.ts - Shared constants for OceanEyes
 
 // ─── Storage Keys ───────────────────────────────────────────────────────────
-export const SNAPSHOTS_STORAGE_KEY = 'oceaneyes_snapshots';
-export const RECORDINGS_STORAGE_KEY = 'oceaneyes_recordings';
 export const LAST_DIAGNOSIS_TIME_KEY = 'oceaneyes_last_diagnosis_time';
 
 // ─── AI & Inference ─────────────────────────────────────────────────────────

@@ -3,7 +3,6 @@ import { useTank } from '../useTank';
 import { useLivePreferences } from '../useLivePreferences';
 import { useNavigation } from '../../context/NavigationContext';
 import type { AIPreferences } from '../../types/aquarium';
-import { SNAPSHOTS_STORAGE_KEY, RECORDINGS_STORAGE_KEY } from '../../utils/constants';
 
 export const useSettings = () => {
   const navigation = useNavigation();
@@ -23,28 +22,6 @@ export const useSettings = () => {
     updateAIPreferences,
     updateAutoConnect,
   } = useLivePreferences(activeTank?.id ?? null);
-
-  const [mediaCounts, setMediaCounts] = useState(() => ({
-    snapshots: getStoredCount(SNAPSHOTS_STORAGE_KEY),
-    recordings: getStoredCount(RECORDINGS_STORAGE_KEY),
-  }));
-
-  const refreshMediaCounts = useCallback(() => {
-    setMediaCounts({
-      snapshots: getStoredCount(SNAPSHOTS_STORAGE_KEY),
-      recordings: getStoredCount(RECORDINGS_STORAGE_KEY),
-    });
-  }, []);
-
-  const clearSnapshots = useCallback(() => {
-    localStorage.removeItem(SNAPSHOTS_STORAGE_KEY);
-    refreshMediaCounts();
-  }, [refreshMediaCounts]);
-
-  const clearRecordings = useCallback(() => {
-    localStorage.removeItem(RECORDINGS_STORAGE_KEY);
-    refreshMediaCounts();
-  }, [refreshMediaCounts]);
 
   const debouncedUpdateThresholds = useCallback(
     (clarityMin: number, fishPct: number) => {
@@ -115,11 +92,6 @@ export const useSettings = () => {
   );
 
   const onStartRename = useCallback(() => setEditing(true), []);
-  const onCancelRename = useCallback(() => {
-    setEditing(false);
-    setName(activeTank?.name || 'Living Room Reef');
-  }, [activeTank?.name]);
-
   const onRequestUnlink = useCallback(() => setShowConfirmUnlink(true), []);
   const onCancelUnlink = useCallback(() => setShowConfirmUnlink(false), []);
   const onConfirmUnlink = useCallback(() => {
@@ -148,14 +120,6 @@ export const useSettings = () => {
     [updateAutoConnect]
   );
 
-  const onNavigateToFish = useCallback(
-    () => navigation.setActiveTab('my_fish'),
-    [navigation]
-  );
-  const onNavigateToHistory = useCallback(
-    () => navigation.setActiveTab('history'),
-    [navigation]
-  );
   const onNavigateToAlerts = useCallback(
     () => navigation.setActiveTab('alerts'),
     [navigation]
@@ -171,7 +135,6 @@ export const useSettings = () => {
     fishChangePct,
     handleNameChange,
     onStartRename,
-    onCancelRename,
     onTurbidityChange,
     onTurbidityCommit,
     onFishPctChange,
@@ -183,22 +146,6 @@ export const useSettings = () => {
     onAIPreferenceCommit,
     onAutoConnectChange,
     preferences,
-    mediaCounts,
-    clearSnapshots,
-    clearRecordings,
-    onNavigateToFish,
-    onNavigateToHistory,
     onNavigateToAlerts,
   };
 };
-
-function getStoredCount(key: string): number {
-  try {
-    const data = localStorage.getItem(key);
-    if (!data) return 0;
-    const parsed = JSON.parse(data) as unknown[];
-    return Array.isArray(parsed) ? parsed.length : 0;
-  } catch {
-    return 0;
-  }
-}
