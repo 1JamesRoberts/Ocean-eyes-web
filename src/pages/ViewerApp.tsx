@@ -4,6 +4,7 @@ import { useNavigation, type ViewerTab } from '../context/NavigationContext';
 import { useTank } from '../hooks/useTank';
 import { useAnalytics } from '../hooks/pages/useAnalytics';
 import { useCameraFilters } from '../hooks/live/useCameraFilters';
+import { useAmbientCanvasDebug } from '../hooks/live/useAmbientCanvasDebug';
 import { ScreenWithHeroVideo } from '../components/shared';
 import { HeroLiveFeedSection } from '../components/home/HeroLiveFeedSection';
 import { SpatialDetectionHeatmapOverlay } from '../components/analytics/SpatialDetectionHeatmapOverlay';
@@ -36,6 +37,7 @@ export const ViewerApp: React.FC = () => {
     tintOverlay,
     handleFilterChange,
   } = useCameraFilters({ tankId });
+  const ambientCanvasDebug = useAmbientCanvasDebug();
 
   // Hoisted once so the hero and AnalyticsScreen share the same selectedSpecies state
   const analyticsData = useAnalytics();
@@ -98,6 +100,9 @@ export const ViewerApp: React.FC = () => {
             tintOverlay={tintOverlay}
             onFilterChange={handleFilterChange}
             showPreviewDetections
+            canvasDebugValues={ambientCanvasDebug.values}
+            onCanvasDebugChange={ambientCanvasDebug.updateValue}
+            onCanvasDebugReset={ambientCanvasDebug.reset}
           />
         );
       case 'alerts':
@@ -137,7 +142,12 @@ export const ViewerApp: React.FC = () => {
           <ScreenWithHeroVideo
             hero={defaultHero}
             showHero={showHero}
-            ambientVideo={{ filters, temperatureOverlay, tintOverlay }}
+            ambientVideo={{
+              filters,
+              temperatureOverlay,
+              tintOverlay,
+              canvasStyle: ambientCanvasDebug.canvasStyle,
+            }}
           >
             <Suspense fallback={<ScreenLoadingFallback />}>
               <div className={activeTab === 'home' ? undefined : '-mt-2'}>

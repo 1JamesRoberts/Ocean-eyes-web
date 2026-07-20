@@ -6,6 +6,7 @@ interface GlassIconButtonProps {
   onClick?: () => void;
   className?: string;
   active?: boolean;
+  expanded?: boolean;
   size?: 'sm' | 'md' | 'lg';
   label: string;
 }
@@ -21,6 +22,7 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({
   onClick,
   className = '',
   active = false,
+  expanded,
   size = 'md',
   label,
 }) => (
@@ -28,6 +30,7 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({
     type="button"
     onClick={onClick}
     aria-label={label}
+    aria-expanded={expanded}
     title={label}
     className={`
       glass-icon-button focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal

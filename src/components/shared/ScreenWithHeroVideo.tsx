@@ -10,6 +10,7 @@ interface AmbientVideoSettings {
   filters?: CameraFilters;
   temperatureOverlay?: React.CSSProperties | null;
   tintOverlay?: React.CSSProperties | null;
+  canvasStyle?: React.CSSProperties;
 }
 
 interface ScreenWithHeroVideoProps {
@@ -35,7 +36,10 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
   return (
     <HeroActionLayerContext.Provider value={heroActionLayer}>
       <HeroMediaLayerContext.Provider value={heroMediaLayer}>
-        <div className="bg-gradient-mint relative flex min-h-0 w-full flex-1 flex-col">
+        <div
+          className="bg-gradient-mint relative flex min-h-0 w-full flex-1 flex-col"
+          style={ambientVideo?.canvasStyle}
+        >
         <section
           className={`
             mobile-hero-video

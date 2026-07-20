@@ -41,6 +41,10 @@
   /* Video-derived dashboard atmosphere */
   --mobile-canvas-background: #f0f0f0;
   --ambient-page-background: var(--mobile-canvas-background);
+  --mobile-ambient-opacity: 0.38;
+  --mobile-ambient-blur: 24px;
+  --mobile-ambient-fade-start: 18%;
+  --mobile-ambient-fade-end: 92%;
 
   /* Transitions */
   --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -877,20 +881,20 @@
 @utility mobile-ambient-feed {
   position: absolute;
   inset: -32px;
-  opacity: 0.38;
-  filter: blur(24px);
+  opacity: var(--mobile-ambient-opacity);
+  filter: blur(var(--mobile-ambient-blur));
   transform: scale(1.05);
   -webkit-mask-image: linear-gradient(
     to bottom,
     black 0%,
-    black 18%,
-    transparent 92%
+    black var(--mobile-ambient-fade-start),
+    transparent var(--mobile-ambient-fade-end)
   );
   mask-image: linear-gradient(
     to bottom,
     black 0%,
-    black 18%,
-    transparent 92%
+    black var(--mobile-ambient-fade-start),
+    transparent var(--mobile-ambient-fade-end)
   );
 }
 

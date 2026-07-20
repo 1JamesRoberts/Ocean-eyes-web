@@ -20,6 +20,10 @@ import {
   HeadedCard,
 } from '../shared';
 import { StreamAdjustments } from '../live/StreamAdjustments';
+import {
+  BackgroundCanvasDebugPanel,
+  type BackgroundCanvasDebugPanelProps,
+} from './BackgroundCanvasDebugPanel';
 import type {
   AIPreferences,
   CameraFilters,
@@ -314,6 +318,7 @@ interface AquariumPanelCardProps {
   onConfirmUnlink: () => void;
   filters?: CameraFilters;
   onFilterChange?: (filters: Partial<CameraFilters>) => void;
+  canvasDebug: BackgroundCanvasDebugPanelProps;
 }
 
 export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
@@ -329,6 +334,7 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
   onConfirmUnlink,
   filters,
   onFilterChange,
+  canvasDebug,
 }) => (
   <HeadedCard icon={ShieldAlert} title="Tank Management">
 
@@ -378,6 +384,8 @@ export const AquariumPanelCard: React.FC<AquariumPanelCardProps> = ({
       {filters && onFilterChange && (
         <StreamAdjustments filters={filters} onFilterChange={onFilterChange} />
       )}
+
+      <BackgroundCanvasDebugPanel {...canvasDebug} />
 
       {showConfirmUnlink ? (
         <div className="rounded-2xl border border-critical/20 bg-critical/8 p-2.5 pb-2">

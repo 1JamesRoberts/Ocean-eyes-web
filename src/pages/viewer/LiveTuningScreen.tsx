@@ -7,6 +7,10 @@ import {
 } from '../../components/settings/SettingsSections';
 import { ScreenHeader } from '../../components/shared';
 import type { CameraFilters } from '../../types/aquarium';
+import type {
+  AmbientCanvasDebugKey,
+  AmbientCanvasDebugValues,
+} from '../../hooks/live/useAmbientCanvasDebug';
 
 interface LiveTuningScreenProps {
   tankId: string | null;
@@ -15,6 +19,9 @@ interface LiveTuningScreenProps {
   tintOverlay: { backgroundColor: string; opacity: number } | null;
   onFilterChange: (partial: Partial<CameraFilters>) => void;
   showPreviewDetections: boolean;
+  canvasDebugValues: AmbientCanvasDebugValues;
+  onCanvasDebugChange: (key: AmbientCanvasDebugKey, value: number) => void;
+  onCanvasDebugReset: () => void;
 }
 
 export const LiveTuningScreen: React.FC<LiveTuningScreenProps> = ({
@@ -24,6 +31,9 @@ export const LiveTuningScreen: React.FC<LiveTuningScreenProps> = ({
   tintOverlay,
   onFilterChange,
   showPreviewDetections,
+  canvasDebugValues,
+  onCanvasDebugChange,
+  onCanvasDebugReset,
 }) => {
   const settings = useSettings();
 
@@ -54,6 +64,11 @@ export const LiveTuningScreen: React.FC<LiveTuningScreenProps> = ({
           onConfirmUnlink={settings.onConfirmUnlink}
           filters={filters}
           onFilterChange={onFilterChange}
+          canvasDebug={{
+            values: canvasDebugValues,
+            onChange: onCanvasDebugChange,
+            onReset: onCanvasDebugReset,
+          }}
         />
 
         <SafetyThresholdsCard

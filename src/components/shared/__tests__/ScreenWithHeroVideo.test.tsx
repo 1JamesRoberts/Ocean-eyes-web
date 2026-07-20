@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { CSSProperties } from 'react';
 import { ScreenHeader } from '../ScreenHeader';
 import { ScreenWithHeroVideo } from '../ScreenWithHeroVideo';
 import { useHeroMediaLayer } from '../HeroActionLayerContext';
@@ -68,6 +69,32 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     );
 
     expect(getByTestId('media-layer-class').textContent).toContain('mobile-hero-media');
+  });
+
+  it('applies inherited canvas debug variables without changing transition classes', () => {
+    const canvasStyle = {
+      '--mobile-canvas-background': 'rgb(186 186 186)',
+      '--mobile-ambient-opacity': '0.6',
+      '--mobile-ambient-blur': '30px',
+      '--mobile-ambient-fade-start': '24%',
+      '--mobile-ambient-fade-end': '88%',
+    } as CSSProperties;
+    const { container } = render(
+      <ScreenWithHeroVideo
+        hero={<div>Live video</div>}
+        ambientVideo={{ canvasStyle }}
+      >
+        <div>Screen content</div>
+      </ScreenWithHeroVideo>,
+    );
+
+    const shell = container.querySelector<HTMLElement>('.bg-gradient-mint');
+    expect(shell?.style.getPropertyValue('--mobile-canvas-background')).toBe(
+      'rgb(186 186 186)',
+    );
+    expect(shell?.style.getPropertyValue('--mobile-ambient-opacity')).toBe('0.6');
+    expect(container.querySelector('.mobile-ambient-backdrop')).not.toBeNull();
+    expect(container.querySelector('.mobile-hero-content-clip')).not.toBeNull();
   });
 
   it('keeps the hard clip stationary during large and repeated scroll jumps', () => {
