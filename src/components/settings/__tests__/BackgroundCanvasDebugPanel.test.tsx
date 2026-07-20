@@ -21,7 +21,7 @@ describe('BackgroundCanvasDebugPanel', () => {
 
     const toggle = screen.getByRole('button', { name: /Background Canvas Debug/ });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(screen.getByText('Temporary session-only controls')).toBeTruthy();
+    expect(screen.getByText('Default background controls')).toBeTruthy();
     expect(toggle.querySelector('.text-warning')).toBeTruthy();
 
     fireEvent.click(toggle);

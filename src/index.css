@@ -27,10 +27,10 @@
   /* Video-derived dashboard atmosphere */
   --mobile-canvas-background: #f0f0f0;
   --ambient-page-background: var(--mobile-canvas-background);
-  --mobile-ambient-opacity: 0.38;
-  --mobile-ambient-blur: 24px;
-  --mobile-ambient-fade-start: 18%;
-  --mobile-ambient-fade-end: 92%;
+  --mobile-ambient-opacity: 1;
+  --mobile-ambient-blur: 48px;
+  --mobile-ambient-fade-start: 50%;
+  --mobile-ambient-fade-end: 100%;
 
   /* Transitions */
   --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),

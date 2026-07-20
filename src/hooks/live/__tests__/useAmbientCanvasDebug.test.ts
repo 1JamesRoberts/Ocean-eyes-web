@@ -13,10 +13,10 @@ describe('useAmbientCanvasDebug', () => {
     expect(result.current.values).toEqual(DEFAULT_AMBIENT_CANVAS_DEBUG_VALUES);
     expect(result.current.canvasStyle).toMatchObject({
       '--mobile-canvas-background': 'rgb(240 240 240)',
-      '--mobile-ambient-opacity': '0.38',
-      '--mobile-ambient-blur': '24px',
-      '--mobile-ambient-fade-start': '18%',
-      '--mobile-ambient-fade-end': '92%',
+      '--mobile-ambient-opacity': '1',
+      '--mobile-ambient-blur': '48px',
+      '--mobile-ambient-fade-start': '50%',
+      '--mobile-ambient-fade-end': '100%',
     });
 
     act(() => result.current.updateValue('sampleOpacity', 64));
@@ -31,6 +31,7 @@ describe('useAmbientCanvasDebug', () => {
   it('keeps at least five percent between the fade stops', () => {
     const { result } = renderHook(() => useAmbientCanvasDebug());
 
+    act(() => result.current.updateValue('fadeStart', 18));
     act(() => result.current.updateValue('fadeEnd', 20));
     expect(result.current.values.fadeEnd).toBe(23);
 

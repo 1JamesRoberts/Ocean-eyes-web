@@ -67,7 +67,7 @@ export const BackgroundCanvasDebugPanel: React.FC<BackgroundCanvasDebugPanelProp
     <GlassDisclosurePanel
       icon={Bug}
       title="Background Canvas Debug"
-      detail="Temporary session-only controls"
+      detail="Default background controls"
       expanded={expanded}
       onToggle={() => setExpanded((current) => !current)}
       iconClassName="text-warning"
