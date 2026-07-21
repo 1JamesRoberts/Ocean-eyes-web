@@ -13,7 +13,7 @@ describe('useAmbientCanvasDebug', () => {
     expect(result.current.values).toEqual(DEFAULT_AMBIENT_CANVAS_DEBUG_VALUES);
     expect(result.current.canvasStyle).toMatchObject({
       '--mobile-canvas-background': 'rgb(240 240 240)',
-      '--mobile-ambient-opacity': '1',
+      '--mobile-ambient-opacity': '0.1',
       '--mobile-ambient-blur': '48px',
       '--mobile-ambient-fade-start': '50%',
       '--mobile-ambient-fade-end': '100%',
