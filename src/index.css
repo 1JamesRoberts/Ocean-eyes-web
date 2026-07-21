@@ -32,7 +32,6 @@
     inset -1px -1px 2px color-mix(in srgb, var(--color-pine-teal) 3%, transparent);
   /* Video-derived dashboard atmosphere */
   --mobile-canvas-background: #f0f0f0;
-  --ambient-page-background: var(--mobile-canvas-background);
   --mobile-ambient-opacity: 1;
   --mobile-ambient-blur: 48px;
   --mobile-ambient-fade-start: 50%;
@@ -674,10 +673,10 @@
   bottom: 0;
   left: 0;
   z-index: 15;
-  overflow: hidden;
-  background: var(--ambient-page-background);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 40px);
-  mask-image: linear-gradient(to bottom, transparent 0, black 40px);
+  /* The hero shell already supplies the same continuous canvas base. Keeping
+     this layer transparent avoids exposing a mask boundary through glass cards. */
+  overflow: visible;
+  background: transparent;
 }
 
 @utility mobile-ambient-feed {
@@ -705,7 +704,8 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--color-white) 10%, transparent),
+    transparent 0,
+    color-mix(in srgb, var(--color-white) 10%, transparent) 40px,
     color-mix(in srgb, var(--color-white) 12%, transparent) 44%,
     color-mix(in srgb, var(--color-white) 8%, transparent)
   );
