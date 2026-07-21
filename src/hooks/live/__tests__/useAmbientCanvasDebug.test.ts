@@ -17,6 +17,7 @@ describe('useAmbientCanvasDebug', () => {
       '--mobile-ambient-blur': '48px',
       '--mobile-ambient-fade-start': '50%',
       '--mobile-ambient-fade-end': '100%',
+      '--mobile-hero-fade-start': '50%',
     });
 
     act(() => result.current.updateValue('sampleOpacity', 64));
@@ -37,6 +38,9 @@ describe('useAmbientCanvasDebug', () => {
 
     act(() => result.current.updateValue('fadeStart', 80));
     expect(result.current.values.fadeStart).toBe(18);
+
+    act(() => result.current.updateValue('heroFadeStart', 22));
+    expect(result.current.values.heroFadeStart).toBe(22);
   });
 
   it('survives rerenders, resets explicitly, and returns to defaults on remount', () => {

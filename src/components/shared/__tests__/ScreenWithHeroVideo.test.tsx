@@ -78,6 +78,7 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
       '--mobile-ambient-blur': '30px',
       '--mobile-ambient-fade-start': '24%',
       '--mobile-ambient-fade-end': '88%',
+      '--mobile-hero-fade-start': '45%',
     } as CSSProperties;
     const { container } = render(
       <ScreenWithHeroVideo
@@ -93,6 +94,7 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
       'rgb(186 186 186)',
     );
     expect(shell?.style.getPropertyValue('--mobile-ambient-opacity')).toBe('0.6');
+    expect(shell?.style.getPropertyValue('--mobile-hero-fade-start')).toBe('45%');
     expect(container.querySelector('.mobile-ambient-backdrop')).not.toBeNull();
     expect(container.querySelector('.mobile-hero-content-clip')).not.toBeNull();
   });

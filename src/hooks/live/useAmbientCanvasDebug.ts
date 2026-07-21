@@ -6,6 +6,7 @@ export interface AmbientCanvasDebugValues {
   blurRadius: number;
   fadeStart: number;
   fadeEnd: number;
+  heroFadeStart: number;
 }
 
 export type AmbientCanvasDebugKey = keyof AmbientCanvasDebugValues;
@@ -16,6 +17,7 @@ export const DEFAULT_AMBIENT_CANVAS_DEBUG_VALUES: AmbientCanvasDebugValues = {
   blurRadius: 48,
   fadeStart: 50,
   fadeEnd: 100,
+  heroFadeStart: 50,
 };
 
 const MIN_FADE_GAP = 5;
@@ -39,6 +41,8 @@ const normaliseValue = (
       return clamp(Math.round(value), 0, Math.min(80, current.fadeEnd - MIN_FADE_GAP));
     case 'fadeEnd':
       return clamp(Math.round(value), Math.max(20, current.fadeStart + MIN_FADE_GAP), 100);
+    case 'heroFadeStart':
+      return clamp(Math.round(value), 0, 80);
   }
 };
 
@@ -48,6 +52,7 @@ type AmbientCanvasCssProperties = CSSProperties & {
   '--mobile-ambient-blur': string;
   '--mobile-ambient-fade-start': string;
   '--mobile-ambient-fade-end': string;
+  '--mobile-hero-fade-start': string;
 };
 
 export const useAmbientCanvasDebug = () => {
@@ -72,6 +77,7 @@ export const useAmbientCanvasDebug = () => {
     '--mobile-ambient-blur': `${values.blurRadius}px`,
     '--mobile-ambient-fade-start': `${values.fadeStart}%`,
     '--mobile-ambient-fade-end': `${values.fadeEnd}%`,
+    '--mobile-hero-fade-start': `${values.heroFadeStart}%`,
   }), [values]);
 
   return {

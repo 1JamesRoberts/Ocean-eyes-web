@@ -36,6 +36,7 @@
   --mobile-ambient-blur: 48px;
   --mobile-ambient-fade-start: 50%;
   --mobile-ambient-fade-end: 100%;
+  --mobile-hero-fade-start: 50%;
 
   /* Transitions */
   --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -663,6 +664,18 @@
   z-index: 10;
   overflow: hidden;
   background: var(--color-prussian-blue);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black var(--mobile-hero-fade-start),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black var(--mobile-hero-fade-start),
+    transparent 100%
+  );
 }
 
 @utility mobile-ambient-backdrop {
@@ -672,7 +685,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 15;
+  z-index: 5;
   /* The hero shell already supplies the same continuous canvas base. Keeping
      this layer transparent avoids exposing a mask boundary through glass cards. */
   overflow: visible;

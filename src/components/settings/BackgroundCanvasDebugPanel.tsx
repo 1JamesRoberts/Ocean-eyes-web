@@ -67,7 +67,7 @@ export const BackgroundCanvasDebugPanel: React.FC<BackgroundCanvasDebugPanelProp
     <GlassDisclosurePanel
       icon={Bug}
       title="Background Canvas Debug"
-      detail="Default background controls"
+      detail="Video and background transition controls"
       expanded={expanded}
       onToggle={() => setExpanded((current) => !current)}
       iconClassName="text-warning"
@@ -112,6 +112,14 @@ export const BackgroundCanvasDebugPanel: React.FC<BackgroundCanvasDebugPanelProp
           min={Math.max(20, values.fadeStart + 5)}
           max={100}
           onChange={(value) => onChange('fadeEnd', value)}
+        />
+        <DebugSlider
+          label="Hero fade start"
+          value={values.heroFadeStart}
+          displayValue={`${values.heroFadeStart}%`}
+          min={0}
+          max={80}
+          onChange={(value) => onChange('heroFadeStart', value)}
         />
         <GlassButton
           variant="outline"

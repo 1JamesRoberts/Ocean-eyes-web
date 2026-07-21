@@ -8,7 +8,7 @@ import { AquariumPanelCard } from '../SettingsSections';
 afterEach(cleanup);
 
 describe('BackgroundCanvasDebugPanel', () => {
-  it('starts collapsed and exposes the five live debug sliders when expanded', () => {
+  it('starts collapsed and exposes the six live debug sliders when expanded', () => {
     const onChange = vi.fn();
     const onReset = vi.fn();
     render(
@@ -21,17 +21,32 @@ describe('BackgroundCanvasDebugPanel', () => {
 
     const toggle = screen.getByRole('button', { name: /Background Canvas Debug/ });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(screen.getByText('Default background controls')).toBeTruthy();
+    expect(screen.getByText('Video and background transition controls')).toBeTruthy();
     expect(toggle.querySelector('.text-warning')).toBeTruthy();
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(screen.getAllByRole('slider')).toHaveLength(5);
+    expect(screen.getAllByRole('slider')).toHaveLength(6);
 
     fireEvent.change(screen.getByRole('slider', { name: 'Blur radius' }), {
       target: { value: '31' },
     });
     expect(onChange).toHaveBeenCalledWith('blurRadius', 31);
+
+    fireEvent.change(screen.getByRole('slider', { name: 'Fade start' }), {
+      target: { value: '45' },
+    });
+    expect(onChange).toHaveBeenCalledWith('fadeStart', 45);
+
+    fireEvent.change(screen.getByRole('slider', { name: 'Fade end' }), {
+      target: { value: '95' },
+    });
+    expect(onChange).toHaveBeenCalledWith('fadeEnd', 95);
+
+    fireEvent.change(screen.getByRole('slider', { name: 'Hero fade start' }), {
+      target: { value: '40' },
+    });
+    expect(onChange).toHaveBeenCalledWith('heroFadeStart', 40);
 
     fireEvent.click(screen.getByRole('button', { name: 'Reset defaults' }));
     expect(onReset).toHaveBeenCalledTimes(1);

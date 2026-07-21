@@ -381,7 +381,7 @@ export const MyFishScreen: React.FC = () => {
                     onClick={() => onToggleFish(fish.id)}
                     aria-expanded={isActive}
                   >
-                    <FishThumbnail imagePath={display.imagePath} initials={display.initials} color={display.color} />
+                    <FishThumbnail imagePath={display.imagePath} initials={display.initials} color={display.color} size={56} />
                     <div className="min-w-0 flex-1">
                       <span className="
                         block truncate type-strong
