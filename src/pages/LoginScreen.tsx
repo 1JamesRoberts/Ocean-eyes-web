@@ -43,7 +43,7 @@ const OceanEyesBrand = () => (
       <circle cx="85" cy="4" r="2" fill="var(--color-turquoise)" />
     </svg>
     <p className="
-      mt-1 text-[35px] leading-none font-extrabold tracking-[-0.065em]
+      mt-1 text-[35px] leading-none font-bold tracking-[-0.065em]
       text-white
     ">
       Ocean<span className="text-turquoise">Eyes</span>
@@ -105,7 +105,7 @@ export const LoginScreen = ({ isLoading, isExiting, onSignIn }: LoginScreenProps
 
             <div className="mt-7">
               <h1 id="login-title" className="
-                text-[27px] leading-[1.08] font-extrabold tracking-[-0.045em]
+                text-[27px] leading-[1.08] font-bold tracking-[-0.045em]
                 text-white
               ">
                 Smart aquarium monitoring
@@ -142,13 +142,13 @@ export const LoginScreen = ({ isLoading, isExiting, onSignIn }: LoginScreenProps
 
           <p className="
             mt-5 max-w-[330px] px-3 text-center text-[12px] leading-relaxed
-            font-medium text-white/80
+            font-normal text-white/80
           ">
             By continuing, you agree to our{' '}
             <a
               href="#privacy"
               className="
-                rounded-sm font-semibold text-turquoise underline
+                rounded-sm font-medium text-turquoise underline
                 decoration-turquoise/55 underline-offset-2 transition-smooth
                 hover:text-white
               "
@@ -161,7 +161,7 @@ export const LoginScreen = ({ isLoading, isExiting, onSignIn }: LoginScreenProps
             <a
               href="#terms"
               className="
-                rounded-sm font-semibold text-turquoise underline
+                rounded-sm font-medium text-turquoise underline
                 decoration-turquoise/55 underline-offset-2 transition-smooth
                 hover:text-white
               "

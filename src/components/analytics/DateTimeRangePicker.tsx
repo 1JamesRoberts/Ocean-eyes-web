@@ -286,7 +286,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
             />
           </>
         ) : (
-          <span className="font-semibold">Range</span>
+          <span className="font-medium">Range</span>
         )}
       </button>
 

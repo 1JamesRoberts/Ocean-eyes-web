@@ -83,7 +83,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
 
               <div className="shrink-0">
                 <DetectionVisibilityRing detected={fish.detected} expected={fish.count} size={34} strokeWidth={3} showLabel={false} />
-                <span className={`mt-1 block text-center text-2xs font-semibold ${isComplete ? 'text-good' : visibilityPercent >= 50 ? 'text-warning' : 'text-critical'}`}>
+                <span className={`mt-1 block text-center text-2xs font-medium ${isComplete ? 'text-good' : visibilityPercent >= 50 ? 'text-warning' : 'text-critical'}`}>
                   {visibilityPercent}%
                 </span>
               </div>

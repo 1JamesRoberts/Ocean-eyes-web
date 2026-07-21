@@ -42,12 +42,12 @@ const ParameterTile: React.FC<ParameterTileProps> = ({
   const content = (
     <>
       <Icon aria-hidden="true" className="size-4 shrink-0 text-turquoise-surf" />
-      <span className="type-caption text-[10px] font-semibold text-slate-grey">{label}</span>
+      <span className="type-caption text-[10px] font-medium text-slate-grey">{label}</span>
       <div className={`flex items-baseline justify-center ${isCritical ? 'text-critical' : 'text-prussian-blue'}`}>
-        <span className="text-[14px] leading-none font-bold">
+        <span className="text-[14px] leading-none font-semibold">
           {value}
         </span>
-        <span className="ml-0.5 text-[10px] leading-none font-semibold">{unit}</span>
+        <span className="ml-0.5 text-[10px] leading-none font-medium">{unit}</span>
       </div>
       <span aria-hidden="true" className={`mt-0.5 size-2 rounded-full ${statusClassName}`} />
     </>
