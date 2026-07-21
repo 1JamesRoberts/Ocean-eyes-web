@@ -19,7 +19,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   if (!heroActionLayer) {
     return (
       <header className={`-mt-1 flex min-h-6 items-center justify-between gap-4 ${className}`}>
-        <h1 className="text-xs font-medium tracking-[0.11em] text-pine-teal uppercase">
+        <h1 className="text-xs font-semibold tracking-[0.11em] text-pine-teal uppercase">
           {eyebrow}
         </h1>
         {action && <div className="shrink-0">{action}</div>}
@@ -29,7 +29,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 
   return createPortal(
     <header className={`pointer-events-none absolute inset-0 ${className}`}>
-      <h1 className="absolute bottom-4 left-4 text-xs font-medium tracking-[0.11em] text-white uppercase drop-shadow-sm">
+      <h1 className="absolute bottom-4 left-4 text-xs font-semibold tracking-[0.11em] text-white uppercase drop-shadow-sm">
         {eyebrow}
       </h1>
       {action && (

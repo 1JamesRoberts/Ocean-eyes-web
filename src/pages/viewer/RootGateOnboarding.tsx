@@ -38,7 +38,7 @@ export const RootGateOnboarding: React.FC = () => {
         ">
           <QrCode size={36} />
         </div>
-        <h2 className="mb-2 text-section font-bold text-prussian-blue">Link Your Aquarium</h2>
+        <h2 className="mb-2 text-section font-extrabold text-prussian-blue">Link Your Aquarium</h2>
         <p className="type-body-muted">
           Scan the QR code displayed on your OceanEyes smart monitoring hardware unit or enter the code manually.
         </p>

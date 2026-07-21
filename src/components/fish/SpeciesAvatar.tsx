@@ -40,7 +40,7 @@ export const SpeciesAvatar: React.FC<SpeciesAvatarProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: `${Math.max(9, size * 0.34)}px`,
-          fontWeight: 600,
+          fontWeight: 700,
           color: 'var(--color-white)',
           textShadow: '0 1px 2px color-mix(in srgb, var(--color-prussian-blue) 30%, transparent)',
         }}

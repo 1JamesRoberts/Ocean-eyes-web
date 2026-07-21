@@ -83,7 +83,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
           absolute inset-0 flex flex-col items-center justify-center
         ">
           <span className="
-            text-[2.5rem] leading-none font-semibold tracking-[-0.06em] text-prussian-blue
+            text-[2.5rem] leading-none font-bold tracking-[-0.06em] text-prussian-blue
           ">{displayScore}</span>
           <span className="mt-1 text-[13px] leading-none text-slate-grey">/100</span>
         </div>
@@ -101,7 +101,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             className="size-2.5 shrink-0 rounded-full"
             style={{ backgroundColor: healthColor }}
           />
-          <span className="text-[13px] font-medium" style={{ color: healthColor }}>{healthHeading}</span>
+          <span className="text-[13px] font-semibold" style={{ color: healthColor }}>{healthHeading}</span>
         </div>
         <h3 className="mt-2 type-title whitespace-nowrap">
           Aquarium Health
@@ -121,7 +121,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
               " />
               <span className="sr-only">{parameter.label}: </span>
               <span className="
-                min-w-0 truncate text-2xs font-medium whitespace-nowrap
+                min-w-0 truncate text-2xs font-semibold whitespace-nowrap
                 text-prussian-blue
                 sm:text-xs
               ">
