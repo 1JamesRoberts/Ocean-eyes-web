@@ -18,6 +18,9 @@ describe('useAmbientCanvasDebug', () => {
       '--mobile-ambient-fade-start': '50%',
       '--mobile-ambient-fade-end': '100%',
       '--mobile-hero-fade-start': '55%',
+      '--mobile-hero-fade-soft-stop': '64%',
+      '--mobile-hero-fade-mid-stop': '77.5%',
+      '--mobile-hero-fade-deep-stop': '91%',
     });
 
     act(() => result.current.updateValue('sampleOpacity', 64));
@@ -41,6 +44,24 @@ describe('useAmbientCanvasDebug', () => {
 
     act(() => result.current.updateValue('heroFadeStart', 22));
     expect(result.current.values.heroFadeStart).toBe(22);
+  });
+
+  it('keeps the eased hero fade stops proportional and ordered', () => {
+    const { result } = renderHook(() => useAmbientCanvasDebug());
+
+    act(() => result.current.updateValue('heroFadeStart', 22));
+
+    const stopValues = [
+      '--mobile-hero-fade-start',
+      '--mobile-hero-fade-soft-stop',
+      '--mobile-hero-fade-mid-stop',
+      '--mobile-hero-fade-deep-stop',
+    ].map((property) => Number.parseFloat(
+      result.current.canvasStyle[property as keyof typeof result.current.canvasStyle] as string,
+    ));
+
+    expect(stopValues).toEqual([22, 37.6, 61, 84.4]);
+    expect(stopValues).toEqual([...stopValues].sort((left, right) => left - right));
   });
 
   it('survives rerenders, resets explicitly, and returns to defaults on remount', () => {

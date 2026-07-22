@@ -53,7 +53,13 @@ type AmbientCanvasCssProperties = CSSProperties & {
   '--mobile-ambient-fade-start': string;
   '--mobile-ambient-fade-end': string;
   '--mobile-hero-fade-start': string;
+  '--mobile-hero-fade-soft-stop': string;
+  '--mobile-hero-fade-mid-stop': string;
+  '--mobile-hero-fade-deep-stop': string;
 };
+
+const heroFadeStop = (fadeStart: number, progress: number) =>
+  `${fadeStart + (100 - fadeStart) * progress}%`;
 
 export const useAmbientCanvasDebug = () => {
   const [values, setValues] = useState<AmbientCanvasDebugValues>(
@@ -80,6 +86,9 @@ export const useAmbientCanvasDebug = () => {
     '--mobile-ambient-fade-start': `${values.fadeStart}%`,
     '--mobile-ambient-fade-end': `${values.fadeEnd}%`,
     '--mobile-hero-fade-start': `${values.heroFadeStart}%`,
+    '--mobile-hero-fade-soft-stop': heroFadeStop(values.heroFadeStart, 0.2),
+    '--mobile-hero-fade-mid-stop': heroFadeStop(values.heroFadeStart, 0.5),
+    '--mobile-hero-fade-deep-stop': heroFadeStop(values.heroFadeStart, 0.8),
   }), [values]);
 
   return {

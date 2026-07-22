@@ -59,6 +59,9 @@
   --mobile-ambient-fade-start: 50%;
   --mobile-ambient-fade-end: 100%;
   --mobile-hero-fade-start: 50%;
+  --mobile-hero-fade-soft-stop: 60%;
+  --mobile-hero-fade-mid-stop: 75%;
+  --mobile-hero-fade-deep-stop: 90%;
 
   /* Transitions */
   --transition-smooth: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -713,12 +716,18 @@
     to bottom,
     black 0%,
     black var(--mobile-hero-fade-start),
+    rgb(0 0 0 / 80%) var(--mobile-hero-fade-soft-stop),
+    rgb(0 0 0 / 30%) var(--mobile-hero-fade-mid-stop),
+    rgb(0 0 0 / 10%) var(--mobile-hero-fade-deep-stop),
     transparent 100%
   );
   mask-image: linear-gradient(
     to bottom,
     black 0%,
     black var(--mobile-hero-fade-start),
+    rgb(0 0 0 / 80%) var(--mobile-hero-fade-soft-stop),
+    rgb(0 0 0 / 30%) var(--mobile-hero-fade-mid-stop),
+    rgb(0 0 0 / 10%) var(--mobile-hero-fade-deep-stop),
     transparent 100%
   );
 }
