@@ -66,7 +66,7 @@ export const BackgroundCanvasDebugPanel: React.FC<BackgroundCanvasDebugPanelProp
   return (
     <GlassDisclosurePanel
       icon={Bug}
-      title="Background Canvas Debug"
+      title="Background Canvas"
       detail="Video and background transition controls"
       expanded={expanded}
       onToggle={() => setExpanded((current) => !current)}

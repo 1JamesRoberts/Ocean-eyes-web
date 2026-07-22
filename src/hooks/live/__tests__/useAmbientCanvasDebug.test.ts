@@ -17,7 +17,7 @@ describe('useAmbientCanvasDebug', () => {
       '--mobile-ambient-blur': '48px',
       '--mobile-ambient-fade-start': '50%',
       '--mobile-ambient-fade-end': '100%',
-      '--mobile-hero-fade-start': '50%',
+      '--mobile-hero-fade-start': '55%',
     });
 
     act(() => result.current.updateValue('sampleOpacity', 64));
@@ -56,6 +56,6 @@ describe('useAmbientCanvasDebug', () => {
     act(() => first.result.current.updateValue('baseGrey', 120));
     first.unmount();
     const second = renderHook(() => useAmbientCanvasDebug());
-    expect(second.result.current.values.baseGrey).toBe(240);
+    expect(second.result.current.values.baseGrey).toBe(255);
   });
 });

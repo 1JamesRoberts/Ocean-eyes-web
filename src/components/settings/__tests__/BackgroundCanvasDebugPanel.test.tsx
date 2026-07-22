@@ -19,7 +19,9 @@ describe('BackgroundCanvasDebugPanel', () => {
       />,
     );
 
-    const toggle = screen.getByRole('button', { name: /Background Canvas Debug/ });
+    const toggle = screen.getByRole('button', {
+      name: /^Background CanvasVideo and background transition controls$/,
+    });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     expect(screen.getByText('Video and background transition controls')).toBeTruthy();
     expect(toggle.querySelector('.text-warning')).toBeTruthy();
@@ -76,7 +78,9 @@ describe('BackgroundCanvasDebugPanel', () => {
 
     const managementCard = screen.getByText('Tank Management').closest('.glass-card');
     const adjustments = screen.getByRole('button', { name: /Stream Image Adjustments/ });
-    const debug = screen.getByRole('button', { name: /Background Canvas Debug/ });
+    const debug = screen.getByRole('button', {
+      name: /^Background CanvasVideo and background transition controls$/,
+    });
 
     expect(managementCard?.contains(adjustments)).toBe(true);
     expect(managementCard?.contains(debug)).toBe(true);

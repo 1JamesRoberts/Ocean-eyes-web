@@ -12,12 +12,12 @@ export interface AmbientCanvasDebugValues {
 export type AmbientCanvasDebugKey = keyof AmbientCanvasDebugValues;
 
 export const DEFAULT_AMBIENT_CANVAS_DEBUG_VALUES: AmbientCanvasDebugValues = {
-  baseGrey: 240,
+  baseGrey: 255,
   sampleOpacity: 10,
   blurRadius: 48,
   fadeStart: 50,
   fadeEnd: 100,
-  heroFadeStart: 50,
+  heroFadeStart: 55,
 };
 
 const MIN_FADE_GAP = 5;
