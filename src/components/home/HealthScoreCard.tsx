@@ -62,6 +62,14 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
             cx="56"
             cy="56"
             r={radius}
+            stroke="rgb(255 255 255 / 50%)"
+            strokeWidth={strokeWidth + 2}
+            fill="none"
+          />
+          <circle
+            cx="56"
+            cy="56"
+            r={radius}
             stroke="var(--color-health-parameter-bg)"
             strokeWidth={strokeWidth}
             fill="none"

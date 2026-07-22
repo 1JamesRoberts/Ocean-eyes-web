@@ -105,14 +105,19 @@ export const DonutChart: React.FC<DonutChartProps> = ({ speciesDistribution }) =
           viewBox={`0 0 ${chartSize} ${chartSize}`}
         >
           <g transform={`rotate(-90 ${chartCenter} ${chartCenter})`}>
-            <circle
-              cx={chartCenter}
-              cy={chartCenter}
-              r={radius}
-              fill="none"
-              stroke="transparent"
-              strokeWidth={strokeWidth}
-            />
+            {segmentsWithOffsets.map(({ species, dashLength, gapLength, offset, index }) => (
+              <circle
+                key={`outline-${species.name}-${index}`}
+                cx={chartCenter}
+                cy={chartCenter}
+                r={radius}
+                fill="none"
+                stroke="rgb(255 255 255 / 50%)"
+                strokeWidth={strokeWidth + 2}
+                strokeDasharray={`${dashLength} ${gapLength}`}
+                strokeDashoffset={-offset}
+              />
+            ))}
             {segmentsWithOffsets.map(({ species, dashLength, gapLength, offset, index }) => (
               <circle
                 key={`${species.name}-${index}`}
