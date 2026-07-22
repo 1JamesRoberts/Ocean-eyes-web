@@ -300,7 +300,7 @@ export const MyFishScreen: React.FC = () => {
                       Tank Compatibility
                     </div>
                     <div className="
-                      flex items-center gap-2 border-b border-divider py-1.5
+                      flex items-center gap-2 border-b border-slate-grey/15 py-1.5
                       last:border-b-0
                     ">
                       <div
@@ -469,7 +469,7 @@ export const MyFishScreen: React.FC = () => {
                                 return (
                                   <div key={cr.speciesId} className="
                                     flex items-center gap-2 border-b
-                                    border-divider py-1.5
+                                    border-slate-grey/15 py-1.5
                                     last:border-b-0
                                   ">
                                     <div className="

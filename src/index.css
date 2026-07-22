@@ -24,7 +24,7 @@
   --role-data-primary: var(--color-verdigris);
   --role-data-secondary: var(--color-turquoise);
   --role-data-highlight: var(--color-neon-ice);
-  --role-data-grid: var(--color-pearl-aqua);
+  --role-data-grid: color-mix(in srgb, var(--color-slate-grey) 15%, transparent);
   --role-shadow: var(--color-prussian-blue);
 
   /* Gradients (not supported in @theme --color-*) */
