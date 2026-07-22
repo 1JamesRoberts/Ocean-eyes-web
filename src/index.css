@@ -724,17 +724,21 @@
   );
 }
 
-@utility mobile-hero-content-clip {
-  --mobile-hero-heading-bottom: calc(
-    var(--mobile-hero-height) - var(--mobile-content-gutter)
+/* This viewport replaces the old clip-path cutoff. A clip-path ancestor forms
+   a Backdrop Root, which prevents descendant glass cards from blurring the
+   hero video behind the scrolling layer. Overflow clipping preserves the same
+   stationary rounded edge without interrupting backdrop sampling. */
+@utility mobile-hero-content-viewport {
+  margin-top: calc(
+    var(--mobile-hero-height) - (var(--mobile-content-gutter) * 2) +
+      var(--mobile-hero-content-clearance)
   );
-  --mobile-hero-content-clip-start: calc(
-    var(--mobile-hero-heading-bottom) + var(--mobile-hero-content-clearance)
-  );
-  clip-path: inset(
-    var(--mobile-hero-content-clip-start) var(--mobile-content-gutter) 0
-      var(--mobile-content-gutter) round var(--glass-radius-card)
-      var(--glass-radius-card) 0 0
+  border-radius: var(--glass-radius-card) var(--glass-radius-card) 0 0;
+}
+
+@utility mobile-hero-content-leading {
+  height: calc(
+    var(--mobile-content-gutter) + var(--mobile-hero-content-clearance) + 0.25rem
   );
 }
 

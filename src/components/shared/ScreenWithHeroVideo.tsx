@@ -37,7 +37,9 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
     <HeroActionLayerContext.Provider value={heroActionLayer}>
       <HeroMediaLayerContext.Provider value={heroMediaLayer}>
         <div
-          className="bg-gradient-mint relative flex min-h-0 w-full flex-1 flex-col"
+          className="
+            bg-gradient-mint relative flex min-h-0 w-full flex-1 flex-col
+          "
           style={ambientVideo?.canvasStyle}
         >
         <section
@@ -59,39 +61,46 @@ export const ScreenWithHeroVideo: React.FC<ScreenWithHeroVideoProps> = ({
           <div
             ref={setHeroActionLayer}
             className="
-              pointer-events-none absolute top-0 right-0 left-0 z-30
-              h-[var(--mobile-hero-height)]
+              pointer-events-none absolute inset-x-0 top-0 z-30
+              h-(--mobile-hero-height)
             "
           />
         </section>
         <div
-          data-mobile-screen-scroll
-          data-mobile-hero-scroll-layer
+          data-mobile-hero-content-viewport={showHero ? '' : undefined}
           className={`
-            relative z-30 -mx-4 flex min-h-0 flex-1
-            flex-col overflow-y-auto px-4
+            relative z-30 flex min-h-0 flex-1 flex-col
             ${showHero
-              ? '-mt-4 bg-transparent mobile-hero-content-clip'
-              : 'bg-gradient-mint'}
+              ? 'mobile-hero-content-viewport overflow-hidden'
+              : '-mx-4'}
           `}
         >
           <div
-            data-mobile-hero-clipped-content
-            className="flex min-h-full flex-col"
+            data-mobile-screen-scroll
+            data-mobile-hero-scroll-layer
+            className={`
+              flex min-h-0 flex-1 flex-col overflow-y-auto
+              ${showHero ? 'bg-transparent' : 'bg-gradient-mint px-4'}
+            `}
           >
-            {showHero && (
+            <div
+              data-mobile-hero-clipped-content
+              className="flex min-h-full flex-col"
+            >
+              {showHero && (
+                <div
+                  data-mobile-hero-content-spacer
+                  className="mobile-hero-content-leading shrink-0"
+                  aria-hidden="true"
+                />
+              )}
+              {children}
               <div
-                data-mobile-hero-content-spacer
-                className="h-[calc(var(--mobile-hero-height)+1.25rem)] shrink-0"
+                data-mobile-screen-bottom-spacer
+                className="h-(--mobile-bottom-navigation-clearance) shrink-0"
                 aria-hidden="true"
               />
-            )}
-            {children}
-            <div
-              data-mobile-screen-bottom-spacer
-              className="h-[var(--mobile-bottom-navigation-clearance)] shrink-0"
-              aria-hidden="true"
-            />
+            </div>
           </div>
         </div>
         </div>

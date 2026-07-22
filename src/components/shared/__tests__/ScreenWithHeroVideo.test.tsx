@@ -18,7 +18,7 @@ const HeroMediaLayerProbe = () => {
 afterEach(cleanup);
 
 describe('ScreenWithHeroVideo stationary scroller', () => {
-  it('renders the rounded content clip, ambient backdrop, and spacer when the hero is visible', () => {
+  it('renders the rounded overflow viewport, ambient backdrop, and spacer when the hero is visible', () => {
     const { container } = render(
       <ScreenWithHeroVideo hero={<div>Live video</div>} ambientVideo={{}}>
         <div>Screen content</div>
@@ -29,15 +29,24 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     expect(container.querySelector('.mobile-hero-media')).not.toBeNull();
     expect(container.querySelector('.mobile-hero-surface')).toBeNull();
     expect(container.querySelector('[data-ambient-video-backdrop]')).not.toBeNull();
+    const contentViewport = container.querySelector<HTMLElement>(
+      '[data-mobile-hero-content-viewport]',
+    );
+    expect(contentViewport?.classList.contains('mobile-hero-content-viewport')).toBe(true);
+    expect(contentViewport?.classList.contains('overflow-hidden')).toBe(true);
     const scrollContainer = container.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
     expect(scrollContainer?.classList.contains('overflow-y-auto')).toBe(true);
-    // The shared utility owns the stationary cutoff and its rounded top corners.
-    expect(scrollContainer?.classList.contains('mobile-hero-content-clip')).toBe(true);
-    expect(scrollContainer?.classList.contains('mobile-hero-content-mask')).toBe(false);
+    // No clip-path or mask may sit above glass cards: either would block their
+    // backdrop filter from sampling the hero layer.
+    expect(scrollContainer?.classList.contains('mobile-hero-content-clip')).toBe(false);
     expect(scrollContainer?.classList.contains('bg-transparent')).toBe(true);
-    expect(container.querySelector('[data-mobile-hero-content-spacer]')).not.toBeNull();
+    expect(
+      container
+        .querySelector('[data-mobile-hero-content-spacer]')
+        ?.classList.contains('mobile-hero-content-leading'),
+    ).toBe(true);
     const bottomSpacer = container.querySelector<HTMLElement>('[data-mobile-screen-bottom-spacer]');
-    expect(bottomSpacer?.classList.contains('h-[var(--mobile-bottom-navigation-clearance)]')).toBe(true);
+    expect(bottomSpacer?.classList.contains('h-(--mobile-bottom-navigation-clearance)')).toBe(true);
     expect(bottomSpacer?.getAttribute('aria-hidden')).toBe('true');
   });
 
@@ -54,8 +63,8 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     expect(container.querySelector('.mobile-hero-media')).not.toBeNull();
     expect(container.querySelector('.mobile-hero-surface')).toBeNull();
     expect(container.querySelector('[data-ambient-video-backdrop]')).toBeNull();
+    expect(container.querySelector('[data-mobile-hero-content-viewport]')).toBeNull();
     const scrollContainer = container.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
-    expect(scrollContainer?.classList.contains('mobile-hero-content-clip')).toBe(false);
     expect(scrollContainer?.classList.contains('bg-gradient-mint')).toBe(true);
     expect(container.querySelector('[data-mobile-hero-content-spacer]')).toBeNull();
     expect(container.querySelector('[data-mobile-screen-bottom-spacer]')).not.toBeNull();
@@ -96,10 +105,10 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     expect(shell?.style.getPropertyValue('--mobile-ambient-opacity')).toBe('0.6');
     expect(shell?.style.getPropertyValue('--mobile-hero-fade-start')).toBe('45%');
     expect(container.querySelector('.mobile-ambient-backdrop')).not.toBeNull();
-    expect(container.querySelector('.mobile-hero-content-clip')).not.toBeNull();
+    expect(container.querySelector('.mobile-hero-content-viewport')).not.toBeNull();
   });
 
-  it('keeps the hard clip stationary during large and repeated scroll jumps', () => {
+  it('keeps the overflow viewport stationary during large and repeated scroll jumps', () => {
     const { container } = render(
       <div className="phone-content">
         <ScreenWithHeroVideo hero={<div>Live video</div>}>
@@ -110,11 +119,14 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     );
 
     const scrollContainer = container.querySelector<HTMLElement>('[data-mobile-screen-scroll]');
+    const contentViewport = container.querySelector<HTMLElement>(
+      '[data-mobile-hero-content-viewport]',
+    );
 
     expect(scrollContainer).not.toBeNull();
-    expect(scrollContainer!.classList.contains('mobile-hero-content-clip')).toBe(true);
-    expect(scrollContainer!.classList.contains('mobile-hero-content-mask')).toBe(false);
-    expect(scrollContainer!.style.getPropertyValue('--mobile-hero-content-clip-start')).toBe('');
+    expect(contentViewport?.classList.contains('mobile-hero-content-viewport')).toBe(true);
+    expect(contentViewport?.classList.contains('overflow-hidden')).toBe(true);
+    expect(scrollContainer!.classList.contains('mobile-hero-content-clip')).toBe(false);
 
     scrollContainer!.scrollTop = 1_000;
     for (let index = 0; index < 10; index += 1) {
@@ -122,8 +134,7 @@ describe('ScreenWithHeroVideo stationary scroller', () => {
     }
 
     expect(scrollContainer!.scrollTop).toBe(1_000);
-    expect(scrollContainer!.classList.contains('mobile-hero-content-clip')).toBe(true);
-    expect(scrollContainer!.classList.contains('mobile-hero-content-mask')).toBe(false);
-    expect(scrollContainer!.style.getPropertyValue('--mobile-hero-content-clip-start')).toBe('');
+    expect(contentViewport?.classList.contains('mobile-hero-content-viewport')).toBe(true);
+    expect(scrollContainer!.classList.contains('mobile-hero-content-clip')).toBe(false);
   });
 });
