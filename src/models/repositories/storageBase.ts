@@ -63,8 +63,6 @@ export const subscribeToDb = (key: string, callback: () => void) => {
   return () => window.removeEventListener(DB_UPDATE_EVENT, handler);
 };
 
-export const subscribe = (key: string, callback: () => void) => subscribeToDb(key, callback);
-
 export const getSnapshot = <T>(key: string, fallback: T): T => {
   const cached = snapshotCache.get(key);
   if (cached !== undefined) {
@@ -91,16 +89,6 @@ const dispatchStorageError = (key: string, error: Error) => {
       detail: { key, message: error.message, code: (error as DOMException).code },
     })
   );
-};
-
-export const subscribeToStorageError = (
-  callback: (detail: { key: string; message: string; code?: number }) => void
-) => {
-  const handler = (event: Event) => {
-    callback((event as CustomEvent).detail);
-  };
-  window.addEventListener(STORAGE_ERROR_EVENT, handler);
-  return () => window.removeEventListener(STORAGE_ERROR_EVENT, handler);
 };
 
 export const safeSetItem = (key: string, value: string): StorageWriteResult => {
@@ -590,19 +578,6 @@ export const saveLiveState = (tankId: string, state: LiveState) => {
   const result = safeSetItem(key, JSON.stringify(state));
   if (result.success) notifyUpdate(key);
   return result;
-};
-
-export const switchActiveFeed = (tankId: string, feedId: string) => {
-  const liveState = getLiveState(tankId);
-  const activeFeed = liveState.feeds.find((f) => f.id === feedId);
-  if (activeFeed) {
-    liveState.selected_feed_id = feedId;
-    liveState.stream_url = activeFeed.stream_url;
-    liveState.current_clarity = activeFeed.current_clarity;
-    liveState.current_fish_count = activeFeed.current_fish_count;
-    liveState.started_at = activeFeed.started_at;
-    saveLiveState(tankId, liveState);
-  }
 };
 
 export const updateCalibration = (

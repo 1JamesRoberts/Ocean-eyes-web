@@ -47,13 +47,6 @@ export function toISODate(date: Date): string {
 }
 
 /**
- * Convert a Date object to HH:mm (24-hour).
- */
-export function toISOTime(date: Date): string {
-  return format(date, 'HH:mm');
-}
-
-/**
  * Convert a snake_case species ID to Title Case display name.
  * Example: "harlequin_rasbora" → "Harlequin Rasbora"
  */
@@ -76,13 +69,4 @@ export function todayUTC(): string {
 
 function isValidDate(date: Date): boolean {
   return !Number.isNaN(date.getTime());
-}
-
-/**
- * Format a duration in seconds as MM:SS.
- */
-export function formatDuration(totalSeconds: number): string {
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }

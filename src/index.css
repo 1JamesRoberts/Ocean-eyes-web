@@ -922,8 +922,7 @@
 }
 
 @supports not (backdrop-filter: blur(15px)) {
-  .pill-nav,
-  .phone-frame .glass-panel {
+  .pill-nav {
     background: color-mix(in srgb, var(--color-white) 85%, transparent);
   }
 }

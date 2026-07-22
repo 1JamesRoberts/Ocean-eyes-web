@@ -1,12 +1,7 @@
 // inferenceHelpers.ts - Small, pure-ish helpers shared by AI/camera hooks.
 import type { CameraFeedConfig, DateRange, LiveState, ReadingItem } from '../../types/aquarium';
 import { isVideoReady, captureFrame } from '../api/aiApi';
-import { getSnapshot, safeSetItem, notifyUpdate } from '../repositories/storageBase';
 import { combineDateTime } from '../../utils/formatters';
-import {
-  DIAGNOSIS_COOLDOWN_MS,
-  LAST_DIAGNOSIS_TIME_KEY,
-} from '../../utils/constants';
 
 // ---------------------------------------------------------------------------
 // History filtering
@@ -74,21 +69,4 @@ export function selectActiveFeedMetrics(
     clarity: latestReading?.clarity ?? 0,
     fishCount: latestReading?.fish_count ?? 0,
   };
-}
-
-// ---------------------------------------------------------------------------
-// Diagnosis cooldown
-// ---------------------------------------------------------------------------
-
-export function getLastDiagnosisTime(): number {
-  return getSnapshot<number>(LAST_DIAGNOSIS_TIME_KEY, 0);
-}
-
-export function shouldDiagnose(): boolean {
-  return Date.now() - getLastDiagnosisTime() > DIAGNOSIS_COOLDOWN_MS;
-}
-
-export function recordDiagnosisTime(): void {
-  const result = safeSetItem(LAST_DIAGNOSIS_TIME_KEY, Date.now().toString());
-  if (result.success) notifyUpdate(LAST_DIAGNOSIS_TIME_KEY);
 }

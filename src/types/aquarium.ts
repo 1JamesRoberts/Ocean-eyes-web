@@ -208,20 +208,6 @@ export interface AISummary {
   species_counts: Record<string, number>;
 }
 
-export interface AIPredictionResult {
-  timestamp: string;
-  /** Original image dimensions. Legacy records may omit this field. */
-  image_dimensions?: { width: number; height: number };
-  models: {
-    detection: { provider: string };
-    species: { provider: string };
-    turbidity: { provider: string };
-  };
-  turbidity: AITurbidity;
-  detections: AIDetection[];
-  summary: AISummary;
-}
-
 export interface AIDetectionResult {
   timestamp: string;
   /** Original image dimensions. Legacy records may omit this field. */

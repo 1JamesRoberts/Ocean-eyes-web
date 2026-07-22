@@ -22,16 +22,6 @@ export function getTintOpacity(tint: number): number {
   return Math.abs(tint) / 400;
 }
 
-export function getTemperatureRgba(temperature: number): string {
-  const color = temperature > 0 ? '255, 176, 0' : '0, 160, 255';
-  return `rgba(${color}, ${getTemperatureOpacity(temperature)})`;
-}
-
-export function getTintRgba(tint: number): string {
-  const color = tint > 0 ? '255, 0, 187' : '0, 255, 68';
-  return `rgba(${color}, ${getTintOpacity(tint)})`;
-}
-
 export function buildCanvasFilterString(filters: CameraFilters): string {
   return `contrast(${filters.contrast}%) brightness(${filters.brightness}%) saturate(${filters.saturation}%)`;
 }

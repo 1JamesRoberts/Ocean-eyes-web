@@ -105,12 +105,11 @@
     <section class="card"><h3>Persistence detail</h3><p>Each inference is added to local history immediately. The most recent full prediction/turbidity object is also copied into live state when the stream stops, so it can be restored later.</p></section>
   </div>
 
-  <h2>7. The retained FastAPI path</h2>
+  <h2>7. The retained FastAPI backend</h2>
   <div class="notice backend">
-    <strong>Important distinction:</strong> the repository still contains a server implementation and frontend API helpers, but they are not called by the current live inference hooks.
+    <strong>Important distinction:</strong> the repository still contains the server implementation, but the current frontend does not call it for live inference.
   </div>
-  <p>The retained path is:</p>
-  <p><code>captureFrame()</code> → <code>sendFrameForDetection()</code> or <code>sendFrameForTurbidity()</code> → <code>POST http://localhost:8000/predict/detection</code> or <code>/predict/turbidity</code> → Python <code>FishAIPipeline</code> → ONNX Runtime for Python → JSON response.</p>
+  <p>The server continues to expose <code>POST /predict/detection</code> and <code>POST /predict/turbidity</code> for direct integration clients. Those requests run through the Python <code>FishAIPipeline</code>, ONNX Runtime for Python, and return JSON responses.</p>
   <p>FastAPI loads its models once at startup and prefers CUDA, then DirectML, then CPU. It also writes server-side JSONL history. That server route is useful legacy/integration code, but current browser polling uses <code>detectFishOnDevice()</code> and current turbidity measurement uses <code>measureTurbidityOnDevice()</code>.</p>
 
   <h2>8. Files to read in order</h2>
