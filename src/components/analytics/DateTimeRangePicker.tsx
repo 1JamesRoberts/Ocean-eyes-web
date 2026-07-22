@@ -16,7 +16,7 @@ import { TimeWheelSheet } from './TimeWheelSheet';
 type ActiveField = 'startDate' | 'startTime' | 'endDate' | 'endTime' | null;
 
 const POPOVER_EDGE_GUTTER = 16;
-const POPOVER_MAX_WIDTH = 348;
+const POPOVER_MAX_WIDTH = 320;
 const POPOVER_TRIGGER_GAP = 12;
 const EDITOR_TRIGGER_GAP = 8;
 const HERO_LIVE_BADGE_SELECTOR = '[data-hero-live-badge]';

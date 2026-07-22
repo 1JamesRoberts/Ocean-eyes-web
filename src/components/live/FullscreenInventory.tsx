@@ -34,7 +34,7 @@ export const FullscreenInventory: React.FC<FullscreenInventoryProps> = ({
         onClick={onClose}
         type="button"
         aria-label="Close fish inventory"
-        className="absolute top-3 right-1 grid size-11 cursor-pointer place-items-center rounded-full border-none bg-transparent text-white/65 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        className="absolute top-5 right-3 grid size-8 cursor-pointer place-items-center rounded-full border-none bg-transparent text-white/65 transition-colors before:absolute before:-inset-1.5 before:content-[''] hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
         <X size={17} aria-hidden="true" />
       </button>

@@ -250,25 +250,19 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
               aria-checked={preferences.autoConnect}
               aria-labelledby={autoConnectLabelId}
               className={`
-                grid size-11 shrink-0 cursor-pointer place-items-center rounded-full
-                border-none bg-transparent
+                relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-none transition-colors
+                before:absolute before:inset-x-0 before:-inset-y-2.5 before:content-['']
+                ${preferences.autoConnect ? 'bg-accent' : 'bg-slate-grey/20'}
                 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
               `}
             >
               <span
                 className={`
-                  relative inline-flex h-6 w-11 rounded-full transition-colors
-                  ${preferences.autoConnect ? 'bg-accent' : 'bg-slate-grey/20'}
+                  absolute top-1 left-1 inline-block size-4 rounded-full bg-white transition-transform
+                  ${preferences.autoConnect ? 'translate-x-5' : 'translate-x-0'}
                 `}
                 aria-hidden="true"
-              >
-                <span
-                  className={`
-                    absolute top-1 left-1 inline-block size-4 rounded-full bg-white transition-transform
-                    ${preferences.autoConnect ? 'translate-x-5' : 'translate-x-0'}
-                  `}
-                />
-              </span>
+              />
             </button>
           </div>
           <SettingsRangeControl

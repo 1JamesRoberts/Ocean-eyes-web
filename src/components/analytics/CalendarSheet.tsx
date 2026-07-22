@@ -35,7 +35,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
   }, [viewMonth]);
 
   return (
-    <div className="w-full max-w-[348px] p-2 pb-2.5 text-prussian-blue">
+    <div className="w-full max-w-[320px] p-3.5 pb-2.5 text-prussian-blue">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
@@ -49,8 +49,9 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             type="button"
             onClick={() => setViewMonth((m) => subUTCMonths(m, 1))}
             className="
-              overlay-glass-control flex size-11 items-center justify-center rounded-full
-              p-0 text-slate-grey hover:text-prussian-blue
+              relative flex size-9 overlay-glass-control items-center justify-center rounded-full
+              p-0 text-slate-grey before:absolute
+              before:-inset-1 before:content-[''] hover:text-prussian-blue
               focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
             "
             aria-label="Previous month"
@@ -61,8 +62,9 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             type="button"
             onClick={() => setViewMonth((m) => addUTCMonths(m, 1))}
             className="
-              overlay-glass-control flex size-11 items-center justify-center rounded-full
-              p-0 text-slate-grey hover:text-prussian-blue
+              relative flex size-9 overlay-glass-control items-center justify-center rounded-full
+              p-0 text-slate-grey before:absolute
+              before:-inset-1 before:content-[''] hover:text-prussian-blue
               focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
             "
             aria-label="Next month"
@@ -93,7 +95,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
               type="button"
               onClick={() => onSelect(day)}
               className={`
-                relative mx-auto flex size-11 cursor-pointer items-center
+                relative mx-auto flex size-9 cursor-pointer items-center
                 justify-center type-body ${selected ? 'overlay-glass-control' : ''}
                 ${selected
                   ? `rounded-full fish-count-teal-outline type-strong text-white`
@@ -102,6 +104,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                       : inMonth
                         ? 'text-prussian-blue hover:text-accent-ink'
                         : 'text-slate-grey/60 hover:text-slate-grey'}`}
+                before:absolute before:-inset-x-0.5 before:-inset-y-1 before:content-['']
                 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
               `}
             >
