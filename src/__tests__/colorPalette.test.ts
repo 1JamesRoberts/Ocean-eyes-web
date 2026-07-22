@@ -12,6 +12,7 @@ const indexCss = join(srcRoot, 'index.css');
 const approvedPrimitives = new Map([
   ['neon-ice', '#00ffe5'],
   ['turquoise', '#00c8b3'],
+  ['dark-cyan', '#00645a'],
   ['verdigris', '#32a198'],
   ['tropical-teal', '#79beb7'],
   ['pearl-aqua', '#9bcbc7'],
@@ -66,6 +67,18 @@ describe('OceanEyes color palette', () => {
         expect(source, `${retiredName} remains in ${file}`).not.toContain(retiredName);
       }
     }
+  });
+
+  it('maps Dark Cyan to active navigation icons only', () => {
+    const css = readFileSync(indexCss, 'utf8');
+
+    expect(css).toContain('--role-navigation-active-icon: var(--color-dark-cyan);');
+    expect(css).toMatch(
+      /\.pill-nav-active \.pill-nav-icon\s*{\s*color: var\(--role-navigation-active-icon\);\s*}/,
+    );
+    expect(css).toMatch(
+      /\.pill-nav-active\s*{\s*color: var\(--role-text-primary\);\s*}/,
+    );
   });
 
   it('keeps authored color literals in the token source or documented exception paths', () => {

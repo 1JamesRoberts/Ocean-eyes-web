@@ -18,6 +18,7 @@
   --role-border-focus: var(--color-verdigris);
   --role-accent-primary: var(--color-verdigris);
   --role-accent-secondary: var(--color-turquoise);
+  --role-navigation-active-icon: var(--color-dark-cyan);
   --role-action-primary: var(--color-prussian-blue);
   --role-action-primary-hover: color-mix(in srgb, var(--color-prussian-blue) 92%, var(--color-white));
   --role-data-primary: var(--color-verdigris);
@@ -101,6 +102,7 @@
   /* ─── Named OceanEyes palette ─── */
   --color-neon-ice: #00ffe5;
   --color-turquoise: #00c8b3;
+  --color-dark-cyan: #00645a;
   --color-verdigris: #32a198;
   --color-tropical-teal: #79beb7;
   --color-pearl-aqua: #9bcbc7;
@@ -884,6 +886,10 @@
 
 .pill-nav-active {
   color: var(--role-text-primary);
+}
+
+.pill-nav-active .pill-nav-icon {
+  color: var(--role-navigation-active-icon);
 }
 
 .pill-nav-indicator {

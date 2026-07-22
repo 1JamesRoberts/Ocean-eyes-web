@@ -11,6 +11,7 @@
     :root {
       --neon-ice: #00ffe5;
       --turquoise: #00c8b3;
+      --dark-cyan: #00645a;
       --verdigris: #32a198;
       --tropical-teal: #79beb7;
       --pearl-aqua: #9bcbc7;
@@ -318,12 +319,15 @@
         <h2 id="aquatic-heading">Aquatic spectrum</h2>
         <p class="section-note">Brand, interaction, focus, and data accents</p>
       </div>
-      <div class="palette-row" style="--columns: 5">
+      <div class="palette-row" style="--columns: 6">
         <article class="swatch" style="--swatch: var(--neon-ice)">
           <span class="swatch-name">Neon Ice</span><span class="swatch-value">#00FFE5</span><span class="swatch-token">--color-neon-ice</span>
         </article>
         <article class="swatch" style="--swatch: var(--turquoise)">
           <span class="swatch-name">Turquoise</span><span class="swatch-value">#00C8B3</span><span class="swatch-token">--color-turquoise</span>
+        </article>
+        <article class="swatch" style="--swatch: var(--dark-cyan); --ink: var(--white)">
+          <span class="swatch-name">Dark Cyan</span><span class="swatch-value">#00645A</span><span class="swatch-token">--color-dark-cyan</span>
         </article>
         <article class="swatch" style="--swatch: var(--verdigris)">
           <span class="swatch-name">Verdigris</span><span class="swatch-value">#32A198</span><span class="swatch-token">--color-verdigris</span>
@@ -386,14 +390,14 @@
         </article>
         <article class="usage-card" style="--sample: linear-gradient(90deg, var(--verdigris), var(--turquoise), var(--neon-ice))">
           <h3>Data and focus</h3>
-          <p>Prussian Blue and Verdigris carry readable data marks; Turquoise and Neon Ice are reserved for supporting accents and highlights.</p>
+          <p>Prussian Blue and Verdigris carry readable data marks; Dark Cyan identifies active navigation icons; Turquoise and Neon Ice support accents and highlights.</p>
         </article>
       </div>
     </section>
 
     <p class="source-note">
       Source of truth: <code>src/index.css</code>. This document records the application’s light-mode
-      palette. Transparent tints may only derive from these nine primitives. Status colors, Google branding,
+      palette. Transparent tints may only derive from these ten primitives. Status colors, Google branding,
       species identity, camera calibration, recording, and detection colors remain intentional exceptions
       when their hue carries functional meaning. Use Prussian Blue on light surfaces and White on Prussian
       Blue; do not place normal-size White text on the brighter aquatic colors.
