@@ -303,32 +303,6 @@
   }
 }
 
-@utility glass-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  border: 0.5px solid var(--glass-border-strong);
-  background: var(--glass-bg-inline);
-  backdrop-filter: blur(var(--glass-blur-sm));
-  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
-  border-radius: var(--glass-radius-pill);
-  padding: 0.5rem 1.25rem;
-  font-family: var(--font-main);
-  font-size: 15px;
-  line-height: 1.35;
-  font-weight: 700;
-  color: var(--color-prussian-blue);
-  transition: var(--transition-smooth);
-  white-space: nowrap;
-
-  &:hover {
-    background: color-mix(in srgb, var(--color-white) 50%, transparent);
-  }
-
-}
-
 @utility glass-button-primary {
   display: inline-flex;
   align-items: center;

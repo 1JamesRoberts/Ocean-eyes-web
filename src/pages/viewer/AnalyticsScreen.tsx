@@ -5,7 +5,7 @@ import type { useAnalytics } from '../../hooks/pages/useAnalytics';
 import { FishCountChart } from '../../components/analytics/FishCountChart';
 import { MeanNNDChart } from '../../components/analytics/MeanNNDChart';
 import { ClarityTrendChart } from '../../components/analytics/ClarityTrendChart';
-import { GlassButton, GlassCard, GlassPanel, HeadedCard, ScreenHeader, ScreenState } from '../../components/shared';
+import { GlassButton, GlassCard, GlassPanel, HeadedCard, ScreenHeader, ScreenStateCard } from '../../components/shared';
 import { formatDateForDisplay } from '../../utils/formatters';
 import { createDetectionTimeAxis } from '../../utils/detectionTimeAxis';
 
@@ -134,16 +134,14 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
       <ScreenHeader eyebrow="Aquarium intelligence" />
       {/* Error banner */}
       {error && (
-        <GlassCard className="border-critical bg-critical/10 p-0">
-          <ScreenState
-            icon={TriangleAlert}
-            title="Analytics could not be loaded"
-            description={error}
-            tone="danger"
-            compact
-            action={<GlassButton variant="outline" size="sm" onClick={refetch}>Retry</GlassButton>}
-          />
-        </GlassCard>
+        <ScreenStateCard
+          icon={TriangleAlert}
+          title="Analytics could not be loaded"
+          description={error}
+          tone="danger"
+          compact
+          action={<GlassButton variant="outline" size="sm" onClick={refetch}>Retry</GlassButton>}
+        />
       )}
 
       {/* Initial loading keeps the dashboard geometry stable. */}
@@ -155,13 +153,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({
 
       {/* Empty state */}
       {!isInitialLoading && !error && !hasAnyData && (
-        <GlassCard className="p-0">
-          <ScreenState
-            icon={Calendar}
-            title={`No data for ${formatDateForDisplay(range.startDate)} – ${formatDateForDisplay(range.endDate)}`}
-            description="Choose another range or run the AI pipeline to generate history."
-          />
-        </GlassCard>
+        <ScreenStateCard
+          icon={Calendar}
+          title={`No data for ${formatDateForDisplay(range.startDate)} – ${formatDateForDisplay(range.endDate)}`}
+          description="Choose another range or run the AI pipeline to generate history."
+        />
       )}
 
       {/* Charts grid */}

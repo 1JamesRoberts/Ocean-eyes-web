@@ -2,7 +2,7 @@ import React from 'react';
 import { BellOff, ChevronRight } from 'lucide-react';
 import { useAlertsScreen } from '../../hooks/pages/useAlertsScreen';
 import { AlertDetail } from '../../components/shared/AlertDetail';
-import { BackButton, GlassBadge, GlassPanel, ScreenHeader, ScreenState } from '../../components/shared';
+import { BackButton, GlassBadge, GlassPanel, ScreenHeader, ScreenStateCard } from '../../components/shared';
 
 export const AlertsScreen: React.FC = () => {
   const {
@@ -31,19 +31,17 @@ export const AlertsScreen: React.FC = () => {
       <ScreenHeader
         eyebrow="Alerts"
         action={(
-          <BackButton onClick={onBack} heroOverlay />
+          <BackButton onClick={onBack} />
         )}
       />
 
       <div className="flex flex-col gap-4">
         {alerts.length === 0 ? (
-          <div className="glass-card">
-            <ScreenState
-              icon={BellOff}
-              title="No alerts yet"
-              description="Aquarium safety events and resolved notices will appear here."
-            />
-          </div>
+          <ScreenStateCard
+            icon={BellOff}
+            title="No alerts yet"
+            description="Aquarium safety events and resolved notices will appear here."
+          />
         ) : alerts.map(alert => (
           <GlassPanel
             as="button"

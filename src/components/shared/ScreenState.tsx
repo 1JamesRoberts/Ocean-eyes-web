@@ -1,5 +1,6 @@
 import type React from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { GlassCard } from './GlassCard';
 
 type ScreenStateTone = 'neutral' | 'danger' | 'success';
 
@@ -10,7 +11,6 @@ interface ScreenStateProps {
   action?: React.ReactNode;
   tone?: ScreenStateTone;
   compact?: boolean;
-  className?: string;
 }
 
 const toneStyles: Record<ScreenStateTone, string> = {
@@ -27,7 +27,6 @@ export const ScreenState: React.FC<ScreenStateProps> = ({
   action,
   tone = 'neutral',
   compact = false,
-  className = '',
 }) => {
   const Heading = compact ? 'h3' : 'h2';
 
@@ -36,7 +35,6 @@ export const ScreenState: React.FC<ScreenStateProps> = ({
     className={`
       flex flex-col items-center justify-center text-center
       ${compact ? 'gap-2 p-4' : 'gap-3 px-6 py-10'}
-      ${className}
     `}
   >
     <span className={`
@@ -53,3 +51,24 @@ export const ScreenState: React.FC<ScreenStateProps> = ({
   </div>
   );
 };
+
+interface ScreenStateCardProps extends ScreenStateProps {
+  as?: 'section' | 'div' | 'article';
+}
+
+const cardToneStyles: Record<ScreenStateTone, string> = {
+  neutral: '',
+  danger: 'border-critical bg-critical/10',
+  success: 'border-2 border-dashed border-white/40',
+};
+
+/** A screen-level feedback state with the app's standard glass-card surface. */
+export const ScreenStateCard: React.FC<ScreenStateCardProps> = ({
+  as,
+  tone = 'neutral',
+  ...stateProps
+}) => (
+  <GlassCard as={as} className={`p-0! ${cardToneStyles[tone]}`}>
+    <ScreenState {...stateProps} tone={tone} />
+  </GlassCard>
+);

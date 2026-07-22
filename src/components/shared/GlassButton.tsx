@@ -1,24 +1,22 @@
 // GlassButton.tsx — Unified glass button primitive
 import React from 'react';
 
-type GlassVariant = 'default' | 'primary' | 'outline' | 'danger' | 'ghost';
+type GlassVariant = 'primary' | 'outline' | 'danger';
 type GlassSize = 'sm' | 'md' | 'lg';
 
 interface GlassButtonProps {
   children: React.ReactNode;
-  variant?: GlassVariant;
+  variant: GlassVariant;
   size?: GlassSize;
   className?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit' | 'reset';
-  disabled?: boolean;
   fullWidth?: boolean;
   'aria-label'?: string;
   'aria-expanded'?: boolean;
 }
 
 const variantStyles: Record<GlassVariant, string> = {
-  default: 'glass-button',
   primary: 'glass-button-primary text-white',
   outline: 'glass-button-outline',
   danger: `
@@ -28,13 +26,6 @@ const variantStyles: Record<GlassVariant, string> = {
     transition-smooth whitespace-nowrap
     hover:bg-critical/15
   `,
-  ghost: `
-    inline-flex items-center justify-center gap-2 cursor-pointer
-    border-none bg-transparent rounded-3xl
-    type-strong text-slate-grey
-    transition-smooth whitespace-nowrap
-    hover:text-accent-ink
-  `,
 };
 
 const sizeStyles: Record<GlassSize, string> = {
@@ -43,16 +34,13 @@ const sizeStyles: Record<GlassSize, string> = {
   lg: 'px-6 py-3.5 type-title',
 };
 
-const disabledStyles = 'cursor-not-allowed opacity-50';
-
 export const GlassButton: React.FC<GlassButtonProps> = ({
   children,
-  variant = 'default',
+  variant,
   size = 'md',
   className = '',
   onClick,
   type = 'button',
-  disabled = false,
   fullWidth = false,
   'aria-label': ariaLabel,
   'aria-expanded': ariaExpanded,
@@ -60,7 +48,6 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   <button
     type={type}
     onClick={onClick}
-    disabled={disabled}
     aria-label={ariaLabel}
     aria-expanded={ariaExpanded}
     className={`
@@ -68,7 +55,6 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
       ${variantStyles[variant]}
       ${sizeStyles[size]}
       ${fullWidth ? 'w-full' : ''}
-      ${disabled ? disabledStyles : ''}
       ${className}
     `}
   >

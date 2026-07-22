@@ -99,7 +99,6 @@ export const LoginScreen = ({ isLoading, isExiting, onSignIn }: LoginScreenProps
         >
           <div className="
             glass-card w-full max-w-[345px] px-6 py-7 text-center
-            shadow-[var(--shadow-glass),0_20px_60px_color-mix(in_srgb,var(--color-prussian-blue)_48%,transparent)]
           ">
             <OceanEyesBrand />
 

@@ -10,7 +10,6 @@ interface HeadedCardProps {
   title: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
-  iconClassName?: string;
   headerClassName?: string;
   headerVariant?: 'inset' | 'edge';
   as?: 'section' | 'div' | 'article';
@@ -26,7 +25,6 @@ export const HeadedCard: React.FC<HeadedCardProps> = ({
   title,
   action,
   className = '',
-  iconClassName,
   headerClassName = '',
   headerVariant = 'inset',
   ...rest
@@ -55,7 +53,6 @@ export const HeadedCard: React.FC<HeadedCardProps> = ({
           title={title}
           action={action}
           className={headerClassName}
-          iconClassName={iconClassName}
         />
       )}
       {children}

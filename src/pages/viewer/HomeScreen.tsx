@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronRight, FlaskConical, Radio } from 'lucide-react';
 import { useHome } from '../../hooks/pages/useHome';
-import { HeadedCard, ScreenHeader, ScreenState } from '../../components/shared';
+import { HeadedCard, ScreenHeader, ScreenStateCard } from '../../components/shared';
 import { HealthScoreCard } from '../../components/home/HealthScoreCard';
 import { FishInventorySummary } from '../../components/home/FishInventorySummary';
 import { WaterChemistryGrid } from '../../components/home/WaterChemistryGrid';
@@ -23,13 +23,11 @@ export const HomeScreen: React.FC = () => {
     <div className="flex flex-col gap-4">
       <ScreenHeader eyebrow="Aquarium overview" />
       {!hasReadingData ? (
-        <div className="glass-card">
-          <ScreenState
-            icon={Radio}
-            title="Waiting for monitor data"
-            description="OceanEyes will populate this dashboard after the inference service processes its first frame."
-          />
-        </div>
+        <ScreenStateCard
+          icon={Radio}
+          title="Waiting for monitor data"
+          description="OceanEyes will populate this dashboard after the inference service processes its first frame."
+        />
       ) : (
         <>
           <HealthScoreCard
@@ -49,7 +47,6 @@ export const HomeScreen: React.FC = () => {
 
           <HeadedCard
             icon={FlaskConical}
-            iconClassName="text-prussian-blue"
             title="Parameters"
             action={(
                 <button

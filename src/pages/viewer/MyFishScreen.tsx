@@ -18,7 +18,7 @@ import {
   GlassIconButton,
   GlassModal,
   ScreenHeader,
-  ScreenState,
+  ScreenStateCard,
 } from '../../components/shared';
 import {
   getSpeciesById,
@@ -141,7 +141,6 @@ const AddSpeciesForm: React.FC<AddSpeciesFormProps> = ({
         excludeSpeciesIds={fishList.map((fish) => fish.speciesId)}
         inputAction={(
           <GlassIconButton
-            size="sm"
             label="Close add fish"
             onClick={onClose}
             className="
@@ -335,19 +334,17 @@ export const MyFishScreen: React.FC = () => {
         {/* Right Column — Fish Cards */}
         <div className="flex flex-col gap-4">
           {fishList.length === 0 && (
-            <GlassCard className="p-0">
-              <ScreenState
-                icon={Fish}
-                title="No fish in your inventory"
-                description="Build your tank profile one species at a time."
-                action={(
-                  <GlassButton variant="primary" size="md" onClick={onToggleAddForm}>
-                    <Plus size={18} aria-hidden="true" />
-                    Add your first fish
-                  </GlassButton>
-                )}
-              />
-            </GlassCard>
+            <ScreenStateCard
+              icon={Fish}
+              title="No fish in your inventory"
+              description="Build your tank profile one species at a time."
+              action={(
+                <GlassButton variant="primary" size="md" onClick={onToggleAddForm}>
+                  <Plus size={18} aria-hidden="true" />
+                  Add your first fish
+                </GlassButton>
+              )}
+            />
           )}
 
           {fishList.map(fish => {
@@ -418,7 +415,6 @@ export const MyFishScreen: React.FC = () => {
                           onIncrement={() => onIncrementCount(fish.id, fish.count)}
                         />
                         <GlassIconButton
-                          size="sm"
                           label="Delete fish"
                           onClick={() => onRequestDelete(fish.id)}
                           className="

@@ -5,20 +5,18 @@ import { useHeroActionLayer } from './HeroActionLayerContext';
 interface ScreenHeaderProps {
   eyebrow: string;
   action?: React.ReactNode;
-  className?: string;
 }
 
 /** A semantic screen heading and action group rendered over the shared hero. */
 export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   eyebrow,
   action,
-  className = '',
 }) => {
   const heroActionLayer = useHeroActionLayer();
 
   if (!heroActionLayer) {
     return (
-      <header className={`-mt-1 flex min-h-6 items-center justify-between gap-4 ${className}`}>
+      <header className="-mt-1 flex min-h-6 items-center justify-between gap-4">
         <h1 className="text-xs font-semibold tracking-[0.11em] text-accent-ink uppercase">
           {eyebrow}
         </h1>
@@ -28,7 +26,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   }
 
   return createPortal(
-    <header className={`pointer-events-none absolute inset-0 ${className}`}>
+    <header className="pointer-events-none absolute inset-0">
       <h1 className="absolute bottom-4 left-4 text-xs font-semibold tracking-[0.11em] text-white uppercase drop-shadow-sm">
         {eyebrow}
       </h1>

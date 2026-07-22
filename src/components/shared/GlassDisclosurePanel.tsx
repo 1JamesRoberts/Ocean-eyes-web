@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { CollapsibleContent } from './CollapsibleContent';
+import { GlassPanel } from './GlassPanel';
 
 interface GlassDisclosurePanelProps {
   icon: LucideIcon;
@@ -9,10 +10,7 @@ interface GlassDisclosurePanelProps {
   expanded: boolean;
   onToggle: () => void;
   children: React.ReactNode;
-  className?: string;
-  contentClassName?: string;
   iconClassName?: string;
-  chevronClassName?: string;
 }
 
 export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
@@ -22,12 +20,9 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
   expanded,
   onToggle,
   children,
-  className = '',
-  contentClassName = 'flex flex-col gap-4 pt-3',
   iconClassName = 'text-slate-grey',
-  chevronClassName = 'text-slate-grey',
 }) => (
-  <div className={`rounded-2xl border border-white/20 bg-white/20 p-2.5 pb-2 ${className}`}>
+  <GlassPanel>
     <button
       type="button"
       onClick={onToggle}
@@ -49,12 +44,12 @@ export const GlassDisclosurePanel: React.FC<GlassDisclosurePanelProps> = ({
       </span>
       <ChevronRight
         size={18}
-        className={`shrink-0 transition-transform duration-300 ease-in-out ${chevronClassName} ${expanded ? 'rotate-90' : ''}`}
+        className={`shrink-0 text-slate-grey transition-transform duration-300 ease-in-out ${expanded ? 'rotate-90' : ''}`}
       />
     </button>
 
-    <CollapsibleContent expanded={expanded} className={contentClassName}>
+    <CollapsibleContent expanded={expanded} className="flex flex-col gap-4 pt-3">
       {children}
     </CollapsibleContent>
-  </div>
+  </GlassPanel>
 );

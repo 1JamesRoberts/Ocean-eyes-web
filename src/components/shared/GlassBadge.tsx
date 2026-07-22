@@ -1,30 +1,23 @@
 // GlassBadge.tsx — Translucent glass badge/chip primitive
 import React from 'react';
 
-type BadgeColor = 'good' | 'warning' | 'critical' | 'info' | 'neutral' | 'live' | 'parameter';
+type BadgeColor = 'good' | 'parameter';
 
 interface GlassBadgeProps {
   children: React.ReactNode;
-  color?: BadgeColor;
+  color: BadgeColor;
   className?: string;
-  dot?: boolean;
 }
 
 const colorStyles: Record<BadgeColor, string> = {
   good: 'bg-good/10 text-good',
-  warning: 'bg-warning/10 text-warning',
-  critical: 'bg-critical/12 text-critical',
-  info: 'bg-data-secondary/10 text-accent-ink',
-  neutral: 'bg-accent/10 text-accent-ink',
-  live: 'bg-verdigris/10 text-verdigris',
   parameter: 'bg-(--color-health-parameter-bg) text-prussian-blue',
 };
 
 export const GlassBadge: React.FC<GlassBadgeProps> = ({
   children,
-  color = 'neutral',
+  color,
   className = '',
-  dot = false,
 }) => (
   <span
     className={`
@@ -33,7 +26,6 @@ export const GlassBadge: React.FC<GlassBadgeProps> = ({
       ${className}
     `}
   >
-    {dot && <span className="size-1.5 rounded-full bg-current" />}
     {children}
   </span>
 );

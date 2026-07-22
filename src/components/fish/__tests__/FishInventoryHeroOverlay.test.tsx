@@ -51,14 +51,14 @@ describe('FishInventoryHeroOverlay', () => {
     expect(overlay?.querySelector('[data-fish-motion-canvas]')).not.toBeNull();
   });
 
-  it('summarizes capped, unsupported, and failed artwork', () => {
+  it('shows unsupported and failed artwork without a capped-fish pill', () => {
     hookState.failedFishCount = 1;
     renderOverlay([
       fish('guppy-1', 'guppy', 14),
       fish('custom-1', 'moonlight_minnow', 2),
     ]);
 
-    expect(screen.getByText('+2 more')).toBeTruthy();
+    expect(screen.queryByText('+2 more')).toBeNull();
     expect(screen.getByText('3 awaiting art')).toBeTruthy();
   });
 

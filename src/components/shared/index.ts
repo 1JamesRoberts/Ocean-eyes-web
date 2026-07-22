@@ -4,7 +4,7 @@ export { GlassDisclosurePanel } from "./GlassDisclosurePanel";
 export { CardSectionHeader } from "./CardSectionHeader";
 export { HeadedCard } from "./HeadedCard";
 export { ScreenHeader } from "./ScreenHeader";
-export { ScreenState } from "./ScreenState";
+export { ScreenState, ScreenStateCard } from "./ScreenState";
 export { BackButton } from "./BackButton";
 export { GlassPanel } from "./GlassPanel";
 export { GlassButton } from "./GlassButton";
@@ -13,7 +13,6 @@ export { GlassIconButton } from "./GlassIconButton";
 export { GlassInput } from "./GlassInput";
 export { GlassModal } from "./GlassModal";
 export { SliderControl } from "./SliderControl";
-export { AlertDetail } from "./AlertDetail";
 export { PhoneFrame } from "./PhoneFrame";
 export { PillNavigation } from "./PillNavigation";
 

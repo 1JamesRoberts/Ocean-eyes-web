@@ -48,16 +48,11 @@ export const FishInventoryHeroOverlay = React.memo<FishInventoryHeroOverlayProps
         />
       ) : null}
 
-      {(scene.overflowCount > 0 || awaitingArtCount > 0) ? (
+      {awaitingArtCount > 0 ? (
         <div className="
           absolute right-4 bottom-3 z-10 flex max-w-[58%] flex-wrap justify-end
           gap-1.5
         ">
-          {scene.overflowCount > 0 ? (
-            <span className="hero-overlay-pill min-h-7! px-2! text-2xs!">
-              +{scene.overflowCount} more
-            </span>
-          ) : null}
           {awaitingArtCount > 0 ? (
             <span className="hero-overlay-pill min-h-7! px-2! text-2xs!">
               {awaitingArtCount} awaiting art

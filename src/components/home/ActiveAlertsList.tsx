@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronRight, ShieldAlert, ShieldCheck } from 'lucide-react';
-import { HeadedCard, ScreenState } from '../shared';
+import { HeadedCard, ScreenStateCard } from '../shared';
 import type { AlertItem } from '../../types/aquarium';
 
 interface ActiveAlertsListProps {
@@ -13,15 +13,14 @@ export const ActiveAlertsList = React.memo<ActiveAlertsListProps>(({ alerts, onS
 
   if (activeAlerts.length === 0) {
     return (
-      <section className="glass-card border-2 border-dashed border-white/40">
-        <ScreenState
-          icon={ShieldCheck}
-          title="System operating safely"
-          description="No active safety alarms require your attention."
-          tone="success"
-          compact
-        />
-      </section>
+      <ScreenStateCard
+        as="section"
+        icon={ShieldCheck}
+        title="System operating safely"
+        description="No active safety alarms require your attention."
+        tone="success"
+        compact
+      />
     );
   }
 
