@@ -717,7 +717,7 @@
     black 0%,
     black var(--mobile-hero-fade-start),
     rgb(0 0 0 / 70%) var(--mobile-hero-fade-soft-stop),
-    rgb(0 0 0 / 30%) var(--mobile-hero-fade-mid-stop),
+    rgb(0 0 0 / 20%) var(--mobile-hero-fade-mid-stop),
     rgb(0 0 0 / 10%) var(--mobile-hero-fade-deep-stop),
     transparent 100%
   );
@@ -726,7 +726,7 @@
     black 0%,
     black var(--mobile-hero-fade-start),
     rgb(0 0 0 / 70%) var(--mobile-hero-fade-soft-stop),
-    rgb(0 0 0 / 30%) var(--mobile-hero-fade-mid-stop),
+    rgb(0 0 0 / 20%) var(--mobile-hero-fade-mid-stop),
     rgb(0 0 0 / 10%) var(--mobile-hero-fade-deep-stop),
     transparent 100%
   );

@@ -17,7 +17,7 @@ export const DEFAULT_AMBIENT_CANVAS_DEBUG_VALUES: AmbientCanvasDebugValues = {
   blurRadius: 48,
   fadeStart: 50,
   fadeEnd: 100,
-  heroFadeStart: 55,
+  heroFadeStart: 70,
 };
 
 const MIN_FADE_GAP = 5;

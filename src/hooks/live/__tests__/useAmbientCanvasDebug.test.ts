@@ -17,10 +17,10 @@ describe('useAmbientCanvasDebug', () => {
       '--mobile-ambient-blur': '48px',
       '--mobile-ambient-fade-start': '50%',
       '--mobile-ambient-fade-end': '100%',
-      '--mobile-hero-fade-start': '55%',
-      '--mobile-hero-fade-soft-stop': '64%',
-      '--mobile-hero-fade-mid-stop': '77.5%',
-      '--mobile-hero-fade-deep-stop': '91%',
+      '--mobile-hero-fade-start': '70%',
+      '--mobile-hero-fade-soft-stop': '76%',
+      '--mobile-hero-fade-mid-stop': '85%',
+      '--mobile-hero-fade-deep-stop': '94%',
     });
 
     act(() => result.current.updateValue('sampleOpacity', 64));
