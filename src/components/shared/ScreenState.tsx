@@ -14,7 +14,7 @@ interface ScreenStateProps {
 }
 
 const toneStyles: Record<ScreenStateTone, string> = {
-  neutral: 'bg-pine-teal/8 text-pine-teal',
+  neutral: 'bg-accent/8 text-accent-ink',
   danger: 'bg-critical/10 text-critical',
   success: 'bg-good/10 text-good',
 };

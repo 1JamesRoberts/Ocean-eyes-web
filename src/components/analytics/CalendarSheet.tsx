@@ -51,7 +51,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             className="
               overlay-glass-control flex size-9 items-center justify-center rounded-full
               p-0 text-slate-grey hover:text-prussian-blue
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
             "
             aria-label="Previous month"
           >
@@ -63,7 +63,7 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
             className="
               overlay-glass-control flex size-9 items-center justify-center rounded-full
               p-0 text-slate-grey hover:text-prussian-blue
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
             "
             aria-label="Next month"
           >
@@ -100,9 +100,9 @@ export const CalendarSheet: React.FC<CalendarSheetProps> = ({
                   : `rounded-md type-body ${today
                       ? 'type-strong text-prussian-blue'
                       : inMonth
-                        ? 'text-prussian-blue hover:text-pine-teal'
+                        ? 'text-prussian-blue hover:text-accent-ink'
                         : 'text-slate-grey/60 hover:text-slate-grey'}`}
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
               `}
             >
               {formatUTCDate(day, 'd')}

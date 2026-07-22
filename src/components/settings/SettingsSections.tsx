@@ -55,7 +55,7 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
   const className = `
     flex items-center justify-between gap-3 text-left
     ${onClick ? 'cursor-pointer hover:bg-white/55' : ''}
-    ${highlight ? 'border-pine-teal/20 bg-pine-teal/8' : ''}
+    ${highlight ? 'border-focus/20 bg-accent/8' : ''}
     ${danger ? 'border-critical/20 bg-critical/8' : ''}
   `;
   const content = (
@@ -65,7 +65,7 @@ const SettingsPanelRow: React.FC<SettingsPanelRowProps> = ({
           <span
             className={`
               grid size-9 shrink-0 place-items-center rounded-full
-              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'text-pine-teal' : 'text-slate-grey'}
+              ${danger ? 'bg-critical/10 text-critical' : highlight ? 'text-accent-ink' : 'text-slate-grey'}
             `}
           >
             <Icon size={17} />
@@ -138,7 +138,7 @@ const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
     <div className={variant === 'panel' ? 'rounded-2xl border border-white/20 bg-white/20 p-2.5 pb-2' : ''}>
       <div className="mb-1.5 flex items-baseline justify-between gap-3 type-body">
         <span className="min-w-0 type-body-muted">{label}</span>
-        <strong className="shrink-0 text-pine-teal">{displayValue}</strong>
+        <strong className="shrink-0 text-accent-ink">{displayValue}</strong>
       </div>
       <input
         type="range"
@@ -241,7 +241,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
               onClick={() => onAutoConnectChange(!preferences.autoConnect)}
               className={`
                 relative inline-flex h-6 w-11 cursor-pointer rounded-full border-none transition-colors
-                ${preferences.autoConnect ? 'bg-pine-teal' : 'bg-slate-grey/20'}
+                ${preferences.autoConnect ? 'bg-accent' : 'bg-slate-grey/20'}
               `}
             >
               <span

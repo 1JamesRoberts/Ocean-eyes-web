@@ -77,11 +77,11 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies, time
         <defs>
           <linearGradient id="fishCountBarGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-verdigris)" />
-            <stop offset="100%" stopColor="var(--color-pine-teal)" />
+            <stop offset="100%" stopColor="var(--role-data-primary)" />
           </linearGradient>
         </defs>
         <CartesianGrid
-          stroke="var(--color-azure-mist-2)"
+          stroke="var(--role-data-grid)"
           strokeDasharray="5 6"
         />
         <XAxis
@@ -92,8 +92,8 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies, time
           ticks={timeAxis.ticks}
           tickFormatter={formatChartTimestamp}
           tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
-          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          axisLine={{ stroke: 'var(--role-data-grid)' }}
+          tickLine={{ stroke: 'var(--role-data-grid)' }}
         />
         <YAxis
           allowDecimals={false}

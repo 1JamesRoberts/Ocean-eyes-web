@@ -300,7 +300,7 @@ export const MyFishScreen: React.FC = () => {
                       Tank Compatibility
                     </div>
                     <div className="
-                      flex items-center gap-2 border-b border-azure-mist-2 py-1.5
+                      flex items-center gap-2 border-b border-divider py-1.5
                       last:border-b-0
                     ">
                       <div
@@ -377,7 +377,7 @@ export const MyFishScreen: React.FC = () => {
                 <div className="flex items-center justify-between px-2.5 py-2">
                   <button
                     type="button"
-                    className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-xl border-none bg-transparent text-left focus-visible:outline-2 focus-visible:outline-pine-teal"
+                    className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-xl border-none bg-transparent text-left focus-visible:outline-2 focus-visible:outline-focus"
                     onClick={() => onToggleFish(fish.id)}
                     aria-expanded={isActive}
                   >
@@ -469,7 +469,7 @@ export const MyFishScreen: React.FC = () => {
                                 return (
                                   <div key={cr.speciesId} className="
                                     flex items-center gap-2 border-b
-                                    border-azure-mist-2 py-1.5
+                                    border-divider py-1.5
                                     last:border-b-0
                                   ">
                                     <div className="

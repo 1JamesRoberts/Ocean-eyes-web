@@ -7,7 +7,7 @@ const MAX_RESULTS = 60;
 
 /** Small coloured badge showing the creature type (shrimp/snail/crab) */
 const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
-  const bgColor = type === 'shrimp' ? '#FF9800' : type === 'snail' ? '#8BC34A' : type === 'crab' ? '#E91E63' : 'var(--color-azure-mist-2)';
+  const bgColor = type === 'shrimp' ? '#FF9800' : type === 'snail' ? '#8BC34A' : type === 'crab' ? '#E91E63' : 'var(--role-border-primary)';
   return (
     <span className="
       rounded-sm px-1.5 py-0.5 type-caption-inverse
@@ -96,7 +96,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             <CreatureBadge type={species.creatureType} />
           )}
           {selectedSpeciesId === species.id && (
-            <Check size={18} className="shrink-0 text-pine-teal" aria-hidden="true" />
+            <Check size={18} className="shrink-0 text-accent-ink" aria-hidden="true" />
           )}
         </button>
       ))}
@@ -115,13 +115,13 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
           onClick={handleCustomSelect}
           className="
             flex min-h-12 w-full cursor-pointer items-center gap-3 border-none
-            bg-transparent px-3 py-2 text-left type-body text-pine-teal
+            bg-transparent px-3 py-2 text-left type-body text-accent-ink
             transition-colors hover:bg-azure-mist
           "
         >
           <div className="
             flex size-[38px] shrink-0 items-center justify-center rounded-[10px]
-            bg-pine-teal/10 type-strong text-pine-teal
+            bg-accent/10 type-strong text-accent-ink
           ">
             +
           </div>
@@ -160,9 +160,9 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
             aria-autocomplete="list"
             role="combobox"
             className="
-              w-full rounded-2xl border border-azure-mist-2 bg-white/55 px-3 py-3 pl-10
+              w-full rounded-2xl border border-divider bg-white/55 px-3 py-3 pl-10
               type-body text-base! outline-none transition-smooth
-              focus:border-pine-teal/40 focus:ring-3 focus:ring-pine-teal/10
+              focus:border-focus/40 focus:ring-3 focus:ring-focus/10
             "
           />
         </div>

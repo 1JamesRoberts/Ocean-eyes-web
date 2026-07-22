@@ -33,7 +33,7 @@ const variantStyles: Record<GlassVariant, string> = {
     border-none bg-transparent rounded-3xl
     type-strong text-slate-grey
     transition-smooth whitespace-nowrap
-    hover:text-pine-teal
+    hover:text-accent-ink
   `,
 };
 
@@ -64,7 +64,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
     aria-label={ariaLabel}
     aria-expanded={ariaExpanded}
     className={`
-      min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
+      min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
       ${variantStyles[variant]}
       ${sizeStyles[size]}
       ${fullWidth ? 'w-full' : ''}

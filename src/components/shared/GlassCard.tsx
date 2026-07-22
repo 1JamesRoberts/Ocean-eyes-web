@@ -24,7 +24,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
 }) => (
   <Tag
     className={`
-      glass-card p-5 pb-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
+      glass-card p-5 pb-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
       ${clickable ? 'cursor-pointer' : ''}
       ${hover ? `
         transition-smooth

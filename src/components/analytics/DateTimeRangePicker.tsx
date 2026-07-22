@@ -259,17 +259,17 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         style={{
           boxShadow: heroOverlay
             ? undefined
-            : 'var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--color-pine-teal) 5%, transparent)',
+            : 'var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--role-shadow) 5%, transparent)',
         }}
         onMouseEnter={(e) => {
           if (heroOverlay) return;
           e.currentTarget.style.boxShadow =
-            'var(--shadow-glass), 0 6px 24px 0 color-mix(in srgb, var(--color-pine-teal) 8%, transparent)';
+            'var(--shadow-glass), 0 6px 24px 0 color-mix(in srgb, var(--role-shadow) 8%, transparent)';
         }}
         onMouseLeave={(e) => {
           if (heroOverlay) return;
           e.currentTarget.style.boxShadow =
-            'var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--color-pine-teal) 5%, transparent)';
+            'var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--role-shadow) 5%, transparent)';
         }}
       >
         <History size={16} className={heroOverlay ? 'text-white/70' : 'text-slate-grey'} />

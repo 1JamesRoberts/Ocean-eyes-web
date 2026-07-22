@@ -9,14 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --pine-teal: #00584e;
-      --verdigris: #009d8d;
+      --neon-ice: #00ffe5;
       --turquoise: #00c8b3;
-      --turquoise-surf: #00a9cc;
-      --sky-surge: #00c0e8;
-      --azure-mist: #e5f5f8;
+      --verdigris: #32a198;
+      --tropical-teal: #79beb7;
+      --pearl-aqua: #9bcbc7;
+      --azure-mist: #f4fffe;
       --white: #ffffff;
-      --azure-mist-2: #deeff3;
       --slate-grey: #828e97;
       --prussian-blue: #051e32;
 
@@ -46,8 +45,8 @@
       min-height: 100vh;
       margin: 0;
       background:
-        radial-gradient(circle at 82% 7%, rgb(0 192 232 / 10%), transparent 28rem),
-        linear-gradient(180deg, var(--white), var(--azure-mist-2));
+        radial-gradient(circle at 82% 7%, rgb(0 255 229 / 10%), transparent 28rem),
+        linear-gradient(180deg, var(--white), var(--azure-mist));
       color: var(--prussian-blue);
       font-family: var(--font-main);
       -webkit-font-smoothing: antialiased;
@@ -65,7 +64,7 @@
       align-items: end;
       gap: 32px;
       padding-bottom: 34px;
-      border-bottom: 1px solid color-mix(in srgb, var(--pine-teal) 15%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--prussian-blue) 15%, transparent);
     }
 
     .eyebrow {
@@ -80,7 +79,7 @@
     h1 {
       max-width: 720px;
       margin: 0;
-      color: var(--pine-teal);
+      color: var(--prussian-blue);
       font-size: clamp(42px, 7vw, 78px);
       font-weight: 800;
       letter-spacing: -0.065em;
@@ -97,10 +96,10 @@
 
     .stamp {
       padding: 12px 16px;
-      border: 1px solid color-mix(in srgb, var(--pine-teal) 15%, transparent);
+      border: 1px solid color-mix(in srgb, var(--prussian-blue) 15%, transparent);
       border-radius: 999px;
       background: color-mix(in srgb, var(--white) 65%, transparent);
-      color: var(--pine-teal);
+      color: var(--prussian-blue);
       font-family: var(--font-mono);
       font-size: 12px;
       white-space: nowrap;
@@ -193,7 +192,7 @@
     .usage-card {
       min-height: 170px;
       padding: 24px;
-      border: 1px solid color-mix(in srgb, var(--pine-teal) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--prussian-blue) 10%, transparent);
       border-radius: 22px;
       background: color-mix(in srgb, var(--white) 62%, transparent);
       box-shadow: 0 16px 40px rgb(5 30 50 / 5%);
@@ -225,14 +224,14 @@
     .source-note {
       margin-top: 42px;
       padding-top: 22px;
-      border-top: 1px solid color-mix(in srgb, var(--pine-teal) 12%, transparent);
+      border-top: 1px solid color-mix(in srgb, var(--prussian-blue) 12%, transparent);
       color: var(--slate-grey);
       font-size: 13px;
       line-height: 1.6;
     }
 
     code {
-      color: var(--pine-teal);
+      color: var(--prussian-blue);
       font-family: var(--font-mono);
       font-size: 0.94em;
     }
@@ -298,17 +297,14 @@
         <h2 id="foundation-heading">Foundation palette</h2>
         <p class="section-note">Primary developer-facing color tokens</p>
       </div>
-      <div class="palette-row" style="--columns: 5">
+      <div class="palette-row" style="--columns: 4">
         <article class="swatch" style="--swatch: var(--white)">
           <span class="swatch-name">White</span><span class="swatch-value">#FFFFFF</span><span class="swatch-token">--color-white</span>
         </article>
         <article class="swatch" style="--swatch: var(--azure-mist)">
-          <span class="swatch-name">Azure Mist</span><span class="swatch-value">#E5F5F8</span><span class="swatch-token">--color-azure-mist</span>
+          <span class="swatch-name">Azure Mist</span><span class="swatch-value">#F4FFFE</span><span class="swatch-token">--color-azure-mist</span>
         </article>
-        <article class="swatch" style="--swatch: var(--azure-mist-2)">
-          <span class="swatch-name">Azure Mist 2</span><span class="swatch-value">#DEEFF3</span><span class="swatch-token">--color-azure-mist-2</span>
-        </article>
-        <article class="swatch" style="--swatch: var(--slate-grey); --ink: var(--white)">
+        <article class="swatch" style="--swatch: var(--slate-grey)">
           <span class="swatch-name">Slate Grey</span><span class="swatch-value">#828E97</span><span class="swatch-token">--color-slate-grey</span>
         </article>
         <article class="swatch" style="--swatch: var(--prussian-blue); --ink: var(--white)">
@@ -323,20 +319,20 @@
         <p class="section-note">Brand, interaction, focus, and data accents</p>
       </div>
       <div class="palette-row" style="--columns: 5">
-        <article class="swatch" style="--swatch: var(--pine-teal); --ink: var(--white)">
-          <span class="swatch-name">Pine Teal</span><span class="swatch-value">#00584E</span><span class="swatch-token">--color-pine-teal</span>
-        </article>
-        <article class="swatch" style="--swatch: var(--verdigris); --ink: var(--white)">
-          <span class="swatch-name">Verdigris</span><span class="swatch-value">#009D8D</span><span class="swatch-token">--color-verdigris</span>
+        <article class="swatch" style="--swatch: var(--neon-ice)">
+          <span class="swatch-name">Neon Ice</span><span class="swatch-value">#00FFE5</span><span class="swatch-token">--color-neon-ice</span>
         </article>
         <article class="swatch" style="--swatch: var(--turquoise)">
           <span class="swatch-name">Turquoise</span><span class="swatch-value">#00C8B3</span><span class="swatch-token">--color-turquoise</span>
         </article>
-        <article class="swatch" style="--swatch: var(--turquoise-surf)">
-          <span class="swatch-name">Turquoise Surf</span><span class="swatch-value">#00A9CC</span><span class="swatch-token">--color-turquoise-surf</span>
+        <article class="swatch" style="--swatch: var(--verdigris)">
+          <span class="swatch-name">Verdigris</span><span class="swatch-value">#32A198</span><span class="swatch-token">--color-verdigris</span>
         </article>
-        <article class="swatch" style="--swatch: var(--sky-surge)">
-          <span class="swatch-name">Sky Surge</span><span class="swatch-value">#00C0E8</span><span class="swatch-token">--color-sky-surge</span>
+        <article class="swatch" style="--swatch: var(--tropical-teal)">
+          <span class="swatch-name">Tropical Teal</span><span class="swatch-value">#79BEB7</span><span class="swatch-token">--color-tropical-teal</span>
+        </article>
+        <article class="swatch" style="--swatch: var(--pearl-aqua)">
+          <span class="swatch-name">Pearl Aqua</span><span class="swatch-value">#9BCBC7</span><span class="swatch-token">--color-pearl-aqua</span>
         </article>
       </div>
     </section>
@@ -380,25 +376,27 @@
         <p class="section-note">How the palette appears in the product</p>
       </div>
       <div class="usage-grid">
-        <article class="usage-card" style="--sample: linear-gradient(90deg, var(--verdigris), var(--pine-teal))">
+        <article class="usage-card" style="--sample: linear-gradient(90deg, var(--prussian-blue), var(--prussian-blue))">
           <h3>Brand and actions</h3>
-          <p>Pine Teal anchors primary actions and selected states; Verdigris lifts gradients and active controls.</p>
+          <p>Prussian Blue anchors primary actions with White text. Verdigris and Turquoise carry focus, selection, and active states.</p>
         </article>
-        <article class="usage-card" style="--sample: linear-gradient(90deg, var(--white), var(--azure-mist), var(--azure-mist-2))">
+        <article class="usage-card" style="--sample: linear-gradient(90deg, var(--white), var(--azure-mist), var(--pearl-aqua))">
           <h3>Surfaces and structure</h3>
-          <p>White and Azure Mist establish the light glass system, page backgrounds, hover fills, and borders.</p>
+          <p>Azure Mist is the canvas; White supplies solid and glass surfaces; Pearl Aqua and Tropical Teal define borders and chart grids.</p>
         </article>
-        <article class="usage-card" style="--sample: linear-gradient(90deg, var(--turquoise), var(--turquoise-surf), var(--sky-surge))">
+        <article class="usage-card" style="--sample: linear-gradient(90deg, var(--verdigris), var(--turquoise), var(--neon-ice))">
           <h3>Data and focus</h3>
-          <p>The bright aquatic spectrum carries charts, focus feedback, highlights, and informational measurements.</p>
+          <p>Prussian Blue and Verdigris carry readable data marks; Turquoise and Neon Ice are reserved for supporting accents and highlights.</p>
         </article>
       </div>
     </section>
 
     <p class="source-note">
       Source of truth: <code>src/index.css</code>. This document records the application’s light-mode
-      palette. Species identity, camera calibration, recording, and detection colors remain intentionally
-      independent when their hue carries functional meaning.
+      palette. Transparent tints may only derive from these nine primitives. Status colors, Google branding,
+      species identity, camera calibration, recording, and detection colors remain intentional exceptions
+      when their hue carries functional meaning. Use Prussian Blue on light surfaces and White on Prussian
+      Blue; do not place normal-size White text on the brighter aquatic colors.
     </p>
   </main>
 </body>

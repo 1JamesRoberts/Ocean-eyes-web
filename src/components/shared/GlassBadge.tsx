@@ -14,8 +14,8 @@ const colorStyles: Record<BadgeColor, string> = {
   good: 'bg-good/10 text-good',
   warning: 'bg-warning/10 text-warning',
   critical: 'bg-critical/12 text-critical',
-  info: 'bg-sky-surge/10 text-sky-surge',
-  neutral: 'bg-pine-teal/10 text-pine-teal',
+  info: 'bg-data-secondary/10 text-accent-ink',
+  neutral: 'bg-accent/10 text-accent-ink',
   live: 'bg-verdigris/10 text-verdigris',
   parameter: 'bg-(--color-health-parameter-bg) text-prussian-blue',
 };

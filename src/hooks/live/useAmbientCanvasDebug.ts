@@ -72,7 +72,9 @@ export const useAmbientCanvasDebug = () => {
   }, []);
 
   const canvasStyle = useMemo<AmbientCanvasCssProperties>(() => ({
-    '--mobile-canvas-background': `rgb(${values.baseGrey} ${values.baseGrey} ${values.baseGrey})`,
+    '--mobile-canvas-background': values.baseGrey === DEFAULT_AMBIENT_CANVAS_DEBUG_VALUES.baseGrey
+      ? 'var(--role-bg-canvas)'
+      : `rgb(${values.baseGrey} ${values.baseGrey} ${values.baseGrey})`,
     '--mobile-ambient-opacity': String(values.sampleOpacity / 100),
     '--mobile-ambient-blur': `${values.blurRadius}px`,
     '--mobile-ambient-fade-start': `${values.fadeStart}%`,

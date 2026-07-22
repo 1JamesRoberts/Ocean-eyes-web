@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 
@@ -6,33 +6,53 @@
 
 :root {
   /* ─── OceanEyes Design Tokens ─── */
+  /* Semantic color roles. Palette primitives live in @theme below. */
+  --role-bg-canvas: var(--color-azure-mist);
+  --role-bg-surface: var(--color-white);
+  --role-bg-inverse: var(--color-prussian-blue);
+  --role-text-primary: var(--color-prussian-blue);
+  --role-text-secondary: var(--color-slate-grey);
+  --role-text-inverse: var(--color-white);
+  --role-border-primary: var(--color-pearl-aqua);
+  --role-border-strong: var(--color-tropical-teal);
+  --role-border-focus: var(--color-verdigris);
+  --role-accent-primary: var(--color-verdigris);
+  --role-accent-secondary: var(--color-turquoise);
+  --role-action-primary: var(--color-prussian-blue);
+  --role-action-primary-hover: color-mix(in srgb, var(--color-prussian-blue) 92%, var(--color-white));
+  --role-data-primary: var(--color-verdigris);
+  --role-data-secondary: var(--color-turquoise);
+  --role-data-highlight: var(--color-neon-ice);
+  --role-data-grid: var(--color-pearl-aqua);
+  --role-shadow: var(--color-prussian-blue);
+
   /* Gradients (not supported in @theme --color-*) */
-  --color-primary: linear-gradient(180deg, var(--color-verdigris) 0%, var(--color-pine-teal) 100%);
+  --color-primary: var(--role-action-primary);
   --color-primary-hover: var(--color-primary);
-  --color-primary-soft: linear-gradient(90deg, color-mix(in srgb, var(--color-turquoise) 49%, transparent) 0%, color-mix(in srgb, var(--color-sky-surge) 20%, transparent) 40%);
+  --color-primary-soft: linear-gradient(90deg, color-mix(in srgb, var(--color-turquoise) 30%, transparent) 0%, color-mix(in srgb, var(--color-neon-ice) 16%, transparent) 100%);
   /* Glass-system tokens */
   --glass-bg-card: color-mix(in srgb, var(--color-white) 40%, transparent);
-  --glass-bg-surface: rgb(234 253 251 / 42%);
+  --glass-bg-surface: color-mix(in srgb, var(--color-azure-mist) 42%, transparent);
   --glass-bg-inline: color-mix(in srgb, var(--color-white) 30%, transparent);
   /* Shared fill for health-parameter containers: Prussian blue at 3% opacity. */
   --color-health-parameter-bg: color-mix(in srgb, var(--color-prussian-blue) 3%, transparent);
-  --glass-blur-card: 8px;
+  --glass-blur-card: 2px;
   --glass-blur-md: 12px;
   --glass-blur-sm: 6px;
-  --glass-border-card: rgb(155 203 199 / 72%);
+  --glass-border-card: color-mix(in srgb, var(--color-pearl-aqua) 72%, transparent);
   --glass-border-strong: color-mix(in srgb, var(--color-white) 30%, transparent);
-  --glass-radius-card: 2rem;
+  --glass-radius-card: 28px;
   --glass-radius-inline: 0.75rem;
   --glass-radius-pill: 9999px;
 
   /* Shadow tokens (only --shadow-glass not in @theme) */
-  --shadow-glass-card: inset 0 5px 5px 0 rgb(255 255 255 / 30%),
-    inset 1px -5px 5px 0 rgb(255 255 255 / 50%),
-    inset 0 1px 0 0 rgb(121 190 183 / 50%);
+  --shadow-glass-card: inset 0 5px 5px 0 color-mix(in srgb, var(--color-white) 30%, transparent),
+    inset 1px -5px 5px 0 color-mix(in srgb, var(--color-white) 50%, transparent),
+    inset 0 1px 0 0 color-mix(in srgb, var(--color-tropical-teal) 50%, transparent);
   --shadow-glass: inset 1px 1px 0px color-mix(in srgb, var(--color-white) 25%, transparent),
-    inset -1px -1px 2px color-mix(in srgb, var(--color-pine-teal) 3%, transparent);
+    inset -1px -1px 2px color-mix(in srgb, var(--role-shadow) 3%, transparent);
   /* Video-derived dashboard atmosphere */
-  --mobile-canvas-background: #f0f0f0;
+  --mobile-canvas-background: var(--role-bg-canvas);
   --mobile-ambient-opacity: 1;
   --mobile-ambient-blur: 48px;
   --mobile-ambient-fade-start: 50%;
@@ -65,11 +85,11 @@
   --mobile-page-background: var(--mobile-canvas-background);
 
   /* Font */
-  --font-main: 'Public Sans', system-ui, -apple-system, sans-serif;
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
   --letter-spacing-base: -0.01em;
-  --type-ink: var(--color-prussian-blue);
-  --type-ink-muted: var(--color-slate-grey);
-  --type-ink-inverse: var(--color-white);
+  --type-ink: var(--role-text-primary);
+  --type-ink-muted: var(--role-text-secondary);
+  --type-ink-inverse: var(--role-text-inverse);
   --type-ink-inverse-muted: color-mix(in srgb, var(--color-white) 70%, transparent);
 
 }
@@ -79,16 +99,34 @@
   --breakpoint-lg: 1024px;
 
   /* ─── Named OceanEyes palette ─── */
-  --color-pine-teal: #00584e;
-  --color-verdigris: #009d8d;
+  --color-neon-ice: #00ffe5;
   --color-turquoise: #00c8b3;
-  --color-turquoise-surf: #00a9cc;
-  --color-sky-surge: #00c0e8;
-  --color-azure-mist: #e5f5f8;
+  --color-verdigris: #32a198;
+  --color-tropical-teal: #79beb7;
+  --color-pearl-aqua: #9bcbc7;
+  --color-azure-mist: #f4fffe;
   --color-white: #ffffff;
-  --color-azure-mist-2: #deeff3;
   --color-slate-grey: #828e97;
   --color-prussian-blue: #051e32;
+
+  /* ─── Semantic Tailwind colors ─── */
+  --color-canvas: var(--role-bg-canvas);
+  --color-surface: var(--role-bg-surface);
+  --color-inverse: var(--role-bg-inverse);
+  --color-ink: var(--role-text-primary);
+  --color-ink-muted: var(--role-text-secondary);
+  --color-ink-inverse: var(--role-text-inverse);
+  --color-divider: var(--role-border-primary);
+  --color-divider-strong: var(--role-border-strong);
+  --color-focus: var(--role-border-focus);
+  --color-accent: var(--role-accent-primary);
+  --color-accent-secondary: var(--role-accent-secondary);
+  --color-accent-ink: var(--role-text-primary);
+  --color-action: var(--role-action-primary);
+  --color-data-primary: var(--role-data-primary);
+  --color-data-secondary: var(--role-data-secondary);
+  --color-data-highlight: var(--role-data-highlight);
+  --color-data-grid: var(--role-data-grid);
 
   /* ─── Status ─── */
   --color-good: #10b981;
@@ -96,7 +134,7 @@
   --color-critical: #ef4444;
 
   /* ─── Typography ─── */
-  --font-main: 'Public Sans', system-ui, -apple-system, sans-serif;
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
   --text-section: 24px;
   --text-2xs: 10px;
 
@@ -106,9 +144,9 @@
   --background-image-primary-soft-gradient: var(--color-primary-soft);
 
   /* ─── Shadows ─── */
-  --shadow-card: 0 4px 20px color-mix(in srgb, var(--color-pine-teal) 5%, transparent), 0 1px 3px color-mix(in srgb, var(--color-pine-teal) 2%, transparent);
-  --shadow-primary-hover: 0 6px 16px color-mix(in srgb, var(--color-pine-teal) 25%, transparent);
-  --shadow-primary-glow: 0 4px 12px color-mix(in srgb, var(--color-pine-teal) 20%, transparent);
+  --shadow-card: 0 4px 20px color-mix(in srgb, var(--role-shadow) 5%, transparent), 0 1px 3px color-mix(in srgb, var(--role-shadow) 2%, transparent);
+  --shadow-primary-hover: 0 6px 16px color-mix(in srgb, var(--role-shadow) 25%, transparent);
+  --shadow-primary-glow: 0 4px 12px color-mix(in srgb, var(--role-shadow) 20%, transparent);
 
   /* ─── Z-index ─── */
   --z-index-1: 1;
@@ -226,7 +264,7 @@
   -webkit-backdrop-filter: blur(var(--glass-blur-md));
   border: 1px solid var(--glass-border-strong);
   border-radius: var(--glass-radius-card);
-  box-shadow: var(--shadow-glass), 0 8px 32px color-mix(in srgb, var(--color-pine-teal) 12%, transparent);
+  box-shadow: var(--shadow-glass), 0 8px 32px color-mix(in srgb, var(--role-shadow) 12%, transparent);
 }
 
 @utility shimmer {
@@ -251,8 +289,8 @@
   width: 100%;
 
   &:focus {
-    border-color: color-mix(in srgb, var(--color-pine-teal) 40%, transparent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-pine-teal) 10%, transparent);
+    border-color: color-mix(in srgb, var(--role-border-focus) 40%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--role-border-focus) 10%, transparent);
   }
 
   &::placeholder {
@@ -305,6 +343,10 @@
   transition: var(--transition-smooth);
   white-space: nowrap;
 
+  &:hover {
+    background: var(--role-action-primary-hover);
+  }
+
 }
 
 @utility glass-button-outline {
@@ -323,14 +365,14 @@
   font-size: 15px;
   line-height: 1.35;
   font-weight: 700;
-  color: var(--color-pine-teal);
-  box-shadow: var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--color-pine-teal) 5%, transparent);
+  color: var(--role-text-primary);
+  box-shadow: var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--role-shadow) 5%, transparent);
   transition: var(--transition-smooth);
   white-space: nowrap;
 
   &:hover {
-    background: color-mix(in srgb, var(--color-pine-teal) 6%, transparent);
-    box-shadow: var(--shadow-glass), 0 6px 24px 0 color-mix(in srgb, var(--color-pine-teal) 8%, transparent);
+    background: color-mix(in srgb, var(--role-accent-primary) 6%, transparent);
+    box-shadow: var(--shadow-glass), 0 6px 24px 0 color-mix(in srgb, var(--role-shadow) 8%, transparent);
   }
 
 }
@@ -347,13 +389,13 @@
   border-radius: var(--glass-radius-inline);
   padding: 0.5rem;
   color: var(--color-slate-grey);
-  box-shadow: var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--color-pine-teal) 5%, transparent);
+  box-shadow: var(--shadow-glass), 0 4px 20px 0 color-mix(in srgb, var(--role-shadow) 5%, transparent);
   transition: var(--transition-smooth);
 
   &:hover {
     background: color-mix(in srgb, var(--color-white) 50%, transparent);
-    color: var(--color-pine-teal);
-    box-shadow: var(--shadow-glass), 0 6px 24px 0 color-mix(in srgb, var(--color-pine-teal) 8%, transparent);
+    color: var(--role-text-primary);
+    box-shadow: var(--shadow-glass), 0 6px 24px 0 color-mix(in srgb, var(--role-shadow) 8%, transparent);
   }
 
 }
@@ -398,7 +440,7 @@
   html {
     height: 100%;
     overflow: hidden;
-    background: #1a1a1a;
+    background: var(--role-bg-inverse);
   }
 
   select,
@@ -417,7 +459,7 @@
     font-family: var(--font-main);
     letter-spacing: var(--letter-spacing-base);
     height: 100dvh;
-    background: #1a1a1a;
+    background: var(--role-bg-inverse);
     color: var(--color-prussian-blue);
     min-height: 0;
     padding: 0;
@@ -427,7 +469,7 @@
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--color-pine-teal) 20%, transparent);
+    background: color-mix(in srgb, var(--role-accent-primary) 20%, transparent);
   }
 
   :focus-visible {
@@ -509,13 +551,13 @@
   0%, 100% {
     box-shadow:
       var(--shadow-glass),
-      0 4px 20px color-mix(in srgb, var(--color-pine-teal) 5%, transparent),
+      0 4px 20px color-mix(in srgb, var(--role-shadow) 5%, transparent),
       0 0 0 0 var(--color-ai-glow);
   }
   50% {
     box-shadow:
       var(--shadow-glass),
-      0 4px 20px color-mix(in srgb, var(--color-pine-teal) 5%, transparent),
+      0 4px 20px color-mix(in srgb, var(--role-shadow) 5%, transparent),
       0 0 0 6px color-mix(in srgb, var(--color-white) 0%, transparent);
   }
 }
@@ -527,14 +569,14 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  background: #1a1a1a;
+  background: var(--role-bg-inverse);
   overflow: hidden;
 }
 
 .phone-frame {
   width: min(100%, var(--mobile-frame-width));
   height: 100%;
-  background: #000;
+  background: var(--role-bg-inverse);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -592,7 +634,7 @@
   font-weight: 400;
   letter-spacing: var(--letter-spacing-base);
   color: var(--color-white);
-  box-shadow: var(--shadow-glass), 0 4px 20px color-mix(in srgb, var(--color-pine-teal) 5%, transparent);
+  box-shadow: var(--shadow-glass), 0 4px 20px color-mix(in srgb, var(--role-shadow) 5%, transparent);
   backdrop-filter: blur(var(--glass-blur-sm));
   -webkit-backdrop-filter: blur(var(--glass-blur-sm));
   transition: var(--transition-smooth);
@@ -605,8 +647,8 @@
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--color-pine-teal) 6%, transparent);
-    box-shadow: var(--shadow-glass), 0 6px 24px color-mix(in srgb, var(--color-pine-teal) 8%, transparent);
+    background: color-mix(in srgb, var(--role-accent-primary) 6%, transparent);
+    box-shadow: var(--shadow-glass), 0 6px 24px color-mix(in srgb, var(--role-shadow) 8%, transparent);
   }
 
 }
@@ -615,14 +657,14 @@
   cursor: pointer;
   border: 1px solid transparent;
   background: transparent;
-  box-shadow: var(--shadow-glass), 0 4px 20px color-mix(in srgb, var(--color-pine-teal) 5%, transparent);
+  box-shadow: var(--shadow-glass), 0 4px 20px color-mix(in srgb, var(--role-shadow) 5%, transparent);
   backdrop-filter: blur(var(--glass-blur-sm));
   -webkit-backdrop-filter: blur(var(--glass-blur-sm));
   transition: var(--transition-smooth);
 
   &:hover {
-    background: color-mix(in srgb, var(--color-pine-teal) 6%, transparent);
-    box-shadow: var(--shadow-glass), 0 6px 24px color-mix(in srgb, var(--color-pine-teal) 8%, transparent);
+    background: color-mix(in srgb, var(--role-accent-primary) 6%, transparent);
+    box-shadow: var(--shadow-glass), 0 6px 24px color-mix(in srgb, var(--role-shadow) 8%, transparent);
   }
 
 }
@@ -632,12 +674,12 @@
   border-color: transparent;
   background:
     linear-gradient(transparent, transparent) padding-box,
-    linear-gradient(180deg, var(--color-verdigris) 0%, var(--color-pine-teal) 100%) border-box;
+    linear-gradient(180deg, var(--role-data-secondary) 0%, var(--role-data-primary) 100%) border-box;
 
   &:hover {
     background:
-      linear-gradient(color-mix(in srgb, var(--color-pine-teal) 6%, transparent), color-mix(in srgb, var(--color-pine-teal) 6%, transparent)) padding-box,
-      linear-gradient(180deg, var(--color-verdigris) 0%, var(--color-pine-teal) 100%) border-box;
+      linear-gradient(color-mix(in srgb, var(--role-accent-primary) 6%, transparent), color-mix(in srgb, var(--role-accent-primary) 6%, transparent)) padding-box,
+      linear-gradient(180deg, var(--role-data-secondary) 0%, var(--role-data-primary) 100%) border-box;
   }
 }
 
@@ -768,7 +810,7 @@
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border: 1px solid color-mix(in srgb, var(--color-white) 35%, transparent);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-pine-teal) 10%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--role-shadow) 10%, transparent);
   pointer-events: auto;
 }
 
@@ -837,11 +879,11 @@
 }
 
 .pill-nav-item:hover {
-  color: var(--color-pine-teal);
+  color: var(--role-text-primary);
 }
 
 .pill-nav-active {
-  color: var(--color-pine-teal);
+  color: var(--role-text-primary);
 }
 
 .pill-nav-indicator {
@@ -853,7 +895,7 @@
   transform: translateX(calc(var(--pill-index, 0) * 100%));
   border-radius: 24px;
   background: linear-gradient(to right, color-mix(in srgb, var(--color-turquoise) 20%, var(--color-white)) 0%, transparent 140%);
-  border: 1.5px solid var(--color-pine-teal);
+  border: 1.5px solid var(--role-border-focus);
   pointer-events: none;
   z-index: 0;
   will-change: transform, width;

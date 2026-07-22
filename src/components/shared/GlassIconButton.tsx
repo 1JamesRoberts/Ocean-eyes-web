@@ -33,7 +33,7 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({
     aria-expanded={expanded}
     title={label}
     className={`
-      glass-icon-button focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-teal
+      glass-icon-button focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
       ${sizeStyles[size]}
       ${active ? `
         border-none bg-primary-gradient text-white

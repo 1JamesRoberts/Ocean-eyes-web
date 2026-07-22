@@ -133,7 +133,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             Live
           </span>
           <span
-            className="rounded-full bg-pine-teal/10 px-3 py-1 type-caption text-pine-teal"
+            className="rounded-full bg-accent/10 px-3 py-1 type-caption text-accent-ink"
           >
             1080p
           </span>

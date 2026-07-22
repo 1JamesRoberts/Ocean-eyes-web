@@ -33,7 +33,7 @@ export const RootGateOnboarding: React.FC = () => {
       <div className="mb-10 text-center">
         <div className="
           mx-auto mb-4 flex size-[72px] items-center justify-center rounded-3xl
-          border border-white/20 bg-primary-soft-gradient text-pine-teal
+          border border-white/20 bg-primary-soft-gradient text-accent-ink
           shadow-primary-glow
         ">
           <QrCode size={36} />
@@ -61,7 +61,7 @@ export const RootGateOnboarding: React.FC = () => {
               type="button"
               className="
                 cursor-pointer border-none bg-transparent font-main
-                type-strong text-pine-teal
+                type-strong text-accent-ink
               "
               onClick={() => setShowCreate(true)}
             >

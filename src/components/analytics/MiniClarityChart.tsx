@@ -68,29 +68,29 @@ export const MiniClarityChart: React.FC<Props> = ({ readings, height = DEFAULT_H
       <svg width="100%" height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} className="block overflow-hidden">
         <defs>
           <linearGradient id="miniChartGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-sky-surge)" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="var(--color-sky-surge)" stopOpacity="0.0" />
+            <stop offset="0%" stopColor="var(--role-data-secondary)" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="var(--role-data-secondary)" stopOpacity="0.0" />
           </linearGradient>
         </defs>
 
         {/* Grid lines — matching Recharts CartesianGrid style */}
-        <line x1={PADDING} y1={baselineY} x2={width - PADDING} y2={baselineY} stroke="var(--color-azure-mist-2)" strokeWidth="1" />
-        <line x1={PADDING} y1={HEIGHT / 2} x2={width - PADDING} y2={HEIGHT / 2} stroke="var(--color-azure-mist-2)" strokeWidth="0.5" strokeDasharray="3 3" />
-        <line x1={PADDING} y1={PADDING} x2={width - PADDING} y2={PADDING} stroke="var(--color-azure-mist-2)" strokeWidth="0.5" strokeDasharray="3 3" />
+        <line x1={PADDING} y1={baselineY} x2={width - PADDING} y2={baselineY} stroke="var(--role-data-grid)" strokeWidth="1" />
+        <line x1={PADDING} y1={HEIGHT / 2} x2={width - PADDING} y2={HEIGHT / 2} stroke="var(--role-data-grid)" strokeWidth="0.5" strokeDasharray="3 3" />
+        <line x1={PADDING} y1={PADDING} x2={width - PADDING} y2={PADDING} stroke="var(--role-data-grid)" strokeWidth="0.5" strokeDasharray="3 3" />
         {points.map((p) => (
-          <line key={`vgrid-${p.x}`} x1={p.x} y1={PADDING} x2={p.x} y2={baselineY} stroke="var(--color-azure-mist-2)" strokeWidth="0.5" strokeDasharray="3 3" opacity="0.5" />
+          <line key={`vgrid-${p.x}`} x1={p.x} y1={PADDING} x2={p.x} y2={baselineY} stroke="var(--role-data-grid)" strokeWidth="0.5" strokeDasharray="3 3" opacity="0.5" />
         ))}
 
         {/* Filled area */}
         <polygon points={areaPoints} fill="url(#miniChartGrad)" />
 
         {/* Line */}
-        <polyline fill="none" stroke="var(--color-sky-surge)" strokeWidth="2.5" points={polylinePoints} strokeLinecap="round" />
+        <polyline fill="none" stroke="var(--role-data-primary)" strokeWidth="2.5" points={polylinePoints} strokeLinecap="round" />
 
         {/* Data points */}
         {points.map((p, idx) => (
           <g key={idx}>
-            <circle cx={p.x} cy={p.y} r="4" fill="var(--color-sky-surge)" stroke="var(--color-white)" strokeWidth="2" />
+            <circle cx={p.x} cy={p.y} r="4" fill="var(--role-data-primary)" stroke="var(--color-white)" strokeWidth="2" />
             <text x={p.x} y={p.y - 8} fontSize="9" fontWeight="700" textAnchor="middle" fill="var(--color-prussian-blue)">
               {p.clarity}
             </text>

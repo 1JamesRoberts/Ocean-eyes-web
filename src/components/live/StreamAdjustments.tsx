@@ -33,7 +33,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
         <div key={key}>
           <div className="mb-1 flex justify-between type-caption">
             <span>{label}</span>
-            <span className="text-pine-teal">
+            <span className="text-accent-ink">
               {key === 'temperature'
                 ? filters.temperature > 0 ? `Warm (+${filters.temperature})` : filters.temperature < 0 ? `Cool (${filters.temperature})` : 'Neutral'
                 : key === 'tint'

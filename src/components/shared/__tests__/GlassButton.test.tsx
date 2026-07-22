@@ -17,7 +17,7 @@ describe('GlassButton', () => {
 
     expect(button.classList.contains('glass-button-primary')).toBe(true);
     expect(button.classList.contains('text-white')).toBe(true);
-    expect(button.classList.contains('focus-visible:outline-pine-teal')).toBe(true);
+    expect(button.classList.contains('focus-visible:outline-focus')).toBe(true);
     expect(button.querySelector('svg')).toBeTruthy();
   });
 });

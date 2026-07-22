@@ -22,7 +22,7 @@ const SCREENS_WITH_HERO: ViewerTab[] = ['home', 'live', 'settings', 'my_fish', '
 
 const ScreenLoadingFallback = () => (
   <div className="flex flex-col gap-4" aria-label="Loading screen" aria-busy="true">
-    <div className="h-5 w-32 animate-pulse rounded-full bg-pine-teal/10" />
+    <div className="h-5 w-32 animate-pulse rounded-full bg-accent/10" />
     <div className="h-40 animate-pulse rounded-4xl bg-white/35" />
     <div className="h-28 animate-pulse rounded-4xl bg-white/25" />
   </div>

@@ -60,17 +60,17 @@ export const ClarityTrendChart: React.FC<Props> = ({ records, readings, emptyAct
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-azure-mist-2)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--role-data-grid)" />
         <XAxis
           dataKey="time"
           tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
-          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          axisLine={{ stroke: 'var(--role-data-grid)' }}
+          tickLine={{ stroke: 'var(--role-data-grid)' }}
         />
         <YAxis
           tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
-          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          axisLine={{ stroke: 'var(--role-data-grid)' }}
+          tickLine={{ stroke: 'var(--role-data-grid)' }}
           domain={['auto', 'auto']}
         />
         <Tooltip
@@ -83,10 +83,10 @@ export const ClarityTrendChart: React.FC<Props> = ({ records, readings, emptyAct
         <Line
           type="monotone"
           dataKey="fnu"
-          stroke="var(--color-pine-teal)"
+          stroke="var(--role-data-primary)"
           strokeWidth={2}
-          dot={{ r: 3, fill: 'var(--color-pine-teal)', strokeWidth: 0 }}
-          activeDot={{ r: 5, fill: 'var(--color-pine-teal)', stroke: 'var(--color-white)', strokeWidth: 2 }}
+          dot={{ r: 3, fill: 'var(--role-data-primary)', strokeWidth: 0 }}
+          activeDot={{ r: 5, fill: 'var(--role-data-primary)', stroke: 'var(--color-white)', strokeWidth: 2 }}
         />
       </LineChart>
     </ResponsiveContainer>

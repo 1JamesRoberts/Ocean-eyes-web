@@ -71,8 +71,8 @@ export const FishInventorySummary = React.memo<FishInventorySummaryProps>(({
                   className="inline-flex items-center rounded-full px-2.5 py-1 leading-none type-caption"
                   style={{
                     backgroundColor: isComplete
-                      ? 'color-mix(in srgb, var(--color-pine-teal) 12%, transparent)'
-                      : 'rgba(186, 26, 26, 0.12)',
+                      ? 'color-mix(in srgb, var(--role-accent-primary) 12%, transparent)'
+                      : 'color-mix(in srgb, var(--color-critical) 12%, transparent)',
                     color: isComplete ? 'var(--color-good)' : 'var(--color-critical)'
                   }}
                 >

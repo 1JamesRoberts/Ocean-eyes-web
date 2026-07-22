@@ -54,7 +54,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
         >
           <defs>
             <linearGradient id="healthRingGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="var(--color-turquoise-surf)" />
+              <stop offset="0%" stopColor="var(--role-data-primary)" />
               <stop offset="100%" stopColor="var(--color-verdigris)" />
             </linearGradient>
           </defs>
@@ -117,7 +117,7 @@ export const HealthScoreCard = React.memo<HealthScoreCardProps>(({ reading }) =>
               "
             >
               <parameter.icon aria-hidden="true" className="
-                size-4 shrink-0 text-turquoise-surf
+                size-4 shrink-0 text-data-primary
               " />
               <span className="sr-only">{parameter.label}: </span>
               <span className="

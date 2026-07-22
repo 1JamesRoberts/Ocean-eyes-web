@@ -33,7 +33,7 @@ const OceanEyesBrand = () => (
       <circle cx="49" cy="37" r="11" stroke="var(--color-turquoise)" strokeWidth="6" />
       <path
         d="M8 50c20 18 47 20 73 7 6-3 10-6 14-10-12 5-24 6-35 5-18-2-31-9-44-19"
-        stroke="var(--color-sky-surge)"
+        stroke="var(--role-data-highlight)"
         strokeWidth="6"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -131,7 +131,7 @@ export const LoginScreen = ({ isLoading, isExiting, onSignIn }: LoginScreenProps
               aria-describedby="google-login-status"
             >
               {isLoading ? <LoaderCircle className="
-                size-6 animate-spin text-pine-teal
+                size-6 animate-spin text-accent-ink
               " aria-hidden="true" /> : <GoogleMark />}
               <span>{isLoading ? 'Connecting…' : 'Continue with Google'}</span>
             </button>

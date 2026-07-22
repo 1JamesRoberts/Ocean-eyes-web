@@ -65,7 +65,7 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies, timeAx
             <stop offset="95%" stopColor="var(--color-warning)" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-azure-mist-2)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--role-data-grid)" />
         <XAxis
           dataKey="time"
           type="number"
@@ -74,13 +74,13 @@ export const MeanNNDChart: React.FC<Props> = ({ records, selectedSpecies, timeAx
           ticks={timeAxis.ticks}
           tickFormatter={formatChartTimestamp}
           tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
-          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          axisLine={{ stroke: 'var(--role-data-grid)' }}
+          tickLine={{ stroke: 'var(--role-data-grid)' }}
         />
         <YAxis
           tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
-          axisLine={{ stroke: 'var(--color-azure-mist-2)' }}
-          tickLine={{ stroke: 'var(--color-azure-mist-2)' }}
+          axisLine={{ stroke: 'var(--role-data-grid)' }}
+          tickLine={{ stroke: 'var(--role-data-grid)' }}
           width={32}
         />
         <Tooltip

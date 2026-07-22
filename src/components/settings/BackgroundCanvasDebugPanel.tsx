@@ -36,7 +36,7 @@ const DebugSlider: React.FC<DebugSliderProps> = ({
   >
     <span className="mb-1.5 flex items-baseline justify-between gap-3">
       <span className="type-body-muted">{label}</span>
-      <strong className="type-body text-pine-teal">{displayValue}</strong>
+      <strong className="type-body text-accent-ink">{displayValue}</strong>
     </span>
     <input
       type="range"

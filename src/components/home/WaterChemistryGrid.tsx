@@ -41,7 +41,7 @@ const ParameterTile: React.FC<ParameterTileProps> = ({
 
   const content = (
     <>
-      <Icon aria-hidden="true" className="size-4 shrink-0 text-turquoise-surf" />
+      <Icon aria-hidden="true" className="size-4 shrink-0 text-data-primary" />
       <span className="type-caption text-[10px] font-semibold text-slate-grey">{label}</span>
       <div className={`flex items-baseline justify-center ${isCritical ? 'text-critical' : 'text-prussian-blue'}`}>
         <span className="text-[14px] leading-none font-bold">
