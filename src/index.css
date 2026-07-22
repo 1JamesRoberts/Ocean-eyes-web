@@ -12,22 +12,23 @@
   --color-primary-soft: linear-gradient(90deg, color-mix(in srgb, var(--color-turquoise) 49%, transparent) 0%, color-mix(in srgb, var(--color-sky-surge) 20%, transparent) 40%);
   /* Glass-system tokens */
   --glass-bg-card: color-mix(in srgb, var(--color-white) 40%, transparent);
-  --glass-bg-surface: rgb(237 252 252 / 42%);
+  --glass-bg-surface: rgb(234 253 251 / 42%);
   --glass-bg-inline: color-mix(in srgb, var(--color-white) 30%, transparent);
-  --color-health-parameter-bg: var(--color-azure-mist);
-  --glass-blur-card: 22px;
+  /* Shared fill for health-parameter containers: Prussian blue at 3% opacity. */
+  --color-health-parameter-bg: color-mix(in srgb, var(--color-prussian-blue) 3%, transparent);
+  --glass-blur-card: 8px;
   --glass-blur-md: 12px;
   --glass-blur-sm: 6px;
-  --glass-border-card: rgb(158 201 200 / 72%);
+  --glass-border-card: rgb(155 203 199 / 72%);
   --glass-border-strong: color-mix(in srgb, var(--color-white) 30%, transparent);
   --glass-radius-card: 2rem;
   --glass-radius-inline: 0.75rem;
   --glass-radius-pill: 9999px;
 
   /* Shadow tokens (only --shadow-glass not in @theme) */
-  --shadow-glass-card: inset 0 5px 5px 0 rgb(255 255 255 / 40%),
+  --shadow-glass-card: inset 0 5px 5px 0 rgb(255 255 255 / 30%),
     inset 1px -5px 5px 0 rgb(255 255 255 / 50%),
-    inset 0 1px 0 0 rgb(119 191 179 / 50%);
+    inset 0 1px 0 0 rgb(121 190 183 / 50%);
   --shadow-glass: inset 1px 1px 0px color-mix(in srgb, var(--color-white) 25%, transparent),
     inset -1px -1px 2px color-mix(in srgb, var(--color-pine-teal) 3%, transparent);
   /* Video-derived dashboard atmosphere */
