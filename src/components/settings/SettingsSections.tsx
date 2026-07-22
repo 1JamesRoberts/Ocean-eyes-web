@@ -130,17 +130,20 @@ const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
   onChange,
   onCommit,
 }) => {
+  const inputId = React.useId();
+
   const commitCurrentValue = (target: EventTarget & HTMLInputElement) => {
     onCommit(parseRangeValue(target.value, parser));
   };
 
   return (
     <div className={variant === 'panel' ? 'rounded-2xl border border-white/20 bg-white/20 p-2.5 pb-2' : ''}>
-      <div className="mb-1.5 flex items-baseline justify-between gap-3 type-body">
+      <label htmlFor={inputId} className="mb-1.5 flex items-baseline justify-between gap-3 type-body">
         <span className="min-w-0 type-body-muted">{label}</span>
         <strong className="shrink-0 text-accent-ink">{displayValue}</strong>
-      </div>
+      </label>
       <input
+        id={inputId}
         type="range"
         min={min}
         max={max}
@@ -184,6 +187,7 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [aiExpanded, setAiExpanded] = useState(false);
+  const autoConnectLabelId = React.useId();
   const percentValue = (value: number) => Math.round(value * 100);
 
   return (
@@ -236,20 +240,35 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
           onToggle={() => setAiExpanded((current) => !current)}
         >
           <div className="flex items-center justify-between">
-            <span className="pr-4 type-body-muted">Auto-start AI when stream connects</span>
+            <span id={autoConnectLabelId} className="pr-4 type-body-muted">
+              Auto-start AI when stream connects
+            </span>
             <button
+              type="button"
               onClick={() => onAutoConnectChange(!preferences.autoConnect)}
+              role="switch"
+              aria-checked={preferences.autoConnect}
+              aria-labelledby={autoConnectLabelId}
               className={`
-                relative inline-flex h-6 w-11 cursor-pointer rounded-full border-none transition-colors
-                ${preferences.autoConnect ? 'bg-accent' : 'bg-slate-grey/20'}
+                grid size-11 shrink-0 cursor-pointer place-items-center rounded-full
+                border-none bg-transparent
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
               `}
             >
               <span
                 className={`
-                  absolute top-1 left-1 inline-block h-4 w-4 rounded-full bg-white transition-transform
-                  ${preferences.autoConnect ? 'translate-x-5' : 'translate-x-0'}
+                  relative inline-flex h-6 w-11 rounded-full transition-colors
+                  ${preferences.autoConnect ? 'bg-accent' : 'bg-slate-grey/20'}
                 `}
-              />
+                aria-hidden="true"
+              >
+                <span
+                  className={`
+                    absolute top-1 left-1 inline-block size-4 rounded-full bg-white transition-transform
+                    ${preferences.autoConnect ? 'translate-x-5' : 'translate-x-0'}
+                  `}
+                />
+              </span>
             </button>
           </div>
           <SettingsRangeControl

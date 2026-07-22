@@ -13,13 +13,16 @@ describe('CollapsibleContent', () => {
       </CollapsibleContent>,
     );
 
-    const action = screen.getByRole('button', { name: 'Disclosure action' });
+    const action = screen.getByRole('button', { name: 'Disclosure action', hidden: true });
     const content = action.parentElement;
+    const collapseRegion = content?.parentElement?.parentElement;
 
     expect(content?.className).toContain('pt-4');
     expect(content?.className).toContain('-translate-y-3');
     expect(content?.className).toContain('opacity-0');
-    expect(content?.parentElement?.parentElement?.className).toContain('grid-rows-[0fr]');
+    expect(collapseRegion?.className).toContain('grid-rows-[0fr]');
+    expect(collapseRegion?.hasAttribute('inert')).toBe(true);
+    expect(collapseRegion?.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('applies the expanded transition state', () => {
@@ -34,5 +37,6 @@ describe('CollapsibleContent', () => {
     expect(content?.className).toContain('translate-y-0');
     expect(content?.className).toContain('opacity-100');
     expect(content?.parentElement?.parentElement?.className).toContain('grid-rows-[1fr]');
+    expect(content?.parentElement?.parentElement?.hasAttribute('inert')).toBe(false);
   });
 });

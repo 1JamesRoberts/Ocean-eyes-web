@@ -28,10 +28,12 @@ describe('GlassDisclosurePanel', () => {
 
     const toggle = screen.getByRole('button', { name: 'Alert sensitivity' });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(screen.getByRole('button', { name: 'Adjust threshold' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Adjust threshold' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Adjust threshold', hidden: true })).toBeTruthy();
 
     fireEvent.click(toggle);
 
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Adjust threshold' })).toBeTruthy();
   });
 });

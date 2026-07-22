@@ -55,7 +55,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
             videoClassName="h-full w-full object-cover"
             idlePlaceholder={
               <div className="
-                relative z-10 flex h-full flex-col items-center justify-center
+                pointer-events-none relative z-10 flex h-full flex-col items-center justify-center
                 gap-2
               ">
                 <span
@@ -68,7 +68,7 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
                 </p>
                 <button
                   className="
-                    mx-auto mt-2 inline-flex cursor-pointer items-center
+                    pointer-events-auto relative z-20 mx-auto mt-2 inline-flex cursor-pointer items-center
                     justify-center gap-2 rounded-3xl border-none
                     bg-primary-gradient px-4 py-2 type-caption-inverse shadow-primary-hover
                     transition-smooth
@@ -97,6 +97,20 @@ export const LiveFeedPreview: React.FC<LiveFeedPreviewProps> = ({
               />
             )}
           </CameraFeed>
+
+          <button
+            type="button"
+            aria-label="Open live monitoring controls"
+            onClick={(event) => {
+              event.stopPropagation();
+              onViewAdvanced();
+            }}
+            className="
+              absolute inset-0 z-1 cursor-pointer border-0 bg-transparent
+              focus-visible:outline-2 focus-visible:outline-offset-[-3px]
+              focus-visible:outline-white
+            "
+          />
 
           {isStreaming && (
             <HeroBadges

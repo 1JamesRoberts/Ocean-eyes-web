@@ -30,7 +30,7 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
         { key: 'temperature' as const, label: 'Temperature (Cool / Warm)', min: -80, max: 80 },
         { key: 'tint' as const, label: 'Tint (Green / Magenta)', min: -80, max: 80 },
       ] as const).map(({ key, label, min, max }) => (
-        <div key={key}>
+        <label key={key} className="block">
           <div className="mb-1 flex justify-between type-caption">
             <span>{label}</span>
             <span className="text-accent-ink">
@@ -41,26 +41,16 @@ export const StreamAdjustments: React.FC<StreamAdjustmentsProps> = ({
                   : `${filters[key]}%`}
             </span>
           </div>
-          <div className="flex items-center gap-2.5">
-            <input
-              type="range"
-              min={min}
-              max={max}
-              step="5"
-              value={filters[key]}
-              onChange={(e) => onFilterChange({ [key]: parseInt(e.target.value) })}
-              className="flex-1 accent-verdigris"
-            />
-            <button
-              onClick={() => onFilterChange({ [key]: key === 'temperature' || key === 'tint' ? 0 : 100 })}
-              className="
-                cursor-pointer border-none bg-transparent type-caption
-                text-slate-grey
-              "
-            >
-            </button>
-          </div>
-        </div>
+          <input
+            type="range"
+            min={min}
+            max={max}
+            step="5"
+            value={filters[key]}
+            onChange={(e) => onFilterChange({ [key]: parseInt(e.target.value) })}
+            className="w-full accent-verdigris focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          />
+        </label>
       ))}
     </GlassDisclosurePanel>
   );

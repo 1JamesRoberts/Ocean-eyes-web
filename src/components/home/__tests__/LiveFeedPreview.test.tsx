@@ -43,9 +43,17 @@ describe('LiveFeedPreview hero', () => {
   it('opens the advanced live view when the hero is selected', () => {
     renderHero();
 
-    fireEvent.click(screen.getByText('Feed is idle. Connect stream to monitor.'));
+    fireEvent.click(screen.getByRole('button', { name: 'Open live monitoring controls' }));
 
     expect(onViewAdvanced).toHaveBeenCalledOnce();
+  });
+
+  it('exposes hero navigation as a semantic keyboard action', () => {
+    renderHero();
+
+    const heroAction = screen.getByRole('button', { name: 'Open live monitoring controls' });
+    expect(heroAction.getAttribute('type')).toBe('button');
+    expect(heroAction.classList.contains('focus-visible:outline-white')).toBe(true);
   });
 
   it('does not open the advanced view when connecting the stream', () => {

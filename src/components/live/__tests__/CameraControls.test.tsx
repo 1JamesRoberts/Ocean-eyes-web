@@ -28,7 +28,7 @@ const defaultProps = {
 
 const expectSharedOverlayStyle = (button: HTMLElement) => {
   expect(button.classList.contains('hero-overlay-pill')).toBe(true);
-  expect(button.classList.contains('size-8')).toBe(true);
+  expect(button.classList.contains('size-11')).toBe(true);
   expect(button.classList.contains('focus-visible:outline-white')).toBe(true);
   expect(button.getAttribute('type')).toBe('button');
 };

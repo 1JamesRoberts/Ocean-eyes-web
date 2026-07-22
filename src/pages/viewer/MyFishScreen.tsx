@@ -66,8 +66,9 @@ const FishCountStepper: React.FC<FishCountStepperProps> = ({
       type="button"
       aria-label="Decrease fish count"
       className="
-        flex size-9 cursor-pointer items-center justify-center border-none bg-transparent
-        type-strong
+        flex size-11 cursor-pointer items-center justify-center rounded-full border-none
+        bg-transparent type-strong hover:bg-white/30
+        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
       "
       onClick={onDecrement}
     >
@@ -78,8 +79,9 @@ const FishCountStepper: React.FC<FishCountStepperProps> = ({
       type="button"
       aria-label="Increase fish count"
       className="
-        flex size-9 cursor-pointer items-center justify-center border-none bg-transparent
-        type-strong
+        flex size-11 cursor-pointer items-center justify-center rounded-full border-none
+        bg-transparent type-strong hover:bg-white/30
+        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
       "
       onClick={onIncrement}
     >
@@ -420,9 +422,9 @@ export const MyFishScreen: React.FC = () => {
                           label="Delete fish"
                           onClick={() => onRequestDelete(fish.id)}
                           className="
-                            size-9! border-none! bg-transparent! p-0! shadow-none!
+                            border-none! bg-transparent! p-0! shadow-none!
                             backdrop-blur-none!
-                            hover:bg-transparent! hover:shadow-none!
+                            hover:bg-white/30! hover:shadow-none!
                           "
                         >
                           <Trash2 size={16} />

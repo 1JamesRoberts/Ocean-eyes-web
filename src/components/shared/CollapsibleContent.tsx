@@ -12,6 +12,8 @@ export const CollapsibleContent: React.FC<CollapsibleContentProps> = ({
   className = '',
 }) => (
   <div
+    inert={!expanded}
+    aria-hidden={!expanded}
     className={`
       grid transition-[grid-template-rows_0.35s_cubic-bezier(0.4,0,0.2,1)]
       ${expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}

@@ -143,8 +143,8 @@ describe('MyFishScreen inventory controls', () => {
     expect(fishCard?.classList.contains('h-24')).toBe(false);
     expect(screen.queryByText('44%')).toBeNull();
     expect(screen.queryByText('Visible: 4 / 9')).toBeNull();
-    expect(screen.getByRole('button', { name: 'Increase fish count' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Delete fish' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Increase fish count' }).classList.contains('size-11')).toBe(true);
+    expect(screen.getByRole('button', { name: 'Delete fish' }).classList.contains('size-11')).toBe(true);
     expect(screen.getByText('Size')).toBeTruthy();
     expect(screen.queryByText('Inventory count')).toBeNull();
   });

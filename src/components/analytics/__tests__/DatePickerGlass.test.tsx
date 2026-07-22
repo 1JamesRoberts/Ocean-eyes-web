@@ -57,6 +57,27 @@ describe('date picker glass styling', () => {
     expect(screen.getByText('Ends').classList.contains('type-strong-inverse')).toBe(true);
   });
 
+  it('removes the collapsed editor from keyboard and accessibility navigation', () => {
+    render(
+      <DateTimeRangePicker
+        value={{ startDate: '2026-07-14', startTime: '00:00', endDate: '2026-07-14', endTime: '23:55' }}
+        onChange={() => undefined}
+      />,
+    );
+
+    const editor = document.getElementById('date-range-editor');
+    expect(editor?.hasAttribute('inert')).toBe(true);
+    expect(editor?.getAttribute('aria-hidden')).toBe('true');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit date range' }));
+    expect(editor?.hasAttribute('inert')).toBe(false);
+    expect(editor?.getAttribute('aria-hidden')).toBe('false');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit date range' }));
+    expect(editor?.hasAttribute('inert')).toBe(true);
+    expect(editor?.getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('does not trigger the clickable hero when expanding the range editor', () => {
     const onHeroClick = vi.fn();
 

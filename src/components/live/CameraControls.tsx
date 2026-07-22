@@ -68,7 +68,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
     pulse?: boolean;
   } = {}): string => {
     const base = `
-      hero-overlay-pill size-8 shrink-0 cursor-pointer p-0
+      hero-overlay-pill size-11 shrink-0 cursor-pointer p-0
       focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white
     `;
 

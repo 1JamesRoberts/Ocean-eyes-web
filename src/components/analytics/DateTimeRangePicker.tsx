@@ -16,7 +16,7 @@ import { TimeWheelSheet } from './TimeWheelSheet';
 type ActiveField = 'startDate' | 'startTime' | 'endDate' | 'endTime' | null;
 
 const POPOVER_EDGE_GUTTER = 16;
-const POPOVER_MAX_WIDTH = 320;
+const POPOVER_MAX_WIDTH = 348;
 const POPOVER_TRIGGER_GAP = 12;
 const EDITOR_TRIGGER_GAP = 8;
 const HERO_LIVE_BADGE_SELECTOR = '[data-hero-live-badge]';
@@ -125,10 +125,25 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       }
     };
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key !== 'Escape') return;
+
+      if (open) {
         setOpen(null);
         setPopoverTop(null);
+        editorRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
+        return;
       }
+
+      if (!isExpanded) return;
+
+      setIsExpanded(false);
+      setEditorStyle((current) => ({
+        ...current,
+        maxHeight: 0,
+        opacity: 0,
+        pointerEvents: 'none',
+      }));
+      triggerRef.current?.focus();
     };
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
@@ -136,7 +151,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [isExpanded, open]);
 
   const handlePillClick = useCallback(
     (field: ActiveField) =>
@@ -225,6 +240,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
       opacity: nextIsExpanded ? 1 : 0,
       pointerEvents: nextIsExpanded ? 'auto' : 'none',
     });
+    if (!nextIsExpanded) {
+      setOpen(null);
+      setPopoverTop(null);
+    }
     setIsExpanded(nextIsExpanded);
   }, [collapseToIcon, heroOverlay, isExpanded]);
 
@@ -296,6 +315,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = ({
         id="date-range-editor"
         className="hero-overlay-pill !block overflow-hidden rounded-[var(--glass-radius-card)] p-2.5 pb-2 text-white transition-all duration-300 ease-in-out"
         style={editorStyle}
+        inert={!isExpanded}
+        aria-hidden={!isExpanded}
         aria-label="Date range editor"
       >
         <div className="grid grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,0.8fr)] items-center gap-x-2 gap-y-2">
