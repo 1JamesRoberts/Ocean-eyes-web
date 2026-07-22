@@ -12,6 +12,7 @@ export { GlassBadge } from "./GlassBadge";
 export { GlassIconButton } from "./GlassIconButton";
 export { GlassInput } from "./GlassInput";
 export { GlassModal } from "./GlassModal";
+export { SliderControl } from "./SliderControl";
 export { AlertDetail } from "./AlertDetail";
 export { PhoneFrame } from "./PhoneFrame";
 export { PillNavigation } from "./PillNavigation";

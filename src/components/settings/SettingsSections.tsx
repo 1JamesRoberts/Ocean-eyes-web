@@ -18,6 +18,7 @@ import {
   GlassInput,
   GlassPanel,
   HeadedCard,
+  SliderControl,
 } from '../shared';
 import { StreamAdjustments } from '../live/StreamAdjustments';
 import {
@@ -108,7 +109,6 @@ interface SettingsRangeControlProps {
   max: number | string;
   step: number | string;
   parser?: RangeParser;
-  variant?: 'panel' | 'inline';
   onChange: (value: number) => void;
   onCommit: (value: number) => void;
 }
@@ -126,35 +126,20 @@ const SettingsRangeControl: React.FC<SettingsRangeControlProps> = ({
   max,
   step,
   parser = 'int',
-  variant = 'panel',
   onChange,
   onCommit,
 }) => {
-  const inputId = React.useId();
-
-  const commitCurrentValue = (target: EventTarget & HTMLInputElement) => {
-    onCommit(parseRangeValue(target.value, parser));
-  };
-
   return (
-    <div className={variant === 'panel' ? 'rounded-2xl border border-white/20 bg-white/20 p-2.5 pb-2' : ''}>
-      <label htmlFor={inputId} className="mb-1.5 flex items-baseline justify-between gap-3 type-body">
-        <span className="min-w-0 type-body-muted">{label}</span>
-        <strong className="shrink-0 text-accent-ink">{displayValue}</strong>
-      </label>
-      <input
-        id={inputId}
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(event) => onChange(parseRangeValue(event.target.value, parser))}
-        onMouseUp={(event) => commitCurrentValue(event.currentTarget)}
-        onTouchEnd={(event) => commitCurrentValue(event.currentTarget)}
-        className="w-full accent-verdigris"
-      />
-    </div>
+    <SliderControl
+      label={label}
+      value={value}
+      displayValue={displayValue}
+      min={min}
+      max={max}
+      step={step}
+      onChange={(nextValue) => onChange(parseRangeValue(String(nextValue), parser))}
+      onCommit={(nextValue) => onCommit(parseRangeValue(String(nextValue), parser))}
+    />
   );
 };
 
@@ -208,7 +193,6 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
             max="10.0"
             step="0.5"
             parser="float"
-            variant="inline"
             onChange={onTurbidityChange}
             onCommit={onTurbidityCommit}
           />
@@ -219,7 +203,6 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
             min="20"
             max="80"
             step="10"
-            variant="inline"
             onChange={onFishPctChange}
             onCommit={onFishPctCommit}
           />
@@ -272,7 +255,6 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
             min="2000"
             max="60000"
             step="1000"
-            variant="inline"
             onChange={(value) => onAIPreferenceChange({ pollingIntervalMs: value })}
             onCommit={(value) => onAIPreferenceCommit({ pollingIntervalMs: value })}
           />
@@ -284,7 +266,6 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
             max="90"
             step="5"
             parser="percent"
-            variant="inline"
             onChange={(value) => onAIPreferenceChange({ detectionConfidenceThreshold: value })}
             onCommit={(value) => onAIPreferenceCommit({ detectionConfidenceThreshold: value })}
           />
@@ -296,7 +277,6 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
             max="90"
             step="5"
             parser="percent"
-            variant="inline"
             onChange={(value) => onAIPreferenceChange({ speciesConfidenceThreshold: value })}
             onCommit={(value) => onAIPreferenceCommit({ speciesConfidenceThreshold: value })}
           />
@@ -308,7 +288,6 @@ export const SafetyThresholdsCard: React.FC<SafetyThresholdsCardProps> = ({
             max="90"
             step="5"
             parser="percent"
-            variant="inline"
             onChange={(value) => onAIPreferenceChange({ diagnosisMinConfidence: value })}
             onCommit={(value) => onAIPreferenceCommit({ diagnosisMinConfidence: value })}
           />
