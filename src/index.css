@@ -885,10 +885,6 @@
 }
 
 .pill-nav-active {
-  color: var(--role-text-primary);
-}
-
-.pill-nav-active .pill-nav-icon {
   color: var(--role-navigation-active-icon);
 }
 
@@ -901,7 +897,7 @@
   transform: translateX(calc(var(--pill-index, 0) * 100%));
   border-radius: 24px;
   background: linear-gradient(to right, color-mix(in srgb, var(--color-turquoise) 20%, var(--color-white)) 0%, transparent 140%);
-  border: 1.5px solid var(--role-border-focus);
+  border: 1.5px solid var(--role-navigation-active-icon);
   pointer-events: none;
   z-index: 0;
   will-change: transform, width;

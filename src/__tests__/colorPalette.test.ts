@@ -69,15 +69,15 @@ describe('OceanEyes color palette', () => {
     }
   });
 
-  it('maps Dark Cyan to active navigation icons only', () => {
+  it('uses Dark Cyan consistently across the active navigation item', () => {
     const css = readFileSync(indexCss, 'utf8');
 
     expect(css).toContain('--role-navigation-active-icon: var(--color-dark-cyan);');
     expect(css).toMatch(
-      /\.pill-nav-active \.pill-nav-icon\s*{\s*color: var\(--role-navigation-active-icon\);\s*}/,
+      /\.pill-nav-active\s*{\s*color: var\(--role-navigation-active-icon\);\s*}/,
     );
     expect(css).toMatch(
-      /\.pill-nav-active\s*{\s*color: var\(--role-text-primary\);\s*}/,
+      /\.pill-nav-indicator\s*{[\s\S]*?border: 1\.5px solid var\(--role-navigation-active-icon\);/,
     );
   });
 

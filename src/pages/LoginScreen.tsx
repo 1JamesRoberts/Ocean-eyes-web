@@ -73,7 +73,7 @@ export const LoginScreen = ({ isLoading, isExiting, onSignIn }: LoginScreenProps
         "
       >
         <img
-          src="/oceaneyes-login-aquarium.webp"
+          src="/oceaneyes-login-aquarium.png"
           alt=""
           className="absolute inset-0 -z-3 size-full object-cover"
         />
@@ -98,7 +98,7 @@ export const LoginScreen = ({ isLoading, isExiting, onSignIn }: LoginScreenProps
           aria-labelledby="login-title"
         >
           <div className="
-            glass-card-overlay w-full max-w-[345px] px-6 py-7 text-center
+            glass-card w-full max-w-[345px] px-6 py-7 text-center
             shadow-[var(--shadow-glass),0_20px_60px_color-mix(in_srgb,var(--color-prussian-blue)_48%,transparent)]
           ">
             <OceanEyesBrand />

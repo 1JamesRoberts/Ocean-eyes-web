@@ -11,7 +11,8 @@ describe('LoginScreen', () => {
       <LoginScreen isLoading={false} isExiting={false} onSignIn={vi.fn()} />,
     );
 
-    expect(container.querySelector('img')?.getAttribute('src')).toBe('/oceaneyes-login-aquarium.webp');
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('/oceaneyes-login-aquarium.png');
+    expect(container.querySelector('.glass-card')).not.toBeNull();
 
     const privacyLink = screen.getByRole('link', { name: 'Privacy Policy (placeholder)' });
     const termsLink = screen.getByRole('link', { name: 'Terms of Service (placeholder)' });
