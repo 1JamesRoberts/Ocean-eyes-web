@@ -77,7 +77,7 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies, time
         <defs>
           <linearGradient id="fishCountBarGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-verdigris)" />
-            <stop offset="100%" stopColor="var(--role-data-primary)" />
+            <stop offset="100%" stopColor="var(--color-dark-cyan)" />
           </linearGradient>
         </defs>
         <CartesianGrid
@@ -89,6 +89,7 @@ export const FishCountChart: React.FC<Props> = ({ records, selectedSpecies, time
           type="number"
           scale="time"
           domain={timeAxis.domain}
+          padding="gap"
           ticks={timeAxis.ticks}
           tickFormatter={formatChartTimestamp}
           tick={{ fill: 'var(--color-slate-grey)', fontSize: 12 }}
