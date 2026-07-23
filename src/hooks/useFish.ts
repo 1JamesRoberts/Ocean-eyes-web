@@ -27,9 +27,9 @@ export const useFish = (tankId: string | null) => {
     () => EMPTY_FISH
   );
 
-  const addFish = (name: string, imageUrl: string, count: number) => {
+  const addFish = (name: string, imageUrl: string, count: number, speciesId?: string) => {
     if (!tankId) return;
-    addFishToRepository(tankId, name, imageUrl, count);
+    addFishToRepository(tankId, name, imageUrl, count, speciesId);
   };
 
   const updateFishCount = (docId: string, count: number) => {

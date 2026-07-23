@@ -3353,9 +3353,14 @@ export const SPECIES_CATALOG: SpeciesInfo[] = [
 
 // ── Lookup helpers ───────────────────────────────────────────────────────────
 
+export const SPECIES_ID_ALIASES: Record<string, string> = {
+  black_skirt_tetra: 'black_widow_tetra',
+};
+
 export const getSpeciesById = (id: string): SpeciesInfo | undefined => {
-  return SPECIES_CATALOG.find(s => s.id === id) ||
-         SPECIES_CATALOG.find(s => s.id === id.replace(/-/g, '_'));
+  const normalizedId = id.toLowerCase().trim().replace(/-/g, '_');
+  const canonicalId = SPECIES_ID_ALIASES[normalizedId] ?? normalizedId;
+  return SPECIES_CATALOG.find(s => s.id === canonicalId);
 };
 
 export const getSpeciesByName = (name: string): SpeciesInfo | undefined => {
@@ -3366,17 +3371,20 @@ export const getSpeciesByName = (name: string): SpeciesInfo | undefined => {
   );
 };
 
-export const searchSpecies = (query: string): SpeciesInfo[] => {
-  if (!query.trim()) return SPECIES_CATALOG;
+export const searchSpecies = (
+  query: string,
+  source: readonly SpeciesInfo[] = SPECIES_CATALOG,
+): SpeciesInfo[] => {
+  if (!query.trim()) return [...source];
   const raw = query.toLowerCase().trim();
   // Tokenize: strip common punctuation, split by whitespace
   const tokens = raw
     .replace(/[(){}[\]"',.;:!?]/g, '')
     .split(/\s+/)
     .filter(t => t.length > 1);
-  if (tokens.length === 0) return SPECIES_CATALOG;
+  if (tokens.length === 0) return [...source];
 
-  return SPECIES_CATALOG.filter(s => {
+  return source.filter(s => {
     const searchable = [
       s.name.toLowerCase(),
       s.displayName.toLowerCase(),

@@ -69,11 +69,10 @@ export const useMyFish = () => {
     setShowAddForm(false);
   }, []);
 
-  const onSpeciesSelect = useCallback((species: SpeciesInfo | null, customName?: string) => {
-    const speciesName = species?.name ?? customName?.trim();
-    if (!speciesName || !tankId) return;
+  const onSpeciesSelect = useCallback((species: SpeciesInfo) => {
+    if (!tankId) return;
 
-    addFish(speciesName, species?.imagePath ?? '/species-placeholder.png', 1);
+    addFish(species.name, species.imagePath ?? '/species-placeholder.png', 1, species.id);
     setShowAddForm(false);
   }, [addFish, tankId]);
 

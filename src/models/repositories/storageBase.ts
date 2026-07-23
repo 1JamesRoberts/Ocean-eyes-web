@@ -432,12 +432,13 @@ export const addFish = (
   tankId: string,
   name: string,
   imageUrl: string,
-  count: number
+  count: number,
+  speciesId?: string,
 ) => {
   const fish = getFish(tankId);
-  const speciesId = name.toLowerCase().replace(/\s+/g, '_');
+  const resolvedSpeciesId = speciesId?.trim() || name.toLowerCase().replace(/\s+/g, '_');
 
-  const existingIndex = fish.findIndex((f) => f.speciesId === speciesId);
+  const existingIndex = fish.findIndex((f) => f.speciesId === resolvedSpeciesId);
   if (existingIndex !== -1) {
     fish[existingIndex].count += count;
     fish[existingIndex].detected = fish[existingIndex].count;
@@ -448,7 +449,7 @@ export const addFish = (
   const newEntry: FishEntry = {
     id: `fish-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     tankId,
-    speciesId,
+    speciesId: resolvedSpeciesId,
     name,
     imageUrl,
     count,

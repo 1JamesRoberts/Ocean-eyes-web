@@ -1,6 +1,10 @@
 import React, { useId, useMemo, useState } from 'react';
 import { Search, Check } from 'lucide-react';
-import { SPECIES_CATALOG, searchSpecies, getSpeciesByName, type SpeciesInfo } from '../data/speciesCatalog';
+import {
+  CLASSIFIABLE_SPECIES,
+  resolveClassifiableSpeciesId,
+} from '../data/classifiableSpecies';
+import { searchSpecies, type SpeciesInfo } from '../data/speciesCatalog';
 import { SpeciesAvatar } from './fish/SpeciesAvatar';
 
 const MAX_RESULTS = 60;
@@ -19,7 +23,7 @@ const CreatureBadge: React.FC<{ type: string }> = ({ type }) => {
 
 interface SpeciesSelectorProps {
   selectedSpeciesId: string | null;
-  onSelect: (species: SpeciesInfo | null, customName?: string) => void;
+  onSelect: (species: SpeciesInfo) => void;
   placeholder?: string;
   excludeSpeciesIds?: string[];
   inputAction?: React.ReactNode;
@@ -35,29 +39,27 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
   const [query, setQuery] = useState('');
   const resultsId = useId();
 
-  const selectedSpecies = selectedSpeciesId ? SPECIES_CATALOG.find((s: SpeciesInfo) => s.id === selectedSpeciesId) : null;
+  const selectedSpecies = selectedSpeciesId
+    ? CLASSIFIABLE_SPECIES.find((s) => s.id === selectedSpeciesId)
+    : null;
+  const excludedSpeciesIds = useMemo(
+    () => new Set(excludeSpeciesIds.map(resolveClassifiableSpeciesId)),
+    [excludeSpeciesIds],
+  );
   const filteredSpecies = useMemo(() => {
-    const results = searchSpecies(query);
-    return results.filter(s => !excludeSpeciesIds.includes(s.id));
-  }, [query, excludeSpeciesIds]);
+    const results = searchSpecies(query, CLASSIFIABLE_SPECIES);
+    return results.filter((s) => !excludedSpeciesIds.has(resolveClassifiableSpeciesId(s.id)));
+  }, [query, excludedSpeciesIds]);
 
   const handleSelect = (species: SpeciesInfo) => {
     onSelect(species);
     setQuery('');
   };
 
-  const handleCustomSelect = () => {
-    if (query.trim()) {
-      onSelect(null, query.trim());
-      setQuery('');
-    }
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   };
 
-  const showCustomOption = query.trim() && !getSpeciesByName(query.trim());
   const visibleSpecies = filteredSpecies.slice(0, MAX_RESULTS);
 
   const results = (
@@ -107,31 +109,7 @@ export const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({
         </p>
       )}
 
-      {showCustomOption && (
-        <button
-          type="button"
-          role="option"
-          aria-selected={selectedSpeciesId === null}
-          onClick={handleCustomSelect}
-          className="
-            flex min-h-12 w-full cursor-pointer items-center gap-3 border-none
-            bg-transparent px-3 py-2 text-left type-body text-accent-ink
-            transition-colors hover:bg-azure-mist
-          "
-        >
-          <div className="
-            flex size-[38px] shrink-0 items-center justify-center rounded-[10px]
-            bg-accent/10 type-strong text-accent-ink
-          ">
-            +
-          </div>
-          <span className="min-w-0 flex-1 truncate">
-            Add custom species “{query.trim()}”
-          </span>
-        </button>
-      )}
-
-      {filteredSpecies.length === 0 && !showCustomOption && (
+      {filteredSpecies.length === 0 && (
         <div className="px-4 py-6 text-center type-body-muted">
           No species found
         </div>

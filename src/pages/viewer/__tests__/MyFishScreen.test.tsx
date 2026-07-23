@@ -31,7 +31,7 @@ vi.mock('../../../hooks/pages/useMyFish', () => ({
 
     const onToggleAddForm = useCallback(() => setShowAddForm((open) => !open), []);
     const onCloseAddForm = useCallback(() => setShowAddForm(false), []);
-    const onSpeciesSelect = useCallback((_species: SpeciesInfo | null, _customName?: string) => {
+    const onSpeciesSelect = useCallback((_species: SpeciesInfo) => {
       mockPersistFish();
       setShowAddForm(false);
     }, []);
@@ -106,12 +106,12 @@ describe('MyFishScreen add flow', () => {
     expect(screen.queryByRole('button', { name: 'Add selected species' })).toBeNull();
   });
 
-  it('opens from the empty state and submits a custom species', () => {
+  it('opens from the empty state and submits an AI-supported species', () => {
     render(<MyFishScreen />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Add your first fish' }));
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Moonlight minnow' } });
-    fireEvent.click(screen.getByRole('option', { name: /Add custom species/i }));
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Neon tetra' } });
+    fireEvent.click(screen.getByRole('option', { name: /Neon tetra/i }));
 
     expect(mockPersistFish).toHaveBeenCalledOnce();
     expect(screen.queryByRole('dialog')).toBeNull();

@@ -116,7 +116,7 @@ const DeleteFishModal: React.FC<DeleteFishModalProps> = ({
 interface AddSpeciesFormProps {
   isOpen: boolean;
   fishList: { speciesId: string }[];
-  onSpeciesSelect: (species: SpeciesInfo | null, customName?: string) => void;
+  onSpeciesSelect: (species: SpeciesInfo) => void;
   onClose: () => void;
 }
 
