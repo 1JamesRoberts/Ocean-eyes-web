@@ -96,11 +96,11 @@ describe('CameraControls', () => {
     const aiButton = screen.getByRole('button', { name: 'Stop AI Analysis' });
     const turbidityButton = screen.getByRole('button', { name: 'Measure Water Clarity' });
 
-    expect(aiButton.classList.contains('animate-pulse-ai')).toBe(true);
+    expect(aiButton.classList.contains('[&_svg]:animate-ai-icon-dim')).toBe(true);
     expect(aiButton.classList.contains('text-white')).toBe(false);
     expect(aiButton.classList.contains('[&_svg]:!text-white')).toBe(true);
-    expect(aiButton.classList.contains('[&_svg]:drop-shadow-[0_0_5px_white]')).toBe(true);
-    expect(aiButton.classList.contains('[&_svg]:animate-pulse-ai-icon')).toBe(false);
+    expect(aiButton.classList.contains('animate-pulse-ai')).toBe(true);
+    expect(aiButton.classList.contains('[&_svg]:drop-shadow-[0_0_5px_white]')).toBe(false);
     expect(turbidityButton.hasAttribute('disabled')).toBe(true);
     expect(turbidityButton.classList.contains('opacity-35')).toBe(true);
   });

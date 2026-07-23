@@ -164,6 +164,7 @@
 
   /* ─── Animations ─── */
   --animate-pulse-ai: pulse-ai-border 4s infinite;
+  --animate-ai-icon-dim: ai-icon-dim 2.5s ease-in-out infinite;
   --animate-fade-in: fadeIn 0.2s ease-out;
   --animate-sheet-enter: sheetEnter 0.18s ease-out both;
   --animate-sheet-backdrop: sheetBackdrop 0.18s ease-out both;
@@ -538,6 +539,15 @@
       var(--shadow-glass),
       0 4px 20px color-mix(in srgb, var(--role-shadow) 5%, transparent),
       0 0 0 6px color-mix(in srgb, var(--color-white) 0%, transparent);
+  }
+}
+
+@keyframes ai-icon-dim {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.65;
   }
 }
 

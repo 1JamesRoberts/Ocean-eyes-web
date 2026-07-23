@@ -77,7 +77,7 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       return `${base} cursor-not-allowed opacity-35`;
     }
     if (active) {
-      return `${base} [&_svg]:!text-white [&_svg]:drop-shadow-[0_0_5px_white] ${pulse ? 'animate-pulse-ai' : ''}`;
+      return `${base} [&_svg]:!text-white ${pulse ? 'animate-pulse-ai [&_svg]:animate-ai-icon-dim' : ''}`;
     }
     return base;
   };
