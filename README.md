@@ -1,5 +1,8 @@
 # 🐟 OceanEyes Web: AI Fish Monitoring & Aquarium Diagnostics Portal
 
+> The Flutter mobile conversion lives in [`flutter_app/`](flutter_app/README.md).
+> The React app remains the visual source of truth and reference-capture client.
+
 OceanEyes Web is a modern, high-performance web dashboard designed to monitor smart aquariums in real-time. The application provides advanced diagnostics (pH, temperature, water clarity, chemical balances) alongside active computer vision feeds that count, classify, and track fish species in real-time.
 
 ---
