@@ -1,4 +1,0 @@
-interface:
-  display_name: "Deploy Firebase Prototype"
-  short_description: "Build, deploy, and verify the prototype"
-  default_prompt: "Use $deploy-firebase-prototype to deploy the current web app to Firebase prototype hosting and verify the hosted release."
