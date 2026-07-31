@@ -1,28 +1,35 @@
 # Project Overview
 
-OceanEyes is a React + TypeScript dashboard for real-time AI aquarium monitoring. It combines computer vision (fish detection, species classification, turbidity). The current branch (mobile-ui) is for Mobile webapp prototyp.
+OceanEyes is a Flutter/Dart aquarium-monitoring client for Android, iOS, and
+Flutter web. It uses deterministic fixtures for camera-, AI-, and
+backend-dependent states so the interface remains testable without production
+services.
 
 ## Tech Stack
 
-Framework: React 19 + TypeScript 6
-Build: Vite 8
-Styling: Tailwind CSS v4 (default and preferred styling system for all UI work. Avoid writing custom CSS except for values that cannot be expressed with utilities.)
-Charts: Recharts
-Icons: Lucide React
-State: React Context + localStorage (mock Firestore)
-AI Backend: Python FastAPI + ONNX models (port 8000)
+- Framework: Flutter and Dart
+- UI: Material widgets, custom painters, and bundled assets
+- Icons: Lucide Flutter
+- Persistence: SharedPreferences repositories
+- Architecture: MVVM
 
-## Project Structure & Module Organization
+## Project Structure
 
-OceanEyes Web is a Vite + React + TypeScript dashboard. Main application code lives in `src/`: `pages/` contains route-level screens, `components/` is organized by feature, `hooks/` contains shared and page hooks, `context/` holds providers, and `models/` contains API clients, repositories, and pure services. Static assets live in `public/`, including generated fish crop images; source assets live in `src/assets/`. Tests are colocated in `__tests__/` directories under `src/`. The `ai/` directory contains the Python AI/FastAPI backend and model metadata; `scripts/` contains catalog utilities.
-
-### Key Architecture
-
-The app use MVVM (Model-View-ViewModel) architecture
-
-- **Hooks** (`src/hooks/`) — React hooks that own state, side effects, and lifecycle. They are the public API that components consume.
-- **Model** (`src/models/`) — Data access, persistence, transport, and pure domain helpers. No React imports.
-- **UI** (`src/components/`, `src/pages/`) — JSX, Tailwind classes, and event wiring.
+- `lib/models/` contains domain entities, repositories, persistence, and pure
+  services. It must not import Flutter UI code.
+- `lib/view_models/` owns application state, transitions, and route intent. It
+  is the public state API consumed by the interface.
+- `lib/ui/` contains screens, shell layout, widgets, rendering, and event
+  wiring.
+- `lib/core/theme/` contains shared visual tokens and theme configuration.
+- `assets/` contains bundled fonts and images.
+- `test/` and `integration_test/` contain widget, model, and visual-matrix
+  coverage.
+- `docs/` documents visual tokens and screenshot validation.
+- `tool/` contains project-specific validation utilities.
 
 ## Preferred Behavior
-When editing the codebase, prioritize maintainability.
+
+Preserve the MVVM boundary and keep domain policy out of widgets. Prefer shared
+tokens and reusable UI primitives over repeated raw values. Before handing off
+changes, run `dart format`, `flutter analyze`, and the relevant Flutter tests.
