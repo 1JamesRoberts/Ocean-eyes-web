@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,7 @@ class OceanEyesController extends ChangeNotifier {
     FishInventoryRepository? inventoryRepository,
     OceanEyesSettingsRepository? settingsRepository,
     Uri? launchUri,
+    bool requireLogin = false,
   }) : _inventoryRepository =
            inventoryRepository ??
            (preferences == null
@@ -28,7 +30,12 @@ class OceanEyesController extends ChangeNotifier {
                : SharedPreferencesOceanEyesSettingsRepository(preferences)) {
     final uri = launchUri ?? Uri.base;
     final requestedFixture = uri.queryParameters['fixture'];
-    if (requestedFixture == null) {
+    final forceLogin =
+        requestedFixture?.toLowerCase().replaceAll('-', '_') == 'login' ||
+        uri.queryParameters['route'] == 'login';
+    isAuthenticated =
+        !(forceLogin || (requireLogin && requestedFixture == null));
+    if (requestedFixture == null || forceLogin) {
       _restorePreferences();
     } else {
       applyFixtureName(requestedFixture, notify: false);
@@ -64,6 +71,7 @@ class OceanEyesController extends ChangeNotifier {
       settingsRepository: SharedPreferencesOceanEyesSettingsRepository(
         preferences,
       ),
+      requireLogin: true,
     );
   }
 
@@ -81,6 +89,9 @@ class OceanEyesController extends ChangeNotifier {
   bool _addFishRequestPending = false;
   bool _analyticsSpeciesRequestPending = false;
   bool _analyticsRangeRequestPending = false;
+
+  bool isAuthenticated = true;
+  bool isAuthenticating = false;
 
   FixtureScenario fixtureScenario = FixtureScenario.dashboardWaiting;
   DashboardHealthState dashboardHealth = DashboardHealthState.waiting;
@@ -127,10 +138,25 @@ class OceanEyesController extends ChangeNotifier {
   double visibleFishThreshold = 50;
   double ambientBlur = 48;
   double ambientOpacity = 1;
+  double ambientBaseGrey = 255;
+  double ambientFadeStart = 50;
+  double ambientFadeEnd = 100;
+  double heroFadeStart = 70;
   String? lastTurbidityResult = '1.5 FNU';
   String tankName = 'Living Room Reef';
   bool tankConnected = true;
   bool usingFrontCamera = false;
+
+  Future<void> signInWithGoogle() async {
+    if (isAuthenticated || isAuthenticating) return;
+    isAuthenticating = true;
+    _notify();
+    await Future<void>.delayed(const Duration(milliseconds: 650));
+    if (_disposed) return;
+    isAuthenticating = false;
+    isAuthenticated = true;
+    _notify();
+  }
 
   int get totalFish => fish.fold(0, (sum, entry) => sum + entry.count);
   int get detectedFish => fish.fold(0, (sum, entry) => sum + entry.detected);
@@ -538,6 +564,24 @@ class OceanEyesController extends ChangeNotifier {
       case 'ambientOpacity':
         ambientOpacity = value;
         break;
+      case 'ambientBaseGrey':
+        ambientBaseGrey = value.round().clamp(0, 255).toDouble();
+        break;
+      case 'ambientFadeStart':
+        ambientFadeStart = value
+            .round()
+            .clamp(0, math.min(80, ambientFadeEnd - 5).round())
+            .toDouble();
+        break;
+      case 'ambientFadeEnd':
+        ambientFadeEnd = value
+            .round()
+            .clamp(math.max(20, ambientFadeStart + 5).round(), 100)
+            .toDouble();
+        break;
+      case 'heroFadeStart':
+        heroFadeStart = value.round().clamp(0, 80).toDouble();
+        break;
     }
   }
 
@@ -550,6 +594,16 @@ class OceanEyesController extends ChangeNotifier {
   void setAutoConnect(bool value) {
     autoConnect = value;
     _savePreferences();
+    _notify();
+  }
+
+  void resetAmbientCanvas() {
+    ambientBaseGrey = 255;
+    ambientOpacity = 1;
+    ambientBlur = 48;
+    ambientFadeStart = 50;
+    ambientFadeEnd = 100;
+    heroFadeStart = 70;
     _notify();
   }
 
@@ -589,6 +643,10 @@ class OceanEyesController extends ChangeNotifier {
     visibleFishThreshold = 50;
     ambientBlur = 48;
     ambientOpacity = 1;
+    ambientBaseGrey = 255;
+    ambientFadeStart = 50;
+    ambientFadeEnd = 100;
+    heroFadeStart = 70;
     lastTurbidityResult = '1.5 FNU';
     tankName = 'Living Room Reef';
     tankConnected = true;
@@ -605,7 +663,8 @@ class OceanEyesController extends ChangeNotifier {
       case FixtureScenario.dashboardWaiting:
         dashboardHealth = DashboardHealthState.waiting;
         analyticsState = AnalyticsContentState.empty;
-        cameraStage = CameraStage.beforePermission;
+        aiEnabled = false;
+        lastTurbidityResult = null;
         fish = [];
         alerts = [];
         history = [];
@@ -615,7 +674,10 @@ class OceanEyesController extends ChangeNotifier {
         dashboardHealth = DashboardHealthState.warning;
         break;
       case FixtureScenario.fishEmpty:
+        aiEnabled = false;
+        lastTurbidityResult = null;
         fish = [];
+        alerts = [];
         break;
       case FixtureScenario.analyticsLoading:
         analyticsState = AnalyticsContentState.loading;
@@ -623,6 +685,15 @@ class OceanEyesController extends ChangeNotifier {
         break;
       case FixtureScenario.analyticsEmpty:
         analyticsState = AnalyticsContentState.empty;
+        aiEnabled = false;
+        lastTurbidityResult = null;
+        analyticsRange = DateTimeRange(
+          start: DateTime(2026, 8, 5),
+          end: DateTime(2026, 8, 5, 23, 59),
+        );
+        fish = [];
+        alerts = [];
+        history = [];
         heatmapCenters = const [];
         break;
       case FixtureScenario.analyticsError:
@@ -640,9 +711,17 @@ class OceanEyesController extends ChangeNotifier {
         cameraStage = CameraStage.unavailable;
         break;
       case FixtureScenario.alertsEmpty:
+        aiEnabled = false;
+        lastTurbidityResult = null;
+        fish = [];
         alerts = [];
+        history = [];
         break;
       case FixtureScenario.historyEmpty:
+        aiEnabled = false;
+        lastTurbidityResult = null;
+        fish = [];
+        alerts = [];
         history = [];
         break;
     }

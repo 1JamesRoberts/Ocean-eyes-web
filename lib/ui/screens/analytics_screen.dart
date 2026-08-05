@@ -89,6 +89,7 @@ Future<void> _showAnalyticsSpeciesSelector(
   final selected = await _showAnalyticsOverlay<String>(
     context: context,
     alignment: Alignment.topRight,
+    anchoredTop: OceanGeometry.heroHeight - 4,
     child: _SpeciesSelectorDialog(
       options: options.toSet().toList(growable: false),
       selected: controller.selectedSpecies,
@@ -121,6 +122,7 @@ Future<T?> _showAnalyticsOverlay<T>({
   required BuildContext context,
   required Widget child,
   Alignment alignment = Alignment.topCenter,
+  double anchoredTop = 52,
 }) {
   return showGeneralDialog<T>(
     context: context,
@@ -130,16 +132,13 @@ Future<T?> _showAnalyticsOverlay<T>({
     transitionDuration: OceanMotion.responsive(context, OceanMotion.sheet),
     pageBuilder: (context, _, _) {
       final size = MediaQuery.sizeOf(context);
-      final anchoredTop = math
-          .min(
-            OceanGeometry.statusBarHeight + OceanGeometry.heroHeight - 4,
-            math.max(16, size.height - 96),
-          )
+      final resolvedTop = math
+          .min(anchoredTop, math.max(16, size.height - 96))
           .toDouble();
       return Material(
         color: Colors.transparent,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(16, anchoredTop, 16, 16),
+          padding: EdgeInsets.fromLTRB(16, resolvedTop, 16, 16),
           child: Align(
             alignment: Alignment.topCenter,
             child: SizedBox(
@@ -273,44 +272,43 @@ class _AnalyticsLoadingState extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            GlassCard(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 428),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: _SkeletonBlock(
-                        width: 176,
-                        height: 20,
-                        radius: 4,
-                        color: OceanColors.azureMist2,
-                      ),
+            const GlassCard(
+              padding: EdgeInsets.all(OceanSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: _SkeletonBlock(
+                      width: 176,
+                      height: 20,
+                      radius: 4,
+                      color: OceanColors.pearlAqua,
                     ),
-                    SizedBox(height: 20),
-                    _SkeletonBlock(height: 180, radius: 8),
-                    SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: _SkeletonBlock(
-                        width: 192,
-                        height: 20,
-                        radius: 4,
-                        color: OceanColors.azureMist2,
-                      ),
+                  ),
+                  SizedBox(height: OceanSpacing.lg),
+                  _SkeletonBlock(height: 180),
+                  SizedBox(height: OceanSpacing.lg),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: _SkeletonBlock(
+                      width: 192,
+                      height: 20,
+                      radius: 4,
+                      color: OceanColors.pearlAqua,
                     ),
-                    SizedBox(height: 20),
-                    _SkeletonBlock(height: 180, radius: 8),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: OceanSpacing.lg),
+                  _SkeletonBlock(height: 180),
+                ],
               ),
             ),
             const SizedBox(height: OceanSpacing.md),
-            GlassCard(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 280),
-                child: const Column(
+            const GlassCard(
+              padding: EdgeInsets.all(OceanSpacing.md),
+              child: SizedBox(
+                height: 288,
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Align(
@@ -319,20 +317,21 @@ class _AnalyticsLoadingState extends StatelessWidget {
                         width: 160,
                         height: 20,
                         radius: 4,
-                        color: OceanColors.azureMist2,
+                        color: OceanColors.pearlAqua,
                       ),
                     ),
-                    SizedBox(height: 20),
-                    _SkeletonBlock(height: 240, radius: 8),
+                    SizedBox(height: OceanSpacing.lg),
+                    _SkeletonBlock(height: 240),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: OceanSpacing.md),
-            GlassCard(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 152),
-                child: const Column(
+            const GlassCard(
+              padding: EdgeInsets.all(OceanSpacing.md),
+              child: SizedBox(
+                height: 164,
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Align(
@@ -341,11 +340,11 @@ class _AnalyticsLoadingState extends StatelessWidget {
                         width: 256,
                         height: 20,
                         radius: 4,
-                        color: OceanColors.azureMist2,
+                        color: OceanColors.pearlAqua,
                       ),
                     ),
-                    SizedBox(height: 20),
-                    _SkeletonBlock(height: 80, radius: 8),
+                    SizedBox(height: OceanSpacing.lg),
+                    _SkeletonBlock(height: 80),
                   ],
                 ),
               ),
@@ -394,41 +393,10 @@ class _AnalyticsEmptyState extends StatelessWidget {
         'No data for ${_fullDate(range.start)} – ${_fullDate(range.end)}';
     const description =
         'Choose another range or run the AI pipeline to generate history.';
-    return GlassCard(
-      semanticLabel: '$title. $description',
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: OceanColors.pineTeal.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Icon(
-                LucideIcons.calendarDays,
-                size: 22,
-                color: OceanColors.pineTeal,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: OceanTypography.title,
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              description,
-              textAlign: TextAlign.center,
-              style: OceanTypography.caption,
-            ),
-          ],
-        ),
-      ),
+    return _AnalyticsStateCard(
+      icon: LucideIcons.calendar,
+      title: title,
+      description: description,
     );
   }
 }
@@ -448,7 +416,7 @@ class _AnalyticsErrorState extends StatelessWidget {
       child: ColoredBox(
         color: OceanColors.critical.withValues(alpha: 0.10),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(40, 40, 40, 36),
+          padding: const EdgeInsets.all(OceanSpacing.md),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -465,25 +433,113 @@ class _AnalyticsErrorState extends StatelessWidget {
                   color: OceanColors.critical,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OceanSpacing.xs),
               Text(
                 'Analytics could not be loaded',
                 textAlign: TextAlign.center,
                 style: OceanTypography.title,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: OceanSpacing.xxs),
               Text(
                 'The aquarium data service did not respond. Try loading the analytics again.',
                 textAlign: TextAlign.center,
                 style: OceanTypography.caption,
               ),
-              const SizedBox(height: 12),
-              GlassButton(
-                label: 'Retry',
-                style: GlassButtonStyle.outline,
-                onPressed: onRetry,
-              ),
+              const SizedBox(height: OceanSpacing.sm),
+              _AnalyticsRetryButton(onPressed: onRetry),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnalyticsStateCard extends StatelessWidget {
+  const _AnalyticsStateCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
+
+  final IconData icon;
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      semanticLabel: '$title. $description',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: OceanColors.verdigris.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(icon, size: 22, color: OceanColors.ink),
+            ),
+            const SizedBox(height: OceanSpacing.sm),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: OceanTypography.title,
+            ),
+            const SizedBox(height: OceanSpacing.xxs),
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: OceanTypography.caption,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AnalyticsRetryButton extends StatelessWidget {
+  const _AnalyticsRetryButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: OceanGeometry.minimumTouchTarget,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(OceanRadii.pill),
+          boxShadow: [
+            BoxShadow(
+              color: OceanColors.prussianBlue.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(OceanRadii.pill),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onPressed,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Center(
+                    child: Text('Retry', style: OceanTypography.caption),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -506,7 +562,7 @@ class _AnalyticsPopulatedState extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         GlassCard(
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -527,7 +583,7 @@ class _AnalyticsPopulatedState extends StatelessWidget {
         ),
         const SizedBox(height: OceanSpacing.md),
         GlassCard(
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -552,7 +608,7 @@ class _AnalyticsPopulatedState extends StatelessWidget {
         GlassCard(
           onTap: controller.openHistory,
           semanticLabel: 'Water Clarity Trend. Opens detailed clarity history.',
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -594,13 +650,13 @@ class _AnalyticsSectionHeader extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Icon(icon, size: 16, color: OceanColors.ink),
+              child: Icon(icon, size: 16, color: OceanColors.prussianBlue),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: OceanSpacing.xs),
             Expanded(child: Text(title, style: OceanTypography.title)),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: OceanSpacing.xs),
         Divider(
           height: 1,
           thickness: 1,
@@ -618,7 +674,7 @@ class _AnalyticsChartBleed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.sizeOf(context).width >= 600) return child;
+    if (MediaQuery.sizeOf(context).width >= 768) return child;
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth + 16;
@@ -650,7 +706,7 @@ class _DiagnosticsCard extends StatelessWidget {
         '${_fullDate(controller.analyticsRange.start)} – ${_fullDate(controller.analyticsRange.end)}';
 
     return GlassCard(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -658,22 +714,23 @@ class _DiagnosticsCard extends StatelessWidget {
             icon: LucideIcons.brain,
             title: 'Fish Diagnostics',
           ),
-          const SizedBox(height: OceanSpacing.xs),
           if (diagnostics.isEmpty)
             Padding(
-              padding: const EdgeInsets.all(OceanSpacing.xl),
+              padding: const EdgeInsets.all(OceanSpacing.lg),
               child: Text(
                 'No health diagnostic records found for $dateLabel.',
                 textAlign: TextAlign.center,
                 style: OceanTypography.bodyMuted,
               ),
             )
-          else
+          else ...[
+            const SizedBox(height: OceanSpacing.xs),
             for (var index = 0; index < diagnostics.length; index += 1) ...[
               _DiagnosisPanel(diagnostic: diagnostics[index]),
               if (index != diagnostics.length - 1)
                 const SizedBox(height: OceanSpacing.sm),
             ],
+          ],
         ],
       ),
     );
@@ -705,41 +762,47 @@ class _DiagnosisPanel extends StatelessWidget {
           'confidence. Scanned at $time. Observation: '
           '${diagnostic.observation}',
       child: ExcludeSemantics(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
-          decoration: BoxDecoration(
-            color: OceanColors.white.withValues(alpha: 0.20),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: tone),
-          ),
+        child: GlassPanel(
+          borderColor: tone,
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Wrap(
+                alignment: WrapAlignment.spaceBetween,
                 crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
+                spacing: OceanSpacing.xs,
+                runSpacing: OceanSpacing.xs,
                 children: [
-                  Text(fish.name, style: OceanTypography.strong),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: tone.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      diagnostic.status,
-                      style: OceanTypography.caption.copyWith(color: tone),
-                    ),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: OceanSpacing.xs,
+                    runSpacing: OceanSpacing.xs,
+                    children: [
+                      Text(fish.name, style: OceanTypography.strong),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: tone.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(
+                            OceanRadii.inline,
+                          ),
+                        ),
+                        child: Text(
+                          isError ? 'Error' : diagnostic.status,
+                          style: OceanTypography.caption.copyWith(color: tone),
+                        ),
+                      ),
+                      if (!isError)
+                        Text(
+                          '${diagnostic.confidence}% confidence',
+                          style: OceanTypography.caption,
+                        ),
+                    ],
                   ),
-                  if (!isError)
-                    Text(
-                      '${diagnostic.confidence}% confidence',
-                      style: OceanTypography.caption,
-                    ),
                   Text(time, style: OceanTypography.caption),
                 ],
               ),
@@ -747,13 +810,13 @@ class _DiagnosisPanel extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 160,
-                      maxHeight: 110,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(OceanRadii.inline),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(OceanRadii.inline),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 160,
+                        maxHeight: 110,
+                      ),
                       child: Image.asset(
                         fish.assetPath,
                         fit: BoxFit.scaleDown,
@@ -822,7 +885,7 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
   late DateTime _endDate = DateUtils.dateOnly(widget.range.end);
   late TimeOfDay _startTime = _normalizeWheelTime(widget.startTime);
   late TimeOfDay _endTime = _normalizeWheelTime(widget.endTime);
-  _RangeField _activeField = _RangeField.startDate;
+  _RangeField? _activeField;
 
   @override
   Widget build(BuildContext context) {
@@ -832,15 +895,7 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
       key: const ValueKey('analytics-range-editor'),
       constraints: BoxConstraints(
         maxWidth: math.min(320, mediaSize.width - 32).toDouble(),
-        maxHeight: math
-            .max(
-              280,
-              mediaSize.height -
-                  OceanGeometry.statusBarHeight -
-                  OceanGeometry.heroHeight -
-                  12,
-            )
-            .toDouble(),
+        maxHeight: math.max(280, mediaSize.height - 68).toDouble(),
       ),
       child: Semantics(
         container: true,
@@ -848,8 +903,6 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Retained for the established widget contract; the branch labels
-            // the editor semantically and does not render a visible heading.
             const SizedBox(
               width: 0,
               height: 0,
@@ -887,21 +940,26 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
                 ),
               ),
             ),
-            const SizedBox(height: OceanSpacing.sm),
-            Flexible(
-              child: GlassCard(
-                overlay: true,
-                padding: EdgeInsets.zero,
-                semanticLabel: 'Active date or time control',
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                  child: AnimatedSwitcher(
-                    duration: OceanMotion.responsive(context, OceanMotion.fade),
-                    child: _activeEditor(),
+            if (_activeField != null) ...[
+              const SizedBox(height: OceanSpacing.sm),
+              Flexible(
+                child: GlassCard(
+                  overlay: true,
+                  padding: EdgeInsets.zero,
+                  semanticLabel: 'Active date or time control',
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+                    child: AnimatedSwitcher(
+                      duration: OceanMotion.responsive(
+                        context,
+                        OceanMotion.fade,
+                      ),
+                      child: _activeEditor(),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),
@@ -946,6 +1004,7 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
         onChanged: (time) => _endTime = time,
         onDone: _apply,
       ),
+      null => const SizedBox.shrink(),
     };
   }
 
@@ -981,7 +1040,7 @@ class _HeroRangeEditorSurface extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: OceanColors.pineTeal.withValues(alpha: 0.05),
+            color: OceanColors.prussianBlue.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -997,7 +1056,7 @@ class _HeroRangeEditorSurface extends StatelessWidget {
               borderRadius: radius,
             ),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
               child: child,
             ),
           ),
@@ -1035,10 +1094,13 @@ class _RangeEditorRow extends StatelessWidget {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: OceanTypography.strong.copyWith(color: OceanColors.white),
+            style: OceanTypography.strong.copyWith(
+              color: OceanColors.white,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: OceanSpacing.xs),
         Expanded(
           flex: 5,
           child: _RangeFieldButton(
@@ -1048,7 +1110,7 @@ class _RangeEditorRow extends StatelessWidget {
             onTap: onDateTap,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: OceanSpacing.xs),
         Expanded(
           flex: 4,
           child: _RangeFieldButton(
@@ -1086,7 +1148,7 @@ class _RangeFieldButton extends StatelessWidget {
       onTap: onTap,
       excludeSemantics: true,
       child: SizedBox(
-        height: OceanGeometry.minimumTouchTarget,
+        height: 43.35,
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(OceanRadii.pill),
@@ -1105,7 +1167,7 @@ class _RangeFieldButton extends StatelessWidget {
                   borderRadius: BorderRadius.circular(OceanRadii.pill),
                   boxShadow: [
                     BoxShadow(
-                      color: OceanColors.pineTeal.withValues(alpha: 0.05),
+                      color: OceanColors.prussianBlue.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 4),
                     ),
@@ -1177,7 +1239,7 @@ class _OceanCalendarState extends State<_OceanCalendar> {
                         style: OceanTypography.title,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: OceanSpacing.xxs),
                     const Icon(
                       LucideIcons.chevronDown,
                       size: 18,
@@ -1193,7 +1255,7 @@ class _OceanCalendarState extends State<_OceanCalendar> {
                   _viewMonth = DateTime(_viewMonth.year, _viewMonth.month - 1);
                 }),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: OceanSpacing.xxs),
               _CalendarNavigationButton(
                 icon: LucideIcons.chevronRight,
                 tooltip: 'Next month',
@@ -1223,7 +1285,8 @@ class _OceanCalendarState extends State<_OceanCalendar> {
             itemCount: cellCount,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisExtent: 40,
+              mainAxisExtent: 36,
+              mainAxisSpacing: 4,
             ),
             itemBuilder: (context, index) {
               final date = firstVisibleDay.add(Duration(days: index));
@@ -1269,7 +1332,7 @@ class _CalendarNavigationButton extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: OceanColors.pineTeal.withValues(alpha: 0.05),
+                  color: OceanColors.prussianBlue.withValues(alpha: 0.05),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -1341,7 +1404,9 @@ class _CalendarDay extends StatelessWidget {
                   boxShadow: selected
                       ? [
                           BoxShadow(
-                            color: OceanColors.pineTeal.withValues(alpha: 0.05),
+                            color: OceanColors.prussianBlue.withValues(
+                              alpha: 0.05,
+                            ),
                             blurRadius: 20,
                             offset: const Offset(0, 4),
                           ),
@@ -1655,7 +1720,7 @@ class _TealOutlinePainter extends CustomPainter {
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [OceanColors.verdigris, OceanColors.pineTeal],
+        colors: [OceanColors.turquoise, OceanColors.verdigris],
       ).createShader(rect);
     canvas.drawRRect(
       RRect.fromRectAndRadius(outline, Radius.circular(resolvedRadius)),
@@ -1678,7 +1743,7 @@ TimeOfDay _normalizeWheelTime(TimeOfDay time) {
   return TimeOfDay(hour: time.hour, minute: minuteIndex * 5);
 }
 
-String _fullDate(DateTime date) => DateFormat('MMM d, yyyy').format(date);
+String _fullDate(DateTime date) => DateFormat('MMM dd, yyyy').format(date);
 
 String _formatTime(TimeOfDay time) {
   final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;

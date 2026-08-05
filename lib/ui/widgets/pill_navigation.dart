@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -30,112 +29,102 @@ class PillNavigation extends StatelessWidget {
       OceanGeometry.navigationBottom,
       MediaQuery.paddingOf(context).bottom,
     );
-    final navigationHeight = OceanGeometry.navigationHeightFor(context);
-    final navigationWidth = math.min(
-      360.0,
-      MediaQuery.sizeOf(context).width - (OceanGeometry.navigationSide * 2),
-    );
     final activeIndex = controller.activeTab.index;
+    final indicatorColor = Color.lerp(
+      OceanColors.white,
+      OceanColors.turquoise,
+      0.20,
+    )!;
     return Positioned(
-      left: 0,
-      right: 0,
+      left: OceanGeometry.navigationSide,
+      right: OceanGeometry.navigationSide,
       bottom: bottom,
-      height: navigationHeight,
-      child: Center(
-        child: SizedBox(
-          width: navigationWidth,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(OceanRadii.navigation),
-              boxShadow: [
-                BoxShadow(
-                  color: OceanColors.pineTeal.withValues(alpha: 0.10),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(OceanRadii.navigation),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: OceanColors.white.withValues(alpha: 0.30),
-                    borderRadius: BorderRadius.circular(OceanRadii.navigation),
-                    border: Border.all(
-                      color: OceanColors.white.withValues(alpha: 0.35),
-                    ),
+      height: OceanGeometry.navigationHeight,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(OceanRadii.navigation),
+            boxShadow: [
+              BoxShadow(
+                color: OceanColors.prussianBlue.withValues(alpha: 0.10),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(OceanRadii.navigation),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: OceanColors.white.withValues(alpha: 0.30),
+                  borderRadius: BorderRadius.circular(OceanRadii.navigation),
+                  border: Border.all(
+                    color: OceanColors.white.withValues(alpha: 0.35),
                   ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final innerWidth = constraints.maxWidth - 16;
-                      final slotWidth = innerWidth / tabs.length;
-                      return Stack(
-                        children: [
-                          AnimatedPositioned(
-                            duration: OceanMotion.responsive(
-                              context,
-                              OceanMotion.smooth,
-                            ),
-                            curve: OceanMotion.smoothCurve,
-                            left: 8 + slotWidth * activeIndex,
-                            top: 6,
-                            width: slotWidth,
-                            bottom: 6,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  OceanRadii.navigationItem,
-                                ),
-                                border: Border.all(
-                                  color: OceanColors.navigationActive,
-                                  width: 1.5,
-                                ),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.lerp(
-                                      OceanColors.white,
-                                      OceanColors.turquoise,
-                                      0.20,
-                                    )!,
-                                    Color.lerp(
-                                      OceanColors.white,
-                                      OceanColors.turquoise,
-                                      0.20,
-                                    )!.withValues(alpha: 0.286),
-                                  ],
-                                ),
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final innerWidth = constraints.maxWidth - 16;
+                    final slotWidth = innerWidth / tabs.length;
+                    return Stack(
+                      children: [
+                        AnimatedPositioned(
+                          duration: OceanMotion.responsive(
+                            context,
+                            OceanMotion.smooth,
+                          ),
+                          curve: OceanMotion.smoothCurve,
+                          left: 8 + slotWidth * activeIndex,
+                          top: 6,
+                          width: slotWidth,
+                          bottom: 6,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                OceanRadii.navigationItem,
+                              ),
+                              border: Border.all(
+                                color: OceanColors.navigationActive,
+                                width: 1.5,
+                              ),
+                              gradient: LinearGradient(
+                                colors: [
+                                  indicatorColor,
+                                  indicatorColor.withValues(alpha: 0.286),
+                                ],
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            child: Row(
-                              children: [
-                                for (final tab in tabs)
-                                  Expanded(
-                                    child: _NavigationItem(
-                                      tab: tab.$1,
-                                      label: tab.$2,
-                                      icon: tab.$3,
-                                      active: controller.activeTab == tab.$1,
-                                      alertCount: tab.$1 == PrimaryTab.dashboard
-                                          ? controller.unresolvedAlertCount
-                                          : 0,
-                                      onTap: () => controller.selectTab(tab.$1),
-                                    ),
-                                  ),
-                              ],
-                            ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 6,
                           ),
-                        ],
-                      );
-                    },
-                  ),
+                          child: Row(
+                            children: [
+                              for (final tab in tabs)
+                                Expanded(
+                                  child: _NavigationItem(
+                                    tab: tab.$1,
+                                    label: tab.$2,
+                                    icon: tab.$3,
+                                    active: controller.activeTab == tab.$1,
+                                    alertCount: tab.$1 == PrimaryTab.dashboard
+                                        ? controller.unresolvedAlertCount
+                                        : 0,
+                                    onTap: () => controller.selectTab(tab.$1),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
@@ -205,13 +194,12 @@ class _NavigationItem extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          alertCount > 9 ? '9+' : '$alertCount',
+                          '$alertCount',
                           style: const TextStyle(
-                            fontFamily: OceanTypography.family,
+                            fontFamily: 'Inter',
                             fontSize: 9,
                             height: 1,
                             fontWeight: FontWeight.w700,
-                            letterSpacing: -0.09,
                             color: OceanColors.white,
                           ),
                         ),
@@ -224,11 +212,10 @@ class _NavigationItem extends StatelessWidget {
                 label,
                 maxLines: 1,
                 style: TextStyle(
-                  fontFamily: OceanTypography.family,
+                  fontFamily: 'Inter',
                   fontSize: 10,
                   height: 1,
                   fontWeight: FontWeight.w600,
-                  letterSpacing: -0.10,
                   color: color,
                 ),
               ),

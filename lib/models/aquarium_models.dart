@@ -135,6 +135,8 @@ class SpeciesOption {
     this.altName = '',
     this.creatureType = 'fish',
     this.initials = '',
+    this.catalogId,
+    this.legacyIds = const [],
   });
 
   final String id;
@@ -146,6 +148,8 @@ class SpeciesOption {
   final String altName;
   final String creatureType;
   final String initials;
+  final String? catalogId;
+  final List<String> legacyIds;
 }
 
 class WaterMetric {
@@ -172,6 +176,10 @@ class AlertItem {
     required this.timeLabel,
     required this.severity,
     required this.actionPlan,
+    this.clarityBefore = '',
+    this.clarityAfter = '',
+    this.fishBefore = '',
+    this.fishAfter = '',
     this.resolved = false,
   });
 
@@ -181,6 +189,10 @@ class AlertItem {
   final String timeLabel;
   final AlertSeverity severity;
   final String actionPlan;
+  final String clarityBefore;
+  final String clarityAfter;
+  final String fishBefore;
+  final String fishAfter;
   final bool resolved;
 
   AlertItem copyWith({bool? resolved}) => AlertItem(
@@ -190,6 +202,10 @@ class AlertItem {
     timeLabel: timeLabel,
     severity: severity,
     actionPlan: actionPlan,
+    clarityBefore: clarityBefore,
+    clarityAfter: clarityAfter,
+    fishBefore: fishBefore,
+    fishAfter: fishAfter,
     resolved: resolved ?? this.resolved,
   );
 }
@@ -223,10 +239,14 @@ class HistoryReading {
     required this.clarity,
     required this.fishCount,
     required this.summary,
+    this.ph,
+    this.temp,
   });
 
   final DateTime date;
   final double clarity;
   final int fishCount;
   final String summary;
+  final double? ph;
+  final double? temp;
 }

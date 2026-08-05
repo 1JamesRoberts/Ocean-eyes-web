@@ -326,7 +326,7 @@ void main() {
       controller.requestAddFish();
       await tester.pumpAndSettle();
       expect(find.text('Search common or scientific name'), findsOneWidget);
-      expect(find.text("Adolfo's cory"), findsOneWidget);
+      expect(find.text('Angelfish'), findsOneWidget);
 
       await tester.tap(find.byTooltip('Close add fish'));
       await tester.pumpAndSettle();

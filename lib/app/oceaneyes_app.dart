@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import '../core/theme/oceaneyes_theme.dart';
 import '../core/theme/oceaneyes_tokens.dart';
 import '../models/aquarium_models.dart';
+import '../ui/screens/account_screen.dart';
+import '../ui/screens/login_screen.dart';
 import '../ui/shell/oceaneyes_shell.dart';
-import '../ui/widgets/pill_navigation.dart';
 import '../view_models/oceaneyes_controller.dart';
 
 class OceanEyesApp extends StatefulWidget {
@@ -18,13 +19,49 @@ class OceanEyesApp extends StatefulWidget {
   State<OceanEyesApp> createState() => _OceanEyesAppState();
 }
 
-class _OceanEyesAppState extends State<OceanEyesApp> {
+class _OceanEyesAppState extends State<OceanEyesApp>
+    with SingleTickerProviderStateMixin {
   late final OceanEyesController _controller =
       widget.controller ?? OceanEyesController();
   late final bool _ownsController = widget.controller == null;
+  late bool _showLogin = !_controller.isAuthenticated;
+  bool _loginExiting = false;
+  Timer? _loginExitTimer;
+  late final AnimationController _dashboardEntrance;
+  late final CurvedAnimation _dashboardOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _dashboardEntrance = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+      value: _controller.isAuthenticated ? 1 : 0,
+    );
+    _dashboardOpacity = CurvedAnimation(
+      parent: _dashboardEntrance,
+      curve: Curves.easeOut,
+    );
+    _controller.addListener(_handleAuthentication);
+  }
+
+  void _handleAuthentication() {
+    if (!_controller.isAuthenticated || !_showLogin || _loginExiting) return;
+    _dashboardEntrance.forward(from: 0);
+    setState(() => _loginExiting = true);
+    _loginExitTimer?.cancel();
+    _loginExitTimer = Timer(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
+      setState(() => _showLogin = false);
+    });
+  }
 
   @override
   void dispose() {
+    _loginExitTimer?.cancel();
+    _dashboardOpacity.dispose();
+    _dashboardEntrance.dispose();
+    _controller.removeListener(_handleAuthentication);
     if (_ownsController) _controller.dispose();
     super.dispose();
   }
@@ -38,36 +75,24 @@ class _OceanEyesAppState extends State<OceanEyesApp> {
       themeMode: ThemeMode.light,
       builder: (context, child) => AnimatedBuilder(
         animation: _controller,
-        child: child,
-        builder: (context, child) {
-          final page = child ?? const SizedBox.shrink();
-          final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
-          return ColoredBox(
-            color: OceanColors.frame,
-            child: _controller.fullscreenCamera
-                ? ColoredBox(
-                    color: Colors.black,
-                    child: SizedBox.expand(child: page),
-                  )
-                : Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: OceanGeometry.referenceWidth,
-                      ),
-                      child: ColoredBox(
-                        color: Colors.black,
-                        child: Stack(
-                          children: [
-                            Positioned.fill(child: page),
-                            if (!keyboardOpen)
-                              PillNavigation(controller: _controller),
-                          ],
-                        ),
-                      ),
-                    ),
+        builder: (context, _) => Material(
+          color: OceanColors.prussianBlue,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: OceanGeometry.referenceWidth,
                   ),
-          );
-        },
+                  child: child ?? const SizedBox.shrink(),
+                ),
+              ),
+              if (_controller.fullscreenCamera)
+                FullscreenCameraOverlay(controller: _controller),
+            ],
+          ),
+        ),
       ),
       home: AnimatedBuilder(
         animation: _controller,
@@ -75,23 +100,43 @@ class _OceanEyesAppState extends State<OceanEyesApp> {
           final handlesBack =
               _controller.fullscreenCamera ||
               _controller.secondaryRoute != null;
-          return PopScope<Object?>(
-            canPop: !handlesBack,
-            onPopInvokedWithResult: (didPop, _) {
-              if (didPop || !handlesBack) return;
-              if (_controller.fullscreenCamera) {
-                if (_controller.inventoryDrawerOpen) {
-                  _controller.toggleInventoryDrawer();
-                } else {
-                  _controller.setFullscreenCamera(false);
-                }
-              } else if (_controller.selectedAlertId != null) {
-                _controller.popAlertDetail();
-              } else {
-                _controller.closeSecondaryRoute();
-              }
-            },
-            child: Navigator(pages: _pages, onDidRemovePage: _didRemovePage),
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              if (_controller.isAuthenticated)
+                FadeTransition(
+                  opacity: _dashboardOpacity,
+                  child: PopScope<Object?>(
+                    canPop: !handlesBack,
+                    onPopInvokedWithResult: (didPop, _) {
+                      if (didPop || !handlesBack) return;
+                      if (_controller.fullscreenCamera) {
+                        if (_controller.inventoryDrawerOpen) {
+                          _controller.toggleInventoryDrawer();
+                        } else {
+                          _controller.setFullscreenCamera(false);
+                        }
+                      } else if (_controller.selectedAlertId != null) {
+                        _controller.popAlertDetail();
+                      } else {
+                        _controller.closeSecondaryRoute();
+                      }
+                    },
+                    child: Navigator(
+                      pages: _pages,
+                      onDidRemovePage: _didRemovePage,
+                    ),
+                  ),
+                ),
+              if (_showLogin)
+                Positioned.fill(
+                  child: LoginScreen(
+                    isLoading: _controller.isAuthenticating,
+                    isExiting: _loginExiting,
+                    onSignIn: _controller.signInWithGoogle,
+                  ),
+                ),
+            ],
           );
         },
       ),

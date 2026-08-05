@@ -6,6 +6,7 @@ Flutter web accepts fixture and destination query parameters, which are also
 usable in screenshot automation:
 
 ```text
+/?fixture=login
 /?fixture=populated
 /?fixture=dashboard_waiting
 /?fixture=dashboard_warning
@@ -24,8 +25,8 @@ usable in screenshot automation:
 Supported `tab` values are `dashboard`, `my_fish`, `analytics`, and `account`.
 Supported routes are `alerts` and `history`.
 
-The default populated fixture is fixed to 31 July 2026 data, the complete
-541-entry mobile-ui species catalog, and bundled local media. It does not
+The default populated fixture is fixed to 31 July 2026 data, the exact ordered
+24-class mobile-deploy classifier catalog, and bundled local media. It does not
 depend on a camera, backend, locale-specific network data, or current time.
 
 ## Capture matrix
@@ -42,7 +43,7 @@ The test locks the surface to 393 × 852 logical pixels and names captures as:
 393x852__<screen>__<state>.png
 ```
 
-It covers Dashboard waiting/healthy/warning/no-alerts; My Fish empty/populated/
+It covers Login idle; Dashboard waiting/healthy/warning/no-alerts; My Fish empty/populated/
 expanded, add-species, count adjustment, and delete confirmation; Analytics
 loading/empty/error/populated plus the species, calendar, and time-wheel
 selectors; Account permission/denied/unavailable/active, AI-disabled,
@@ -56,6 +57,11 @@ The capture helper intentionally advances a bounded number of frames so finite
 route, sheet, and chart transitions settle deterministically.
 
 ## Compare
+
+For source-parity review, serve the `mobile-deploy` worktree and the release
+Flutter web build on separate local origins. Capture both at an exact 393 × 852
+browser viewport without lossy conversion. Store the reference, candidate, and
+comparison artifacts under `build/mobile-deploy-comparison/`.
 
 Select an approved 393 × 852 baseline capture, then run:
 
@@ -75,13 +81,13 @@ substitute.
 
 ## Reviewed platform exceptions
 
-- Flutter font rasterization differs slightly between CanvasKit/Skia/Impeller
-  and the browser even with the same Hanken Grotesk outlines.
-- The authored 54 px phone status bar is part of the locked comparison surface;
-  native OS chrome is outside device-surface captures.
-- Flutter does not expose CSS inset box shadows. The reference's inset-only
-  highlight on solid white cards is visually neutral; translucent overlays use
-  the matching blur, border, and exterior shadow values.
+- Flutter font rasterization can differ by subpixel coverage between
+  CanvasKit/Skia/Impeller and the browser even with the same bundled Inter
+  outlines.
+- Native OS chrome is outside device-surface captures; the authored web canvas
+  begins at y=0 and does not include a synthetic status bar.
+- CSS inset shadows are rendered as clipped highlight layers with matching
+  color, extent, and opacity.
 - The screenshot fixture uses `assets/images/aquarium_hero.png`; production
   camera frames are intentionally frozen during comparison.
 

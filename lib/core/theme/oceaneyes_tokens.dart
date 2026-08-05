@@ -2,40 +2,34 @@ import 'package:flutter/material.dart';
 
 /// Authoritative OceanEyes visual tokens for the Flutter client.
 abstract final class OceanColors {
-  static const pineTeal = Color(0xFF00584E);
-  static const verdigris = Color(0xFF009D8D);
+  static const neonIce = Color(0xFF00FFE5);
   static const turquoise = Color(0xFF00C8B3);
-  static const turquoiseSurf = Color(0xFF00A9CC);
-  static const skySurge = Color(0xFF00C0E8);
-  static const azureMist = Color(0xFFE5F5F8);
-  static const azureMist2 = Color(0xFFDEEFF3);
+  static const darkCyan = Color(0xFF00645A);
+  static const verdigris = Color(0xFF32A198);
+  static const tropicalTeal = Color(0xFF79BEB7);
+  static const pearlAqua = Color(0xFF9BCBC7);
+  static const azureMist = Color(0xFFF4FFFE);
   static const white = Color(0xFFFFFFFF);
   static const slateGrey = Color(0xFF828E97);
-  static const scrollbarThumb = Color(0xFF8D8B8C);
   static const prussianBlue = Color(0xFF051E32);
-  static const frame = Color(0xFF1A1A1A);
 
   static const good = Color(0xFF10B981);
   static const warning = Color(0xFFF59E0B);
   static const critical = Color(0xFFEF4444);
 
-  // Compatibility aliases used by widgets while retaining the exact
-  // mobile-ui branch palette.
-  static const neonIce = skySurge;
-  static const darkCyan = pineTeal;
-  static const tropicalTeal = turquoise;
-  static const pearlAqua = azureMist2;
+  // The mobile-deploy reference uses the same status colors for text and
+  // decorative marks.
   static const goodInk = good;
   static const warningInk = warning;
   static const criticalInk = critical;
 
-  static const canvas = azureMist2;
+  static const canvas = azureMist;
   static const ink = prussianBlue;
   static const inkMuted = slateGrey;
   static const accent = verdigris;
   static const accentSecondary = turquoise;
-  static const action = pineTeal;
-  static const navigationActive = pineTeal;
+  static const action = prussianBlue;
+  static const navigationActive = darkCyan;
 }
 
 abstract final class OceanSpacing {
@@ -49,8 +43,7 @@ abstract final class OceanSpacing {
 }
 
 abstract final class OceanRadii {
-  static const card = 32.0;
-  static const panel = 24.0;
+  static const card = 28.0;
   static const inline = 12.0;
   static const navigation = 32.0;
   static const navigationItem = 24.0;
@@ -60,13 +53,13 @@ abstract final class OceanRadii {
 abstract final class OceanGeometry {
   static const referenceWidth = 393.0;
   static const referenceHeight = 852.0;
-  static const statusBarHeight = 54.0;
-  static const contentRadius = 20.0;
   static const heroHeight = 221.0;
   static const heroBlendExtension = 56.0;
-  static const heroSurfaceTop = 217.0;
-  static const heroContentClipStart = 213.0;
-  static const heroContentSpacer = 241.0;
+  // The React shell starts inside a 16 px padded main element. Its rounded
+  // viewport is 197 px below that origin and the first content row is another
+  // 28 px below the viewport edge.
+  static const heroViewportTop = 213.0;
+  static const heroContentLeading = 28.0;
   static const contentGutter = 16.0;
   static const navigationHeight = 64.0;
   static const navigationSide = 16.0;
@@ -97,60 +90,63 @@ abstract final class OceanMotion {
 }
 
 abstract final class OceanTypography {
-  static const family = 'Hanken Grotesk';
-  static const letterSpacing = -0.16;
-
   static const title = TextStyle(
-    fontFamily: family,
-    fontSize: 17,
+    fontFamily: 'Inter',
+    fontSize: 16,
     height: 1.3,
-    fontWeight: FontWeight.w700,
-    letterSpacing: -0.17,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.16,
     color: OceanColors.ink,
+    decoration: TextDecoration.none,
   );
 
   static const strong = TextStyle(
-    fontFamily: family,
-    fontSize: 16,
+    fontFamily: 'Inter',
+    fontSize: 15,
     height: 1.35,
     fontWeight: FontWeight.w600,
-    letterSpacing: letterSpacing,
+    letterSpacing: -0.15,
     color: OceanColors.ink,
+    decoration: TextDecoration.none,
   );
 
   static const body = TextStyle(
-    fontFamily: family,
-    fontSize: 16,
+    fontFamily: 'Inter',
+    fontSize: 15,
     height: 1.45,
     fontWeight: FontWeight.w400,
-    letterSpacing: letterSpacing,
+    letterSpacing: -0.15,
     color: OceanColors.ink,
+    decoration: TextDecoration.none,
   );
 
   static const bodyMuted = TextStyle(
-    fontFamily: family,
-    fontSize: 16,
+    fontFamily: 'Inter',
+    fontSize: 15,
     height: 1.45,
     fontWeight: FontWeight.w400,
-    letterSpacing: letterSpacing,
+    letterSpacing: -0.15,
     color: OceanColors.inkMuted,
+    decoration: TextDecoration.none,
   );
 
   static const caption = TextStyle(
-    fontFamily: family,
-    fontSize: 14,
+    fontFamily: 'Inter',
+    fontSize: 13,
     height: 1.35,
     fontWeight: FontWeight.w500,
-    letterSpacing: -0.14,
+    letterSpacing: -0.13,
     color: OceanColors.inkMuted,
+    decoration: TextDecoration.none,
   );
 
   static const section = TextStyle(
-    fontFamily: family,
-    fontSize: 26,
+    fontFamily: 'Inter',
+    fontSize: 24,
     height: 1.15,
     fontWeight: FontWeight.w700,
-    letterSpacing: -0.26,
+    letterSpacing: -0.24,
     color: OceanColors.ink,
+    decoration: TextDecoration.none,
   );
 }

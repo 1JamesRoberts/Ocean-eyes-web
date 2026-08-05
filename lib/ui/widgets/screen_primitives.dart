@@ -1,8 +1,10 @@
+import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/oceaneyes_tokens.dart';
-import '../../models/species_catalog.dart';
 import 'glass.dart';
 
 class ScreenHeader extends StatelessWidget {
@@ -63,36 +65,28 @@ class CardHeader extends StatelessWidget {
     final header = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Icon(icon, size: 16, color: OceanColors.ink),
-              ),
-              const SizedBox(width: 8),
-              Expanded(child: Text(title, style: OceanTypography.title)),
-            ],
-          ),
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(icon, size: 16, color: OceanColors.ink),
         ),
-        if (trailing != null) ...[const SizedBox(width: 12), trailing!],
+        const SizedBox(width: 8),
+        Expanded(child: Text(title, style: OceanTypography.title)),
+        ?trailing,
       ],
     );
+    if (!divider) return header;
     return Transform.translate(
       offset: const Offset(0, -4),
-      child: divider
-          ? Column(
-              children: [
-                header,
-                const SizedBox(height: 10),
-                Divider(
-                  height: 1,
-                  color: OceanColors.slateGrey.withValues(alpha: 0.15),
-                ),
-              ],
-            )
-          : Padding(padding: const EdgeInsets.only(bottom: 4), child: header),
+      child: Column(
+        children: [
+          header,
+          const SizedBox(height: 8),
+          Divider(
+            height: 1,
+            color: OceanColors.slateGrey.withValues(alpha: 0.15),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -117,13 +111,17 @@ class StateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = success ? OceanColors.good : OceanColors.pineTeal;
-    return GlassCard(
+    final statusColor = success ? OceanColors.good : OceanColors.ink;
+    final statusBackground = success
+        ? OceanColors.good.withValues(alpha: 0.10)
+        : OceanColors.verdigris.withValues(alpha: 0.08);
+    final card = GlassCard(
       semanticLabel: '$title. $description',
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 16 : 24,
-        vertical: compact ? 16 : 40,
-      ),
+      borderColor: success ? Colors.transparent : null,
+      borderWidth: success ? 2 : 1,
+      padding: compact
+          ? const EdgeInsets.all(16)
+          : const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -131,28 +129,76 @@ class StateCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.10),
+              color: statusBackground,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(icon, size: 22, color: statusColor),
           ),
           SizedBox(height: compact ? 8 : 12),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: OceanTypography.title,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: OceanTypography.caption,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: OceanTypography.title,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: OceanTypography.caption,
+              ),
+            ],
           ),
           if (action != null) ...[SizedBox(height: compact ? 12 : 16), action!],
         ],
       ),
     );
+    if (!success) return card;
+    return Stack(
+      children: [
+        card,
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: CustomPaint(painter: _DashedSuccessBorderPainter()),
+          ),
+        ),
+      ],
+    );
   }
+}
+
+class _DashedSuccessBorderPainter extends CustomPainter {
+  const _DashedSuccessBorderPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          const Radius.circular(OceanRadii.card),
+        ),
+      );
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..color = OceanColors.white.withValues(alpha: 0.40);
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        canvas.drawPath(
+          metric.extractPath(distance, (distance + 6).clamp(0, metric.length)),
+          paint,
+        );
+        distance += 10;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class DisclosureCard extends StatelessWidget {
@@ -166,6 +212,7 @@ class DisclosureCard extends StatelessWidget {
     required this.child,
     this.enabled = true,
     this.badge,
+    this.iconColor,
   });
 
   final String title;
@@ -176,12 +223,12 @@ class DisclosureCard extends StatelessWidget {
   final Widget child;
   final bool enabled;
   final Widget? badge;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Semantics(
             button: true,
@@ -189,78 +236,74 @@ class DisclosureCard extends StatelessWidget {
             enabled: enabled,
             child: InkWell(
               onTap: enabled ? () => onChanged(!expanded) : null,
-              borderRadius: BorderRadius.circular(12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        SizedBox.square(
-                          dimension: 36,
-                          child: Center(
-                            child: Icon(
-                              icon,
-                              size: 17,
+              borderRadius: BorderRadius.circular(16),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Row(
+                  children: [
+                    SizedBox.square(
+                      dimension: 36,
+                      child: Center(
+                        child: Icon(
+                          icon,
+                          size: 17,
+                          color: enabled
+                              ? (iconColor ?? OceanColors.inkMuted)
+                              : OceanColors.inkMuted.withValues(alpha: 0.45),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            title,
+                            style: OceanTypography.strong.copyWith(
                               color: enabled
-                                  ? OceanColors.slateGrey
-                                  : OceanColors.slateGrey.withValues(
-                                      alpha: 0.45,
-                                    ),
+                                  ? OceanColors.ink
+                                  : OceanColors.inkMuted,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                title,
-                                style: OceanTypography.strong.copyWith(
-                                  color: enabled
-                                      ? OceanColors.ink
-                                      : OceanColors.inkMuted,
-                                ),
-                              ),
-                              if (subtitle.isNotEmpty) ...[
-                                const SizedBox(height: 2),
-                                Text(subtitle, style: OceanTypography.caption),
-                              ],
-                            ],
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: OceanTypography.caption,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  if (badge != null) ...[const SizedBox(width: 12), badge!],
-                  const SizedBox(width: 12),
-                  AnimatedRotation(
-                    turns: expanded ? 0.25 : 0,
-                    duration: OceanMotion.responsive(
-                      context,
-                      const Duration(milliseconds: 300),
+                    if (badge != null) ...[badge!, const SizedBox(width: 6)],
+                    AnimatedRotation(
+                      turns: expanded ? 0.25 : 0,
+                      duration: OceanMotion.responsive(
+                        context,
+                        OceanMotion.smooth,
+                      ),
+                      child: Icon(
+                        LucideIcons.chevronRight,
+                        size: 18,
+                        color: OceanColors.inkMuted,
+                      ),
                     ),
-                    curve: Curves.easeOut,
-                    child: const Icon(
-                      LucideIcons.chevronRight,
-                      size: 18,
-                      color: OceanColors.inkMuted,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
           AnimatedSize(
             duration: OceanMotion.responsive(
               context,
-              const Duration(milliseconds: 350),
+              const Duration(milliseconds: 300),
             ),
-            curve: const Cubic(0.16, 1, 0.3, 1),
+            curve: Curves.easeOut,
             alignment: Alignment.topCenter,
             child: expanded
-                ? Padding(padding: const EdgeInsets.only(top: 16), child: child)
+                ? Padding(padding: const EdgeInsets.only(top: 12), child: child)
                 : const SizedBox(width: double.infinity),
           ),
         ],
@@ -319,31 +362,42 @@ class _OceanSliderState extends State<OceanSlider> {
               Expanded(
                 child: Text(widget.label, style: OceanTypography.caption),
               ),
-              Text(valueText, style: OceanTypography.strong),
+              Text(
+                valueText,
+                style: OceanTypography.caption.copyWith(
+                  color: OceanColors.darkCyan,
+                ),
+              ),
             ],
           ),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: OceanColors.verdigris,
-              inactiveTrackColor: OceanColors.azureMist,
-              thumbColor: OceanColors.white,
-              overlayColor: OceanColors.verdigris.withValues(alpha: 0.12),
-              trackHeight: 8,
-              thumbShape: const RoundSliderThumbShape(
-                enabledThumbRadius: 8,
-                elevation: 2,
+          const SizedBox(height: 4),
+          SizedBox(
+            height: 20,
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                activeTrackColor: OceanColors.verdigris,
+                inactiveTrackColor: OceanColors.slateGrey.withValues(
+                  alpha: 0.18,
+                ),
+                thumbColor: OceanColors.white,
+                overlayColor: OceanColors.verdigris.withValues(alpha: 0.12),
+                trackHeight: 4,
+                thumbShape: const RoundSliderThumbShape(
+                  enabledThumbRadius: 8,
+                  elevation: 2,
+                ),
               ),
-            ),
-            child: Slider(
-              value: _previewValue.clamp(widget.min, widget.max),
-              min: widget.min,
-              max: widget.max,
-              divisions: widget.divisions,
-              onChanged: (value) {
-                setState(() => _previewValue = value);
-                widget.onChanged(value);
-              },
-              onChangeEnd: widget.onChangeEnd,
+              child: Slider(
+                value: _previewValue.clamp(widget.min, widget.max),
+                min: widget.min,
+                max: widget.max,
+                divisions: widget.divisions,
+                onChanged: (value) {
+                  setState(() => _previewValue = value);
+                  widget.onChanged(value);
+                },
+                onChangeEnd: widget.onChangeEnd,
+              ),
             ),
           ),
         ],
@@ -356,14 +410,14 @@ class SwitchRow extends StatelessWidget {
   const SwitchRow({
     super.key,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.value,
     required this.onChanged,
     this.enabled = true,
   });
 
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
   final bool enabled;
@@ -371,7 +425,7 @@ class SwitchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 56),
+      constraints: BoxConstraints(minHeight: subtitle == null ? 44 : 56),
       child: Row(
         children: [
           Expanded(
@@ -381,22 +435,66 @@ class SwitchRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: OceanTypography.strong.copyWith(
-                    color: enabled ? OceanColors.ink : OceanColors.inkMuted,
-                  ),
+                  style: subtitle == null
+                      ? OceanTypography.bodyMuted
+                      : OceanTypography.strong.copyWith(
+                          color: enabled
+                              ? OceanColors.ink
+                              : OceanColors.inkMuted,
+                        ),
                 ),
-                const SizedBox(height: 2),
-                Text(subtitle, style: OceanTypography.caption),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(subtitle!, style: OceanTypography.caption),
+                ],
               ],
             ),
           ),
-          Switch(
-            value: value,
-            onChanged: enabled ? onChanged : null,
-            activeThumbColor: OceanColors.white,
-            activeTrackColor: OceanColors.verdigris,
-            inactiveThumbColor: OceanColors.white,
-            inactiveTrackColor: OceanColors.slateGrey.withValues(alpha: 0.25),
+          Semantics(
+            toggled: value,
+            enabled: enabled,
+            button: true,
+            child: InkResponse(
+              onTap: enabled ? () => onChanged(!value) : null,
+              radius: 22,
+              child: SizedBox(
+                width: 44,
+                height: 44,
+                child: Center(
+                  child: AnimatedContainer(
+                    duration: OceanMotion.responsive(
+                      context,
+                      OceanMotion.smooth,
+                    ),
+                    width: 44,
+                    height: 24,
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: value
+                          ? OceanColors.verdigris
+                          : OceanColors.slateGrey.withValues(alpha: 0.20),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: AnimatedAlign(
+                      duration: OceanMotion.responsive(
+                        context,
+                        OceanMotion.smooth,
+                      ),
+                      alignment: value
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      child: const DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: OceanColors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: SizedBox.square(dimension: 16),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -410,82 +508,81 @@ class FishAvatar extends StatelessWidget {
     required this.assetPath,
     required this.name,
     this.size = 56,
+    this.radius,
   });
 
   final String assetPath;
   final String name;
   final double size;
+  final double? radius;
 
   @override
   Widget build(BuildContext context) {
-    final normalizedAssetPath = assetPath.replaceAll('\\', '/');
-    var speciesId = normalizedAssetPath
-        .split('/')
-        .last
-        .replaceFirst(RegExp(r'\.[^.]+$'), '')
-        .replaceAll('-', '_');
-    var initials = name
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((word) => word.isNotEmpty)
-        .take(2)
-        .map((word) => word[0])
-        .join();
-    var hasCatalogEntry = false;
-    for (final species in SpeciesCatalog.options) {
-      if (species.id == speciesId ||
-          species.assetPath.replaceAll('\\', '/') == normalizedAssetPath) {
-        speciesId = species.id;
-        initials = species.initials;
-        hasCatalogEntry = true;
-        break;
-      }
-    }
-    final fallbackColor = hasCatalogEntry
-        ? Color(SpeciesCatalog.colorValueFor(speciesId))
-        : const Color(0xFF94A3B8);
-    final fallbackFontSize = size * 0.3 < 9 ? 9.0 : size * 0.3;
-
+    final resolvedRadius = radius ?? size * 0.25;
     return Semantics(
       image: true,
       label: '$name species artwork',
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: Image.asset(
-            assetPath,
-            fit: BoxFit.contain,
-            errorBuilder: (_, _, _) => DecoratedBox(
-              decoration: BoxDecoration(
-                color: fallbackColor,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: OceanColors.white.withValues(alpha: 0.20),
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  initials,
-                  style: TextStyle(
-                    fontFamily: OceanTypography.family,
-                    fontSize: fallbackFontSize,
-                    height: 1,
-                    fontWeight: FontWeight.w700,
-                    color: OceanColors.white,
-                    shadows: [
-                      Shadow(
-                        color: OceanColors.prussianBlue.withValues(alpha: 0.30),
-                        offset: const Offset(0, 1),
-                        blurRadius: 2,
-                      ),
-                    ],
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned(
+              bottom: size * 0.20,
+              left: size * 0.28,
+              width: size * 0.44,
+              height: math.max(1, size * 0.02),
+              child: ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: OceanColors.prussianBlue.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(size),
                   ),
                 ),
               ),
             ),
-          ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(resolvedRadius),
+              child: Image.asset(
+                assetPath,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: OceanColors.verdigris,
+                    borderRadius: BorderRadius.circular(resolvedRadius),
+                    border: Border.all(
+                      color: OceanColors.white.withValues(alpha: 0.20),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      name
+                          .split(' ')
+                          .take(2)
+                          .map((word) => word.isEmpty ? '' : word[0])
+                          .join(),
+                      style: OceanTypography.title.copyWith(
+                        fontSize: math.max(9, size * 0.34),
+                        fontWeight: FontWeight.w700,
+                        color: OceanColors.white,
+                        shadows: [
+                          Shadow(
+                            color: OceanColors.prussianBlue.withValues(
+                              alpha: 0.30,
+                            ),
+                            offset: const Offset(0, 1),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

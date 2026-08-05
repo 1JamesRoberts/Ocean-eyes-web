@@ -17,7 +17,7 @@ duplicate raw palette or shell geometry values.
 | Inline radius | 12 | Inline surface token |
 | Navigation | x 16, h 64, bottom ≥ 12 | Pill navigation token |
 | Navigation radius | 32 | Pill navigation token |
-| Minimum effective target | 48 | Flutter accessibility adaptation |
+| Minimum effective target | 44 | Shared interactive-target floor |
 
 Flutter logical pixels map 1:1 to the reference pixels at the authored size.
 Safe-area values are added only outside the locked authored dimensions.
@@ -38,25 +38,21 @@ Safe-area values are added only outside the locked authored dimensions.
 | Warning | `#F59E0B` |
 | Critical | `#EF4444` |
 
-For normal-size text on pearl and white surfaces, Flutter uses darker
-accessibility foreground variants: muted `#5F6D76`, good `#047857`, warning
-`#8A4B00`, and critical `#B42318`. Each exceeds WCAG AA contrast against the
-app canvas. The brighter accent tokens remain unchanged for decorative fills,
-chart marks, status dots, and alert stripes; this is an intentional, documented
-accessibility exception to literal color parity.
+Status text and marks use the same authored Good, Warning, and Critical values
+as the mobile-deploy reference.
 
 ## Glass recipes
 
 - Card: Azure Mist at 42%, 2px blur, Pearl Aqua at 72%, 1px border,
-  28px radius, white/aqua directional highlight.
+  28px radius, and the three authored top/bottom inset highlights.
 - Overlay: white at 40%, 12px blur, white at 30% border, 28px radius.
 - Inline surface: white at 20–30%, 6px conceptual blur, 12–16px radius.
 - Navigation: white at 30%, 15px blur, white at 35% border, Prussian Blue
   shadow at 10%.
 
-Flutter has no built-in inset `BoxShadow`, so `GlassCard` reproduces the three
-authored inset highlights with a restrained directional gradient and an outer
-shadow. This is a reviewed rendering exception, not a new token.
+`GlassCard` reproduces CSS inset shadows as clipped one-pixel and soft-edge
+highlight layers; the surface fill remains flat rather than becoming a
+diagonal gradient.
 
 ## Typography
 

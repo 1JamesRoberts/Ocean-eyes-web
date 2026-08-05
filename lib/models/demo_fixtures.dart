@@ -1,8 +1,8 @@
 import 'aquarium_models.dart';
-import 'species_catalog.dart';
+import 'classifiable_species.dart';
 
 abstract final class DemoFixtures {
-  static const species = SpeciesCatalog.options;
+  static final species = ClassifiableSpeciesCatalog.options;
 
   /// Matches the bundled camera frame byte-for-byte.
   static const heatmapSourceDimensions = DetectionFrameDimensions(
@@ -122,6 +122,10 @@ abstract final class DemoFixtures {
       actionPlan:
           'Inspect the filter and remove visible debris. If clarity keeps '
           'declining, perform a partial water change and scan again.',
+      clarityBefore: '2.5',
+      clarityAfter: '3.4',
+      fishBefore: '20',
+      fishAfter: '20',
     ),
     AlertItem(
       id: 'alert-fish-count',
@@ -132,6 +136,8 @@ abstract final class DemoFixtures {
       actionPlan:
           'Review the latest camera view and check plants, caves, and other '
           'hiding places. Confirm each fish is active and accounted for.',
+      fishBefore: '20',
+      fishAfter: '17',
     ),
     AlertItem(
       id: 'alert-temperature',
@@ -182,24 +188,32 @@ abstract final class DemoFixtures {
       clarity: 1.5,
       fishCount: 20,
       summary: 'Water is clear and all expected fish are present.',
+      ph: 7.2,
+      temp: 26.3,
     ),
     HistoryReading(
       date: DateTime(2026, 7, 31, 8, 15),
       clarity: 1.8,
       fishCount: 19,
       summary: 'One fish was outside the camera view.',
+      ph: 7.2,
+      temp: 26.1,
     ),
     HistoryReading(
       date: DateTime(2026, 7, 30, 20, 7),
       clarity: 2.1,
       fishCount: 20,
       summary: 'Clarity remained inside the preferred range.',
+      ph: 7.1,
+      temp: 25.9,
     ),
     HistoryReading(
       date: DateTime(2026, 7, 30, 14, 33),
       clarity: 3.4,
       fishCount: 18,
       summary: 'Brief feeding activity reduced visibility.',
+      ph: 7.2,
+      temp: 26.0,
     ),
   ];
 }

@@ -79,6 +79,14 @@ void main() {
       tester.platformDispatcher.clearAccessibilityFeaturesTestValue();
     });
 
+    await capture(
+      tester,
+      OceanEyesController(
+        launchUri: Uri.parse('https://oceaneyes.test/?fixture=login'),
+      ),
+      'login__idle',
+    );
+
     for (final entry in <(FixtureScenario, String)>[
       (FixtureScenario.dashboardWaiting, 'dashboard__waiting'),
       (FixtureScenario.populated, 'dashboard__healthy'),
@@ -279,6 +287,8 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('analytics-date-filter')));
         await pumpBounded(tester, duration: const Duration(milliseconds: 240));
         expect(find.text('Date & time range'), findsOneWidget);
+        await tester.tap(find.text('Jul 31, 2026').first);
+        await pumpBounded(tester, duration: const Duration(milliseconds: 240));
         expect(find.text('July 2026'), findsOneWidget);
       },
     );

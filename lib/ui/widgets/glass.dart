@@ -8,7 +8,7 @@ class GlassCard extends StatelessWidget {
   const GlassCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.fromLTRB(24, 24, 24, 20),
+    this.padding = const EdgeInsets.fromLTRB(20, 20, 20, 16),
     this.margin,
     this.onTap,
     this.overlay = false,
@@ -35,29 +35,32 @@ class GlassCard extends StatelessWidget {
     final borderRadius = BorderRadius.circular(radius);
     final background = overlay
         ? OceanColors.white.withValues(alpha: 0.40 * opacity)
-        : OceanColors.white.withValues(alpha: opacity);
+        : OceanColors.azureMist.withValues(alpha: 0.42 * opacity);
     final resolvedBorder =
         borderColor ??
-        OceanColors.white.withValues(alpha: overlay ? 0.30 * opacity : opacity);
+        (overlay
+            ? OceanColors.white.withValues(alpha: 0.30 * opacity)
+            : OceanColors.pearlAqua.withValues(alpha: 0.72 * opacity));
 
     Widget content = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: borderRadius,
-        boxShadow: [
-          if (overlay)
-            BoxShadow(
-              color: OceanColors.pineTeal.withValues(alpha: 0.12),
-              blurRadius: 32,
-              offset: const Offset(0, 8),
-            ),
-        ],
+        boxShadow: overlay
+            ? [
+                BoxShadow(
+                  color: OceanColors.prussianBlue.withValues(alpha: 0.12),
+                  blurRadius: 32,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : null,
       ),
       child: ClipRRect(
         borderRadius: borderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(
-            sigmaX: overlay ? 12 : 0,
-            sigmaY: overlay ? 12 : 0,
+            sigmaX: overlay ? 12 : 2,
+            sigmaY: overlay ? 12 : 2,
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -65,9 +68,20 @@ class GlassCard extends StatelessWidget {
               borderRadius: borderRadius,
               border: Border.all(color: resolvedBorder, width: borderWidth),
             ),
-            child: Padding(
-              padding: padding.add(EdgeInsets.all(borderWidth)),
-              child: child,
+            child: Stack(
+              children: [
+                Padding(padding: padding, child: child),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: CustomPaint(
+                      painter: _GlassInsetShadowPainter(
+                        overlay: overlay,
+                        opacity: opacity,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -101,11 +115,71 @@ class GlassCard extends StatelessWidget {
   }
 }
 
+class _GlassInsetShadowPainter extends CustomPainter {
+  const _GlassInsetShadowPainter({
+    required this.overlay,
+    required this.opacity,
+  });
+
+  final bool overlay;
+  final double opacity;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (overlay) {
+      final light = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = OceanColors.white.withValues(alpha: 0.25 * opacity);
+      canvas
+        ..drawLine(const Offset(1, 1), Offset(size.width - 1, 1), light)
+        ..drawLine(const Offset(1, 1), Offset(1, size.height - 1), light);
+      final shade = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1)
+        ..color = OceanColors.prussianBlue.withValues(alpha: 0.03 * opacity);
+      canvas
+        ..drawLine(
+          Offset(1, size.height - 1),
+          Offset(size.width - 1, size.height - 1),
+          shade,
+        )
+        ..drawLine(
+          Offset(size.width - 1, 1),
+          Offset(size.width - 1, size.height - 1),
+          shade,
+        );
+      return;
+    }
+
+    final top = Paint()
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5)
+      ..color = OceanColors.white.withValues(alpha: 0.30 * opacity);
+    canvas.drawRect(Rect.fromLTWH(0, 2.5, size.width, 5), top);
+    final bottom = Paint()
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5)
+      ..color = OceanColors.white.withValues(alpha: 0.50 * opacity);
+    canvas.drawRect(Rect.fromLTWH(1, size.height - 7.5, size.width, 5), bottom);
+    canvas.drawLine(
+      const Offset(0, 1),
+      Offset(size.width, 1),
+      Paint()
+        ..strokeWidth = 1
+        ..color = OceanColors.tropicalTeal.withValues(alpha: 0.50 * opacity),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _GlassInsetShadowPainter oldDelegate) =>
+      oldDelegate.overlay != overlay || oldDelegate.opacity != opacity;
+}
+
 class GlassPanel extends StatelessWidget {
   const GlassPanel({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.fromLTRB(12, 12, 12, 8),
+    this.padding = const EdgeInsets.fromLTRB(10, 10, 10, 8),
     this.onTap,
     this.borderColor,
     this.radius = 16,
@@ -132,7 +206,6 @@ class GlassPanel extends StatelessWidget {
         borderRadius: borderRadius,
         border: Border.all(
           color: borderColor ?? OceanColors.white.withValues(alpha: 0.20),
-          width: 1,
         ),
       ),
       child: child,
@@ -148,6 +221,8 @@ class GlassPanel extends StatelessWidget {
 
 enum GlassButtonStyle { primary, outline, destructive }
 
+enum GlassButtonSize { small, medium, large }
+
 class GlassButton extends StatelessWidget {
   const GlassButton({
     super.key,
@@ -157,6 +232,8 @@ class GlassButton extends StatelessWidget {
     this.style = GlassButtonStyle.primary,
     this.expanded = false,
     this.loading = false,
+    this.compact = false,
+    this.size = GlassButtonSize.medium,
   });
 
   final String label;
@@ -165,20 +242,47 @@ class GlassButton extends StatelessWidget {
   final GlassButtonStyle style;
   final bool expanded;
   final bool loading;
+  final bool compact;
+  final GlassButtonSize size;
 
   @override
   Widget build(BuildContext context) {
+    final resolvedSize = compact ? GlassButtonSize.small : size;
     final foreground = switch (style) {
       GlassButtonStyle.primary => OceanColors.white,
-      GlassButtonStyle.outline => OceanColors.pineTeal,
+      GlassButtonStyle.outline => OceanColors.ink,
       GlassButtonStyle.destructive => OceanColors.critical,
     };
     final background = switch (style) {
-      GlassButtonStyle.primary => Colors.transparent,
+      GlassButtonStyle.primary => OceanColors.action,
       GlassButtonStyle.outline => Colors.transparent,
       GlassButtonStyle.destructive => OceanColors.critical.withValues(
         alpha: 0.08,
       ),
+    };
+    final textStyle = switch (resolvedSize) {
+      GlassButtonSize.small => OceanTypography.caption,
+      GlassButtonSize.medium => OceanTypography.strong,
+      GlassButtonSize.large => OceanTypography.title,
+    };
+    final padding = switch (resolvedSize) {
+      GlassButtonSize.small => const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 6,
+      ),
+      GlassButtonSize.medium => const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 10,
+      ),
+      GlassButtonSize.large => const EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 14,
+      ),
+    };
+    final iconSize = switch (resolvedSize) {
+      GlassButtonSize.small => 13.0,
+      GlassButtonSize.medium => 17.0,
+      GlassButtonSize.large => 18.0,
     };
 
     final child = AnimatedSwitcher(
@@ -199,7 +303,7 @@ class GlassButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (icon != null) ...[
-                  Icon(icon, size: 17, color: foreground),
+                  Icon(icon, size: iconSize, color: foreground),
                   const SizedBox(width: 8),
                 ],
                 Flexible(
@@ -208,15 +312,30 @@ class GlassButton extends StatelessWidget {
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
-                    style: OceanTypography.strong.copyWith(
-                      color: foreground,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: textStyle.copyWith(color: foreground),
                   ),
                 ),
               ],
             ),
     );
+
+    final shadows = switch (style) {
+      GlassButtonStyle.primary => [
+        BoxShadow(
+          color: OceanColors.prussianBlue.withValues(alpha: 0.20),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+      GlassButtonStyle.outline => [
+        BoxShadow(
+          color: OceanColors.prussianBlue.withValues(alpha: 0.05),
+          blurRadius: 20,
+          offset: const Offset(0, 4),
+        ),
+      ],
+      GlassButtonStyle.destructive => const <BoxShadow>[],
+    };
 
     final button = ConstrainedBox(
       constraints: const BoxConstraints(
@@ -224,43 +343,100 @@ class GlassButton extends StatelessWidget {
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: background,
-          gradient: style == GlassButtonStyle.primary
-              ? const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [OceanColors.verdigris, OceanColors.pineTeal],
-                )
-              : null,
           borderRadius: BorderRadius.circular(OceanRadii.pill),
-          border: style == GlassButtonStyle.destructive
-              ? Border.all(color: OceanColors.critical.withValues(alpha: 0.30))
-              : null,
-          boxShadow: style == GlassButtonStyle.destructive
-              ? null
-              : [
-                  BoxShadow(
-                    color: OceanColors.pineTeal.withValues(
-                      alpha: style == GlassButtonStyle.primary ? 0.20 : 0.05,
-                    ),
-                    blurRadius: style == GlassButtonStyle.primary ? 12 : 20,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+          boxShadow: shadows,
         ),
-        child: TextButton(
-          onPressed: loading ? null : onPressed,
-          style: TextButton.styleFrom(
-            foregroundColor: foreground,
-            disabledForegroundColor: foreground.withValues(alpha: 0.45),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: const StadiumBorder(),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(OceanRadii.pill),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: style == GlassButtonStyle.outline ? 6 : 0,
+              sigmaY: style == GlassButtonStyle.outline ? 6 : 0,
+            ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: background,
+                borderRadius: BorderRadius.circular(OceanRadii.pill),
+                border: style == GlassButtonStyle.destructive
+                    ? Border.all(
+                        color: OceanColors.critical.withValues(alpha: 0.30),
+                      )
+                    : null,
+              ),
+              child: Stack(
+                children: [
+                  TextButton(
+                    onPressed: loading ? null : onPressed,
+                    style: TextButton.styleFrom(
+                      foregroundColor: foreground,
+                      disabledForegroundColor: foreground.withValues(
+                        alpha: 0.45,
+                      ),
+                      padding: padding,
+                      shape: const StadiumBorder(),
+                    ),
+                    child: child,
+                  ),
+                  if (style == GlassButtonStyle.outline)
+                    const Positioned.fill(
+                      child: IgnorePointer(child: _InlineInsetHighlights()),
+                    ),
+                ],
+              ),
+            ),
           ),
-          child: child,
         ),
       ),
     );
     return expanded ? SizedBox(width: double.infinity, child: button) : button;
+  }
+}
+
+class _InlineInsetHighlights extends StatelessWidget {
+  const _InlineInsetHighlights();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 1,
+            color: OceanColors.white.withValues(alpha: 0.25),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          bottom: 0,
+          left: 0,
+          child: Container(
+            width: 1,
+            color: OceanColors.white.withValues(alpha: 0.25),
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 1,
+            color: OceanColors.prussianBlue.withValues(alpha: 0.03),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          bottom: 0,
+          right: 0,
+          child: Container(
+            width: 1,
+            color: OceanColors.prussianBlue.withValues(alpha: 0.03),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -294,37 +470,16 @@ class GlassIconButton extends StatelessWidget {
         message: tooltip,
         child: SizedBox.square(
           dimension: size,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(OceanRadii.inline),
-              boxShadow: [
-                BoxShadow(
-                  color: OceanColors.pineTeal.withValues(alpha: 0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(OceanRadii.inline),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                child: ColoredBox(
-                  color:
-                      background ?? OceanColors.white.withValues(alpha: 0.30),
-                  child: IconButton(
-                    onPressed: onPressed,
-                    icon: Icon(icon, size: iconSize),
-                    color: color,
-                    disabledColor: color.withValues(alpha: 0.35),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(OceanRadii.inline),
-                      ),
-                    ),
-                  ),
-                ),
+          child: IconButton(
+            onPressed: onPressed,
+            icon: Icon(icon, size: iconSize),
+            color: color,
+            disabledColor: color.withValues(alpha: 0.35),
+            style: IconButton.styleFrom(
+              backgroundColor:
+                  background ?? OceanColors.white.withValues(alpha: 0.30),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(OceanRadii.inline),
               ),
             ),
           ),
@@ -341,8 +496,9 @@ class GlassPill extends StatelessWidget {
     this.onTap,
     this.color,
     this.foregroundColor = OceanColors.ink,
-    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
     this.minimumHeight,
+    this.borderColor,
   });
 
   final Widget child;
@@ -351,6 +507,7 @@ class GlassPill extends StatelessWidget {
   final Color foregroundColor;
   final EdgeInsetsGeometry padding;
   final double? minimumHeight;
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -363,12 +520,12 @@ class GlassPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? OceanColors.white.withValues(alpha: 0.30),
         borderRadius: BorderRadius.circular(OceanRadii.pill),
+        border: Border.all(
+          color: borderColor ?? OceanColors.white.withValues(alpha: 0.25),
+        ),
       ),
       child: DefaultTextStyle(
-        style: OceanTypography.caption.copyWith(
-          color: foregroundColor,
-          fontWeight: FontWeight.w400,
-        ),
+        style: OceanTypography.caption.copyWith(color: foregroundColor),
         child: IconTheme(
           data: IconThemeData(color: foregroundColor, size: 14),
           child: child,
