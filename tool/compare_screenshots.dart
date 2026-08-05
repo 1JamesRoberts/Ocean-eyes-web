@@ -29,22 +29,30 @@ void main(List<String> arguments) {
     exitCode = 65;
     return;
   }
-  final candidate =
-      decodedCandidate.width == reference.width &&
-          decodedCandidate.height == reference.height
-      ? decodedCandidate
-      : img.copyResize(
-          decodedCandidate,
-          width: reference.width,
-          height: reference.height,
-          interpolation: img.Interpolation.linear,
-        );
+  if (decodedCandidate.width != reference.width ||
+      decodedCandidate.height != reference.height) {
+    stderr.writeln(
+      'Screenshot dimensions must match exactly: reference is '
+      '${reference.width}x${reference.height}, candidate is '
+      '${decodedCandidate.width}x${decodedCandidate.height}.',
+    );
+    exitCode = 65;
+    return;
+  }
+  final candidate = decodedCandidate;
 
   final overlay = img.Image(width: reference.width, height: reference.height);
   final difference = img.Image(
     width: reference.width,
     height: reference.height,
   );
+  final sideBySide = img.Image(
+    width: reference.width * 2 + 16,
+    height: reference.height,
+  );
+  sideBySide.clear(img.ColorRgb8(26, 26, 26));
+  img.compositeImage(sideBySide, reference);
+  img.compositeImage(sideBySide, candidate, dstX: reference.width + 16);
   var totalError = 0.0;
   var materiallyDifferent = 0;
   final pixelCount = reference.width * reference.height;
@@ -87,17 +95,18 @@ void main(List<String> arguments) {
   File(
     '${output.path}/difference.png',
   ).writeAsBytesSync(img.encodePng(difference));
+  File(
+    '${output.path}/side-by-side.png',
+  ).writeAsBytesSync(img.encodePng(sideBySide));
   stdout.writeln(
     const JsonEncoder.withIndent('  ').convert({
       'referenceSize': '${reference.width}x${reference.height}',
-      'candidateWasResized':
-          decodedCandidate.width != reference.width ||
-          decodedCandidate.height != reference.height,
       'meanAbsoluteError': totalError / pixelCount,
       'pixelsOver12': materiallyDifferent,
       'pixelsOver12Percent': materiallyDifferent / pixelCount * 100,
       'overlay': '${output.path}/overlay.png',
       'difference': '${output.path}/difference.png',
+      'sideBySide': '${output.path}/side-by-side.png',
     }),
   );
 }

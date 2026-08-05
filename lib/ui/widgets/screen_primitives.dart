@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/oceaneyes_tokens.dart';
+import '../../models/species_catalog.dart';
 import 'glass.dart';
 
 class ScreenHeader extends StatelessWidget {
@@ -60,23 +61,38 @@ class CardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final header = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: OceanColors.ink),
-        const SizedBox(width: 8),
-        Expanded(child: Text(title, style: OceanTypography.title)),
-        ?trailing,
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Icon(icon, size: 16, color: OceanColors.ink),
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: Text(title, style: OceanTypography.title)),
+            ],
+          ),
+        ),
+        if (trailing != null) ...[const SizedBox(width: 12), trailing!],
       ],
     );
-    if (!divider) return header;
-    return Column(
-      children: [
-        header,
-        const SizedBox(height: 8),
-        Divider(
-          height: 1,
-          color: OceanColors.pearlAqua.withValues(alpha: 0.32),
-        ),
-      ],
+    return Transform.translate(
+      offset: const Offset(0, -4),
+      child: divider
+          ? Column(
+              children: [
+                header,
+                const SizedBox(height: 10),
+                Divider(
+                  height: 1,
+                  color: OceanColors.slateGrey.withValues(alpha: 0.15),
+                ),
+              ],
+            )
+          : Padding(padding: const EdgeInsets.only(bottom: 4), child: header),
     );
   }
 }
@@ -101,14 +117,12 @@ class StateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = success ? OceanColors.goodInk : OceanColors.verdigris;
+    final statusColor = success ? OceanColors.good : OceanColors.pineTeal;
     return GlassCard(
       semanticLabel: '$title. $description',
-      borderColor: success ? OceanColors.white.withValues(alpha: 0.40) : null,
-      borderWidth: success ? 2 : 1,
       padding: EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: compact ? 24 : 40,
+        horizontal: compact ? 16 : 24,
+        vertical: compact ? 16 : 40,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -120,21 +134,21 @@ class StateCard extends StatelessWidget {
               color: statusColor.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(icon, size: 24, color: statusColor),
+            child: Icon(icon, size: 22, color: statusColor),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: compact ? 8 : 12),
           Text(
             title,
             textAlign: TextAlign.center,
             style: OceanTypography.title,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             description,
             textAlign: TextAlign.center,
-            style: OceanTypography.bodyMuted,
+            style: OceanTypography.caption,
           ),
-          if (action != null) ...[const SizedBox(height: 18), action!],
+          if (action != null) ...[SizedBox(height: compact ? 12 : 16), action!],
         ],
       ),
     );
@@ -166,8 +180,8 @@ class DisclosureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      padding: EdgeInsets.zero,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Semantics(
             button: true,
@@ -175,78 +189,78 @@ class DisclosureCard extends StatelessWidget {
             enabled: enabled,
             child: InkWell(
               onTap: enabled ? () => onChanged(!expanded) : null,
-              borderRadius: BorderRadius.circular(16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 60),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        icon,
-                        size: 19,
-                        color: enabled
-                            ? OceanColors.ink
-                            : OceanColors.inkMuted.withValues(alpha: 0.45),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              title,
-                              style: OceanTypography.strong.copyWith(
-                                color: enabled
-                                    ? OceanColors.ink
-                                    : OceanColors.inkMuted,
+              borderRadius: BorderRadius.circular(12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        SizedBox.square(
+                          dimension: 36,
+                          child: Center(
+                            child: Icon(
+                              icon,
+                              size: 17,
+                              color: enabled
+                                  ? OceanColors.slateGrey
+                                  : OceanColors.slateGrey.withValues(
+                                      alpha: 0.45,
+                                    ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                title,
+                                style: OceanTypography.strong.copyWith(
+                                  color: enabled
+                                      ? OceanColors.ink
+                                      : OceanColors.inkMuted,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              subtitle,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: OceanTypography.caption,
-                            ),
-                          ],
+                              if (subtitle.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text(subtitle, style: OceanTypography.caption),
+                              ],
+                            ],
+                          ),
                         ),
-                      ),
-                      if (badge != null) ...[badge!, const SizedBox(width: 6)],
-                      AnimatedRotation(
-                        turns: expanded ? 0.25 : 0,
-                        duration: OceanMotion.responsive(
-                          context,
-                          OceanMotion.smooth,
-                        ),
-                        child: Icon(
-                          LucideIcons.chevronRight,
-                          size: 18,
-                          color: OceanColors.inkMuted,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                  if (badge != null) ...[const SizedBox(width: 12), badge!],
+                  const SizedBox(width: 12),
+                  AnimatedRotation(
+                    turns: expanded ? 0.25 : 0,
+                    duration: OceanMotion.responsive(
+                      context,
+                      const Duration(milliseconds: 300),
+                    ),
+                    curve: Curves.easeOut,
+                    child: const Icon(
+                      LucideIcons.chevronRight,
+                      size: 18,
+                      color: OceanColors.inkMuted,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
           AnimatedSize(
             duration: OceanMotion.responsive(
               context,
-              const Duration(milliseconds: 300),
+              const Duration(milliseconds: 350),
             ),
-            curve: Curves.easeOut,
+            curve: const Cubic(0.16, 1, 0.3, 1),
             alignment: Alignment.topCenter,
             child: expanded
-                ? Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 2, 12, 12),
-                    child: child,
-                  )
+                ? Padding(padding: const EdgeInsets.only(top: 16), child: child)
                 : const SizedBox(width: double.infinity),
           ),
         ],
@@ -311,10 +325,10 @@ class _OceanSliderState extends State<OceanSlider> {
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: OceanColors.verdigris,
-              inactiveTrackColor: OceanColors.slateGrey.withValues(alpha: 0.18),
+              inactiveTrackColor: OceanColors.azureMist,
               thumbColor: OceanColors.white,
               overlayColor: OceanColors.verdigris.withValues(alpha: 0.12),
-              trackHeight: 4,
+              trackHeight: 8,
               thumbShape: const RoundSliderThumbShape(
                 enabledThumbRadius: 8,
                 elevation: 2,
@@ -404,29 +418,72 @@ class FishAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final normalizedAssetPath = assetPath.replaceAll('\\', '/');
+    var speciesId = normalizedAssetPath
+        .split('/')
+        .last
+        .replaceFirst(RegExp(r'\.[^.]+$'), '')
+        .replaceAll('-', '_');
+    var initials = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
+        .take(2)
+        .map((word) => word[0])
+        .join();
+    var hasCatalogEntry = false;
+    for (final species in SpeciesCatalog.options) {
+      if (species.id == speciesId ||
+          species.assetPath.replaceAll('\\', '/') == normalizedAssetPath) {
+        speciesId = species.id;
+        initials = species.initials;
+        hasCatalogEntry = true;
+        break;
+      }
+    }
+    final fallbackColor = hasCatalogEntry
+        ? Color(SpeciesCatalog.colorValueFor(speciesId))
+        : const Color(0xFF94A3B8);
+    final fallbackFontSize = size * 0.3 < 9 ? 9.0 : size * 0.3;
+
     return Semantics(
       image: true,
       label: '$name species artwork',
-      child: Container(
-        width: size,
-        height: size,
-        padding: EdgeInsets.all(size * 0.06),
-        decoration: BoxDecoration(
-          color: OceanColors.turquoise.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(size * 0.30),
-          border: Border.all(color: OceanColors.white.withValues(alpha: 0.28)),
-        ),
-        child: Image.asset(
-          assetPath,
-          fit: BoxFit.contain,
-          errorBuilder: (_, _, _) => Center(
-            child: Text(
-              name
-                  .split(' ')
-                  .take(2)
-                  .map((word) => word.isEmpty ? '' : word[0])
-                  .join(),
-              style: OceanTypography.title,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Image.asset(
+            assetPath,
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => DecoratedBox(
+              decoration: BoxDecoration(
+                color: fallbackColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: OceanColors.white.withValues(alpha: 0.20),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  initials,
+                  style: TextStyle(
+                    fontFamily: OceanTypography.family,
+                    fontSize: fallbackFontSize,
+                    height: 1,
+                    fontWeight: FontWeight.w700,
+                    color: OceanColors.white,
+                    shadows: [
+                      Shadow(
+                        color: OceanColors.prussianBlue.withValues(alpha: 0.30),
+                        offset: const Offset(0, 1),
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ),

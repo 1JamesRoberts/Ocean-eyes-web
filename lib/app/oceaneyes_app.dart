@@ -6,6 +6,7 @@ import '../core/theme/oceaneyes_theme.dart';
 import '../core/theme/oceaneyes_tokens.dart';
 import '../models/aquarium_models.dart';
 import '../ui/shell/oceaneyes_shell.dart';
+import '../ui/widgets/pill_navigation.dart';
 import '../view_models/oceaneyes_controller.dart';
 
 class OceanEyesApp extends StatefulWidget {
@@ -35,16 +36,38 @@ class _OceanEyesAppState extends State<OceanEyesApp> {
       debugShowCheckedModeBanner: false,
       theme: OceanEyesTheme.light,
       themeMode: ThemeMode.light,
-      builder: (context, child) => ColoredBox(
-        color: OceanColors.prussianBlue,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: OceanGeometry.referenceWidth,
-            ),
-            child: child ?? const SizedBox.shrink(),
-          ),
-        ),
+      builder: (context, child) => AnimatedBuilder(
+        animation: _controller,
+        child: child,
+        builder: (context, child) {
+          final page = child ?? const SizedBox.shrink();
+          final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+          return ColoredBox(
+            color: OceanColors.frame,
+            child: _controller.fullscreenCamera
+                ? ColoredBox(
+                    color: Colors.black,
+                    child: SizedBox.expand(child: page),
+                  )
+                : Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: OceanGeometry.referenceWidth,
+                      ),
+                      child: ColoredBox(
+                        color: Colors.black,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(child: page),
+                            if (!keyboardOpen)
+                              PillNavigation(controller: _controller),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+          );
+        },
       ),
       home: AnimatedBuilder(
         animation: _controller,

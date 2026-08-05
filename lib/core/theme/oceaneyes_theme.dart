@@ -15,7 +15,7 @@ abstract final class OceanEyesTheme {
 
     return ThemeData(
       useMaterial3: true,
-      fontFamily: 'Inter',
+      fontFamily: OceanTypography.family,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: OceanColors.prussianBlue,
       splashFactory: InkSparkle.splashFactory,
@@ -25,8 +25,8 @@ abstract final class OceanEyesTheme {
         bodyMedium: OceanTypography.body,
         bodySmall: OceanTypography.caption,
       ),
-      focusColor: OceanColors.verdigris.withValues(alpha: 0.12),
-      dividerColor: OceanColors.pearlAqua.withValues(alpha: 0.72),
+      focusColor: OceanColors.pineTeal.withValues(alpha: 0.10),
+      dividerColor: OceanColors.slateGrey.withValues(alpha: 0.15),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: OceanColors.white.withValues(alpha: 0.30),
@@ -51,7 +51,8 @@ abstract final class OceanEyesTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(OceanRadii.inline),
           borderSide: BorderSide(
-            color: OceanColors.verdigris.withValues(alpha: 0.40),
+            width: 0.5,
+            color: OceanColors.pineTeal.withValues(alpha: 0.40),
           ),
         ),
         hintStyle: OceanTypography.bodyMuted,

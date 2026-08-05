@@ -33,7 +33,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('switches primary tabs and opens origin-aware history', (
+  testWidgets('history returns to the dashboard like the reference app', (
     tester,
   ) async {
     final controller = await pumpReferenceApp(tester);
@@ -42,15 +42,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(controller.activeTab, PrimaryTab.analytics);
     expect(find.text('AQUARIUM INTELLIGENCE'), findsOneWidget);
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: 'analytics should lay out before opening history',
+    );
 
     controller.openHistory();
     await tester.pumpAndSettle();
     expect(find.text('CLARITY ANALYTICS'), findsOneWidget);
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: 'history should lay out without overflow',
+    );
 
     controller.closeSecondaryRoute();
     await tester.pumpAndSettle();
-    expect(controller.activeTab, PrimaryTab.analytics);
-    expect(find.text('AQUARIUM INTELLIGENCE'), findsOneWidget);
+    expect(controller.activeTab, PrimaryTab.dashboard);
+    expect(find.text('AQUARIUM OVERVIEW'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -111,9 +121,9 @@ void main() {
     controller.applyFixture(FixtureScenario.cameraPermission);
     controller.selectTab(PrimaryTab.account);
     await tester.pumpAndSettle();
-    expect(find.text('Allow Camera Access'), findsOneWidget);
+    expect(find.text('Connect Stream'), findsOneWidget);
 
-    await tester.tap(find.text('Allow Camera Access'));
+    await tester.tap(find.text('Connect Stream'));
     await tester.pump(const Duration(milliseconds: 550));
     expect(controller.cameraStage, CameraStage.active);
 

@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import '../../core/theme/oceaneyes_tokens.dart';
 import '../../models/aquarium_models.dart';
 import '../../view_models/oceaneyes_controller.dart';
 import 'data_visuals.dart';
-import 'glass.dart';
 
 class AquariumAmbientBackdrop extends StatelessWidget {
   const AquariumAmbientBackdrop({super.key, required this.controller});
@@ -18,55 +16,20 @@ class AquariumAmbientBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.maybeOf(context)?.disableAnimations == true) {
-      return const ColoredBox(color: OceanColors.azureMist);
-    }
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        const ColoredBox(color: OceanColors.azureMist),
-        Positioned(
-          left: -32,
-          right: -32,
-          top: OceanGeometry.heroHeight - 4,
-          bottom: -32,
-          child: ImageFiltered(
-            imageFilter: ImageFilter.blur(
-              sigmaX: controller.ambientBlur,
-              sigmaY: controller.ambientBlur,
-            ),
-            child: Opacity(
-              opacity: (controller.ambientOpacity * 0.10).clamp(0, 1),
-              child: Transform.scale(
-                scale: 1.05,
-                alignment: Alignment.topCenter,
-                child: AquariumStreamImage(
-                  controller: controller,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-          ),
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            OceanColors.white,
+            OceanColors.azureMist2,
+            OceanColors.azureMist2,
+            OceanColors.white,
+          ],
+          stops: [0, 0.05, 0.95, 1],
         ),
-        Positioned.fill(
-          top: OceanGeometry.heroHeight,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  OceanColors.white.withValues(alpha: 0.10),
-                  OceanColors.azureMist.withValues(alpha: 0.82),
-                  OceanColors.azureMist,
-                ],
-                stops: const [0, 0.38, 1],
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -97,34 +60,59 @@ class AquariumStreamImage extends StatelessWidget {
     const greenLuminance = 0.7152;
     const blueLuminance = 0.0722;
 
-    return ColorFiltered(
-      colorFilter: ColorFilter.matrix([
-        (redLuminance * inverseSaturation + saturation) * multiplier,
-        greenLuminance * inverseSaturation * multiplier,
-        blueLuminance * inverseSaturation * multiplier,
-        0,
-        offset,
-        redLuminance * inverseSaturation * multiplier,
-        (greenLuminance * inverseSaturation + saturation) * multiplier,
-        blueLuminance * inverseSaturation * multiplier,
-        0,
-        offset,
-        redLuminance * inverseSaturation * multiplier,
-        greenLuminance * inverseSaturation * multiplier,
-        (blueLuminance * inverseSaturation + saturation) * multiplier,
-        0,
-        offset,
-        0,
-        0,
-        0,
-        1,
-        0,
-      ]),
-      child: Image.asset(
-        'assets/images/aquarium_hero.png',
-        fit: fit,
-        alignment: alignment,
-      ),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ColorFiltered(
+          colorFilter: ColorFilter.matrix([
+            (redLuminance * inverseSaturation + saturation) * multiplier,
+            greenLuminance * inverseSaturation * multiplier,
+            blueLuminance * inverseSaturation * multiplier,
+            0,
+            offset,
+            redLuminance * inverseSaturation * multiplier,
+            (greenLuminance * inverseSaturation + saturation) * multiplier,
+            blueLuminance * inverseSaturation * multiplier,
+            0,
+            offset,
+            redLuminance * inverseSaturation * multiplier,
+            greenLuminance * inverseSaturation * multiplier,
+            (blueLuminance * inverseSaturation + saturation) * multiplier,
+            0,
+            offset,
+            0,
+            0,
+            0,
+            1,
+            0,
+          ]),
+          child: Image.asset(
+            'assets/images/aquarium_hero.png',
+            fit: fit,
+            alignment: alignment,
+          ),
+        ),
+        if (controller.temperature != 0)
+          ColoredBox(
+            color:
+                (controller.temperature > 0
+                        ? const Color(0xFFFFB000)
+                        : const Color(0xFF00A0FF))
+                    .withValues(
+                      alpha: (controller.temperature.abs() / 300).clamp(0, 1),
+                    ),
+          ),
+        if (controller.tint != 0)
+          ColoredBox(
+            color:
+                (controller.tint > 0
+                        ? const Color(0xFFFF00BB)
+                        : const Color(0xFF00FF44))
+                    .withValues(
+                      alpha: (controller.tint.abs() / 400).clamp(0, 1),
+                    ),
+          ),
+      ],
     );
   }
 }
@@ -156,38 +144,21 @@ class AquariumHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final safeTop = MediaQuery.paddingOf(context).top;
     return SizedBox(
       height: OceanGeometry.heroHeight + OceanGeometry.heroBlendExtension,
       child: Stack(
         clipBehavior: Clip.none,
         fit: StackFit.expand,
         children: [
-          ShaderMask(
-            blendMode: BlendMode.dstIn,
-            shaderCallback: (bounds) => const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black,
-                Colors.black,
-                Color(0xB3000000),
-                Color(0x33000000),
-                Color(0x1A000000),
-                Colors.transparent,
-              ],
-              stops: [0, 0.70, 0.76, 0.85, 0.94, 1],
-            ).createShader(bounds),
-            child: ColoredBox(
-              color: OceanColors.prussianBlue,
-              child: _isStreaming
-                  ? AquariumStreamImage(
-                      controller: controller,
-                      fit: BoxFit.cover,
-                      alignment: Alignment.center,
-                    )
-                  : const SizedBox.expand(),
-            ),
+          ColoredBox(
+            color: OceanColors.prussianBlue,
+            child: _isStreaming
+                ? AquariumStreamImage(
+                    controller: controller,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
+                  )
+                : const SizedBox.expand(),
           ),
           if (_isStreaming)
             const DecoratedBox(
@@ -195,21 +166,51 @@ class AquariumHero extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.center,
-                  colors: [Color(0x66000000), Colors.transparent],
+                  colors: [Color(0x33000000), Colors.transparent],
                 ),
               ),
             ),
-          if (_isStreaming && controller.aiEnabled && controller.showDetections)
-            const Positioned.fill(
-              child: IgnorePointer(child: _DetectionBoxes()),
+          Positioned.fill(
+            child: HeatmapOverlay(
+              centers: controller.selectedHeatmapCenters,
+              sourceDimensions: controller.heatmapSourceDimensions,
+              visible:
+                  controller.activeTab == PrimaryTab.analytics &&
+                  page == AppPage.primary,
             ),
-          if (controller.activeTab == PrimaryTab.analytics &&
-              page == AppPage.primary)
-            const Positioned.fill(child: HeatmapOverlay(visible: true)),
-          if (controller.activeTab == PrimaryTab.myFish &&
-              page == AppPage.primary &&
-              controller.fish.isNotEmpty)
-            Positioned.fill(child: _FishMotionOverlay(controller: controller)),
+          ),
+          Positioned(
+            top: OceanGeometry.heroSurfaceTop,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: IgnorePointer(
+              child: ShaderMask(
+                blendMode: BlendMode.dstIn,
+                shaderCallback: (bounds) => LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: const [Colors.transparent, Colors.black],
+                  stops: [0, (40 / bounds.height).clamp(0, 1)],
+                ).createShader(bounds),
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        OceanColors.white,
+                        OceanColors.azureMist2,
+                        OceanColors.azureMist2,
+                        OceanColors.white,
+                      ],
+                      stops: [0, 0.05, 0.95, 1],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           Positioned.fill(
             bottom: OceanGeometry.heroBlendExtension,
             child: Material(
@@ -224,7 +225,7 @@ class AquariumHero extends StatelessWidget {
                   children: [
                     if (_isStreaming)
                       Positioned(
-                        top: math.max(12, safeTop + 6),
+                        top: 12,
                         left: 16,
                         child: Row(
                           children: [
@@ -232,18 +233,7 @@ class AquariumHero extends StatelessWidget {
                               semanticLabel: 'Camera is live',
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 7,
-                                    height: 7,
-                                    decoration: const BoxDecoration(
-                                      color: OceanColors.critical,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  const Text('Live'),
-                                ],
+                                children: [const Text('Live')],
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -254,10 +244,6 @@ class AquariumHero extends StatelessWidget {
                             ),
                           ],
                         ),
-                      )
-                    else
-                      Positioned.fill(
-                        child: _CameraStateMessage(controller: controller),
                       ),
                     Positioned(
                       left: 16,
@@ -267,14 +253,18 @@ class AquariumHero extends StatelessWidget {
                         child: Text(
                           _eyebrow,
                           style: const TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: OceanTypography.family,
                             fontSize: 12,
-                            height: 1.2,
+                            height: 16 / 12,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 1.32,
                             color: OceanColors.white,
                             shadows: [
-                              Shadow(color: Color(0x73051E32), blurRadius: 8),
+                              Shadow(
+                                color: Color(0x26000000),
+                                blurRadius: 2,
+                                offset: Offset(0, 1),
+                              ),
                             ],
                           ),
                         ),
@@ -282,7 +272,7 @@ class AquariumHero extends StatelessWidget {
                     ),
                     if (page != AppPage.primary)
                       Positioned(
-                        top: math.max(12, safeTop + 6),
+                        top: 12,
                         right: 16,
                         child: _HeroBackButton(
                           onTap: page == AppPage.alertDetail
@@ -293,7 +283,7 @@ class AquariumHero extends StatelessWidget {
                     if (page == AppPage.primary &&
                         controller.activeTab == PrimaryTab.myFish)
                       Positioned(
-                        top: math.max(12, safeTop + 6),
+                        top: 12,
                         right: 16,
                         child: _HeroPill(
                           onTap: controller.requestAddFish,
@@ -319,8 +309,8 @@ class AquariumHero extends StatelessWidget {
                         controller.activeTab == PrimaryTab.account &&
                         _isStreaming)
                       Positioned(
-                        right: 12,
-                        bottom: 6,
+                        right: 16,
+                        bottom: 12,
                         child: _CameraHeroControls(controller: controller),
                       ),
                   ],
@@ -328,6 +318,8 @@ class AquariumHero extends StatelessWidget {
               ),
             ),
           ),
+          if (!_isStreaming)
+            Positioned.fill(child: _CameraStateMessage(controller: controller)),
         ],
       ),
     );
@@ -348,16 +340,62 @@ class _HeroPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget content = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(OceanRadii.pill),
+        boxShadow: [
+          BoxShadow(
+            color: OceanColors.pineTeal.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(OceanRadii.pill),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: CustomPaint(
+            foregroundPainter: const _GlassInsetPainter(radius: 999),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 32),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              alignment: Alignment.center,
+              color: Colors.transparent,
+              child: DefaultTextStyle(
+                style: const TextStyle(
+                  fontFamily: OceanTypography.family,
+                  fontSize: 12,
+                  height: 1.35,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: -0.12,
+                  color: OceanColors.white,
+                ),
+                child: IconTheme(
+                  data: const IconThemeData(color: OceanColors.white, size: 13),
+                  child: child,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (onTap != null) {
+      content = Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(OceanRadii.pill),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(OceanRadii.pill),
+          child: content,
+        ),
+      );
+    }
     return Semantics(
       label: semanticLabel,
       button: onTap != null,
-      child: GlassPill(
-        onTap: onTap,
-        foregroundColor: OceanColors.white,
-        color: OceanColors.prussianBlue.withValues(alpha: 0.18),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-        child: child,
-      ),
+      child: content,
     );
   }
 }
@@ -391,67 +429,78 @@ class _CameraStateMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (icon, title, detail) = switch (controller.cameraStage) {
-      CameraStage.beforePermission => (
-        LucideIcons.camera,
-        'Camera access required',
-        'Allow access to start monitoring automatically.',
-      ),
-      CameraStage.requestingPermission => (
-        LucideIcons.loaderCircle,
-        'Requesting camera access',
-        'Check the system permission prompt.',
-      ),
-      CameraStage.denied => (
-        LucideIcons.cameraOff,
-        'Camera permission denied',
-        'Open Account to retry or update system settings.',
-      ),
-      CameraStage.unavailable => (
-        LucideIcons.wifiOff,
-        'Camera unavailable',
-        'No compatible camera was found.',
-      ),
-      _ => (
-        LucideIcons.video,
-        'Feed is idle',
-        'Open Account to start aquarium monitoring.',
-      ),
-    };
-    final isLoading =
+    final connecting =
         controller.cameraStage == CameraStage.requestingPermission;
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(36, 38, 36, 42),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isLoading)
-              const SizedBox.square(
-                dimension: 30,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: OceanColors.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          connecting
+              ? const SizedBox.square(
+                  dimension: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: OceanColors.slateGrey,
+                  ),
+                )
+              : const Icon(
+                  Icons.videocam_outlined,
+                  size: 24,
+                  color: OceanColors.slateGrey,
                 ),
-              )
-            else
-              Icon(icon, size: 30, color: OceanColors.white),
-            const SizedBox(height: 9),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: OceanTypography.strong.copyWith(color: OceanColors.white),
+          const SizedBox(height: 8),
+          const Text(
+            'Feed is idle. Connect stream to monitor.',
+            textAlign: TextAlign.center,
+            style: OceanTypography.caption,
+          ),
+          const SizedBox(height: 16),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [OceanColors.verdigris, OceanColors.pineTeal],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: OceanColors.pineTeal.withValues(alpha: 0.25),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            const SizedBox(height: 3),
-            Text(
-              detail,
-              textAlign: TextAlign.center,
-              style: OceanTypography.caption.copyWith(
-                color: OceanColors.white.withValues(alpha: 0.72),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(24),
+              child: InkWell(
+                onTap: connecting
+                    ? null
+                    : () {
+                        if (controller.cameraStage == CameraStage.unavailable) {
+                          controller.connectDemoTank();
+                        } else {
+                          controller.requestCameraPermission();
+                        }
+                      },
+                borderRadius: BorderRadius.circular(24),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    'Connect Stream',
+                    style: OceanTypography.caption.copyWith(
+                      color: OceanColors.white.withValues(alpha: 0.70),
+                    ),
+                  ),
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -521,20 +570,22 @@ class _CameraHeroControls extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _HeroCircleButton(
-          icon: LucideIcons.switchCamera,
+          icon: LucideIcons.camera,
           tooltip: controller.usingFrontCamera
               ? 'Switch to tank camera'
               : 'Switch to device camera',
           active: controller.usingFrontCamera,
           onTap: busy ? null : controller.switchCamera,
         ),
+        const SizedBox(width: 8),
         _HeroCircleButton(
-          icon: LucideIcons.testTube2,
+          icon: LucideIcons.eye,
           tooltip: 'Measure water clarity',
           onTap: busy ? null : controller.measureTurbidity,
         ),
+        const SizedBox(width: 8),
         _HeroCircleButton(
-          icon: LucideIcons.sparkles,
+          icon: LucideIcons.brain,
           tooltip: controller.aiEnabled
               ? 'Stop AI analysis'
               : 'Start AI analysis',
@@ -542,11 +593,13 @@ class _CameraHeroControls extends StatelessWidget {
           loading: controller.cameraStage == CameraStage.aiProcessing,
           onTap: busy ? null : () => controller.toggleAI(!controller.aiEnabled),
         ),
+        const SizedBox(width: 8),
         const _HeroCircleButton(
           icon: LucideIcons.stethoscope,
           tooltip: 'Disease diagnosis is not yet available',
           onTap: null,
         ),
+        const SizedBox(width: 8),
         _HeroCircleButton(
           icon: LucideIcons.maximize2,
           tooltip: 'Enter fullscreen',
@@ -580,142 +633,52 @@ class _HeroCircleButton extends StatelessWidget {
         button: true,
         enabled: onTap != null,
         label: tooltip,
-        child: SizedBox.square(
-          dimension: 44,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: Center(
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: OceanColors.prussianBlue.withValues(alpha: 0.18),
-                  border: Border.all(
-                    color: active
-                        ? OceanColors.neonIce.withValues(alpha: 0.85)
-                        : OceanColors.white.withValues(alpha: 0.30),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: OceanColors.prussianBlue.withValues(alpha: 0.12),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: loading
-                    ? const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: OceanColors.white,
+        child: Opacity(
+          opacity: onTap == null ? 0.35 : 1,
+          child: SizedBox.square(
+            dimension: 32,
+            child: InkWell(
+              onTap: onTap,
+              customBorder: const CircleBorder(),
+              child: Center(
+                child: ClipOval(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                    child: CustomPaint(
+                      foregroundPainter: const _GlassInsetPainter(radius: 16),
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                          boxShadow: [
+                            BoxShadow(
+                              color: OceanColors.pineTeal.withValues(
+                                alpha: 0.05,
+                              ),
+                              blurRadius: 20,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                      )
-                    : Icon(
-                        icon,
-                        size: 15,
-                        color: onTap == null
-                            ? OceanColors.white.withValues(alpha: 0.35)
-                            : OceanColors.white,
+                        child: loading
+                            ? const _SpinningLoaderIcon()
+                            : Icon(
+                                icon,
+                                size: 14,
+                                color: OceanColors.white,
+                                shadows: active
+                                    ? const [
+                                        Shadow(
+                                          color: OceanColors.white,
+                                          blurRadius: 5,
+                                        ),
+                                      ]
+                                    : null,
+                              ),
                       ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DetectionBoxes extends StatelessWidget {
-  const _DetectionBoxes();
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: const [
-        _DetectionBox(
-          left: 0.12,
-          top: 0.33,
-          width: 0.15,
-          height: 0.18,
-          label: 'Cardinal Tetra 94%',
-        ),
-        _DetectionBox(
-          left: 0.48,
-          top: 0.44,
-          width: 0.18,
-          height: 0.20,
-          label: 'Guppy 89%',
-        ),
-        _DetectionBox(
-          left: 0.72,
-          top: 0.25,
-          width: 0.13,
-          height: 0.17,
-          label: 'Corydoras 82%',
-        ),
-      ],
-    );
-  }
-}
-
-class _DetectionBox extends StatelessWidget {
-  const _DetectionBox({
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
-    required this.label,
-  });
-
-  final double left;
-  final double top;
-  final double width;
-  final double height;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final referenceWidth = math.min(
-      MediaQuery.sizeOf(context).width,
-      OceanGeometry.referenceWidth,
-    );
-    return Positioned(
-      left: referenceWidth * left,
-      top: OceanGeometry.heroHeight * top,
-      width: referenceWidth * width,
-      height: OceanGeometry.heroHeight * height,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border.all(color: OceanColors.neonIce, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: OceanColors.neonIce.withValues(alpha: 0.22),
-              blurRadius: 5,
-            ),
-          ],
-        ),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: Transform.translate(
-            offset: const Offset(-1.5, -16),
-            child: DecoratedBox(
-              decoration: const BoxDecoration(color: OceanColors.neonIce),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.clip,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 8,
-                    height: 1.2,
-                    color: OceanColors.prussianBlue,
-                    fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -727,72 +690,73 @@ class _DetectionBox extends StatelessWidget {
   }
 }
 
-class _FishMotionOverlay extends StatefulWidget {
-  const _FishMotionOverlay({required this.controller});
-
-  final OceanEyesController controller;
+class _SpinningLoaderIcon extends StatefulWidget {
+  const _SpinningLoaderIcon();
 
   @override
-  State<_FishMotionOverlay> createState() => _FishMotionOverlayState();
+  State<_SpinningLoaderIcon> createState() => _SpinningLoaderIconState();
 }
 
-class _FishMotionOverlayState extends State<_FishMotionOverlay>
+class _SpinningLoaderIconState extends State<_SpinningLoaderIcon>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _animation = AnimationController(
+  late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 12),
-  );
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MediaQuery.of(context).disableAnimations) {
-      _animation.stop();
-      _animation.value = 0.42;
-    } else if (!_animation.isAnimating) {
-      _animation.repeat();
-    }
-  }
+    duration: const Duration(milliseconds: 1000),
+  )..repeat();
 
   @override
   void dispose() {
-    _animation.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final swimmers = widget.controller.fish.take(4).toList(growable: false);
-    return IgnorePointer(
-      child: AnimatedBuilder(
-        animation: _animation,
-        builder: (context, _) => LayoutBuilder(
-          builder: (context, constraints) => Stack(
-            children: [
-              for (var index = 0; index < swimmers.length; index += 1)
-                Positioned(
-                  left:
-                      ((_animation.value + index * 0.27) % 1.15) *
-                          (constraints.maxWidth + 70) -
-                      70,
-                  top:
-                      52 +
-                      index * 30 +
-                      math.sin(_animation.value * math.pi * 2 + index) * 9,
-                  child: Opacity(
-                    opacity: 0.72,
-                    child: Image.asset(
-                      swimmers[index].assetPath,
-                      width: 52 + index * 6,
-                      height: 38 + index * 4,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
+    return RotationTransition(
+      turns: _controller,
+      child: const Icon(
+        LucideIcons.loader2,
+        size: 14,
+        color: OceanColors.white,
       ),
     );
   }
+}
+
+class _GlassInsetPainter extends CustomPainter {
+  const _GlassInsetPainter({required this.radius});
+
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final resolvedRadius = radius.clamp(0, size.shortestSide / 2).toDouble();
+    final rect = Offset.zero & size;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        rect.deflate(0.5),
+        Radius.circular(resolvedRadius),
+      ),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = OceanColors.white.withValues(alpha: 0.25),
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        rect.deflate(1.5),
+        Radius.circular(
+          (resolvedRadius - 1).clamp(0, resolvedRadius).toDouble(),
+        ),
+      ),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = OceanColors.pineTeal.withValues(alpha: 0.03),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _GlassInsetPainter oldDelegate) =>
+      oldDelegate.radius != radius;
 }

@@ -10,7 +10,7 @@ import '../screens/dashboard_screen.dart';
 import '../screens/history_screen.dart';
 import '../screens/my_fish_screen.dart';
 import '../widgets/aquarium_hero.dart';
-import '../widgets/pill_navigation.dart';
+import '../widgets/ocean_status_bar.dart';
 
 class OceanEyesShell extends StatefulWidget {
   const OceanEyesShell({
@@ -52,13 +52,17 @@ class _OceanEyesShellState extends State<OceanEyesShell> {
   @override
   Widget build(BuildContext context) {
     final bottomSafe = MediaQuery.paddingOf(context).bottom;
-    final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
     final navigationClearance =
         OceanGeometry.navigationHeightFor(context) +
         (bottomSafe > OceanGeometry.navigationBottom
             ? bottomSafe
             : OceanGeometry.navigationBottom) +
         16;
+    final home =
+        widget.page == AppPage.primary &&
+        widget.controller.activeTab == PrimaryTab.dashboard;
+    final contentTopPadding =
+        OceanGeometry.heroContentSpacer + (home ? 0.0 : -8.0);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -75,7 +79,7 @@ class _OceanEyesShellState extends State<OceanEyesShell> {
               child: AquariumAmbientBackdrop(controller: widget.controller),
             ),
             Positioned(
-              top: 0,
+              top: OceanGeometry.statusBarHeight,
               left: 0,
               right: 0,
               child: ExcludeFocus(
@@ -87,16 +91,15 @@ class _OceanEyesShellState extends State<OceanEyesShell> {
               ),
             ),
             Positioned(
-              top: 213,
+              top: OceanGeometry.statusBarHeight,
               left: 0,
               right: 0,
               bottom: 0,
               child: ExcludeFocus(
                 excluding: widget.controller.fullscreenCamera,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(OceanRadii.card),
-                  ),
+                child: ClipPath(
+                  clipper: const _HeroContentClipper(),
+                  clipBehavior: Clip.antiAlias,
                   child: SingleChildScrollView(
                     key: ValueKey(
                       'screen-scroll-${widget.page.name}-${widget.controller.activeTab.name}',
@@ -109,7 +112,7 @@ class _OceanEyesShellState extends State<OceanEyesShell> {
                     ),
                     padding: EdgeInsets.fromLTRB(
                       OceanGeometry.contentGutter,
-                      20,
+                      contentTopPadding,
                       OceanGeometry.contentGutter,
                       navigationClearance,
                     ),
@@ -141,8 +144,13 @@ class _OceanEyesShellState extends State<OceanEyesShell> {
                 ),
               ),
             ),
-            if (!keyboardOpen && !widget.controller.fullscreenCamera)
-              PillNavigation(controller: widget.controller),
+            if (!widget.controller.fullscreenCamera)
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: OceanStatusBar(),
+              ),
             if (widget.controller.fullscreenCamera)
               FullscreenCameraOverlay(controller: widget.controller),
           ],
@@ -184,4 +192,28 @@ class _OceanEyesShellState extends State<OceanEyesShell> {
       },
     };
   }
+}
+
+class _HeroContentClipper extends CustomClipper<Path> {
+  const _HeroContentClipper();
+
+  @override
+  Path getClip(Size size) {
+    final clippedRegion = Rect.fromLTRB(
+      OceanGeometry.contentGutter,
+      OceanGeometry.heroContentClipStart,
+      size.width - OceanGeometry.contentGutter,
+      size.height,
+    );
+    return Path()..addRRect(
+      RRect.fromRectAndCorners(
+        clippedRegion,
+        topLeft: const Radius.circular(OceanRadii.card),
+        topRight: const Radius.circular(OceanRadii.card),
+      ),
+    );
+  }
+
+  @override
+  bool shouldReclip(covariant _HeroContentClipper oldClipper) => false;
 }

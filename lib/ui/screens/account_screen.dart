@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -7,7 +8,6 @@ import '../../core/theme/oceaneyes_tokens.dart';
 import '../../models/aquarium_models.dart';
 import '../../view_models/oceaneyes_controller.dart';
 import '../widgets/aquarium_hero.dart';
-import '../widgets/data_visuals.dart';
 import '../widgets/glass.dart';
 import '../widgets/screen_primitives.dart';
 
@@ -22,6 +22,7 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   bool _renaming = false;
+  bool _confirmingDisconnect = false;
   late final TextEditingController _tankNameController;
 
   OceanEyesController get controller => widget.controller;
@@ -53,8 +54,12 @@ class _AccountScreenState extends State<AccountScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _CameraLifecycleCard(controller: controller),
-        const SizedBox(height: 16),
+        if (controller.tankConnected && !_isStreaming)
+          const SizedBox(height: 16),
+        if (!controller.tankConnected) ...[
+          const _UnlinkedTankNotice(),
+          const SizedBox(height: 16),
+        ],
         if (_isStreaming) ...[
           _AIAnalysisCard(controller: controller),
           const SizedBox(height: 16),
@@ -75,120 +80,87 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Widget _buildTankManagement(BuildContext context) {
     return GlassCard(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
       child: Column(
         children: [
           const CardHeader(
             title: 'Tank Management',
-            icon: LucideIcons.settings,
+            icon: LucideIcons.shieldAlert,
             divider: true,
           ),
-          const SizedBox(height: 12),
           if (!controller.tankConnected)
             GlassPanel(
-              child: Row(
-                children: [
-                  const Icon(LucideIcons.unplug, size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'No tank connected',
-                          style: OceanTypography.strong,
-                        ),
-                        Text(
-                          'Reconnect the demo tank to resume monitoring.',
-                          style: OceanTypography.caption,
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: controller.connectDemoTank,
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(48, 48),
-                      foregroundColor: OceanColors.darkCyan,
-                    ),
-                    child: const Text('Connect'),
-                  ),
-                ],
+              child: _SettingsPanelRow(
+                icon: LucideIcons.fish,
+                title: 'No tank connected',
+                subtitle: 'Reconnect the demo tank to resume monitoring.',
+                highlighted: true,
+                action: _SmallGlassButton(
+                  label: 'Connect',
+                  onPressed: controller.connectDemoTank,
+                ),
               ),
             )
           else ...[
             GlassPanel(
               child: _renaming
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('Tank name', style: OceanTypography.caption),
-                        const SizedBox(height: 6),
-                        TextField(
-                          controller: _tankNameController,
-                          autofocus: true,
-                          textInputAction: TextInputAction.done,
-                          onSubmitted: (_) => _saveTankName(),
-                          decoration: const InputDecoration(
-                            hintText: 'Aquarium name',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: GlassButton(
-                            label: 'Save',
-                            icon: LucideIcons.save,
-                            onPressed: _saveTankName,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        const Icon(LucideIcons.fishSymbol, size: 20),
-                        const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                controller.tankName,
-                                style: OceanTypography.strong,
-                              ),
-                              Text(
-                                'Ref Code: tank-demo',
-                                style: OceanTypography.caption,
+                              Text('Tank name', style: OceanTypography.caption),
+                              const SizedBox(height: 6),
+                              TextField(
+                                controller: _tankNameController,
+                                autofocus: true,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) => _saveTankName(),
+                                decoration: const InputDecoration(
+                                  hintText: 'Aquarium name',
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        TextButton.icon(
-                          onPressed: () => setState(() {
-                            _tankNameController.text = controller.tankName;
-                            _renaming = true;
-                          }),
-                          icon: const Icon(LucideIcons.pencil, size: 15),
-                          label: const Text('Rename'),
-                          style: TextButton.styleFrom(
-                            minimumSize: const Size(48, 48),
-                            foregroundColor: OceanColors.ink,
-                            textStyle: OceanTypography.caption,
-                          ),
+                        const SizedBox(width: 10),
+                        _SmallGlassButton(
+                          label: 'Save',
+                          icon: LucideIcons.save,
+                          onPressed: _saveTankName,
                         ),
                       ],
+                    )
+                  : _SettingsPanelRow(
+                      icon: LucideIcons.fish,
+                      title: controller.tankName,
+                      subtitle: 'Ref Code: tank-demo',
+                      action: _SmallGlassButton(
+                        label: 'Rename',
+                        icon: LucideIcons.pencil,
+                        style: GlassButtonStyle.outline,
+                        onPressed: () => setState(() {
+                          _tankNameController.text = controller.tankName;
+                          _renaming = true;
+                        }),
+                      ),
                     ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             const GlassPanel(
-              child: _StaticSettingsRow(
-                icon: LucideIcons.radioTower,
+              padding: EdgeInsets.fromLTRB(12, 12, 12, 7),
+              child: _SettingsPanelRow(
+                icon: LucideIcons.monitor,
                 title: 'IoT Scanner Console',
                 subtitle: 'Pair or review monitor hardware',
                 highlighted: true,
+                showChevron: true,
               ),
             ),
-            const SizedBox(height: 8),
-            DisclosureCard(
+            const SizedBox(height: 12),
+            _AccountDisclosure(
               title: 'Stream Image Adjustments',
               subtitle:
                   'Contrast ${(controller.contrast * 100).round()}%, brightness ${(controller.brightness * 100).round()}%, saturation ${(controller.saturation * 100).round()}%',
@@ -207,6 +179,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     divisor: 100,
                     suffix: '%',
                   ),
+                  const SizedBox(height: 16),
                   _settingSlider(
                     label: 'Brightness',
                     setting: 'brightness',
@@ -217,6 +190,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     divisor: 100,
                     suffix: '%',
                   ),
+                  const SizedBox(height: 16),
                   _settingSlider(
                     label: 'Saturation',
                     setting: 'saturation',
@@ -227,28 +201,50 @@ class _AccountScreenState extends State<AccountScreen> {
                     divisor: 100,
                     suffix: '%',
                   ),
+                  const SizedBox(height: 16),
+                  OceanSlider(
+                    label: 'Temperature (Cool / Warm)',
+                    value: controller.temperature,
+                    min: -80,
+                    max: 80,
+                    divisions: 32,
+                    valueLabel: _temperatureLabel(controller.temperature),
+                    onChanged: (value) =>
+                        controller.previewSetting('temperature', value),
+                    onChangeEnd: (value) =>
+                        controller.commitSetting('temperature', value),
+                  ),
+                  const SizedBox(height: 16),
+                  OceanSlider(
+                    label: 'Tint (Green / Magenta)',
+                    value: controller.tint,
+                    min: -80,
+                    max: 80,
+                    divisions: 32,
+                    valueLabel: _tintLabel(controller.tint),
+                    onChanged: (value) =>
+                        controller.previewSetting('tint', value),
+                    onChangeEnd: (value) =>
+                        controller.commitSetting('tint', value),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            DisclosureCard(
-              title: 'Background Canvas',
-              subtitle: 'Video and background transition controls',
-              icon: LucideIcons.palette,
-              expanded: controller.debugSectionOpen,
-              onChanged: (value) => controller.setDisclosure('debug', value),
-              child: _BackgroundDebugControls(controller: controller),
-            ),
-            const SizedBox(height: 8),
-            GlassPanel(
-              onTap: () => _confirmDisconnect(context),
-              child: const _StaticSettingsRow(
-                icon: LucideIcons.unlink,
-                title: 'Disconnect from Tank',
-                subtitle: 'Remove this tank from the active dashboard',
-                destructive: true,
+            const SizedBox(height: 12),
+            if (_confirmingDisconnect)
+              _buildInlineDisconnectConfirmation()
+            else
+              GlassPanel(
+                onTap: () => setState(() => _confirmingDisconnect = true),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 7),
+                child: const _SettingsPanelRow(
+                  icon: LucideIcons.x,
+                  title: 'Disconnect from Tank',
+                  subtitle: 'Remove this tank from the active dashboard',
+                  destructive: true,
+                  showChevron: true,
+                ),
               ),
-            ),
           ],
         ],
       ),
@@ -279,43 +275,45 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Widget _buildAlertsAndThresholds(BuildContext context) {
     return GlassCard(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
       child: Column(
         children: [
           const CardHeader(
             title: 'Alerts & Thresholds',
-            icon: LucideIcons.shield,
+            icon: LucideIcons.shieldCheck,
             divider: true,
           ),
-          const SizedBox(height: 12),
-          DisclosureCard(
+          _AccountDisclosure(
             title: 'Alert sensitivity',
             subtitle:
-                '${controller.clarityThreshold.toStringAsFixed(1)} FNU turbidity max, ${controller.visibleFishThreshold.round()}% fish visibility',
-            icon: LucideIcons.triangleAlert,
+                '${_formatThreshold(controller.clarityThreshold)} FNU turbidity max, ${controller.visibleFishThreshold.clamp(20, 80).round()}% fish visibility change',
+            icon: LucideIcons.bell,
             expanded: controller.thresholdSectionOpen,
             onChanged: (value) => controller.setDisclosure('threshold', value),
             child: Column(
               children: [
                 OceanSlider(
-                  label: 'Maximum turbidity',
+                  label: 'Maximum FNU Threshold',
                   value: controller.clarityThreshold,
                   min: 1,
                   max: 10,
                   divisions: 18,
                   valueLabel:
-                      '${controller.clarityThreshold.toStringAsFixed(1)} FNU',
+                      '${_formatThreshold(controller.clarityThreshold)} FNU',
                   onChanged: (value) =>
                       controller.previewSetting('clarityThreshold', value),
                   onChangeEnd: (value) =>
                       controller.commitSetting('clarityThreshold', value),
                 ),
+                const SizedBox(height: 16),
                 OceanSlider(
-                  label: 'Minimum fish visible',
-                  value: controller.visibleFishThreshold,
+                  label: 'Discrepancy Alarm Trigger',
+                  value: controller.visibleFishThreshold.clamp(20, 80),
                   min: 20,
-                  max: 100,
-                  divisions: 8,
-                  valueLabel: '${controller.visibleFishThreshold.round()}%',
+                  max: 80,
+                  divisions: 6,
+                  valueLabel:
+                      '${controller.visibleFishThreshold.clamp(20, 80).round()}% visibility',
                   onChanged: (value) =>
                       controller.previewSetting('visibleFishThreshold', value),
                   onChangeEnd: (value) =>
@@ -324,46 +322,67 @@ class _AccountScreenState extends State<AccountScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           GlassPanel(
             onTap: controller.openAlerts,
-            child: const _StaticSettingsRow(
+            child: const _SettingsPanelRow(
               icon: LucideIcons.bell,
               title: 'Safety Alert Logs',
               subtitle: 'Warnings and event history',
+              showChevron: true,
             ),
           ),
-          const SizedBox(height: 8),
-          DisclosureCard(
+          const SizedBox(height: 12),
+          _AccountDisclosure(
             title: 'AI Preferences',
-            subtitle: controller.aiEnabled
-                ? 'AI enabled, 10s polling'
-                : 'AI disabled, 10s polling',
-            icon: LucideIcons.cpu,
+            subtitle:
+                '${controller.autoConnect ? 'Auto-start enabled' : 'Auto-start disabled'}, ${(controller.pollingIntervalMs / 1000).round()}s polling',
+            icon: LucideIcons.brain,
             expanded: controller.aiPreferencesOpen,
             onChanged: (value) => controller.setDisclosure('ai', value),
             child: Column(
               children: [
-                SwitchRow(
-                  title: 'Auto-start AI when stream connects',
-                  subtitle:
-                      'Begin local analysis as soon as the camera is ready.',
-                  value: controller.aiEnabled,
-                  onChanged: controller.toggleAI,
+                _AutoStartRow(
+                  value: controller.autoConnect,
+                  onChanged: controller.setAutoConnect,
                 ),
-                SwitchRow(
-                  title: 'Show detection boxes',
-                  subtitle: 'Display species labels over the live camera.',
-                  value: controller.showDetections,
-                  onChanged: controller.setShowDetections,
+                const SizedBox(height: 16),
+                OceanSlider(
+                  label: 'AI Polling Interval',
+                  value: controller.pollingIntervalMs,
+                  min: 2000,
+                  max: 60000,
+                  divisions: 58,
+                  valueLabel:
+                      '${(controller.pollingIntervalMs / 1000).round()}s',
+                  onChanged: (value) =>
+                      controller.previewSetting('pollingIntervalMs', value),
+                  onChangeEnd: (value) =>
+                      controller.commitSetting('pollingIntervalMs', value),
                 ),
-                const Divider(height: 20),
-                const SwitchRow(
-                  title: 'Disease diagnosis',
-                  subtitle: 'Coming in a later on-device model release.',
-                  value: false,
-                  enabled: false,
-                  onChanged: _noopBool,
+                const SizedBox(height: 16),
+                _confidenceSlider(
+                  label: 'Detection Confidence Threshold',
+                  setting: 'detectionConfidenceThreshold',
+                  value: controller.detectionConfidenceThreshold,
+                  minPercent: 10,
+                  maxPercent: 90,
+                ),
+                const SizedBox(height: 16),
+                _confidenceSlider(
+                  label: 'Species Confidence Threshold',
+                  setting: 'speciesConfidenceThreshold',
+                  value: controller.speciesConfidenceThreshold,
+                  minPercent: 10,
+                  maxPercent: 90,
+                ),
+                const SizedBox(height: 16),
+                _confidenceSlider(
+                  label: 'Diagnosis Minimum Confidence',
+                  setting: 'diagnosisMinConfidence',
+                  value: controller.diagnosisMinConfidence,
+                  minPercent: 30,
+                  maxPercent: 90,
                 ),
               ],
             ),
@@ -373,178 +392,355 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Future<void> _confirmDisconnect(BuildContext context) async {
-    await showOceanDialog<void>(
-      context: context,
-      child: GlassCard(
-        overlay: true,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Disconnect from Tank', style: OceanTypography.title),
-            const SizedBox(height: 10),
-            Text(
-              'This will remove “${controller.tankName}” from your active monitoring dashboard. You can reconnect it later using the reference code: tank-demo.',
-              style: OceanTypography.bodyMuted,
+  Widget _buildInlineDisconnectConfirmation() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+      decoration: BoxDecoration(
+        color: OceanColors.critical.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: OceanColors.critical.withValues(alpha: 0.20)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'This will remove "${controller.tankName}" from your active monitoring dashboard. You can reconnect it later using the reference code: tank-demo.',
+            style: OceanTypography.caption,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _SmallGlassButton(
+                label: 'Cancel',
+                style: GlassButtonStyle.outline,
+                onPressed: () => setState(() => _confirmingDisconnect = false),
+              ),
+              const SizedBox(width: 10),
+              _SmallGlassButton(
+                label: 'Yes, Disconnect',
+                style: GlassButtonStyle.destructive,
+                onPressed: () {
+                  setState(() => _confirmingDisconnect = false);
+                  controller.disconnectTank();
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatThreshold(double value) => value == value.roundToDouble()
+      ? value.round().toString()
+      : value.toStringAsFixed(1);
+
+  String _temperatureLabel(double value) {
+    final rounded = value.round();
+    if (rounded == 0) return 'Neutral';
+    return rounded > 0 ? 'Warm (+$rounded)' : 'Cool ($rounded)';
+  }
+
+  String _tintLabel(double value) {
+    final rounded = value.round();
+    if (rounded == 0) return 'Neutral';
+    return rounded > 0 ? 'Magenta (+$rounded)' : 'Green ($rounded)';
+  }
+
+  Widget _confidenceSlider({
+    required String label,
+    required String setting,
+    required double value,
+    required int minPercent,
+    required int maxPercent,
+  }) {
+    final percent = value * 100;
+    return OceanSlider(
+      label: label,
+      value: percent,
+      min: minPercent.toDouble(),
+      max: maxPercent.toDouble(),
+      divisions: (maxPercent - minPercent) ~/ 5,
+      valueLabel: '${percent.round()}%',
+      onChanged: (next) => controller.previewSetting(setting, next / 100),
+      onChangeEnd: (next) => controller.commitSetting(setting, next / 100),
+    );
+  }
+}
+
+class _UnlinkedTankNotice extends StatelessWidget {
+  const _UnlinkedTankNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: OceanColors.warning.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: OceanColors.warning),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '!',
+            style: OceanTypography.strong.copyWith(color: OceanColors.warning),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'No aquarium linked. Link a tank from the Dashboard to save camera feeds and enable AI detection.',
+              style: OceanTypography.body.copyWith(color: OceanColors.warning),
             ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Expanded(
-                  child: GlassButton(
-                    label: 'Cancel',
-                    style: GlassButtonStyle.outline,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountDisclosure extends StatelessWidget {
+  const _AccountDisclosure({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.expanded,
+    required this.onChanged,
+    required this.child,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool expanded;
+  final ValueChanged<bool> onChanged;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          Semantics(
+            button: true,
+            expanded: expanded,
+            child: InkWell(
+              onTap: () => onChanged(!expanded),
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 7),
+                child: Row(
+                  children: [
+                    SizedBox.square(
+                      dimension: 36,
+                      child: Center(
+                        child: Icon(
+                          icon,
+                          size: 17,
+                          color: OceanColors.slateGrey,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(title, style: OceanTypography.strong),
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: OceanTypography.caption,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    AnimatedRotation(
+                      turns: expanded ? 0.25 : 0,
+                      duration: OceanMotion.responsive(
+                        context,
+                        const Duration(milliseconds: 300),
+                      ),
+                      curve: Curves.easeInOut,
+                      child: const Icon(
+                        LucideIcons.chevronRight,
+                        size: 18,
+                        color: OceanColors.slateGrey,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: GlassButton(
-                    label: 'Yes, Disconnect',
-                    style: GlassButtonStyle.destructive,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      controller.disconnectTank();
-                    },
-                  ),
-                ),
-              ],
+              ),
             ),
-          ],
+          ),
+          ClipRect(
+            child: AnimatedSize(
+              duration: OceanMotion.responsive(
+                context,
+                const Duration(milliseconds: 300),
+              ),
+              curve: Curves.easeInOut,
+              alignment: Alignment.topCenter,
+              child: expanded
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
+                      child: child,
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AutoStartRow extends StatelessWidget {
+  const _AutoStartRow({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            'Auto-start AI when stream connects',
+            style: OceanTypography.bodyMuted,
+          ),
+        ),
+        const SizedBox(width: 16),
+        _AccountToggle(value: value, onChanged: onChanged),
+      ],
+    );
+  }
+}
+
+class _AccountToggle extends StatelessWidget {
+  const _AccountToggle({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      toggled: value,
+      label: 'Auto-start AI when stream connects',
+      child: GestureDetector(
+        onTap: () => onChanged(!value),
+        child: AnimatedContainer(
+          duration: OceanMotion.responsive(context, OceanMotion.smooth),
+          width: 44,
+          height: 24,
+          decoration: BoxDecoration(
+            color: value
+                ? OceanColors.pineTeal
+                : OceanColors.slateGrey.withValues(alpha: 0.20),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: AnimatedAlign(
+            duration: OceanMotion.responsive(context, OceanMotion.smooth),
+            alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              width: 16,
+              height: 16,
+              margin: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: OceanColors.white,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-void _noopBool(bool _) {}
+class _SmallGlassButton extends StatelessWidget {
+  const _SmallGlassButton({
+    required this.label,
+    required this.onPressed,
+    this.icon,
+    this.style = GlassButtonStyle.primary,
+  });
 
-class _CameraLifecycleCard extends StatelessWidget {
-  const _CameraLifecycleCard({required this.controller});
-
-  final OceanEyesController controller;
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final GlassButtonStyle style;
 
   @override
   Widget build(BuildContext context) {
-    final (icon, title, description) = switch (controller.cameraStage) {
-      CameraStage.beforePermission => (
-        LucideIcons.camera,
-        'Camera access',
-        'OceanEyes needs camera permission to monitor your aquarium. The feed starts automatically after access is granted.',
-      ),
-      CameraStage.requestingPermission => (
-        LucideIcons.loaderCircle,
-        'Requesting permission',
-        'Complete the system camera prompt to continue.',
-      ),
-      CameraStage.denied => (
-        LucideIcons.cameraOff,
-        'Permission denied',
-        'Camera access is off. Retry the permission request or enable it in system settings.',
-      ),
-      CameraStage.unavailable => (
-        LucideIcons.cameraOff,
-        controller.tankConnected ? 'Camera unavailable' : 'Tank disconnected',
-        controller.tankConnected
-            ? 'OceanEyes could not find a compatible camera on this device.'
-            : 'Reconnect your aquarium to resume camera monitoring.',
-      ),
-      CameraStage.idle => (
-        LucideIcons.video,
-        'Camera idle',
-        'The camera is ready to start.',
-      ),
-      CameraStage.aiProcessing => (
-        LucideIcons.sparkles,
-        'AI analysis in progress',
-        'The latest frame is being analyzed on this device.',
-      ),
-      CameraStage.measuringTurbidity => (
-        LucideIcons.testTube2,
-        'Measuring water clarity',
-        'Hold the camera steady while OceanEyes samples the frame.',
-      ),
-      CameraStage.active => (
-        LucideIcons.camera,
-        'Camera active',
-        '${controller.usingFrontCamera ? 'Device' : 'Tank'} camera is live and ready for local AI analysis.',
-      ),
+    final foreground = switch (style) {
+      GlassButtonStyle.primary => OceanColors.white,
+      GlassButtonStyle.outline => OceanColors.pineTeal,
+      GlassButtonStyle.destructive => OceanColors.critical,
     };
-    final busy =
-        controller.cameraStage == CameraStage.requestingPermission ||
-        controller.cameraStage == CameraStage.aiProcessing ||
-        controller.cameraStage == CameraStage.measuringTurbidity;
-
-    return GlassCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          CardHeader(title: title, icon: icon, divider: true),
-          const SizedBox(height: 12),
-          Text(description, style: OceanTypography.bodyMuted),
-          const SizedBox(height: 14),
-          if (controller.cameraStage == CameraStage.beforePermission)
-            GlassButton(
-              label: 'Allow Camera Access',
-              icon: LucideIcons.camera,
-              expanded: true,
-              onPressed: controller.requestCameraPermission,
-            )
-          else if (controller.cameraStage == CameraStage.denied)
-            GlassButton(
-              label: 'Retry Camera Permission',
-              icon: LucideIcons.refreshCw,
-              expanded: true,
-              onPressed: controller.retryCamera,
-            )
-          else if (controller.cameraStage == CameraStage.unavailable)
-            GlassButton(
-              label: controller.tankConnected
-                  ? 'Check Again'
-                  : 'Reconnect Tank',
-              icon: LucideIcons.refreshCw,
-              expanded: true,
-              onPressed: controller.tankConnected
-                  ? () => controller.setCameraStage(CameraStage.idle)
-                  : controller.connectDemoTank,
-            )
-          else if (controller.cameraStage == CameraStage.idle)
-            GlassButton(
-              label: 'Start Camera',
-              icon: LucideIcons.camera,
-              expanded: true,
-              onPressed: () => controller.setCameraStage(CameraStage.active),
-            )
-          else if (busy)
-            const LinearProgressIndicator(
-              minHeight: 4,
-              color: OceanColors.verdigris,
-              backgroundColor: Color(0x1F828E97),
-            )
-          else
-            Row(
-              children: [
-                Expanded(
-                  child: GlassButton(
-                    label: 'Measure Clarity',
-                    icon: LucideIcons.testTube2,
-                    style: GlassButtonStyle.outline,
-                    onPressed: controller.measureTurbidity,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 44),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: style == GlassButtonStyle.destructive
+              ? OceanColors.critical.withValues(alpha: 0.08)
+              : Colors.transparent,
+          gradient: style == GlassButtonStyle.primary
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [OceanColors.verdigris, OceanColors.pineTeal],
+                )
+              : null,
+          borderRadius: BorderRadius.circular(OceanRadii.pill),
+          border: style == GlassButtonStyle.destructive
+              ? Border.all(color: OceanColors.critical.withValues(alpha: 0.30))
+              : null,
+          boxShadow: style == GlassButtonStyle.destructive
+              ? null
+              : [
+                  BoxShadow(
+                    color: OceanColors.pineTeal.withValues(
+                      alpha: style == GlassButtonStyle.primary ? 0.20 : 0.05,
+                    ),
+                    blurRadius: style == GlassButtonStyle.primary ? 12 : 20,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: GlassButton(
-                    label: 'Fullscreen',
-                    icon: LucideIcons.maximize2,
-                    onPressed: () => controller.setFullscreenCamera(true),
-                  ),
-                ),
+                ],
+        ),
+        child: TextButton(
+          onPressed: onPressed,
+          style: TextButton.styleFrom(
+            foregroundColor: foreground,
+            disabledForegroundColor: foreground.withValues(alpha: 0.50),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            minimumSize: const Size(0, 44),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: const StadiumBorder(),
+            textStyle: OceanTypography.caption,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 12, color: foreground),
+                const SizedBox(width: 8),
               ],
-            ),
-        ],
+              Text(
+                label,
+                style: OceanTypography.caption.copyWith(color: foreground),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -557,117 +753,228 @@ class _AIAnalysisCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final diagnostics = controller.fishDiagnostics;
+    final diagnosis = diagnostics.isEmpty ? null : diagnostics.first;
     return GlassCard(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CardHeader(
             title: 'AI Analysis',
-            icon: LucideIcons.sparkles,
-            trailing: GlassPill(
-              foregroundColor: controller.aiEnabled
-                  ? OceanColors.darkCyan
-                  : OceanColors.inkMuted,
-              color: controller.aiEnabled
-                  ? OceanColors.turquoise.withValues(alpha: 0.14)
-                  : OceanColors.slateGrey.withValues(alpha: 0.10),
-              child: Text(controller.aiEnabled ? 'On-device' : 'Paused'),
+            icon: LucideIcons.brain,
+            trailing: Text(
+              diagnosis == null
+                  ? '—'
+                  : TimeOfDay.fromDateTime(diagnosis.scannedAt).format(context),
+              style: OceanTypography.caption,
             ),
             divider: true,
           ),
-          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: GlassPanel(
                   child: _MetricValue(
                     label: 'Fish Detected',
-                    value: controller.aiEnabled
-                        ? '${controller.detectedFish}'
-                        : '—',
+                    value: controller.fish.isEmpty
+                        ? '—'
+                        : '${controller.detectedFish}',
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Expanded(
                 child: GlassPanel(
                   child: _MetricValue(
-                    label: 'Water Clarity',
-                    value: controller.lastTurbidityResult ?? 'Measuring…',
+                    label: 'FNU',
+                    value: _fnuValue(controller.lastTurbidityResult),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text('Species Breakdown', style: OceanTypography.strong),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: controller.fish
-                .map(
-                  (fish) =>
-                      GlassPill(child: Text('${fish.name} · ${fish.detected}')),
-                )
-                .toList(growable: false),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           GlassPanel(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final details = Row(
-                  children: [
-                    Icon(
-                      LucideIcons.stethoscope,
-                      size: 18,
-                      color: OceanColors.inkMuted.withValues(alpha: 0.55),
-                    ),
-                    const SizedBox(width: 9),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Fish Health Diagnosis',
-                            style: OceanTypography.strong.copyWith(
-                              color: OceanColors.inkMuted,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Species Breakdown', style: OceanTypography.caption),
+                const SizedBox(height: 10),
+                if (controller.fish.isEmpty)
+                  Text('Awaiting analysis…', style: OceanTypography.caption)
+                else
+                  LayoutBuilder(
+                    builder: (context, constraints) => Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: controller.fish
+                          .map(
+                            (fish) => ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: constraints.maxWidth,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: _speciesColor(fish.speciesId),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
+                                        fish.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: OceanTypography.caption,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${fish.detected}',
+                                      style: OceanTypography.caption.copyWith(
+                                        color: OceanColors.ink,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Visible but disabled for this release.',
-                            style: OceanTypography.caption,
-                          ),
-                        ],
-                      ),
+                          )
+                          .toList(growable: false),
                     ),
-                  ],
-                );
-                final largeText =
-                    MediaQuery.textScalerOf(context).scale(13) > 17.5;
-                if (largeText || constraints.maxWidth < 280) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _DiagnosisPanel(diagnosis: diagnosis),
+        ],
+      ),
+    );
+  }
+
+  static String _fnuValue(String? result) {
+    if (result == null) return '—';
+    final match = RegExp(r'-?\d+(?:\.\d+)?').firstMatch(result);
+    final parsed = match == null ? null : double.tryParse(match.group(0)!);
+    return parsed?.toStringAsFixed(2) ?? result;
+  }
+
+  static Color _speciesColor(String speciesId) => switch (speciesId) {
+    'cardinal_tetra' => const Color(0xFF4169E1),
+    'guppy' => const Color(0xFFFF69B4),
+    'corydoras' => const Color(0xFFDAA520),
+    'cherry_barb' => const Color(0xFFDC143C),
+    _ => const Color(0xFF3B82F6),
+  };
+}
+
+class _DiagnosisPanel extends StatelessWidget {
+  const _DiagnosisPanel({required this.diagnosis});
+
+  final FishDiagnostic? diagnosis;
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = diagnosis == null
+        ? OceanColors.slateGrey
+        : OceanColors.good;
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: OceanColors.white.withValues(alpha: 0.20),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: OceanColors.white.withValues(alpha: 0.20)),
+      ),
+      child: Stack(
+        children: [
+          if (diagnosis != null)
+            Positioned(
+              top: 0,
+              bottom: 0,
+              left: 0,
+              child: ColoredBox(
+                color: statusColor,
+                child: const SizedBox(width: 4),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Fish Health Diagnosis',
+                  style: OceanTypography.caption.copyWith(color: statusColor),
+                ),
+                const SizedBox(height: 8),
+                if (diagnosis == null)
+                  Text('Awaiting diagnosis…', style: OceanTypography.caption)
+                else ...[
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      details,
-                      const SizedBox(height: 6),
-                      const Align(
-                        alignment: Alignment.centerRight,
-                        child: GlassPill(child: Text('Coming soon')),
+                      Text('Status: ', style: OceanTypography.body),
+                      Text(
+                        diagnosis!.status.toUpperCase(),
+                        style: OceanTypography.strong.copyWith(
+                          color: statusColor,
+                        ),
+                      ),
+                      Text(
+                        ' (Confidence: ${diagnosis!.confidence}%)',
+                        style: OceanTypography.caption,
                       ),
                     ],
-                  );
-                }
-                return Row(
-                  children: [
-                    Expanded(child: details),
-                    const SizedBox(width: 6),
-                    const GlassPill(child: Text('Coming soon')),
-                  ],
-                );
-              },
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Diagnosed Subject: ${diagnosis!.fish.name}',
+                    style: OceanTypography.caption.copyWith(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 200,
+                      maxHeight: 140,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: Image.asset(
+                        diagnosis!.fish.assetPath,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text.rich(
+                    TextSpan(
+                      style: OceanTypography.body,
+                      children: [
+                        const TextSpan(
+                          text: 'Observation: ',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        TextSpan(text: diagnosis!.observation),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],
@@ -695,13 +1002,15 @@ class _MetricValue extends StatelessWidget {
   }
 }
 
-class _StaticSettingsRow extends StatelessWidget {
-  const _StaticSettingsRow({
+class _SettingsPanelRow extends StatelessWidget {
+  const _SettingsPanelRow({
     required this.icon,
     required this.title,
     required this.subtitle,
     this.highlighted = false,
     this.destructive = false,
+    this.showChevron = false,
+    this.action,
   });
 
   final IconData icon;
@@ -709,135 +1018,85 @@ class _StaticSettingsRow extends StatelessWidget {
   final String subtitle;
   final bool highlighted;
   final bool destructive;
+  final bool showChevron;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
-    final color = destructive
+    final iconColor = destructive
         ? OceanColors.criticalInk
         : highlighted
         ? OceanColors.darkCyan
-        : OceanColors.ink;
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 44),
-      child: Row(
-        children: [
-          Icon(icon, size: 19, color: color),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: OceanTypography.strong.copyWith(color: color),
-                ),
-                const SizedBox(height: 2),
-                Text(subtitle, style: OceanTypography.caption),
-              ],
-            ),
-          ),
-          Icon(LucideIcons.chevronRight, size: 18, color: color),
-        ],
-      ),
-    );
-  }
-}
-
-class _BackgroundDebugControls extends StatelessWidget {
-  const _BackgroundDebugControls({required this.controller});
-
-  final OceanEyesController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
+        : OceanColors.slateGrey;
+    final titleColor = destructive ? OceanColors.criticalInk : OceanColors.ink;
+    return Row(
       children: [
-        OceanSlider(
-          label: 'Sample opacity',
-          value: controller.ambientOpacity * 100,
-          min: 0,
-          max: 100,
-          divisions: 20,
-          valueLabel: '${(controller.ambientOpacity * 100).round()}%',
-          onChanged: (value) =>
-              controller.previewSetting('ambientOpacity', value / 100),
-          onChangeEnd: (value) =>
-              controller.commitSetting('ambientOpacity', value / 100),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: destructive
+                ? OceanColors.critical.withValues(alpha: 0.10)
+                : Colors.transparent,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 17, color: iconColor),
         ),
-        OceanSlider(
-          label: 'Ambient blur',
-          value: controller.ambientBlur,
-          min: 0,
-          max: 48,
-          divisions: 12,
-          valueLabel: '${controller.ambientBlur.round()}px',
-          onChanged: (value) => controller.previewSetting('ambientBlur', value),
-          onChangeEnd: (value) =>
-              controller.commitSetting('ambientBlur', value),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: OceanTypography.strong.copyWith(color: titleColor),
+              ),
+              const SizedBox(height: 2),
+              Text(subtitle, style: OceanTypography.caption),
+            ],
+          ),
         ),
-        const SizedBox(height: 4),
-        DropdownButtonFormField<FixtureScenario>(
-          initialValue: controller.fixtureScenario,
-          isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Visual fixture state'),
-          items: FixtureScenario.values
-              .map(
-                (scenario) => DropdownMenuItem(
-                  value: scenario,
-                  child: Text(_scenarioLabel(scenario)),
-                ),
-              )
-              .toList(growable: false),
-          onChanged: (scenario) {
-            if (scenario != null) controller.applyFixture(scenario);
-          },
-        ),
-        const SizedBox(height: 8),
-        GlassButton(
-          label: 'Reset defaults',
-          icon: LucideIcons.refreshCw,
-          style: GlassButtonStyle.outline,
-          expanded: true,
-          onPressed: () {
-            controller.updateSetting('ambientBlur', 48);
-            controller.updateSetting('ambientOpacity', 1);
-          },
-        ),
+        if (action != null) ...[
+          const SizedBox(width: 8),
+          action!,
+        ] else if (showChevron) ...[
+          const SizedBox(width: 8),
+          const Icon(
+            LucideIcons.chevronRight,
+            size: 18,
+            color: OceanColors.slateGrey,
+          ),
+        ],
       ],
     );
   }
-
-  String _scenarioLabel(FixtureScenario scenario) {
-    return switch (scenario) {
-      FixtureScenario.populated => 'Populated',
-      FixtureScenario.dashboardWaiting => 'Dashboard · waiting',
-      FixtureScenario.dashboardWarning => 'Dashboard · warning',
-      FixtureScenario.fishEmpty => 'My Fish · empty',
-      FixtureScenario.analyticsLoading => 'Analytics · loading',
-      FixtureScenario.analyticsEmpty => 'Analytics · empty',
-      FixtureScenario.analyticsError => 'Analytics · error',
-      FixtureScenario.cameraPermission => 'Camera · permission',
-      FixtureScenario.cameraDenied => 'Camera · denied',
-      FixtureScenario.cameraUnavailable => 'Camera · unavailable',
-      FixtureScenario.alertsEmpty => 'Alerts · empty',
-      FixtureScenario.historyEmpty => 'History · empty',
-    };
-  }
 }
 
-class FullscreenCameraOverlay extends StatelessWidget {
+class FullscreenCameraOverlay extends StatefulWidget {
   const FullscreenCameraOverlay({super.key, required this.controller});
 
   final OceanEyesController controller;
 
   @override
+  State<FullscreenCameraOverlay> createState() =>
+      _FullscreenCameraOverlayState();
+}
+
+class _FullscreenCameraOverlayState extends State<FullscreenCameraOverlay> {
+  bool _flashActive = false;
+
+  OceanEyesController get controller => widget.controller;
+
+  Future<void> _captureSnapshot() async {
+    setState(() => _flashActive = true);
+    await Future<void>.delayed(const Duration(milliseconds: 120));
+    if (mounted) setState(() => _flashActive = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final portraitFallback = width < 640;
-    final drawerWidth = portraitFallback
-        ? width
-        : math.min(320.0, width * 0.42);
+    final drawerWidth = math.min(320.0, MediaQuery.sizeOf(context).width);
     return Positioned.fill(
       child: BlockSemantics(
         child: Semantics(
@@ -857,102 +1116,23 @@ class FullscreenCameraOverlay extends StatelessWidget {
                       controller: controller,
                       fit: BoxFit.cover,
                     ),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Color(0x4D000000),
-                            Colors.transparent,
-                            Color(0x66000000),
-                          ],
-                        ),
+                    IgnorePointer(
+                      child: AnimatedOpacity(
+                        opacity: _flashActive ? 0.85 : 0,
+                        duration: const Duration(milliseconds: 100),
+                        child: const ColoredBox(color: OceanColors.white),
                       ),
                     ),
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: GlassPill(
-                        foregroundColor: OceanColors.white,
-                        color: OceanColors.prussianBlue.withValues(alpha: 0.28),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(LucideIcons.camera, size: 14),
-                            const SizedBox(width: 6),
-                            Text('${controller.detectedFish} fish · Live'),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: Row(
-                        children: [
-                          GlassIconButton(
-                            icon: LucideIcons.panelRight,
-                            tooltip: controller.inventoryDrawerOpen
-                                ? 'Close inventory drawer'
-                                : 'Open inventory drawer',
-                            color: OceanColors.white,
-                            background: OceanColors.prussianBlue.withValues(
-                              alpha: 0.28,
-                            ),
-                            onPressed: controller.toggleInventoryDrawer,
-                          ),
-                          const SizedBox(width: 4),
-                          GlassIconButton(
-                            icon: LucideIcons.x,
-                            tooltip: 'Exit fullscreen',
-                            color: OceanColors.white,
-                            background: OceanColors.prussianBlue.withValues(
-                              alpha: 0.28,
-                            ),
-                            onPressed: () =>
-                                controller.setFullscreenCamera(false),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      left: 12,
-                      right: 12,
-                      bottom: 12,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: GlassButton(
-                              label: 'Measure clarity',
-                              icon: LucideIcons.testTube2,
-                              style: GlassButtonStyle.outline,
-                              expanded: true,
-                              onPressed: controller.measureTurbidity,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: GlassButton(
-                              label: controller.aiEnabled
-                                  ? 'AI active'
-                                  : 'Start AI',
-                              icon: LucideIcons.sparkles,
-                              expanded: true,
-                              onPressed: () =>
-                                  controller.toggleAI(!controller.aiEnabled),
-                            ),
-                          ),
-                        ],
-                      ),
+                    _FullscreenCameraControls(
+                      controller: controller,
+                      onCaptureSnapshot: _captureSnapshot,
                     ),
                     AnimatedPositioned(
                       duration: OceanMotion.responsive(
                         context,
                         const Duration(milliseconds: 300),
                       ),
-                      curve: OceanMotion.smoothCurve,
+                      curve: Curves.easeInOut,
                       top: 0,
                       bottom: 0,
                       right: controller.inventoryDrawerOpen ? 0 : -drawerWidth,
@@ -961,24 +1141,11 @@ class FullscreenCameraOverlay extends StatelessWidget {
                         excluding: !controller.inventoryDrawerOpen,
                         child: ExcludeSemantics(
                           excluding: !controller.inventoryDrawerOpen,
-                          child: controller.inventoryDrawerOpen
-                              ? BlockSemantics(
-                                  child: Semantics(
-                                    container: true,
-                                    scopesRoute: true,
-                                    namesRoute: true,
-                                    explicitChildNodes: true,
-                                    label: 'Fullscreen fish inventory',
-                                    child: _FullscreenInventory(
-                                      controller: controller,
-                                      fullScreenFallback: portraitFallback,
-                                    ),
-                                  ),
-                                )
-                              : _FullscreenInventory(
-                                  controller: controller,
-                                  fullScreenFallback: portraitFallback,
-                                ),
+                          child: Semantics(
+                            container: true,
+                            label: 'Fullscreen fish inventory',
+                            child: _FullscreenInventory(controller: controller),
+                          ),
                         ),
                       ),
                     ),
@@ -993,159 +1160,430 @@ class FullscreenCameraOverlay extends StatelessWidget {
   }
 }
 
-class _FullscreenInventory extends StatelessWidget {
-  const _FullscreenInventory({
+class _FullscreenCameraControls extends StatelessWidget {
+  const _FullscreenCameraControls({
     required this.controller,
-    required this.fullScreenFallback,
+    required this.onCaptureSnapshot,
   });
 
   final OceanEyesController controller;
-  final bool fullScreenFallback;
+  final VoidCallback onCaptureSnapshot;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: OceanColors.prussianBlue.withValues(alpha: 0.88),
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 8, 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Aquarium Inventory',
-                      style: OceanTypography.title.copyWith(
-                        color: OceanColors.white,
+    final busy =
+        controller.cameraStage == CameraStage.aiProcessing ||
+        controller.cameraStage == CameraStage.measuringTurbidity;
+    return AnimatedPositioned(
+      duration: OceanMotion.responsive(
+        context,
+        const Duration(milliseconds: 300),
+      ),
+      curve: Curves.easeInOut,
+      right: controller.inventoryDrawerOpen ? 332 : 16,
+      bottom: 12,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _FullscreenControlButton(
+            icon: LucideIcons.camera,
+            tooltip: 'Capture Snapshot',
+            onPressed: onCaptureSnapshot,
+          ),
+          const SizedBox(width: 8),
+          _FullscreenControlButton(
+            icon: LucideIcons.eye,
+            tooltip: 'Measure Water Clarity',
+            loading: controller.cameraStage == CameraStage.measuringTurbidity,
+            onPressed: busy ? null : controller.measureTurbidity,
+          ),
+          const SizedBox(width: 8),
+          _FullscreenControlButton(
+            icon: LucideIcons.brain,
+            tooltip: controller.aiEnabled
+                ? 'Stop AI Analysis'
+                : 'Start AI Analysis',
+            active: controller.aiEnabled,
+            loading: controller.cameraStage == CameraStage.aiProcessing,
+            onPressed: busy
+                ? null
+                : () => controller.toggleAI(!controller.aiEnabled),
+          ),
+          const SizedBox(width: 8),
+          const _FullscreenControlButton(
+            icon: LucideIcons.stethoscope,
+            tooltip: 'Run Fish Health Diagnosis',
+            onPressed: null,
+          ),
+          const SizedBox(width: 8),
+          _FullscreenControlButton(
+            icon: LucideIcons.fish,
+            tooltip: controller.inventoryDrawerOpen
+                ? 'Hide Fish Inventory'
+                : 'Show Fish Inventory',
+            active: controller.inventoryDrawerOpen,
+            onPressed: controller.toggleInventoryDrawer,
+          ),
+          const SizedBox(width: 8),
+          _FullscreenControlButton(
+            icon: LucideIcons.minimize2,
+            tooltip: 'Exit Fullscreen',
+            onPressed: () => controller.setFullscreenCamera(false),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FullscreenControlButton extends StatelessWidget {
+  const _FullscreenControlButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    this.active = false,
+    this.loading = false,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+  final bool active;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Semantics(
+        button: true,
+        enabled: onPressed != null,
+        label: tooltip,
+        child: Opacity(
+          opacity: onPressed == null ? 0.35 : 1,
+          child: SizedBox.square(
+            dimension: 32,
+            child: Material(
+              color: Colors.transparent,
+              shape: const CircleBorder(),
+              child: InkResponse(
+                onTap: onPressed,
+                radius: 16,
+                customBorder: const CircleBorder(),
+                child: ClipOval(
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.transparent,
+                        boxShadow: [
+                          BoxShadow(
+                            color: OceanColors.pineTeal.withValues(alpha: 0.05),
+                            blurRadius: 20,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: loading
+                            ? const SizedBox.square(
+                                dimension: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: OceanColors.white,
+                                ),
+                              )
+                            : Icon(
+                                icon,
+                                size: 14,
+                                color: OceanColors.white,
+                                shadows: active
+                                    ? const [
+                                        Shadow(
+                                          color: OceanColors.white,
+                                          blurRadius: 5,
+                                        ),
+                                      ]
+                                    : null,
+                              ),
                       ),
                     ),
-                  ),
-                  GlassIconButton(
-                    icon: LucideIcons.x,
-                    tooltip: 'Close inventory',
-                    color: OceanColors.white,
-                    background: OceanColors.white.withValues(alpha: 0.10),
-                    onPressed: controller.toggleInventoryDrawer,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _InverseStat(
-                      label: 'TOTAL FISH',
-                      value: '${controller.totalFish}',
-                    ),
-                  ),
-                  Expanded(
-                    child: _InverseStat(
-                      label: 'DETECTION',
-                      value:
-                          '${controller.detectedFish}/${controller.totalFish}',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Visibility by species',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 13,
-                    color: OceanColors.white,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-                itemCount: controller.fish.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final fish = controller.fish[index];
-                  return Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: OceanColors.white.withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: OceanColors.white.withValues(alpha: 0.16),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        FishAvatar(
-                          assetPath: fish.assetPath,
-                          name: fish.name,
-                          size: 58,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                fish.name,
-                                style: OceanTypography.strong.copyWith(
-                                  color: OceanColors.white,
-                                ),
-                              ),
-                              Text(
-                                '${fish.detected} / ${fish.count} detected',
-                                style: OceanTypography.caption.copyWith(
-                                  color: OceanColors.white.withValues(
-                                    alpha: 0.70,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        VisibilityRing(progress: fish.visibility, size: 38),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
+class _FullscreenInventory extends StatelessWidget {
+  const _FullscreenInventory({required this.controller});
+
+  final OceanEyesController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final detectionRate = controller.totalFish == 0
+        ? 0
+        : (controller.detectedFish / controller.totalFish * 100).round();
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Material(
+          color: OceanColors.prussianBlue.withValues(alpha: 0.55),
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 52, 12),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _InverseStat(
+                              label: 'TOTAL FISH',
+                              value: '${controller.totalFish}',
+                            ),
+                          ),
+                          const SizedBox(width: 32),
+                          Expanded(
+                            child: _InverseStat(
+                              label: 'DETECTION',
+                              value: '$detectionRate%',
+                              valueColor: OceanColors.warning,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                        itemCount: controller.fish.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Text(
+                                'Visibility by species',
+                                style: OceanTypography.caption.copyWith(
+                                  color: OceanColors.white.withValues(
+                                    alpha: 0.55,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          final fish = controller.fish[index - 1];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            child: Row(
+                              children: [
+                                SizedBox.square(
+                                  dimension: 44,
+                                  child: Center(
+                                    child: FishAvatar(
+                                      assetPath: fish.assetPath,
+                                      name: fish.name,
+                                      size: 38,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        fish.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: OceanTypography.strong.copyWith(
+                                          color: OceanColors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${fish.detected} / ${fish.count} detected',
+                                        style: OceanTypography.caption.copyWith(
+                                          color: OceanColors.white.withValues(
+                                            alpha: 0.55,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                _FullscreenVisibility(
+                                  detected: fish.detected,
+                                  expected: fish.count,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  top: 20,
+                  right: 12,
+                  child: _DrawerCloseButton(
+                    onPressed: controller.toggleInventoryDrawer,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerCloseButton extends StatelessWidget {
+  const _DrawerCloseButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Close fish inventory',
+      child: SizedBox.square(
+        dimension: 32,
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: onPressed,
+          color: OceanColors.white.withValues(alpha: 0.65),
+          iconSize: 17,
+          icon: const Icon(LucideIcons.x),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shape: const CircleBorder(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FullscreenVisibility extends StatelessWidget {
+  const _FullscreenVisibility({required this.detected, required this.expected});
+
+  final int detected;
+  final int expected;
+
+  @override
+  Widget build(BuildContext context) {
+    final percent = expected == 0
+        ? 0
+        : (detected / expected * 100).round().clamp(0, 100);
+    final color = percent >= 80
+        ? const Color(0xFF16A34A)
+        : percent >= 50
+        ? const Color(0xFFD97706)
+        : const Color(0xFFDC2626);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox.square(
+          dimension: 34,
+          child: CustomPaint(
+            painter: _VisibilityRingPainter(
+              progress: percent / 100,
+              color: color,
+            ),
+            child: Center(
+              child: Icon(LucideIcons.eye, size: 12.2, color: color),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '$percent%',
+          style: OceanTypography.caption.copyWith(
+            fontSize: 10,
+            height: 1.2,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _VisibilityRingPainter extends CustomPainter {
+  const _VisibilityRingPainter({required this.progress, required this.color});
+
+  final double progress;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const stroke = 3.0;
+    final center = size.center(Offset.zero);
+    final radius = (size.shortestSide - stroke) / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..color = OceanColors.azureMist,
+    );
+    canvas.drawArc(
+      rect,
+      -math.pi / 2,
+      math.pi * 2 * progress.clamp(0, 1),
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..strokeCap = StrokeCap.round
+        ..color = color,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _VisibilityRingPainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.color != color;
+}
+
 class _InverseStat extends StatelessWidget {
-  const _InverseStat({required this.label, required this.value});
+  const _InverseStat({
+    required this.label,
+    required this.value,
+    this.valueColor = OceanColors.white,
+  });
 
   final String label;
   final String value;
+  final Color valueColor;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: OceanTypography.caption.copyWith(
-            fontSize: 10,
             color: OceanColors.white.withValues(alpha: 0.65),
           ),
         ),
-        Text(
-          value,
-          style: OceanTypography.section.copyWith(color: OceanColors.white),
-        ),
+        Text(value, style: OceanTypography.strong.copyWith(color: valueColor)),
       ],
     );
   }

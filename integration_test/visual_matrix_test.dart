@@ -8,6 +8,7 @@ import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  var androidSurfaceConverted = false;
 
   Future<void> pumpBounded(
     WidgetTester tester, {
@@ -31,6 +32,13 @@ void main() {
     try {
       await tester.pumpWidget(OceanEyesApp(controller: controller));
       await pumpBounded(tester);
+      if (!androidSurfaceConverted &&
+          !kIsWeb &&
+          defaultTargetPlatform == TargetPlatform.android) {
+        await binding.convertFlutterSurfaceToImage();
+        androidSurfaceConverted = true;
+        await tester.pump(const Duration(milliseconds: 32));
+      }
       if (prepare != null) {
         await prepare(tester, controller);
         await tester.pump(const Duration(milliseconds: 32));
@@ -71,10 +79,6 @@ void main() {
       tester.platformDispatcher.clearAccessibilityFeaturesTestValue();
     });
 
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-      await binding.convertFlutterSurfaceToImage();
-    }
-
     for (final entry in <(FixtureScenario, String)>[
       (FixtureScenario.dashboardWaiting, 'dashboard__waiting'),
       (FixtureScenario.populated, 'dashboard__healthy'),
@@ -84,7 +88,9 @@ void main() {
         ..applyFixture(entry.$1, notify: false);
       await capture(tester, controller, entry.$2);
     }
-    final dashboardNoAlerts = OceanEyesController()..alerts = const [];
+    final dashboardNoAlerts = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
+      ..alerts = const [];
     await capture(tester, dashboardNoAlerts, 'dashboard__no-alerts');
 
     for (final entry in <(FixtureScenario, String)>[
@@ -97,6 +103,7 @@ void main() {
       await capture(tester, controller, entry.$2);
     }
     final expandedFish = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.myFish
       ..expandedFishId = 'fish-cardinal';
     await capture(tester, expandedFish, 'my-fish__expanded');
@@ -125,7 +132,63 @@ void main() {
       await capture(tester, controller, entry.$2);
     }
 
+    final streamDisclosure = OceanEyesController()
+      ..activeTab = PrimaryTab.account;
+    await capture(
+      tester,
+      streamDisclosure,
+      'account__stream-adjustments',
+      prepare: (tester, _) async {
+        final disclosure = find.text('Stream Image Adjustments');
+        await tester.ensureVisible(disclosure);
+        await tester.tap(disclosure);
+        await pumpBounded(tester, duration: const Duration(milliseconds: 360));
+        expect(find.text('Temperature (Cool / Warm)'), findsOneWidget);
+        expect(find.text('Tint (Green / Magenta)'), findsOneWidget);
+      },
+    );
+
+    final thresholdDisclosure = OceanEyesController()
+      ..activeTab = PrimaryTab.account;
+    await capture(
+      tester,
+      thresholdDisclosure,
+      'account__alert-sensitivity',
+      prepare: (tester, _) async {
+        final disclosure = find.text('Alert sensitivity');
+        await tester.scrollUntilVisible(
+          disclosure,
+          240,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(disclosure);
+        await pumpBounded(tester, duration: const Duration(milliseconds: 360));
+        expect(find.text('Maximum FNU Threshold'), findsOneWidget);
+        expect(find.text('Discrepancy Alarm Trigger'), findsOneWidget);
+      },
+    );
+
+    final aiPreferences = OceanEyesController()..activeTab = PrimaryTab.account;
+    await capture(
+      tester,
+      aiPreferences,
+      'account__ai-preferences',
+      prepare: (tester, _) async {
+        final disclosure = find.text('AI Preferences');
+        await tester.scrollUntilVisible(
+          disclosure,
+          240,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(disclosure);
+        await pumpBounded(tester, duration: const Duration(milliseconds: 360));
+        expect(find.text('AI Polling Interval'), findsOneWidget);
+        expect(find.text('Diagnosis Minimum Confidence'), findsOneWidget);
+      },
+    );
+
     final alertList = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..secondaryRoute = SecondaryRoute.alerts;
     await capture(tester, alertList, 'alerts__list');
     final alertEmpty = OceanEyesController()
@@ -133,11 +196,13 @@ void main() {
       ..secondaryRoute = SecondaryRoute.alerts;
     await capture(tester, alertEmpty, 'alerts__empty');
     final alertDetail = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..secondaryRoute = SecondaryRoute.alerts
       ..selectedAlertId = 'alert-turbidity';
     await capture(tester, alertDetail, 'alerts__detail');
 
     final history = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..secondaryRoute = SecondaryRoute.history;
     await capture(tester, history, 'history__populated');
     final historyEmpty = OceanEyesController()
@@ -158,6 +223,7 @@ void main() {
     );
 
     final countAdjusted = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.myFish
       ..expandedFishId = 'fish-cardinal';
     await capture(
@@ -173,6 +239,7 @@ void main() {
     );
 
     final deleteFish = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.myFish
       ..expandedFishId = 'fish-cardinal';
     await capture(
@@ -231,56 +298,40 @@ void main() {
     );
 
     final aiDisabled = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.account
       ..aiEnabled = false;
     await capture(tester, aiDisabled, 'account__ai-disabled');
 
-    final turbidity = OceanEyesController()..activeTab = PrimaryTab.account;
+    final turbidity = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
+      ..activeTab = PrimaryTab.account;
     await capture(
       tester,
       turbidity,
       'account__turbidity-measuring',
       prepare: (tester, controller) async {
-        await tester.tap(find.text('Measure Clarity'));
+        await tester.tap(find.byTooltip('Measure water clarity'));
         await pumpBounded(tester, duration: const Duration(milliseconds: 120));
         expect(controller.cameraStage, CameraStage.measuringTurbidity);
       },
     );
 
     final fullscreen = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.account
       ..fullscreenCamera = true;
     await capture(tester, fullscreen, 'account__fullscreen');
 
     final fullscreenInventory = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.account
       ..fullscreenCamera = true
       ..inventoryDrawerOpen = true;
     await capture(tester, fullscreenInventory, 'account__fullscreen-inventory');
 
-    final settingsDisclosure = OceanEyesController()
-      ..activeTab = PrimaryTab.account;
-    await capture(
-      tester,
-      settingsDisclosure,
-      'account__settings-disclosure',
-      prepare: (tester, _) async {
-        final disclosure = find.text('Background Canvas');
-        await tester.scrollUntilVisible(
-          disclosure,
-          260,
-          scrollable: find.byType(Scrollable).first,
-        );
-        await tester.tap(disclosure);
-        await pumpBounded(tester, duration: const Duration(milliseconds: 360));
-        final fixtureControl = find.text('Visual fixture state');
-        await tester.ensureVisible(fixtureControl);
-        await tester.pump(const Duration(milliseconds: 120));
-        expect(fixtureControl, findsOneWidget);
-      },
-    );
-
     final resolvedAlert = OceanEyesController()
+      ..applyFixture(FixtureScenario.populated, notify: false)
       ..secondaryRoute = SecondaryRoute.alerts
       ..selectedAlertId = 'alert-turbidity';
     await capture(

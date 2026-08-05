@@ -82,15 +82,18 @@ class OceanEyesController extends ChangeNotifier {
   bool _analyticsSpeciesRequestPending = false;
   bool _analyticsRangeRequestPending = false;
 
-  FixtureScenario fixtureScenario = FixtureScenario.populated;
-  DashboardHealthState dashboardHealth = DashboardHealthState.healthy;
-  AnalyticsContentState analyticsState = AnalyticsContentState.populated;
-  CameraStage cameraStage = CameraStage.active;
+  FixtureScenario fixtureScenario = FixtureScenario.dashboardWaiting;
+  DashboardHealthState dashboardHealth = DashboardHealthState.waiting;
+  AnalyticsContentState analyticsState = AnalyticsContentState.empty;
+  CameraStage cameraStage = CameraStage.beforePermission;
   bool cameraPermissionWillGrant = true;
 
-  List<FishEntry> fish = DemoFixtures.populatedFish();
-  List<AlertItem> alerts = DemoFixtures.alerts();
-  List<HistoryReading> history = DemoFixtures.history();
+  List<FishEntry> fish = const [];
+  List<AlertItem> alerts = const [];
+  List<HistoryReading> history = const [];
+  List<NormalizedDetectionCenter> heatmapCenters = const [];
+  DetectionFrameDimensions heatmapSourceDimensions =
+      DemoFixtures.heatmapSourceDimensions;
 
   String? expandedFishId;
   String selectedSpecies = 'All species';
@@ -113,8 +116,15 @@ class OceanEyesController extends ChangeNotifier {
   double brightness = 1;
   double contrast = 1;
   double saturation = 1;
-  double clarityThreshold = 3;
-  double visibleFishThreshold = 80;
+  double temperature = 0;
+  double tint = 0;
+  bool autoConnect = false;
+  double pollingIntervalMs = 10000;
+  double detectionConfidenceThreshold = 0.35;
+  double speciesConfidenceThreshold = 0.35;
+  double diagnosisMinConfidence = 0.60;
+  double clarityThreshold = 5;
+  double visibleFishThreshold = 50;
   double ambientBlur = 48;
   double ambientOpacity = 1;
   String? lastTurbidityResult = '1.5 FNU';
@@ -136,6 +146,23 @@ class OceanEyesController extends ChangeNotifier {
       AnalyticsSeriesService.spread(fish, selectedSpecies);
   List<FishDiagnostic> get fishDiagnostics =>
       AnalyticsSeriesService.diagnostics(fish, selectedSpecies);
+  List<NormalizedDetectionCenter> get selectedHeatmapCenters {
+    if (selectedSpecies == 'All species') return heatmapCenters;
+
+    String? selectedSpeciesId;
+    for (final entry in fish) {
+      if (entry.name == selectedSpecies) {
+        selectedSpeciesId = entry.speciesId;
+        break;
+      }
+    }
+    if (selectedSpeciesId == null) return const [];
+
+    return heatmapCenters
+        .where((center) => center.speciesId == selectedSpeciesId)
+        .toList(growable: false);
+  }
+
   TankStats get tankStats => FishInsightsService.tankStats(fish);
   SpeciesFacts? speciesFactsFor(String speciesId) =>
       FishInsightsService.factsFor(speciesId);
@@ -159,7 +186,7 @@ class OceanEyesController extends ChangeNotifier {
   }
 
   void openAlerts() {
-    secondaryOrigin = activeTab;
+    secondaryOrigin = PrimaryTab.dashboard;
     secondaryRoute = SecondaryRoute.alerts;
     selectedAlertId = null;
     scrollEpoch += 1;
@@ -210,7 +237,7 @@ class OceanEyesController extends ChangeNotifier {
   }
 
   void openHistory() {
-    secondaryOrigin = activeTab;
+    secondaryOrigin = PrimaryTab.dashboard;
     secondaryRoute = SecondaryRoute.history;
     selectedAlertId = null;
     scrollEpoch += 1;
@@ -328,10 +355,12 @@ class OceanEyesController extends ChangeNotifier {
 
   void retryAnalytics() {
     analyticsState = AnalyticsContentState.loading;
+    heatmapCenters = const [];
     _notify();
     unawaited(
       _completeAfter(const Duration(milliseconds: 650), () {
         analyticsState = AnalyticsContentState.populated;
+        heatmapCenters = DemoFixtures.heatmapCenters;
       }),
     );
   }
@@ -479,6 +508,24 @@ class OceanEyesController extends ChangeNotifier {
       case 'saturation':
         saturation = value;
         break;
+      case 'temperature':
+        temperature = value;
+        break;
+      case 'tint':
+        tint = value;
+        break;
+      case 'pollingIntervalMs':
+        pollingIntervalMs = value;
+        break;
+      case 'detectionConfidenceThreshold':
+        detectionConfidenceThreshold = value;
+        break;
+      case 'speciesConfidenceThreshold':
+        speciesConfidenceThreshold = value;
+        break;
+      case 'diagnosisMinConfidence':
+        diagnosisMinConfidence = value;
+        break;
       case 'clarityThreshold':
         clarityThreshold = value;
         break;
@@ -496,6 +543,12 @@ class OceanEyesController extends ChangeNotifier {
 
   void setShowDetections(bool value) {
     showDetections = value;
+    _savePreferences();
+    _notify();
+  }
+
+  void setAutoConnect(bool value) {
+    autoConnect = value;
     _savePreferences();
     _notify();
   }
@@ -525,8 +578,15 @@ class OceanEyesController extends ChangeNotifier {
     brightness = 1;
     contrast = 1;
     saturation = 1;
-    clarityThreshold = 3;
-    visibleFishThreshold = 80;
+    temperature = 0;
+    tint = 0;
+    autoConnect = false;
+    pollingIntervalMs = 10000;
+    detectionConfidenceThreshold = 0.35;
+    speciesConfidenceThreshold = 0.35;
+    diagnosisMinConfidence = 0.60;
+    clarityThreshold = 5;
+    visibleFishThreshold = 50;
     ambientBlur = 48;
     ambientOpacity = 1;
     lastTurbidityResult = '1.5 FNU';
@@ -536,14 +596,20 @@ class OceanEyesController extends ChangeNotifier {
     fish = DemoFixtures.populatedFish();
     alerts = DemoFixtures.alerts();
     history = DemoFixtures.history();
+    heatmapCenters = DemoFixtures.heatmapCenters;
+    heatmapSourceDimensions = DemoFixtures.heatmapSourceDimensions;
 
     switch (scenario) {
       case FixtureScenario.populated:
         break;
       case FixtureScenario.dashboardWaiting:
         dashboardHealth = DashboardHealthState.waiting;
+        analyticsState = AnalyticsContentState.empty;
+        cameraStage = CameraStage.beforePermission;
         fish = [];
         alerts = [];
+        history = [];
+        heatmapCenters = const [];
         break;
       case FixtureScenario.dashboardWarning:
         dashboardHealth = DashboardHealthState.warning;
@@ -553,12 +619,15 @@ class OceanEyesController extends ChangeNotifier {
         break;
       case FixtureScenario.analyticsLoading:
         analyticsState = AnalyticsContentState.loading;
+        heatmapCenters = const [];
         break;
       case FixtureScenario.analyticsEmpty:
         analyticsState = AnalyticsContentState.empty;
+        heatmapCenters = const [];
         break;
       case FixtureScenario.analyticsError:
         analyticsState = AnalyticsContentState.error;
+        heatmapCenters = const [];
         break;
       case FixtureScenario.cameraPermission:
         cameraStage = CameraStage.beforePermission;
@@ -622,6 +691,13 @@ class OceanEyesController extends ChangeNotifier {
     brightness = settings.brightness;
     contrast = settings.contrast;
     saturation = settings.saturation;
+    temperature = settings.temperature;
+    tint = settings.tint;
+    autoConnect = settings.autoConnect;
+    pollingIntervalMs = settings.pollingIntervalMs;
+    detectionConfidenceThreshold = settings.detectionConfidenceThreshold;
+    speciesConfidenceThreshold = settings.speciesConfidenceThreshold;
+    diagnosisMinConfidence = settings.diagnosisMinConfidence;
     clarityThreshold = settings.clarityThreshold;
     visibleFishThreshold = settings.visibleFishThreshold;
     ambientBlur = settings.ambientBlur;
@@ -649,6 +725,13 @@ class OceanEyesController extends ChangeNotifier {
         brightness: brightness,
         contrast: contrast,
         saturation: saturation,
+        temperature: temperature,
+        tint: tint,
+        autoConnect: autoConnect,
+        pollingIntervalMs: pollingIntervalMs,
+        detectionConfidenceThreshold: detectionConfidenceThreshold,
+        speciesConfidenceThreshold: speciesConfidenceThreshold,
+        diagnosisMinConfidence: diagnosisMinConfidence,
         clarityThreshold: clarityThreshold,
         visibleFishThreshold: visibleFishThreshold,
         ambientBlur: ambientBlur,

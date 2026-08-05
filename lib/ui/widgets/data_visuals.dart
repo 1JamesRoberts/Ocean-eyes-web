@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/oceaneyes_tokens.dart';
 import '../../models/aquarium_models.dart';
@@ -25,24 +29,25 @@ class HealthScoreRing extends StatelessWidget {
               size: Size.square(size),
               painter: _HealthRingPainter(progress: score / 100),
             ),
-            SizedBox(
-              width: size - 28,
+            SizedBox.square(
+              dimension: size * 0.8,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Row(
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
                       '$score',
                       style: OceanTypography.section.copyWith(
-                        fontSize: 40,
+                        fontSize: 42.4,
                         height: 1,
+                        letterSpacing: -2.544,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text('/100', style: OceanTypography.caption),
+                    const SizedBox(height: 4),
+                    Text(
+                      '/100',
+                      style: OceanTypography.caption.copyWith(height: 1),
                     ),
                   ],
                 ),
@@ -63,26 +68,30 @@ class _HealthRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
-    final radius = size.shortestSide / 2 - 8;
+    final scale = size.shortestSide / 112;
+    final radius = 50 * scale;
+    final strokeWidth = 9 * scale;
     canvas.drawCircle(
       center,
       radius,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 11
-        ..color = OceanColors.white.withValues(alpha: 0.58),
+        ..strokeWidth = strokeWidth
+        ..color = OceanColors.azureMist,
     );
     final rect = Rect.fromCircle(center: center, radius: radius);
     final paint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 9
+      ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round
-      ..shader = const SweepGradient(
-        colors: [OceanColors.verdigris, OceanColors.neonIce],
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [OceanColors.turquoiseSurf, OceanColors.verdigris],
       ).createShader(rect);
     canvas.drawArc(
       rect,
-      -math.pi / 2,
+      math.pi,
       math.pi * 2 * progress.clamp(0, 1),
       false,
       paint,
@@ -116,31 +125,40 @@ class VisibilityRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final percent = (progress * 100).round();
+    final ring = SizedBox.square(
+      dimension: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            value: progress.clamp(0, 1),
+            strokeWidth: 5,
+            strokeCap: StrokeCap.round,
+            color: _color,
+            backgroundColor: OceanColors.azureMist,
+          ),
+          Icon(LucideIcons.eye, size: size * 0.36, color: _color),
+        ],
+      ),
+    );
     return Semantics(
       label: '$percent percent of expected fish visible',
-      child: SizedBox.square(
-        dimension: size,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            CircularProgressIndicator(
-              value: progress.clamp(0, 1),
-              strokeWidth: size < 40 ? 3 : 4,
-              strokeCap: StrokeCap.round,
-              color: _color,
-              backgroundColor: OceanColors.white.withValues(alpha: 0.45),
-            ),
-            if (showLabel)
-              Text(
-                '$percent%',
-                style: OceanTypography.caption.copyWith(
-                  fontSize: size < 40 ? 8 : 9,
-                  color: OceanColors.ink,
+      child: showLabel
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ring,
+                const SizedBox(width: 10),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 36),
+                  child: Text(
+                    '$percent%',
+                    style: OceanTypography.strong.copyWith(color: _color),
+                  ),
                 ),
-              ),
-          ],
-        ),
-      ),
+              ],
+            )
+          : ring,
     );
   }
 }
@@ -151,14 +169,26 @@ class SpeciesDonut extends StatelessWidget {
   final List<FishEntry> fish;
   final double size;
 
-  static const colors = [
+  static const fallbackColors = [
     OceanColors.turquoise,
     OceanColors.verdigris,
-    OceanColors.neonIce,
-    Color(0xFFF59E0B),
+    OceanColors.skySurge,
+    OceanColors.warning,
     Color(0xFF8B5CF6),
     Color(0xFF3B82F6),
   ];
+
+  static Color colorFor(FishEntry fish, int index) => switch (fish.speciesId) {
+    'angelfish' => const Color(0xFFE8D5B7),
+    'betta' => const Color(0xFFFFB6C1),
+    'cardinal_tetra' => const Color(0xFF4169E1),
+    'cherry_barb' => const Color(0xFFDC143C),
+    'corydoras' => const Color(0xFFDAA520),
+    'dwarf_gourami' => const Color(0xFF20B2AA),
+    'guppy' => const Color(0xFFFF69B4),
+    'neon_tetra' => const Color(0xFF00CED1),
+    _ => fallbackColors[index % fallbackColors.length],
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +216,10 @@ class SpeciesDonut extends StatelessWidget {
               size: Size.square(size),
               painter: _DonutPainter(
                 values: fish.map((entry) => entry.count).toList(),
-                colors: colors,
+                colors: [
+                  for (var index = 0; index < fish.length; index += 1)
+                    colorFor(fish[index], index),
+                ],
               ),
             ),
             Column(
@@ -194,11 +227,17 @@ class SpeciesDonut extends StatelessWidget {
               children: [
                 Text(
                   '$total',
-                  style: OceanTypography.section.copyWith(fontSize: 28),
+                  style: OceanTypography.section.copyWith(
+                    fontSize: 28,
+                    letterSpacing: -0.28,
+                  ),
                 ),
                 Text(
                   'Total Fish',
-                  style: OceanTypography.caption.copyWith(fontSize: 11),
+                  style: OceanTypography.caption.copyWith(
+                    fontSize: 11,
+                    letterSpacing: -0.11,
+                  ),
                 ),
               ],
             ),
@@ -443,7 +482,7 @@ class _LineChartPainter extends CustomPainter {
       text: TextSpan(
         text: value,
         style: TextStyle(
-          fontFamily: 'Inter',
+          fontFamily: OceanTypography.family,
           fontSize: fontSize,
           color: OceanColors.inkMuted,
           fontWeight: weight,
@@ -542,7 +581,7 @@ class _BarChartPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [OceanColors.turquoise, OceanColors.verdigris],
+            colors: [OceanColors.verdigris, OceanColors.pineTeal],
           ).createShader(bar.outerRect),
       );
       if (index == 0 || index == points.length - 1 || index.isOdd) {
@@ -550,7 +589,7 @@ class _BarChartPainter extends CustomPainter {
           text: TextSpan(
             text: points[index].label,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: OceanTypography.family,
               fontSize: 9,
               color: OceanColors.inkMuted,
             ),
@@ -570,65 +609,393 @@ class _BarChartPainter extends CustomPainter {
       oldDelegate.points != points;
 }
 
-class HeatmapOverlay extends StatelessWidget {
-  const HeatmapOverlay({super.key, required this.visible});
+class HeatmapOverlay extends StatefulWidget {
+  const HeatmapOverlay({
+    super.key,
+    required this.centers,
+    required this.sourceDimensions,
+    required this.visible,
+  });
 
+  final List<NormalizedDetectionCenter> centers;
+  final DetectionFrameDimensions sourceDimensions;
   final bool visible;
 
   @override
+  State<HeatmapOverlay> createState() => _HeatmapOverlayState();
+}
+
+class _HeatmapOverlayState extends State<HeatmapOverlay> {
+  ui.Image? _texture;
+  _HeatmapTextureKey? _requestedKey;
+  _HeatmapTextureKey? _resolvedKey;
+  int _generation = 0;
+
+  @override
+  void dispose() {
+    _generation += 1;
+    _texture?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: AnimatedOpacity(
-        opacity: visible ? 0.55 : 0,
-        duration: OceanMotion.responsive(
-          context,
-          const Duration(milliseconds: 500),
-        ),
-        child: const RepaintBoundary(
-          child: CustomPaint(painter: _HeatmapPainter()),
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.biggest;
+        if (!size.width.isFinite ||
+            !size.height.isFinite ||
+            size.width <= 0 ||
+            size.height <= 0) {
+          return const SizedBox.shrink();
+        }
+
+        final key = _HeatmapTextureKey.fromWidget(size, widget);
+        _ensureTexture(key);
+        final texture = _resolvedKey == key ? _texture : null;
+
+        return ExcludeSemantics(
+          child: IgnorePointer(
+            child: AnimatedOpacity(
+              opacity: widget.visible ? 1 : 0,
+              curve: Curves.easeInOut,
+              duration: OceanMotion.responsive(
+                context,
+                const Duration(milliseconds: 500),
+              ),
+              child: RepaintBoundary(
+                child: SizedBox.expand(
+                  child: CustomPaint(
+                    painter: texture == null
+                        ? null
+                        : _HeatmapImagePainter(texture),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  void _ensureTexture(_HeatmapTextureKey key) {
+    if (_requestedKey == key) return;
+    _requestedKey = key;
+    final generation = ++_generation;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || generation != _generation) return;
+      if (key.centers.isEmpty) {
+        _installTexture(null, key);
+        return;
+      }
+      unawaited(_generateTexture(key, generation));
+    });
+  }
+
+  Future<void> _generateTexture(_HeatmapTextureKey key, int generation) async {
+    final raster = buildHeatmapRaster(
+      centers: key.centers,
+      renderWidth: key.renderWidth,
+      renderHeight: key.renderHeight,
+    );
+    if (raster == null) {
+      if (mounted && generation == _generation) {
+        _installTexture(null, key);
+      }
+      return;
+    }
+
+    final texture = await _decodeHeatmapRaster(raster);
+    if (!mounted || generation != _generation || _requestedKey != key) {
+      texture.dispose();
+      return;
+    }
+    _installTexture(texture, key);
+  }
+
+  void _installTexture(ui.Image? texture, _HeatmapTextureKey key) {
+    final previous = _texture;
+    setState(() {
+      _texture = texture;
+      _resolvedKey = key;
+    });
+    if (previous != null && !identical(previous, texture)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => previous.dispose());
+    }
   }
 }
 
-class _HeatmapPainter extends CustomPainter {
-  const _HeatmapPainter();
+class HeatmapRaster {
+  const HeatmapRaster({
+    required this.width,
+    required this.height,
+    required this.rgba,
+  });
 
-  static const centers = <Offset>[
-    Offset(0.15, 0.28),
-    Offset(0.28, 0.62),
-    Offset(0.46, 0.47),
-    Offset(0.61, 0.36),
-    Offset(0.72, 0.61),
-    Offset(0.83, 0.27),
-    Offset(0.9, 0.70),
-  ];
+  final int width;
+  final int height;
+  final Uint8List rgba;
+}
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (var index = 0; index < centers.length; index += 1) {
-      final center = Offset(
-        centers[index].dx * size.width,
-        centers[index].dy * size.height,
-      );
-      final radius = size.width * (index.isEven ? 0.13 : 0.10);
-      canvas.drawCircle(
-        center,
-        radius,
-        Paint()
-          ..shader = RadialGradient(
-            colors: [
-              const Color(0xFFFF2D2D).withValues(alpha: 0.95),
-              const Color(0xFFFFE600).withValues(alpha: 0.72),
-              const Color(0xFF00D7FF).withValues(alpha: 0.35),
-              const Color(0xFF001B8F).withValues(alpha: 0),
-            ],
-          ).createShader(Rect.fromCircle(center: center, radius: radius)),
-      );
+/// Ports the reference web renderer's Float32 Gaussian/JET texture exactly.
+HeatmapRaster? buildHeatmapRaster({
+  required List<NormalizedDetectionCenter> centers,
+  required int renderWidth,
+  required int renderHeight,
+}) {
+  if (centers.isEmpty || renderWidth <= 0 || renderHeight <= 0) return null;
+
+  final density = Float32List(renderWidth * renderHeight);
+  for (final center in centers) {
+    final px = _javaScriptRound(center.nx * (renderWidth - 1));
+    final py = _javaScriptRound(center.ny * (renderHeight - 1));
+    if (px == null || py == null) continue;
+    if (px >= 0 && px < renderWidth && py >= 0 && py < renderHeight) {
+      final index = py * renderWidth + px;
+      density[index] = density[index] + 1;
     }
   }
 
+  final sigma = math.max(1, (renderWidth * 0.05).round()).toInt();
+  final blurred = _gaussianBlur(density, renderWidth, renderHeight, sigma);
+  var maxValue = 0.0;
+  for (final value in blurred) {
+    if (value > maxValue) maxValue = value;
+  }
+
+  final rgba = Uint8List(renderWidth * renderHeight * 4);
+  if (maxValue > 0) {
+    const alpha = 140; // Math.round(0.55 * 255)
+    for (var index = 0; index < blurred.length; index += 1) {
+      final lutIndex = ((blurred[index] / maxValue) * 255).round();
+      final color = _jetLut[lutIndex];
+      final offset = index * 4;
+      rgba[offset] = color.red;
+      rgba[offset + 1] = color.green;
+      rgba[offset + 2] = color.blue;
+      rgba[offset + 3] = alpha;
+    }
+  }
+
+  return HeatmapRaster(width: renderWidth, height: renderHeight, rgba: rgba);
+}
+
+Rect calculateHeatmapObjectCoverRect({
+  required double sourceWidth,
+  required double sourceHeight,
+  required double containerWidth,
+  required double containerHeight,
+}) {
+  if (sourceWidth <= 0 ||
+      sourceHeight <= 0 ||
+      containerWidth <= 0 ||
+      containerHeight <= 0) {
+    return Rect.zero;
+  }
+
+  final scale = math.max(
+    containerWidth / sourceWidth,
+    containerHeight / sourceHeight,
+  );
+  final width = sourceWidth * scale;
+  final height = sourceHeight * scale;
+  return Rect.fromLTWH(
+    (containerWidth - width) / 2,
+    (containerHeight - height) / 2,
+    width,
+    height,
+  );
+}
+
+Float32List _gaussianBlur(
+  Float32List source,
+  int width,
+  int height,
+  int sigma,
+) {
+  final radius = (sigma * 3).ceil();
+  final kernelSize = radius * 2 + 1;
+  final kernel = Float32List(kernelSize);
+  var kernelSum = 0.0;
+
+  for (var index = 0; index < kernelSize; index += 1) {
+    final x = index - radius;
+    kernel[index] = math.exp(-(x * x) / (2 * sigma * sigma));
+    kernelSum += kernel[index];
+  }
+  for (var index = 0; index < kernelSize; index += 1) {
+    kernel[index] = kernel[index] / kernelSum;
+  }
+
+  final horizontal = Float32List(width * height);
+  for (var y = 0; y < height; y += 1) {
+    final rowOffset = y * width;
+    for (var x = 0; x < width; x += 1) {
+      var accumulated = 0.0;
+      for (var kernelIndex = 0; kernelIndex < kernelSize; kernelIndex += 1) {
+        final sourceX = x + kernelIndex - radius;
+        if (sourceX >= 0 && sourceX < width) {
+          accumulated += source[rowOffset + sourceX] * kernel[kernelIndex];
+        }
+      }
+      horizontal[rowOffset + x] = accumulated;
+    }
+  }
+
+  final result = Float32List(width * height);
+  for (var y = 0; y < height; y += 1) {
+    for (var x = 0; x < width; x += 1) {
+      var accumulated = 0.0;
+      for (var kernelIndex = 0; kernelIndex < kernelSize; kernelIndex += 1) {
+        final sourceY = y + kernelIndex - radius;
+        if (sourceY >= 0 && sourceY < height) {
+          accumulated += horizontal[sourceY * width + x] * kernel[kernelIndex];
+        }
+      }
+      result[y * width + x] = accumulated;
+    }
+  }
+  return result;
+}
+
+int? _javaScriptRound(double value) {
+  if (!value.isFinite) return null;
+  return (value + 0.5).floor();
+}
+
+class _Rgb {
+  const _Rgb(this.red, this.green, this.blue);
+
+  final int red;
+  final int green;
+  final int blue;
+}
+
+final List<_Rgb> _jetLut = List<_Rgb>.unmodifiable(
+  List<_Rgb>.generate(256, (index) => _jetColor(index / 255)),
+);
+
+_Rgb _jetColor(double value) {
+  final clamped = value.clamp(0.0, 1.0);
+  if (clamped < 0.125) {
+    final position = clamped / 0.125;
+    return _Rgb(0, 0, (128 + position * 127).round());
+  }
+  if (clamped < 0.375) {
+    final position = (clamped - 0.125) / 0.25;
+    return _Rgb(0, (position * 255).round(), 255);
+  }
+  if (clamped < 0.625) {
+    final position = (clamped - 0.375) / 0.25;
+    return _Rgb((position * 255).round(), 255, ((1 - position) * 255).round());
+  }
+  if (clamped < 0.875) {
+    final position = (clamped - 0.625) / 0.25;
+    return _Rgb(255, ((1 - position) * 255).round(), 0);
+  }
+  final position = (clamped - 0.875) / 0.125;
+  return _Rgb((255 - position * 127).round(), 0, 0);
+}
+
+class _HeatmapTextureKey {
+  _HeatmapTextureKey({
+    required this.renderWidth,
+    required this.renderHeight,
+    required List<NormalizedDetectionCenter> centers,
+  }) : centers = List<NormalizedDetectionCenter>.unmodifiable(centers);
+
+  factory _HeatmapTextureKey.fromWidget(Size size, HeatmapOverlay widget) {
+    final renderWidth = math.min(800, math.max(1, size.width.round()));
+    final sourceDimensions = widget.sourceDimensions;
+    final sourceWidth = sourceDimensions.isValid ? sourceDimensions.width : 16;
+    final sourceHeight = sourceDimensions.isValid ? sourceDimensions.height : 9;
+    final renderHeight = math.max(
+      1,
+      (renderWidth * (sourceHeight / sourceWidth)).round(),
+    );
+    return _HeatmapTextureKey(
+      renderWidth: renderWidth,
+      renderHeight: renderHeight,
+      centers: widget.centers,
+    );
+  }
+
+  final int renderWidth;
+  final int renderHeight;
+  final List<NormalizedDetectionCenter> centers;
+
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool operator ==(Object other) {
+    if (other is! _HeatmapTextureKey ||
+        other.renderWidth != renderWidth ||
+        other.renderHeight != renderHeight ||
+        other.centers.length != centers.length) {
+      return false;
+    }
+    for (var index = 0; index < centers.length; index += 1) {
+      if (other.centers[index] != centers[index]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(renderWidth, renderHeight, Object.hashAll(centers));
+}
+
+Future<ui.Image> _decodeHeatmapRaster(HeatmapRaster raster) async {
+  final buffer = await ui.ImmutableBuffer.fromUint8List(raster.rgba);
+  final descriptor = ui.ImageDescriptor.raw(
+    buffer,
+    width: raster.width,
+    height: raster.height,
+    rowBytes: raster.width * 4,
+    pixelFormat: ui.PixelFormat.rgba8888,
+  );
+  final codec = await descriptor.instantiateCodec();
+  try {
+    final frame = await codec.getNextFrame();
+    return frame.image;
+  } finally {
+    codec.dispose();
+    descriptor.dispose();
+    buffer.dispose();
+  }
+}
+
+class _HeatmapImagePainter extends CustomPainter {
+  const _HeatmapImagePainter(this.texture);
+
+  final ui.Image texture;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final destination = calculateHeatmapObjectCoverRect(
+      sourceWidth: texture.width.toDouble(),
+      sourceHeight: texture.height.toDouble(),
+      containerWidth: size.width,
+      containerHeight: size.height,
+    );
+    canvas
+      ..save()
+      ..clipRect(Offset.zero & size)
+      ..drawImageRect(
+        texture,
+        Rect.fromLTWH(
+          0,
+          0,
+          texture.width.toDouble(),
+          texture.height.toDouble(),
+        ),
+        destination,
+        Paint()..filterQuality = FilterQuality.low,
+      )
+      ..restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _HeatmapImagePainter oldDelegate) =>
+      oldDelegate.texture != texture;
 }

@@ -1,4 +1,5 @@
 import 'aquarium_models.dart';
+import 'species_catalog.dart';
 
 class TankStats {
   const TankStats({
@@ -53,7 +54,26 @@ class FishCompatibility {
 
 /// Pure aquarium compatibility and care calculations shared by view models.
 abstract final class FishInsightsService {
-  static SpeciesFacts? factsFor(String speciesId) => _speciesFacts[speciesId];
+  static SpeciesFacts? factsFor(String speciesId) {
+    final fixtureFacts = _speciesFacts[speciesId];
+    if (fixtureFacts != null) return fixtureFacts;
+    final facts = SpeciesCatalog.facts[speciesId];
+    if (facts == null) return null;
+    return SpeciesFacts(
+      sizeCm: facts.sizeCm,
+      tankLitres: facts.tankLitres,
+      tempMin: facts.tempMin,
+      tempMax: facts.tempMax,
+      phMin: facts.phMin,
+      phMax: facts.phMax,
+      availability: facts.availability,
+      aggression: facts.aggression,
+      aggressionLabel: facts.aggressionLabel,
+      behavior: facts.behavior,
+      behaviorLabel: facts.behaviorLabel,
+      swimZone: facts.swimZone,
+    );
+  }
 
   static List<FishCompatibility> compatibilitiesFor(
     Iterable<FishEntry> tankFish,
@@ -101,11 +121,11 @@ abstract final class FishInsightsService {
         .toList(growable: false);
     final facts = mappedFacts.whereType<SpeciesFacts>().toList(growable: false);
     if (facts.isEmpty) {
-      return const TankStats(
+      return TankStats(
         idealTankLitres: null,
         temperatureRange: '—',
         phRange: '—',
-        compatibility: null,
+        compatibility: entries.isEmpty ? 100 : null,
       );
     }
 

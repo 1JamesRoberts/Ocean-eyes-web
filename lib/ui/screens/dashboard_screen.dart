@@ -40,7 +40,7 @@ class _DashboardBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (waiting)
-          const StateCard(
+          const _DashboardStateCard(
             icon: LucideIcons.radio,
             title: 'Waiting for monitor data',
             description:
@@ -48,8 +48,13 @@ class _DashboardBody extends StatelessWidget {
                 'service processes its first frame.',
           )
         else ...[
-          _HealthCard(controller: controller, warning: warning),
-          const SizedBox(height: OceanSpacing.md),
+          Transform.translate(
+            offset: const Offset(0, -OceanSpacing.xs),
+            child: _HealthCard(controller: controller, warning: warning),
+          ),
+          // The web card carries a negative top margin. Pairing the visual
+          // translation with an 8 px spacer preserves the 16 px gap below it.
+          const SizedBox(height: OceanSpacing.sm),
           _FishInventorySummary(controller: controller),
           const SizedBox(height: OceanSpacing.md),
           _ParametersCard(controller: controller),
@@ -70,14 +75,11 @@ class _HealthCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final metrics = controller.waterMetrics;
-    final clarity = _metric(metrics, 'Turbidity').value;
+    final clarity = _twoDecimals(_metric(metrics, 'Turbidity').value);
     final ph = _metric(metrics, 'pH Level').value;
     final temperature = _metric(metrics, 'Temperature').value;
     final score = warning ? 68 : 92;
     final statusColor = warning ? OceanColors.warning : OceanColors.good;
-    final statusTextColor = warning
-        ? OceanColors.warningInk
-        : OceanColors.goodInk;
     final status = warning ? 'Attention' : 'Excellent';
     final message = warning
         ? 'Some conditions need watching.'
@@ -86,97 +88,94 @@ class _HealthCard extends StatelessWidget {
     return GlassCard(
       semanticLabel:
           'Aquarium Health. $status. $message Health score $score out of 100.',
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final details = Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      padding: const EdgeInsets.symmetric(
+        horizontal: OceanSpacing.md,
+        vertical: OceanSpacing.sm,
+      ),
+      child: Row(
+        children: [
+          HealthScoreRing(score: score),
+          const SizedBox(width: OceanSpacing.md),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: OceanSpacing.xxs),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: statusColor,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      status,
-                      style: OceanTypography.caption.copyWith(
-                        color: statusTextColor,
-                        fontWeight: FontWeight.w600,
+                  Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          shape: BoxShape.circle,
+                        ),
                       ),
+                      const SizedBox(width: OceanSpacing.xs),
+                      Expanded(
+                        child: Text(
+                          status,
+                          style: OceanTypography.caption.copyWith(
+                            color: statusColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        LucideIcons.chevronRight,
+                        size: 18,
+                        color: OceanColors.inkMuted,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: OceanSpacing.xs),
+                  const Text('Aquarium Health', style: OceanTypography.title),
+                  const SizedBox(height: OceanSpacing.xs),
+                  Text(
+                    message,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: OceanTypography.caption.copyWith(
+                      fontSize: 14,
+                      height: 1.25,
                     ),
                   ),
-                  const Icon(
-                    LucideIcons.chevronRight,
-                    size: 18,
-                    color: OceanColors.inkMuted,
+                  const SizedBox(height: OceanSpacing.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _HealthParameterChip(
+                          icon: LucideIcons.droplets,
+                          semanticLabel: 'Clarity',
+                          value: '$clarity FNU',
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: _HealthParameterChip(
+                          icon: LucideIcons.flaskConical,
+                          semanticLabel: 'pH',
+                          value: '$ph pH',
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: _HealthParameterChip(
+                          icon: LucideIcons.thermometer,
+                          semanticLabel: 'Temperature',
+                          value: '$temperature°C',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
-              const Text('Aquarium Health', style: OceanTypography.title),
-              const SizedBox(height: 5),
-              Text(
-                message,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: OceanTypography.caption,
-              ),
-              const SizedBox(height: 9),
-              Row(
-                children: [
-                  Expanded(
-                    child: _HealthParameterChip(
-                      icon: LucideIcons.droplets,
-                      semanticLabel: 'Clarity',
-                      value: '$clarity FNU',
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: _HealthParameterChip(
-                      icon: LucideIcons.flaskConical,
-                      semanticLabel: 'pH',
-                      value: '$ph pH',
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: _HealthParameterChip(
-                      icon: LucideIcons.thermometer,
-                      semanticLabel: 'Temperature',
-                      value: '$temperature°C',
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-
-          if (constraints.maxWidth < 320) {
-            return Column(
-              children: [
-                HealthScoreRing(score: score),
-                const SizedBox(height: 12),
-                details,
-              ],
-            );
-          }
-          return Row(
-            children: [
-              HealthScoreRing(score: score),
-              const SizedBox(width: 16),
-              Expanded(child: details),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -198,20 +197,19 @@ class _HealthParameterChip extends StatelessWidget {
     return Semantics(
       label: '$semanticLabel: $value',
       child: Container(
-        height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: OceanColors.prussianBlue.withValues(alpha: 0.03),
+          color: OceanColors.azureMist,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 14, color: OceanColors.verdigris),
-            const SizedBox(width: 3),
-            Expanded(
+            Icon(icon, size: 16, color: OceanColors.turquoiseSurf),
+            const SizedBox(width: OceanSpacing.xxs),
+            Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
                 child: Text(
                   value,
                   maxLines: 1,
@@ -241,31 +239,40 @@ class _FishInventorySummary extends StatelessWidget {
     return _HeadedCard(
       title: 'My Fish',
       icon: LucideIcons.fishSymbol,
-      action: GlassIconButton(
+      action: _HeaderActionButton(
         icon: LucideIcons.chevronRight,
-        tooltip: 'Manage fish list',
-        onPressed: () => controller.selectTab(PrimaryTab.myFish),
-        background: Colors.transparent,
+        semanticLabel: 'Manage fish list',
+        onTap: () => controller.selectTab(PrimaryTab.myFish),
       ),
       child: fish.isEmpty
           ? const GlassPanel(
-              child: _InlineEmptyState(
+              padding: EdgeInsets.zero,
+              child: _DashboardStateContent(
                 icon: LucideIcons.fishSymbol,
                 title: 'No fish added',
                 description:
                     'Add your first fish to compare inventory with AI '
                     'detections.',
+                compact: true,
               ),
             )
           : Column(
               children: [
                 for (var index = 0; index < fish.length; index++) ...[
-                  _InventoryRow(fish: fish[index]),
-                  if (index != fish.length - 1)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: index == 0 ? OceanSpacing.sm : 0,
+                      bottom: OceanSpacing.sm,
+                    ),
+                    child: _InventoryRow(fish: fish[index]),
+                  ),
+                  if (index != fish.length - 1) ...[
                     Divider(
                       height: 1,
                       color: OceanColors.slateGrey.withValues(alpha: 0.15),
                     ),
+                    const SizedBox(height: OceanSpacing.sm),
+                  ],
                 ],
               ],
             ),
@@ -281,69 +288,65 @@ class _InventoryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final complete = fish.detected == fish.count;
-    final color = complete ? OceanColors.good : OceanColors.critical;
-    Widget details() => Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          fish.name,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: OceanTypography.strong,
-        ),
-        const SizedBox(height: 2),
-        Text('${fish.detected} detected', style: OceanTypography.caption),
-      ],
-    );
-    Widget statusPill() => GlassPill(
-      color: color.withValues(alpha: 0.12),
-      foregroundColor: complete ? OceanColors.goodInk : OceanColors.criticalInk,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: Text(
-        complete ? 'All Visible' : '${fish.detected} / ${fish.count}',
-        maxLines: 1,
-      ),
-    );
+    final statusColor = complete ? OceanColors.good : OceanColors.critical;
+    final statusBackground = complete
+        ? OceanColors.navigationActive.withValues(alpha: 0.12)
+        : const Color(0xFFBA1A1A).withValues(alpha: 0.12);
+
     return Semantics(
       label:
           '${fish.name}, ${fish.detected} detected out of ${fish.count}. '
           '${complete ? 'All Visible' : 'Visibility incomplete'}',
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 56),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final largeText = MediaQuery.textScalerOf(context).scale(13) > 17.5;
-            final identity = Row(
+      child: Row(
+        children: [
+          SizedBox.square(
+            dimension: 48,
+            child: Center(
+              child: FishAvatar(
+                assetPath: fish.assetPath,
+                name: fish.name,
+                size: 40,
+              ),
+            ),
+          ),
+          const SizedBox(width: OceanSpacing.sm),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FishAvatar(
-                  assetPath: fish.assetPath,
-                  name: fish.name,
-                  size: 56,
+                Text(
+                  fish.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: OceanTypography.strong,
                 ),
-                const SizedBox(width: 12),
-                Expanded(child: details()),
+                const SizedBox(height: 2),
+                Text(
+                  '${fish.detected} / ${fish.count} detected',
+                  style: OceanTypography.caption,
+                ),
               ],
-            );
-            if (largeText || constraints.maxWidth < 280) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  identity,
-                  const SizedBox(height: 6),
-                  Align(alignment: Alignment.centerRight, child: statusPill()),
-                ],
-              );
-            }
-            return Row(
-              children: [
-                Expanded(child: identity),
-                const SizedBox(width: 6),
-                statusPill(),
-              ],
-            );
-          },
-        ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: statusBackground,
+              borderRadius: BorderRadius.circular(OceanRadii.pill),
+            ),
+            child: Text(
+              complete ? 'All Visible' : '${fish.detected} / ${fish.count}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textScaler: MediaQuery.textScalerOf(
+                context,
+              ).clamp(maxScaleFactor: 1.15),
+              style: OceanTypography.caption.copyWith(color: statusColor),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -363,7 +366,6 @@ class _ParametersCard extends StatelessWidget {
         label: 'Clarity',
         value: _twoDecimals(_metric(metrics, 'Turbidity').value),
         unit: 'FNU',
-        warning: _metric(metrics, 'Turbidity').isWarning,
         onTap: controller.openHistory,
       ),
       _ParameterValue(
@@ -377,7 +379,6 @@ class _ParametersCard extends StatelessWidget {
         label: 'Temp',
         value: _metric(metrics, 'Temperature').value,
         unit: '°C',
-        warning: _metric(metrics, 'Temperature').isWarning,
       ),
       _ParameterValue(
         icon: LucideIcons.shield,
@@ -398,16 +399,15 @@ class _ParametersCard extends StatelessWidget {
     return _HeadedCard(
       title: 'Parameters',
       icon: LucideIcons.flaskConical,
-      action: GlassIconButton(
+      action: _HeaderActionButton(
         icon: LucideIcons.chevronRight,
-        tooltip: 'View water parameter history',
-        onPressed: controller.openHistory,
-        background: Colors.transparent,
+        semanticLabel: 'View water parameter history',
+        onTap: controller.openHistory,
       ),
       child: SizedBox(
         height: math.max(
-          76,
-          76 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
+          85,
+          85 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -456,7 +456,7 @@ class _ParameterTile extends StatelessWidget {
         ? OceanColors.critical
         : OceanColors.good;
     final valueColor = parameter.warning
-        ? OceanColors.criticalInk
+        ? OceanColors.critical
         : OceanColors.ink;
 
     return Semantics(
@@ -470,45 +470,52 @@ class _ParameterTile extends StatelessWidget {
               : 'Good'}',
       child: GlassPanel(
         onTap: parameter.onTap,
-        padding: const EdgeInsets.fromLTRB(4, 8, 4, 5),
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(parameter.icon, size: 16, color: OceanColors.verdigris),
+            Icon(parameter.icon, size: 16, color: OceanColors.turquoiseSurf),
+            const SizedBox(height: 6),
             Text(
               parameter.label,
               maxLines: 1,
               style: OceanTypography.caption.copyWith(
-                fontSize: 9.5,
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text.rich(
-                TextSpan(
+            const SizedBox(height: 6),
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
                   children: [
-                    TextSpan(
-                      text: parameter.value,
-                      style: TextStyle(
-                        fontSize: 14,
+                    Text(
+                      parameter.value,
+                      style: OceanTypography.title.copyWith(
+                        fontSize: 15,
+                        height: 1,
                         fontWeight: FontWeight.w700,
                         color: valueColor,
                       ),
                     ),
-                    TextSpan(
-                      text: ' ${parameter.unit}',
-                      style: TextStyle(
-                        fontSize: 9,
+                    const SizedBox(width: 2),
+                    Text(
+                      parameter.unit,
+                      style: OceanTypography.caption.copyWith(
+                        fontSize: 10,
+                        height: 1,
                         fontWeight: FontWeight.w600,
                         color: valueColor,
                       ),
                     ),
                   ],
                 ),
-                maxLines: 1,
               ),
             ),
+            const SizedBox(height: 8),
             Container(
               width: 8,
               height: 8,
@@ -535,12 +542,13 @@ class _AlertsSection extends StatelessWidget {
         .where((alert) => !alert.resolved)
         .toList(growable: false);
     if (activeAlerts.isEmpty) {
-      return const StateCard(
+      return const _DashboardStateCard(
         icon: LucideIcons.shieldCheck,
         title: 'System operating safely',
         description: 'No active safety alarms require your attention.',
         compact: true,
         success: true,
+        dashed: true,
       );
     }
 
@@ -594,7 +602,7 @@ class _AlertRow extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(13.5),
+                  padding: const EdgeInsets.all(OceanSpacing.md),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -644,12 +652,11 @@ class _HeadedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CardHeader(title: title, icon: icon, trailing: action, divider: true),
-          const SizedBox(height: 10),
           child,
         ],
       ),
@@ -657,31 +664,122 @@ class _HeadedCard extends StatelessWidget {
   }
 }
 
-class _InlineEmptyState extends StatelessWidget {
-  const _InlineEmptyState({
+class _HeaderActionButton extends StatelessWidget {
+  const _HeaderActionButton({
+    required this.icon,
+    required this.semanticLabel,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String semanticLabel;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: InkResponse(
+          onTap: onTap,
+          radius: 18,
+          child: SizedBox.square(
+            dimension: 24,
+            child: Icon(icon, size: 18, color: OceanColors.inkMuted),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DashboardStateCard extends StatelessWidget {
+  const _DashboardStateCard({
     required this.icon,
     required this.title,
     required this.description,
+    this.compact = false,
+    this.success = false,
+    this.dashed = false,
   });
 
   final IconData icon;
   final String title;
   final String description;
+  final bool compact;
+  final bool success;
+  final bool dashed;
 
   @override
   Widget build(BuildContext context) {
+    final card = GlassCard(
+      semanticLabel: '$title. $description',
+      borderColor: dashed ? Colors.transparent : null,
+      borderWidth: dashed ? 2 : 1,
+      padding: EdgeInsets.zero,
+      child: _DashboardStateContent(
+        icon: icon,
+        title: title,
+        description: description,
+        compact: compact,
+        success: success,
+      ),
+    );
+    if (!dashed) return card;
+    return CustomPaint(
+      foregroundPainter: _DashedRoundedBorderPainter(
+        color: OceanColors.white.withValues(alpha: 0.40),
+        radius: OceanRadii.card,
+      ),
+      child: card,
+    );
+  }
+}
+
+class _DashboardStateContent extends StatelessWidget {
+  const _DashboardStateContent({
+    required this.icon,
+    required this.title,
+    required this.description,
+    this.compact = false,
+    this.success = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final String description;
+  final bool compact;
+  final bool success;
+
+  @override
+  Widget build(BuildContext context) {
+    final tone = success ? OceanColors.good : OceanColors.navigationActive;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? OceanSpacing.md : OceanSpacing.xl,
+        vertical: compact ? OceanSpacing.md : 40,
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 24, color: OceanColors.verdigris),
-          const SizedBox(height: 8),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: tone.withValues(alpha: success ? 0.10 : 0.08),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, size: 22, color: tone),
+          ),
+          const SizedBox(height: OceanSpacing.sm),
           Text(
             title,
             textAlign: TextAlign.center,
             style: OceanTypography.title,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: OceanSpacing.xxs),
           Text(
             description,
             textAlign: TextAlign.center,
@@ -691,6 +789,50 @@ class _InlineEmptyState extends StatelessWidget {
       ),
     );
   }
+}
+
+class _DashedRoundedBorderPainter extends CustomPainter {
+  const _DashedRoundedBorderPainter({
+    required this.color,
+    required this.radius,
+  });
+
+  final Color color;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const strokeWidth = 2.0;
+    final strokeInset = strokeWidth / 2;
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            strokeInset,
+            strokeInset,
+            size.width - strokeWidth,
+            size.height - strokeWidth,
+          ),
+          Radius.circular(radius - strokeInset),
+        ),
+      );
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..color = color;
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final end = math.min(distance + 7, metric.length);
+        canvas.drawPath(metric.extractPath(distance, end), paint);
+        distance += 11;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedRoundedBorderPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.radius != radius;
 }
 
 WaterMetric _metric(List<WaterMetric> metrics, String label) =>

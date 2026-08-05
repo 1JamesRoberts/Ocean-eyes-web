@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +10,6 @@ import '../../models/aquarium_models.dart';
 import '../../view_models/oceaneyes_controller.dart';
 import '../widgets/data_visuals.dart';
 import '../widgets/glass.dart';
-import '../widgets/screen_primitives.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key, required this.controller});
@@ -86,8 +86,9 @@ Future<void> _showAnalyticsSpeciesSelector(
     'All species',
     ...controller.fish.map((entry) => entry.name),
   ];
-  final selected = await showOceanDialog<String>(
+  final selected = await _showAnalyticsOverlay<String>(
     context: context,
+    alignment: Alignment.topRight,
     child: _SpeciesSelectorDialog(
       options: options.toSet().toList(growable: false),
       selected: controller.selectedSpecies,
@@ -100,9 +101,8 @@ Future<void> _showAnalyticsRangeEditor(
   BuildContext context,
   OceanEyesController controller,
 ) async {
-  final result = await showOceanDialog<_RangeSelection>(
+  final result = await _showAnalyticsOverlay<_RangeSelection>(
     context: context,
-    barrierDismissible: false,
     child: _DateRangeEditorDialog(
       range: controller.analyticsRange,
       startTime: controller.analyticsStartTime,
@@ -114,6 +114,49 @@ Future<void> _showAnalyticsRangeEditor(
     result.range,
     start: result.startTime,
     end: result.endTime,
+  );
+}
+
+Future<T?> _showAnalyticsOverlay<T>({
+  required BuildContext context,
+  required Widget child,
+  Alignment alignment = Alignment.topCenter,
+}) {
+  return showGeneralDialog<T>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Dismiss analytics controls',
+    barrierColor: Colors.transparent,
+    transitionDuration: OceanMotion.responsive(context, OceanMotion.sheet),
+    pageBuilder: (context, _, _) {
+      final size = MediaQuery.sizeOf(context);
+      final anchoredTop = math
+          .min(
+            OceanGeometry.statusBarHeight + OceanGeometry.heroHeight - 4,
+            math.max(16, size.height - 96),
+          )
+          .toDouble();
+      return Material(
+        color: Colors.transparent,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16, anchoredTop, 16, 16),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: math.min(
+                OceanGeometry.referenceWidth - 32,
+                size.width - 32,
+              ),
+              child: Align(alignment: alignment, child: child),
+            ),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, _, child) => FadeTransition(
+      opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+      child: child,
+    ),
   );
 }
 
@@ -130,7 +173,7 @@ class _SpeciesSelectorDialog extends StatelessWidget {
       MediaQuery.sizeOf(context).height - 64,
     );
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 361, maxHeight: availableHeight),
+      constraints: BoxConstraints(maxWidth: 320, maxHeight: availableHeight),
       child: GlassCard(
         overlay: true,
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
@@ -222,37 +265,91 @@ class _AnalyticsLoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const heights = [232.0, 232.0, 210.0, 176.0];
     return Semantics(
       container: true,
       liveRegion: true,
       label: 'Loading analytics',
       child: ExcludeSemantics(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (var index = 0; index < heights.length; index += 1) ...[
-              GlassCard(
-                child: SizedBox(
-                  height: heights[index],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: _SkeletonBlock(
-                          width: index == 3 ? 154 : 174,
-                          height: 18,
-                        ),
+            GlassCard(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 428),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: _SkeletonBlock(
+                        width: 176,
+                        height: 20,
+                        radius: 4,
+                        color: OceanColors.azureMist2,
                       ),
-                      const SizedBox(height: OceanSpacing.lg),
-                      const Expanded(child: _SkeletonBlock()),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 20),
+                    _SkeletonBlock(height: 180, radius: 8),
+                    SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: _SkeletonBlock(
+                        width: 192,
+                        height: 20,
+                        radius: 4,
+                        color: OceanColors.azureMist2,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    _SkeletonBlock(height: 180, radius: 8),
+                  ],
                 ),
               ),
-              if (index != heights.length - 1)
-                const SizedBox(height: OceanSpacing.md),
-            ],
+            ),
+            const SizedBox(height: OceanSpacing.md),
+            GlassCard(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 280),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: _SkeletonBlock(
+                        width: 160,
+                        height: 20,
+                        radius: 4,
+                        color: OceanColors.azureMist2,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    _SkeletonBlock(height: 240, radius: 8),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: OceanSpacing.md),
+            GlassCard(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 152),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: _SkeletonBlock(
+                        width: 256,
+                        height: 20,
+                        radius: 4,
+                        color: OceanColors.azureMist2,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    _SkeletonBlock(height: 80, radius: 8),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -261,10 +358,17 @@ class _AnalyticsLoadingState extends StatelessWidget {
 }
 
 class _SkeletonBlock extends StatelessWidget {
-  const _SkeletonBlock({this.width, this.height});
+  const _SkeletonBlock({
+    this.width,
+    this.height,
+    this.radius = 8,
+    this.color = OceanColors.azureMist,
+  });
 
   final double? width;
   final double? height;
+  final double radius;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -272,8 +376,8 @@ class _SkeletonBlock extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: OceanColors.pearlAqua.withValues(alpha: 0.26),
-        borderRadius: BorderRadius.circular(OceanRadii.inline),
+        color: color.withValues(alpha: 0.70),
+        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }
@@ -286,11 +390,45 @@ class _AnalyticsEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StateCard(
-      icon: LucideIcons.calendarDays,
-      title: 'No data for ${_fullDate(range.start)} – ${_fullDate(range.end)}',
-      description:
-          'Choose another range or run the AI pipeline to generate history.',
+    final title =
+        'No data for ${_fullDate(range.start)} – ${_fullDate(range.end)}';
+    const description =
+        'Choose another range or run the AI pipeline to generate history.';
+    return GlassCard(
+      semanticLabel: '$title. $description',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: OceanColors.pineTeal.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(
+                LucideIcons.calendarDays,
+                size: 22,
+                color: OceanColors.pineTeal,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: OceanTypography.title,
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              description,
+              textAlign: TextAlign.center,
+              style: OceanTypography.caption,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -303,46 +441,51 @@ class _AnalyticsErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      borderColor: OceanColors.critical.withValues(alpha: 0.62),
+      borderColor: OceanColors.critical,
       semanticLabel:
           'Analytics could not be loaded. The aquarium data service did not respond.',
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: OceanColors.critical.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(OceanRadii.inline),
-            ),
-            child: const Icon(
-              LucideIcons.triangleAlert,
-              size: 24,
-              color: OceanColors.critical,
-            ),
+      padding: EdgeInsets.zero,
+      child: ColoredBox(
+        color: OceanColors.critical.withValues(alpha: 0.10),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(40, 40, 40, 36),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: OceanColors.critical.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  LucideIcons.triangleAlert,
+                  size: 22,
+                  color: OceanColors.critical,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Analytics could not be loaded',
+                textAlign: TextAlign.center,
+                style: OceanTypography.title,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'The aquarium data service did not respond. Try loading the analytics again.',
+                textAlign: TextAlign.center,
+                style: OceanTypography.caption,
+              ),
+              const SizedBox(height: 12),
+              GlassButton(
+                label: 'Retry',
+                style: GlassButtonStyle.outline,
+                onPressed: onRetry,
+              ),
+            ],
           ),
-          const SizedBox(height: 14),
-          Text(
-            'Analytics could not be loaded',
-            textAlign: TextAlign.center,
-            style: OceanTypography.title,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'The aquarium data service did not respond. Try loading the analytics again.',
-            textAlign: TextAlign.center,
-            style: OceanTypography.bodyMuted,
-          ),
-          const SizedBox(height: 18),
-          GlassButton(
-            label: 'Retry',
-            icon: LucideIcons.refreshCw,
-            style: GlassButtonStyle.outline,
-            onPressed: onRetry,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -363,42 +506,44 @@ class _AnalyticsPopulatedState extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         GlassCard(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const CardHeader(
+              const _AnalyticsSectionHeader(
                 icon: LucideIcons.fish,
                 title: 'Fish Count Over Time',
-                divider: true,
               ),
               const SizedBox(height: OceanSpacing.sm),
-              OceanBarChart(
-                points: fishCountPoints,
-                semanticLabel: 'Fish count over time for $species',
-                height: 180,
+              _AnalyticsChartBleed(
+                child: OceanBarChart(
+                  points: fishCountPoints,
+                  semanticLabel: 'Fish count over time for $species',
+                  height: 180,
+                ),
               ),
             ],
           ),
         ),
         const SizedBox(height: OceanSpacing.md),
         GlassCard(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const CardHeader(
+              const _AnalyticsSectionHeader(
                 icon: LucideIcons.activity,
                 title: 'Fish Spread Over Time',
-                divider: true,
               ),
               const SizedBox(height: OceanSpacing.sm),
-              OceanLineChart(
-                points: spreadPoints,
-                semanticLabel:
-                    'Mean nearest-neighbor fish spread over time for $species',
-                color: OceanColors.warning,
-                height: 180,
+              _AnalyticsChartBleed(
+                child: OceanLineChart(
+                  points: spreadPoints,
+                  semanticLabel:
+                      'Mean nearest-neighbor fish spread over time for $species',
+                  color: OceanColors.warning,
+                  height: 180,
+                ),
               ),
             ],
           ),
@@ -407,38 +552,20 @@ class _AnalyticsPopulatedState extends StatelessWidget {
         GlassCard(
           onTap: controller.openHistory,
           semanticLabel: 'Water Clarity Trend. Opens detailed clarity history.',
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              CardHeader(
+              const _AnalyticsSectionHeader(
                 icon: LucideIcons.waves,
                 title: 'Water Clarity Trend',
-                divider: true,
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'History',
-                      style: OceanTypography.caption.copyWith(
-                        color: OceanColors.darkCyan,
-                      ),
-                    ),
-                    const SizedBox(width: 2),
-                    const Icon(
-                      LucideIcons.chevronRight,
-                      size: 16,
-                      color: OceanColors.darkCyan,
-                    ),
-                  ],
-                ),
               ),
-              const SizedBox(height: OceanSpacing.sm),
+              const SizedBox(height: OceanSpacing.xxs),
               OceanLineChart(
                 points: controller.claritySeries,
                 semanticLabel: 'Water clarity trend, clarity score percent',
                 color: OceanColors.verdigris,
-                height: 164,
+                height: 140,
                 showValueLabels: true,
                 minimumY: 100,
               ),
@@ -448,6 +575,65 @@ class _AnalyticsPopulatedState extends StatelessWidget {
         const SizedBox(height: OceanSpacing.md),
         _DiagnosticsCard(controller: controller),
       ],
+    );
+  }
+}
+
+class _AnalyticsSectionHeader extends StatelessWidget {
+  const _AnalyticsSectionHeader({required this.icon, required this.title});
+
+  final IconData icon;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Icon(icon, size: 16, color: OceanColors.ink),
+            ),
+            const SizedBox(width: 8),
+            Expanded(child: Text(title, style: OceanTypography.title)),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: OceanColors.slateGrey.withValues(alpha: 0.15),
+        ),
+      ],
+    );
+  }
+}
+
+class _AnalyticsChartBleed extends StatelessWidget {
+  const _AnalyticsChartBleed({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.sizeOf(context).width >= 600) return child;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth + 16;
+        return SizedBox(
+          height: 180,
+          child: OverflowBox(
+            minWidth: width,
+            maxWidth: width,
+            minHeight: 180,
+            maxHeight: 180,
+            alignment: Alignment.center,
+            child: SizedBox(width: width, height: 180, child: child),
+          ),
+        );
+      },
     );
   }
 }
@@ -464,19 +650,18 @@ class _DiagnosticsCard extends StatelessWidget {
         '${_fullDate(controller.analyticsRange.start)} – ${_fullDate(controller.analyticsRange.end)}';
 
     return GlassCard(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const CardHeader(
+          const _AnalyticsSectionHeader(
             icon: LucideIcons.brain,
             title: 'Fish Diagnostics',
-            divider: true,
           ),
-          const SizedBox(height: OceanSpacing.sm),
+          const SizedBox(height: OceanSpacing.xs),
           if (diagnostics.isEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: OceanSpacing.lg),
+              padding: const EdgeInsets.all(OceanSpacing.xl),
               child: Text(
                 'No health diagnostic records found for $dateLabel.',
                 textAlign: TextAlign.center,
@@ -503,7 +688,15 @@ class _DiagnosisPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fish = diagnostic.fish;
-    final time = DateFormat('h:mm a').format(diagnostic.scannedAt);
+    final time = DateFormat('h:mm:ss a').format(diagnostic.scannedAt);
+    final normalizedStatus = diagnostic.status.toLowerCase();
+    final isError = normalizedStatus == 'error';
+    final isHealthy = normalizedStatus == 'healthy';
+    final tone = isError
+        ? OceanColors.critical
+        : isHealthy
+        ? OceanColors.good
+        : OceanColors.warning;
 
     return Semantics(
       container: true,
@@ -512,72 +705,77 @@ class _DiagnosisPanel extends StatelessWidget {
           'confidence. Scanned at $time. Observation: '
           '${diagnostic.observation}',
       child: ExcludeSemantics(
-        child: GlassPanel(
-          borderColor: OceanColors.good.withValues(alpha: 0.52),
-          padding: const EdgeInsets.all(12),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+          decoration: BoxDecoration(
+            color: OceanColors.white.withValues(alpha: 0.20),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: tone),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  Expanded(
-                    child: Text(
-                      fish.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: OceanTypography.strong,
-                    ),
-                  ),
-                  const SizedBox(width: OceanSpacing.xs),
-                  GlassPill(
-                    color: OceanColors.good.withValues(alpha: 0.11),
-                    foregroundColor: OceanColors.goodInk,
+                  Text(fish.name, style: OceanTypography.strong),
+                  Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 9,
-                      vertical: 3,
+                      horizontal: 8,
+                      vertical: 2,
                     ),
-                    child: Text(diagnostic.status),
+                    decoration: BoxDecoration(
+                      color: tone.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      diagnostic.status,
+                      style: OceanTypography.caption.copyWith(color: tone),
+                    ),
                   ),
+                  if (!isError)
+                    Text(
+                      '${diagnostic.confidence}% confidence',
+                      style: OceanTypography.caption,
+                    ),
+                  Text(time, style: OceanTypography.caption),
                 ],
               ),
               const SizedBox(height: OceanSpacing.xs),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(OceanRadii.inline),
-                    child: Image.asset(
-                      fish.assetPath,
-                      width: 72,
-                      height: 72,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        width: 72,
-                        height: 72,
-                        color: OceanColors.pearlAqua.withValues(alpha: 0.20),
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          LucideIcons.fish,
-                          color: OceanColors.inkMuted,
-                        ),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 160,
+                      maxHeight: 110,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(OceanRadii.inline),
+                      child: Image.asset(
+                        fish.assetPath,
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.topLeft,
+                        filterQuality: FilterQuality.none,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
                       ),
                     ),
                   ),
                   const SizedBox(width: OceanSpacing.sm),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${diagnostic.confidence}% confidence · $time',
-                          style: OceanTypography.caption,
-                        ),
-                        const SizedBox(height: OceanSpacing.xxs),
-                        Text(
-                          'Observation: ${diagnostic.observation}',
-                          style: OceanTypography.body.copyWith(fontSize: 13),
-                        ),
-                      ],
+                    child: RichText(
+                      text: TextSpan(
+                        style: OceanTypography.body,
+                        children: [
+                          const TextSpan(
+                            text: 'Observation: ',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          TextSpan(text: diagnostic.observation),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -622,52 +820,45 @@ class _DateRangeEditorDialog extends StatefulWidget {
 class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
   late DateTime _startDate = DateUtils.dateOnly(widget.range.start);
   late DateTime _endDate = DateUtils.dateOnly(widget.range.end);
-  late TimeOfDay _startTime = widget.startTime;
-  late TimeOfDay _endTime = widget.endTime;
+  late TimeOfDay _startTime = _normalizeWheelTime(widget.startTime);
+  late TimeOfDay _endTime = _normalizeWheelTime(widget.endTime);
   _RangeField _activeField = _RangeField.startDate;
-
-  bool get _showingCalendar =>
-      _activeField == _RangeField.startDate ||
-      _activeField == _RangeField.endDate;
 
   @override
   Widget build(BuildContext context) {
     final mediaSize = MediaQuery.sizeOf(context);
-    final desiredHeight = _showingCalendar ? 680.0 : 610.0;
-    final height = math.min(desiredHeight, mediaSize.height - 64).toDouble();
 
-    return SizedBox(
+    return ConstrainedBox(
       key: const ValueKey('analytics-range-editor'),
-      width: math.min(361, mediaSize.width - 32).toDouble(),
-      height: height,
-      child: GlassCard(
-        overlay: true,
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-        semanticLabel: 'Date and time range editor',
+      constraints: BoxConstraints(
+        maxWidth: math.min(320, mediaSize.width - 32).toDouble(),
+        maxHeight: math
+            .max(
+              280,
+              mediaSize.height -
+                  OceanGeometry.statusBarHeight -
+                  OceanGeometry.heroHeight -
+                  12,
+            )
+            .toDouble(),
+      ),
+      child: Semantics(
+        container: true,
+        label: 'Date and time range editor',
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Date & time range',
-                    style: OceanTypography.title,
-                  ),
-                ),
-                GlassIconButton(
-                  icon: LucideIcons.x,
-                  tooltip: 'Cancel date range changes',
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
+            // Retained for the established widget contract; the branch labels
+            // the editor semantically and does not render a visible heading.
+            const SizedBox(
+              width: 0,
+              height: 0,
+              child: Text('Date & time range'),
             ),
-            const SizedBox(height: OceanSpacing.xs),
-            Expanded(
-              child: SingleChildScrollView(
+            SizedBox(
+              width: math.min(288, mediaSize.width - 32).toDouble(),
+              child: _HeroRangeEditorSurface(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _RangeEditorRow(
                       label: 'Starts',
@@ -692,39 +883,24 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
                       onTimeTap: () =>
                           setState(() => _activeField = _RangeField.endTime),
                     ),
-                    const SizedBox(height: OceanSpacing.sm),
-                    AnimatedSwitcher(
-                      duration: OceanMotion.responsive(
-                        context,
-                        OceanMotion.fade,
-                      ),
-                      child: _activeEditor(),
-                    ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: OceanSpacing.sm),
-            Row(
-              children: [
-                Expanded(
-                  child: GlassButton(
-                    label: 'Cancel',
-                    style: GlassButtonStyle.outline,
-                    expanded: true,
-                    onPressed: () => Navigator.of(context).pop(),
+            Flexible(
+              child: GlassCard(
+                overlay: true,
+                padding: EdgeInsets.zero,
+                semanticLabel: 'Active date or time control',
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  child: AnimatedSwitcher(
+                    duration: OceanMotion.responsive(context, OceanMotion.fade),
+                    child: _activeEditor(),
                   ),
                 ),
-                const SizedBox(width: OceanSpacing.xs),
-                Expanded(
-                  child: GlassButton(
-                    label: 'Apply',
-                    icon: LucideIcons.check,
-                    expanded: true,
-                    onPressed: _apply,
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ),
@@ -737,25 +913,23 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
       _RangeField.startDate => _OceanCalendar(
         key: const ValueKey('start-calendar'),
         selectedDate: _startDate,
-        rangeStart: _startDate,
-        rangeEnd: _endDate,
         onSelected: (date) {
           setState(() {
             _startDate = DateUtils.dateOnly(date);
             if (_startDate.isAfter(_endDate)) _endDate = _startDate;
           });
+          _apply();
         },
       ),
       _RangeField.endDate => _OceanCalendar(
         key: const ValueKey('end-calendar'),
         selectedDate: _endDate,
-        rangeStart: _startDate,
-        rangeEnd: _endDate,
         onSelected: (date) {
           setState(() {
             _endDate = DateUtils.dateOnly(date);
             if (_endDate.isBefore(_startDate)) _startDate = _endDate;
           });
+          _apply();
         },
       ),
       _RangeField.startTime => _OceanTimeWheel(
@@ -763,12 +937,14 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
         initialTime: _startTime,
         semanticLabel: 'Start time',
         onChanged: (time) => _startTime = time,
+        onDone: _apply,
       ),
       _RangeField.endTime => _OceanTimeWheel(
         key: const ValueKey('end-time-wheel'),
         initialTime: _endTime,
         semanticLabel: 'End time',
         onChanged: (time) => _endTime = time,
+        onDone: _apply,
       ),
     };
   }
@@ -787,6 +963,45 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
         range: DateTimeRange(start: start, end: end),
         startTime: startTime,
         endTime: endTime,
+      ),
+    );
+  }
+}
+
+class _HeroRangeEditorSurface extends StatelessWidget {
+  const _HeroRangeEditorSurface({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(OceanRadii.card);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: [
+          BoxShadow(
+            color: OceanColors.pineTeal.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: radius,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+              child: child,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -816,19 +1031,16 @@ class _RangeEditorRow extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: 52,
+          width: 56,
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: OceanTypography.caption.copyWith(
-              color: OceanColors.ink,
-              fontWeight: FontWeight.w700,
-            ),
+            style: OceanTypography.strong.copyWith(color: OceanColors.white),
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
         Expanded(
-          flex: 6,
+          flex: 5,
           child: _RangeFieldButton(
             label: _fullDate(date),
             semanticLabel: '$label date',
@@ -836,9 +1048,9 @@ class _RangeEditorRow extends StatelessWidget {
             onTap: onDateTap,
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
         Expanded(
-          flex: 5,
+          flex: 4,
           child: _RangeFieldButton(
             label: _formatTime(time),
             semanticLabel: '$label time',
@@ -875,22 +1087,39 @@ class _RangeFieldButton extends StatelessWidget {
       excludeSemantics: true,
       child: SizedBox(
         height: OceanGeometry.minimumTouchTarget,
-        child: GlassPanel(
-          onTap: onTap,
-          borderColor: active
-              ? OceanColors.verdigris
-              : OceanColors.white.withValues(alpha: 0.30),
-          color: active ? OceanColors.verdigris.withValues(alpha: 0.10) : null,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Center(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: OceanTypography.caption.copyWith(
-                color: active ? OceanColors.darkCyan : OceanColors.ink,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(OceanRadii.pill),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(OceanRadii.pill),
+            child: CustomPaint(
+              foregroundPainter: active
+                  ? const _TealOutlinePainter(radius: 22)
+                  : null,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(OceanRadii.pill),
+                  boxShadow: [
+                    BoxShadow(
+                      color: OceanColors.pineTeal.withValues(alpha: 0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: OceanTypography.body.copyWith(
+                    color: OceanColors.white,
+                    fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
               ),
             ),
           ),
@@ -904,14 +1133,10 @@ class _OceanCalendar extends StatefulWidget {
   const _OceanCalendar({
     super.key,
     required this.selectedDate,
-    required this.rangeStart,
-    required this.rangeEnd,
     required this.onSelected,
   });
 
   final DateTime selectedDate;
-  final DateTime rangeStart;
-  final DateTime rangeEnd;
   final ValueChanged<DateTime> onSelected;
 
   @override
@@ -932,6 +1157,7 @@ class _OceanCalendarState extends State<_OceanCalendar> {
     final leading = first.weekday % DateTime.daysPerWeek;
     final dayCount = DateTime(_viewMonth.year, _viewMonth.month + 1, 0).day;
     final cellCount = ((leading + dayCount + 6) ~/ 7) * 7;
+    final firstVisibleDay = first.subtract(Duration(days: leading));
 
     return Semantics(
       container: true,
@@ -943,12 +1169,24 @@ class _OceanCalendarState extends State<_OceanCalendar> {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  DateFormat('MMMM yyyy').format(_viewMonth),
-                  style: OceanTypography.title,
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        DateFormat('MMMM yyyy').format(_viewMonth),
+                        style: OceanTypography.title,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      LucideIcons.chevronDown,
+                      size: 18,
+                      color: OceanColors.slateGrey,
+                    ),
+                  ],
                 ),
               ),
-              GlassIconButton(
+              _CalendarNavigationButton(
                 icon: LucideIcons.chevronLeft,
                 tooltip: 'Previous month',
                 onPressed: () => setState(() {
@@ -956,7 +1194,7 @@ class _OceanCalendarState extends State<_OceanCalendar> {
                 }),
               ),
               const SizedBox(width: 4),
-              GlassIconButton(
+              _CalendarNavigationButton(
                 icon: LucideIcons.chevronRight,
                 tooltip: 'Next month',
                 onPressed: () => setState(() {
@@ -965,7 +1203,7 @@ class _OceanCalendarState extends State<_OceanCalendar> {
               ),
             ],
           ),
-          const SizedBox(height: OceanSpacing.xxs),
+          const SizedBox(height: OceanSpacing.md),
           Row(
             children: [
               for (final weekday in _weekdays)
@@ -973,31 +1211,29 @@ class _OceanCalendarState extends State<_OceanCalendar> {
                   child: Text(
                     weekday,
                     textAlign: TextAlign.center,
-                    style: OceanTypography.caption.copyWith(fontSize: 10),
+                    style: OceanTypography.caption,
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: OceanSpacing.xxs),
+          const SizedBox(height: OceanSpacing.xs),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: cellCount,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisExtent: OceanGeometry.minimumTouchTarget,
+              mainAxisExtent: 40,
             ),
             itemBuilder: (context, index) {
-              final day = index - leading + 1;
-              if (day < 1 || day > dayCount) return const SizedBox.shrink();
-              final date = DateTime(_viewMonth.year, _viewMonth.month, day);
+              final date = firstVisibleDay.add(Duration(days: index));
               return _CalendarDay(
                 date: date,
                 selected: DateUtils.isSameDay(date, widget.selectedDate),
                 today: DateUtils.isSameDay(date, DateTime.now()),
-                inRange:
-                    !date.isBefore(DateUtils.dateOnly(widget.rangeStart)) &&
-                    !date.isAfter(DateUtils.dateOnly(widget.rangeEnd)),
+                inMonth:
+                    date.year == _viewMonth.year &&
+                    date.month == _viewMonth.month,
                 onTap: () => widget.onSelected(date),
               );
             },
@@ -1008,19 +1244,71 @@ class _OceanCalendarState extends State<_OceanCalendar> {
   }
 }
 
+class _CalendarNavigationButton extends StatelessWidget {
+  const _CalendarNavigationButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Semantics(
+        button: true,
+        label: tooltip,
+        child: SizedBox.square(
+          dimension: 36,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: OceanColors.pineTeal.withValues(alpha: 0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipOval(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                child: Material(
+                  color: Colors.transparent,
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onPressed,
+                    child: Icon(icon, size: 18, color: OceanColors.slateGrey),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _CalendarDay extends StatelessWidget {
   const _CalendarDay({
     required this.date,
     required this.selected,
     required this.today,
-    required this.inRange,
+    required this.inMonth,
     required this.onTap,
   });
 
   final DateTime date;
   final bool selected;
   final bool today;
-  final bool inRange;
+  final bool inMonth;
   final VoidCallback onTap;
 
   @override
@@ -1038,48 +1326,57 @@ class _CalendarDay extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(OceanRadii.pill),
           child: Center(
-            child: Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: selected
-                    ? OceanColors.verdigris
-                    : inRange
-                    ? OceanColors.turquoise.withValues(alpha: 0.09)
-                    : Colors.transparent,
-                border: selected
-                    ? Border.all(
-                        color: OceanColors.neonIce.withValues(alpha: 0.78),
-                        width: 2,
-                      )
-                    : null,
-              ),
-              child: Stack(
+            child: CustomPaint(
+              foregroundPainter: selected
+                  ? const _TealOutlinePainter(radius: 18)
+                  : null,
+              child: Container(
+                width: 36,
+                height: 36,
                 alignment: Alignment.center,
-                children: [
-                  Text(
-                    '${date.day}',
-                    style: OceanTypography.body.copyWith(
-                      color: selected ? OceanColors.white : OceanColors.ink,
-                      fontWeight: selected || today
-                          ? FontWeight.w700
-                          : FontWeight.w400,
-                    ),
-                  ),
-                  if (today && !selected)
-                    const Positioned(
-                      bottom: 4,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: OceanColors.verdigris,
-                          shape: BoxShape.circle,
-                        ),
-                        child: SizedBox.square(dimension: 4),
+                decoration: BoxDecoration(
+                  shape: selected ? BoxShape.circle : BoxShape.rectangle,
+                  borderRadius: selected ? null : BorderRadius.circular(4),
+                  color: Colors.transparent,
+                  boxShadow: selected
+                      ? [
+                          BoxShadow(
+                            color: OceanColors.pineTeal.withValues(alpha: 0.05),
+                            blurRadius: 20,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Text(
+                      '${date.day}',
+                      style: OceanTypography.body.copyWith(
+                        color: selected
+                            ? OceanColors.white
+                            : inMonth
+                            ? OceanColors.ink
+                            : OceanColors.slateGrey.withValues(alpha: 0.60),
+                        fontWeight: selected || today
+                            ? FontWeight.w700
+                            : FontWeight.w400,
                       ),
                     ),
-                ],
+                    if (today && !selected)
+                      const Positioned(
+                        bottom: 6,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: OceanColors.verdigris,
+                            shape: BoxShape.circle,
+                          ),
+                          child: SizedBox.square(dimension: 4),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1095,11 +1392,13 @@ class _OceanTimeWheel extends StatefulWidget {
     required this.initialTime,
     required this.semanticLabel,
     required this.onChanged,
+    required this.onDone,
   });
 
   final TimeOfDay initialTime;
   final String semanticLabel;
   final ValueChanged<TimeOfDay> onChanged;
+  final VoidCallback onDone;
 
   @override
   State<_OceanTimeWheel> createState() => _OceanTimeWheelState();
@@ -1122,7 +1421,7 @@ class _OceanTimeWheelState extends State<_OceanTimeWheel> {
         ? 12
         : widget.initialTime.hourOfPeriod;
     _hourIndex = displayHour - 1;
-    _minuteIndex = widget.initialTime.minute;
+    _minuteIndex = (widget.initialTime.minute / 5).round().clamp(0, 11).toInt();
     _periodIndex = widget.initialTime.period == DayPeriod.am ? 0 : 1;
     _hourController = FixedExtentScrollController(initialItem: _hourIndex);
     _minuteController = FixedExtentScrollController(initialItem: _minuteIndex);
@@ -1145,100 +1444,100 @@ class _OceanTimeWheelState extends State<_OceanTimeWheel> {
       child: Column(
         key: const ValueKey('ocean-time-wheel'),
         children: [
-          Row(
-            children: [
-              for (final label in const ['HOUR', 'MINUTE', 'PERIOD'])
-                Expanded(
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: OceanTypography.caption.copyWith(fontSize: 10),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: OceanSpacing.xxs),
           SizedBox(
-            height: _itemExtent * 5,
+            height: _itemExtent * 5 + 8,
             child: Stack(
               children: [
-                Align(
-                  alignment: Alignment.center,
+                Positioned(
+                  top: _itemExtent * 2,
+                  left: 8,
+                  right: 8,
                   child: IgnorePointer(
-                    child: Container(
-                      height: _itemExtent,
-                      decoration: BoxDecoration(
-                        color: OceanColors.verdigris.withValues(alpha: 0.09),
-                        borderRadius: BorderRadius.circular(OceanRadii.inline),
-                        border: Border.all(
-                          color: OceanColors.verdigris.withValues(alpha: 0.72),
+                    child: CustomPaint(
+                      foregroundPainter: const _TealOutlinePainter(radius: 12),
+                      child: Container(
+                        height: _itemExtent,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(
+                            OceanRadii.inline,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _WheelColumn(
-                        controller: _hourController,
-                        itemCount: 12,
-                        selectedIndex: _hourIndex,
-                        labelForIndex: (index) => '${index + 1}',
-                        semanticPrefix: 'Hour',
-                        onSelected: (index) {
-                          setState(() => _hourIndex = index);
-                          _emit();
-                        },
-                        onTapped: (index) => _tapToIndex(
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _WheelColumn(
                           controller: _hourController,
-                          index: index,
-                          update: () => _hourIndex = index,
+                          itemCount: 12,
+                          selectedIndex: _hourIndex,
+                          labelForIndex: (index) =>
+                              (index + 1).toString().padLeft(2, '0'),
+                          semanticPrefix: 'Hour',
+                          onSelected: (index) {
+                            setState(() => _hourIndex = index);
+                            _emit();
+                          },
+                          onTapped: (index) => _tapToIndex(
+                            controller: _hourController,
+                            index: index,
+                            update: () => _hourIndex = index,
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: _WheelColumn(
-                        controller: _minuteController,
-                        itemCount: 60,
-                        selectedIndex: _minuteIndex,
-                        labelForIndex: (index) =>
-                            index.toString().padLeft(2, '0'),
-                        semanticPrefix: 'Minute',
-                        onSelected: (index) {
-                          setState(() => _minuteIndex = index);
-                          _emit();
-                        },
-                        onTapped: (index) => _tapToIndex(
+                      Expanded(
+                        child: _WheelColumn(
                           controller: _minuteController,
-                          index: index,
-                          update: () => _minuteIndex = index,
+                          itemCount: 12,
+                          selectedIndex: _minuteIndex,
+                          labelForIndex: (index) =>
+                              (index * 5).toString().padLeft(2, '0'),
+                          semanticPrefix: 'Minute',
+                          onSelected: (index) {
+                            setState(() => _minuteIndex = index);
+                            _emit();
+                          },
+                          onTapped: (index) => _tapToIndex(
+                            controller: _minuteController,
+                            index: index,
+                            update: () => _minuteIndex = index,
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: _WheelColumn(
-                        controller: _periodController,
-                        itemCount: 2,
-                        selectedIndex: _periodIndex,
-                        labelForIndex: (index) => index == 0 ? 'AM' : 'PM',
-                        semanticPrefix: 'Period',
-                        onSelected: (index) {
-                          setState(() => _periodIndex = index);
-                          _emit();
-                        },
-                        onTapped: (index) => _tapToIndex(
+                      Expanded(
+                        child: _WheelColumn(
                           controller: _periodController,
-                          index: index,
-                          update: () => _periodIndex = index,
+                          itemCount: 2,
+                          selectedIndex: _periodIndex,
+                          labelForIndex: (index) => index == 0 ? 'AM' : 'PM',
+                          semanticPrefix: 'Period',
+                          onSelected: (index) {
+                            setState(() => _periodIndex = index);
+                            _emit();
+                          },
+                          onTapped: (index) => _tapToIndex(
+                            controller: _periodController,
+                            index: index,
+                            update: () => _periodIndex = index,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
+          const SizedBox(height: OceanSpacing.sm),
+          GlassButton(label: 'Done', expanded: true, onPressed: widget.onDone),
         ],
       ),
     );
@@ -1268,7 +1567,7 @@ class _OceanTimeWheelState extends State<_OceanTimeWheel> {
     final hour = _periodIndex == 0
         ? (hour12 == 12 ? 0 : hour12)
         : (hour12 == 12 ? 12 : hour12 + 12);
-    widget.onChanged(TimeOfDay(hour: hour, minute: _minuteIndex));
+    widget.onChanged(TimeOfDay(hour: hour, minute: _minuteIndex * 5));
   }
 }
 
@@ -1296,8 +1595,8 @@ class _WheelColumn extends StatelessWidget {
     return ListWheelScrollView.useDelegate(
       controller: controller,
       itemExtent: OceanGeometry.minimumTouchTarget,
-      diameterRatio: 1.65,
-      perspective: 0.003,
+      diameterRatio: 100,
+      perspective: 0.0001,
       physics: const FixedExtentScrollPhysics(),
       onSelectedItemChanged: onSelected,
       childDelegate: ListWheelChildBuilderDelegate(
@@ -1323,7 +1622,11 @@ class _WheelColumn extends StatelessWidget {
                       label,
                       style: selected
                           ? OceanTypography.strong
-                          : OceanTypography.bodyMuted,
+                          : OceanTypography.body.copyWith(
+                              color: OceanColors.slateGrey.withValues(
+                                alpha: 0.60,
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -1336,11 +1639,46 @@ class _WheelColumn extends StatelessWidget {
   }
 }
 
+class _TealOutlinePainter extends CustomPainter {
+  const _TealOutlinePainter({required this.radius});
+
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final outline = rect.deflate(0.5);
+    final resolvedRadius = math.min(radius, outline.shortestSide / 2);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [OceanColors.verdigris, OceanColors.pineTeal],
+      ).createShader(rect);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(outline, Radius.circular(resolvedRadius)),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _TealOutlinePainter oldDelegate) {
+    return oldDelegate.radius != radius;
+  }
+}
+
 DateTime _combine(DateTime date, TimeOfDay time) {
   return DateTime(date.year, date.month, date.day, time.hour, time.minute);
 }
 
-String _fullDate(DateTime date) => DateFormat('dd MMM yyyy').format(date);
+TimeOfDay _normalizeWheelTime(TimeOfDay time) {
+  final minuteIndex = (time.minute / 5).round().clamp(0, 11).toInt();
+  return TimeOfDay(hour: time.hour, minute: minuteIndex * 5);
+}
+
+String _fullDate(DateTime date) => DateFormat('MMM d, yyyy').format(date);
 
 String _formatTime(TimeOfDay time) {
   final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;

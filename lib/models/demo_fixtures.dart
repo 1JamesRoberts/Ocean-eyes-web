@@ -1,71 +1,24 @@
 import 'aquarium_models.dart';
+import 'species_catalog.dart';
 
 abstract final class DemoFixtures {
-  static const species = <SpeciesOption>[
-    SpeciesOption(
-      id: 'cardinal_tetra',
-      name: 'Cardinal Tetra',
-      scientificName: 'Paracheirodon axelrodi',
-      assetPath: 'assets/images/fish/cardinal_tetra.png',
-      compatibility: 'Peaceful community fish',
-      careLevel: 'Easy',
-    ),
-    SpeciesOption(
-      id: 'guppy',
-      name: 'Guppy',
-      scientificName: 'Poecilia reticulata',
-      assetPath: 'assets/images/fish/guppy.png',
-      compatibility: 'Peaceful livebearer',
-      careLevel: 'Easy',
-    ),
-    SpeciesOption(
-      id: 'corydoras',
-      name: 'Corydoras',
-      scientificName: 'Corydoras paleatus',
-      assetPath: 'assets/images/fish/corydoras.png',
-      compatibility: 'Calm bottom dweller',
-      careLevel: 'Easy',
-    ),
-    SpeciesOption(
-      id: 'cherry_barb',
-      name: 'Cherry Barb',
-      scientificName: 'Puntius titteya',
-      assetPath: 'assets/images/fish/cherry_barb.png',
-      compatibility: 'Peaceful schooling fish',
-      careLevel: 'Easy',
-    ),
-    SpeciesOption(
-      id: 'neon_tetra',
-      name: 'Neon Tetra',
-      scientificName: 'Paracheirodon innesi',
-      assetPath: 'assets/images/fish/neon_tetra.png',
-      compatibility: 'Peaceful community fish',
-      careLevel: 'Easy',
-    ),
-    SpeciesOption(
-      id: 'dwarf_gourami',
-      name: 'Dwarf Gourami',
-      scientificName: 'Trichogaster lalius',
-      assetPath: 'assets/images/fish/dwarf_gourami.png',
-      compatibility: 'Gentle with calm tankmates',
-      careLevel: 'Intermediate',
-    ),
-    SpeciesOption(
-      id: 'angelfish',
-      name: 'Freshwater Angelfish',
-      scientificName: 'Pterophyllum scalare',
-      assetPath: 'assets/images/fish/angelfish.png',
-      compatibility: 'Semi-aggressive adult',
-      careLevel: 'Intermediate',
-    ),
-    SpeciesOption(
-      id: 'betta',
-      name: 'Betta',
-      scientificName: 'Betta splendens',
-      assetPath: 'assets/images/fish/betta.png',
-      compatibility: 'Keep males separately',
-      careLevel: 'Intermediate',
-    ),
+  static const species = SpeciesCatalog.options;
+
+  /// Matches the bundled camera frame byte-for-byte.
+  static const heatmapSourceDimensions = DetectionFrameDimensions(
+    width: 1380,
+    height: 771,
+  );
+
+  /// Deterministic detection centers for populated analytics states.
+  static const heatmapCenters = <NormalizedDetectionCenter>[
+    NormalizedDetectionCenter(nx: 0.15, ny: 0.28, speciesId: 'cardinal_tetra'),
+    NormalizedDetectionCenter(nx: 0.28, ny: 0.62, speciesId: 'cardinal_tetra'),
+    NormalizedDetectionCenter(nx: 0.46, ny: 0.47, speciesId: 'guppy'),
+    NormalizedDetectionCenter(nx: 0.61, ny: 0.36, speciesId: 'corydoras'),
+    NormalizedDetectionCenter(nx: 0.72, ny: 0.61, speciesId: 'cherry_barb'),
+    NormalizedDetectionCenter(nx: 0.83, ny: 0.27, speciesId: 'guppy'),
+    NormalizedDetectionCenter(nx: 0.90, ny: 0.70, speciesId: 'cardinal_tetra'),
   ];
 
   static List<FishEntry> populatedFish() => const [

@@ -59,7 +59,7 @@ void main() {
         final first = OceanEyesController(
           inventoryRepository: repository,
           launchUri: Uri.parse('https://oceaneyes.test/'),
-        );
+        )..applyFixture(FixtureScenario.populated, notify: false);
 
         first.deleteFish('fish-cardinal');
         first.addSpecies(
@@ -274,6 +274,13 @@ void main() {
     expect(preferences.containsKey('brightness'), isFalse);
 
     controller.commitSetting('brightness', 0.8);
+    controller.commitSetting('temperature', 20);
+    controller.commitSetting('tint', -15);
+    controller.commitSetting('pollingIntervalMs', 12000);
+    controller.commitSetting('detectionConfidenceThreshold', 0.45);
+    controller.commitSetting('speciesConfidenceThreshold', 0.50);
+    controller.commitSetting('diagnosisMinConfidence', 0.70);
+    controller.setAutoConnect(true);
     controller.renameTank('Studio Reef');
     controller.switchCamera();
     controller.disconnectTank();
@@ -284,6 +291,13 @@ void main() {
       launchUri: Uri.parse('https://oceaneyes.test/'),
     );
     expect(restored.brightness, 0.8);
+    expect(restored.temperature, 20);
+    expect(restored.tint, -15);
+    expect(restored.pollingIntervalMs, 12000);
+    expect(restored.detectionConfidenceThreshold, 0.45);
+    expect(restored.speciesConfidenceThreshold, 0.50);
+    expect(restored.diagnosisMinConfidence, 0.70);
+    expect(restored.autoConnect, isTrue);
     expect(restored.tankName, 'Studio Reef');
     expect(restored.usingFrontCamera, isTrue);
     expect(restored.tankConnected, isFalse);
@@ -312,6 +326,7 @@ void main() {
       controller.requestAddFish();
       await tester.pumpAndSettle();
       expect(find.text('Search common or scientific name'), findsOneWidget);
+      expect(find.text("Adolfo's cory"), findsOneWidget);
 
       await tester.tap(find.byTooltip('Close add fish'));
       await tester.pumpAndSettle();

@@ -36,6 +36,51 @@ enum FixtureScenario {
   historyEmpty,
 }
 
+/// A detection center expressed in normalized source-image coordinates.
+///
+/// Keeping this type free of Flutter geometry classes lets inference/history
+/// data remain in the model layer while views choose how to project it.
+class NormalizedDetectionCenter {
+  const NormalizedDetectionCenter({
+    required this.nx,
+    required this.ny,
+    required this.speciesId,
+  });
+
+  final double nx;
+  final double ny;
+  final String speciesId;
+
+  @override
+  bool operator ==(Object other) =>
+      other is NormalizedDetectionCenter &&
+      other.nx == nx &&
+      other.ny == ny &&
+      other.speciesId == speciesId;
+
+  @override
+  int get hashCode => Object.hash(nx, ny, speciesId);
+}
+
+/// Pixel dimensions of the image on which normalized detections were made.
+class DetectionFrameDimensions {
+  const DetectionFrameDimensions({required this.width, required this.height});
+
+  final int width;
+  final int height;
+
+  bool get isValid => width > 0 && height > 0;
+
+  @override
+  bool operator ==(Object other) =>
+      other is DetectionFrameDimensions &&
+      other.width == width &&
+      other.height == height;
+
+  @override
+  int get hashCode => Object.hash(width, height);
+}
+
 class FishEntry {
   const FishEntry({
     required this.id,
@@ -87,6 +132,9 @@ class SpeciesOption {
     required this.assetPath,
     required this.compatibility,
     required this.careLevel,
+    this.altName = '',
+    this.creatureType = 'fish',
+    this.initials = '',
   });
 
   final String id;
@@ -95,6 +143,9 @@ class SpeciesOption {
   final String assetPath;
   final String compatibility;
   final String careLevel;
+  final String altName;
+  final String creatureType;
+  final String initials;
 }
 
 class WaterMetric {

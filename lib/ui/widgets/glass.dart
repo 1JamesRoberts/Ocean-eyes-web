@@ -8,7 +8,7 @@ class GlassCard extends StatelessWidget {
   const GlassCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(OceanSpacing.md),
+    this.padding = const EdgeInsets.fromLTRB(24, 24, 24, 20),
     this.margin,
     this.onTap,
     this.overlay = false,
@@ -35,41 +35,41 @@ class GlassCard extends StatelessWidget {
     final borderRadius = BorderRadius.circular(radius);
     final background = overlay
         ? OceanColors.white.withValues(alpha: 0.40 * opacity)
-        : OceanColors.azureMist.withValues(alpha: 0.42 * opacity);
+        : OceanColors.white.withValues(alpha: opacity);
     final resolvedBorder =
-        borderColor ?? OceanColors.pearlAqua.withValues(alpha: 0.72 * opacity);
+        borderColor ??
+        OceanColors.white.withValues(alpha: overlay ? 0.30 * opacity : opacity);
 
-    Widget content = ClipRRect(
-      borderRadius: borderRadius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: overlay ? 12 : 2,
-          sigmaY: overlay ? 12 : 2,
-        ),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: borderRadius,
-            border: Border.all(color: resolvedBorder, width: borderWidth),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                OceanColors.white.withValues(alpha: 0.22 * opacity),
-                background,
-                OceanColors.white.withValues(alpha: 0.08 * opacity),
-              ],
-              stops: const [0, 0.42, 1],
+    Widget content = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        boxShadow: [
+          if (overlay)
+            BoxShadow(
+              color: OceanColors.pineTeal.withValues(alpha: 0.12),
+              blurRadius: 32,
+              offset: const Offset(0, 8),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: OceanColors.prussianBlue.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: overlay ? 12 : 0,
+            sigmaY: overlay ? 12 : 0,
           ),
-          child: Padding(padding: padding, child: child),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: borderRadius,
+              border: Border.all(color: resolvedBorder, width: borderWidth),
+            ),
+            child: Padding(
+              padding: padding.add(EdgeInsets.all(borderWidth)),
+              child: child,
+            ),
+          ),
         ),
       ),
     );
@@ -78,7 +78,6 @@ class GlassCard extends StatelessWidget {
       content = Material(
         color: Colors.transparent,
         borderRadius: borderRadius,
-        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           borderRadius: borderRadius,
@@ -106,7 +105,7 @@ class GlassPanel extends StatelessWidget {
   const GlassPanel({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.fromLTRB(10, 10, 10, 8),
+    this.padding = const EdgeInsets.fromLTRB(12, 12, 12, 8),
     this.onTap,
     this.borderColor,
     this.radius = 16,
@@ -133,6 +132,7 @@ class GlassPanel extends StatelessWidget {
         borderRadius: borderRadius,
         border: Border.all(
           color: borderColor ?? OceanColors.white.withValues(alpha: 0.20),
+          width: 1,
         ),
       ),
       child: child,
@@ -168,13 +168,17 @@ class GlassButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = style == GlassButtonStyle.outline
-        ? OceanColors.ink
-        : OceanColors.white;
+    final foreground = switch (style) {
+      GlassButtonStyle.primary => OceanColors.white,
+      GlassButtonStyle.outline => OceanColors.pineTeal,
+      GlassButtonStyle.destructive => OceanColors.critical,
+    };
     final background = switch (style) {
-      GlassButtonStyle.primary => OceanColors.action,
+      GlassButtonStyle.primary => Colors.transparent,
       GlassButtonStyle.outline => Colors.transparent,
-      GlassButtonStyle.destructive => OceanColors.criticalInk,
+      GlassButtonStyle.destructive => OceanColors.critical.withValues(
+        alpha: 0.08,
+      ),
     };
 
     final child = AnimatedSwitcher(
@@ -221,24 +225,35 @@ class GlassButton extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: background,
-          borderRadius: BorderRadius.circular(OceanRadii.pill),
-          border: style == GlassButtonStyle.outline
-              ? Border.all(color: OceanColors.white.withValues(alpha: 0.35))
+          gradient: style == GlassButtonStyle.primary
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [OceanColors.verdigris, OceanColors.pineTeal],
+                )
               : null,
-          boxShadow: [
-            BoxShadow(
-              color: OceanColors.prussianBlue.withValues(alpha: 0.20),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(OceanRadii.pill),
+          border: style == GlassButtonStyle.destructive
+              ? Border.all(color: OceanColors.critical.withValues(alpha: 0.30))
+              : null,
+          boxShadow: style == GlassButtonStyle.destructive
+              ? null
+              : [
+                  BoxShadow(
+                    color: OceanColors.pineTeal.withValues(
+                      alpha: style == GlassButtonStyle.primary ? 0.20 : 0.05,
+                    ),
+                    blurRadius: style == GlassButtonStyle.primary ? 12 : 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
         child: TextButton(
           onPressed: loading ? null : onPressed,
           style: TextButton.styleFrom(
             foregroundColor: foreground,
             disabledForegroundColor: foreground.withValues(alpha: 0.45),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             shape: const StadiumBorder(),
           ),
           child: child,
@@ -279,16 +294,37 @@ class GlassIconButton extends StatelessWidget {
         message: tooltip,
         child: SizedBox.square(
           dimension: size,
-          child: IconButton(
-            onPressed: onPressed,
-            icon: Icon(icon, size: iconSize),
-            color: color,
-            disabledColor: color.withValues(alpha: 0.35),
-            style: IconButton.styleFrom(
-              backgroundColor:
-                  background ?? OceanColors.white.withValues(alpha: 0.30),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(OceanRadii.inline),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(OceanRadii.inline),
+              boxShadow: [
+                BoxShadow(
+                  color: OceanColors.pineTeal.withValues(alpha: 0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(OceanRadii.inline),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                child: ColoredBox(
+                  color:
+                      background ?? OceanColors.white.withValues(alpha: 0.30),
+                  child: IconButton(
+                    onPressed: onPressed,
+                    icon: Icon(icon, size: iconSize),
+                    color: color,
+                    disabledColor: color.withValues(alpha: 0.35),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(OceanRadii.inline),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -305,7 +341,8 @@ class GlassPill extends StatelessWidget {
     this.onTap,
     this.color,
     this.foregroundColor = OceanColors.ink,
-    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    this.minimumHeight,
   });
 
   final Widget child;
@@ -313,20 +350,25 @@ class GlassPill extends StatelessWidget {
   final Color? color;
   final Color foregroundColor;
   final EdgeInsetsGeometry padding;
+  final double? minimumHeight;
 
   @override
   Widget build(BuildContext context) {
     final content = Container(
-      constraints: BoxConstraints(minHeight: onTap == null ? 0 : 44),
+      constraints: BoxConstraints(
+        minHeight: minimumHeight ?? (onTap == null ? 0 : 44),
+      ),
       padding: padding,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: color ?? OceanColors.white.withValues(alpha: 0.30),
         borderRadius: BorderRadius.circular(OceanRadii.pill),
-        border: Border.all(color: OceanColors.white.withValues(alpha: 0.25)),
       ),
       child: DefaultTextStyle(
-        style: OceanTypography.caption.copyWith(color: foregroundColor),
+        style: OceanTypography.caption.copyWith(
+          color: foregroundColor,
+          fontWeight: FontWeight.w400,
+        ),
         child: IconTheme(
           data: IconThemeData(color: foregroundColor, size: 14),
           child: child,
