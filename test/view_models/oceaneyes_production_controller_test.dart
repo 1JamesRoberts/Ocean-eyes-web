@@ -403,6 +403,99 @@ void main() {
     await auth.close();
   });
 
+  test('unexpected publisher disconnect fully releases live session', () async {
+    final repository = _FakeProductionRepository();
+    final auth = _FakeProductionAuth(user: _user);
+    final wakeLock = _FakeWakeLockGateway();
+    final camera = _FakeCameraCaptureGateway();
+    final live = _FakeLiveGateway();
+    final controller = _productionController(
+      repository,
+      auth,
+      cameraGateway: camera,
+      liveGateway: live,
+      wakeLockGateway: wakeLock,
+    );
+
+    await controller.initializeProduction();
+    repository.emitLinkedTankIds(const ['tank-a']);
+    await _drainMicrotasks();
+    repository
+        .streamsFor('tank-a')
+        .tank
+        .add(_tank('tank-a', name: 'Office Reef'));
+    final disconnectsBeforeStart = live.disconnectCalls;
+
+    await controller.startMonitorLiveStream();
+    live.emit(OceanEyesLiveConnectionState.connected);
+    live.emit(
+      OceanEyesLiveConnectionState.disconnected,
+      error: StateError('server disconnected'),
+    );
+
+    await _waitUntil(
+      () =>
+          repository.liveActiveValues.length == 2 &&
+          camera.resumeCalls == 1 &&
+          wakeLock.enabledValues.last == false,
+    );
+    expect(repository.liveActiveValues, const [true, false]);
+    expect(controller.isLiveConnected, isFalse);
+    expect(controller.remoteVideoTrack, isNull);
+    expect(live.disconnectCalls, disconnectsBeforeStart + 1);
+
+    await controller.startMonitorLiveStream();
+    expect(live.connectRoles, const [
+      OceanEyesLiveRole.monitor,
+      OceanEyesLiveRole.monitor,
+    ]);
+
+    controller.dispose();
+    await live.disposed;
+    await repository.close();
+    await auth.close();
+  });
+
+  test('unexpected viewer disconnect clears its live request', () async {
+    final repository = _FakeProductionRepository();
+    final auth = _FakeProductionAuth(user: _user);
+    final live = _FakeLiveGateway();
+    final controller = _productionController(
+      repository,
+      auth,
+      liveGateway: live,
+    );
+
+    await controller.initializeProduction();
+    repository.emitLinkedTankIds(const ['tank-a']);
+    await _drainMicrotasks();
+    final disconnectsBeforeStart = live.disconnectCalls;
+
+    await controller.startViewerLiveStream();
+    live.emit(OceanEyesLiveConnectionState.connected);
+    live.emit(OceanEyesLiveConnectionState.disconnected);
+
+    await _waitUntil(
+      () =>
+          repository.clearedLiveRequestTankIds.isNotEmpty &&
+          live.disconnectCalls == disconnectsBeforeStart + 1,
+    );
+    expect(repository.requestedLiveTankIds, const ['tank-a']);
+    expect(repository.clearedLiveRequestTankIds, const ['tank-a']);
+    expect(controller.isLiveConnected, isFalse);
+
+    await controller.startViewerLiveStream();
+    expect(live.connectRoles, const [
+      OceanEyesLiveRole.viewer,
+      OceanEyesLiveRole.viewer,
+    ]);
+
+    controller.dispose();
+    await live.disposed;
+    await repository.close();
+    await auth.close();
+  });
+
   test(
     'camera and LiveKit ownership handoffs use injected settle times',
     () async {
@@ -1155,6 +1248,8 @@ final class _FakeInferenceEngine implements FishInferenceEngine {
 final class _FakeLiveGateway implements OceanEyesLiveGateway {
   final List<OceanEyesLiveRole> connectRoles = [];
   final Completer<void> _disposed = Completer<void>();
+  final StreamController<OceanEyesLiveSnapshot> _snapshots =
+      StreamController<OceanEyesLiveSnapshot>.broadcast(sync: true);
   Object? connectError;
   int disconnectCalls = 0;
   int disposeCalls = 0;
@@ -1169,7 +1264,12 @@ final class _FakeLiveGateway implements OceanEyesLiveGateway {
   bool get isConnected => _state == OceanEyesLiveConnectionState.connected;
 
   @override
-  Stream<OceanEyesLiveSnapshot> get snapshots => const Stream.empty();
+  Stream<OceanEyesLiveSnapshot> get snapshots => _snapshots.stream;
+
+  void emit(OceanEyesLiveConnectionState state, {Object? error}) {
+    _state = state;
+    _snapshots.add(OceanEyesLiveSnapshot(state: state, error: error));
+  }
 
   @override
   Future<void> connect(
@@ -1193,6 +1293,7 @@ final class _FakeLiveGateway implements OceanEyesLiveGateway {
   Future<void> dispose() async {
     disposeCalls += 1;
     _state = OceanEyesLiveConnectionState.disconnected;
+    await _snapshots.close();
     if (!_disposed.isCompleted) _disposed.complete();
   }
 }

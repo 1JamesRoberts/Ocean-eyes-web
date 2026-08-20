@@ -173,14 +173,10 @@ class OceanEyesController extends ChangeNotifier {
     final live = _liveGateway;
     if (live != null) {
       _productionSubscriptions.add(
-        live.snapshots.listen((snapshot) {
-          liveConnectionState = snapshot.state;
-          remoteVideoTrack = snapshot.remoteVideoTrack;
-          if (snapshot.error != null) {
-            productionError = 'Live stream: ${snapshot.error}';
-          }
-          _notify();
-        }, onError: _recordProductionError),
+        live.snapshots.listen(
+          _handleLiveSnapshot,
+          onError: _recordProductionError,
+        ),
       );
     }
 
@@ -745,6 +741,39 @@ class OceanEyesController extends ChangeNotifier {
     });
   }
 
+  void _handleLiveSnapshot(OceanEyesLiveSnapshot snapshot) {
+    final previousState = liveConnectionState;
+    liveConnectionState = snapshot.state;
+    remoteVideoTrack = snapshot.remoteVideoTrack;
+    if (snapshot.error != null) {
+      productionError = 'Live stream: ${snapshot.error}';
+    }
+
+    final sessionWasConnected =
+        previousState == OceanEyesLiveConnectionState.connected ||
+        previousState == OceanEyesLiveConnectionState.reconnecting;
+    final sessionTerminated =
+        snapshot.state == OceanEyesLiveConnectionState.disconnected ||
+        snapshot.state == OceanEyesLiveConnectionState.failed;
+    if (sessionWasConnected &&
+        sessionTerminated &&
+        (_publishingLive || _viewingLive) &&
+        !_liveDisconnectRecoveryPending) {
+      _liveDisconnectRecoveryPending = true;
+      final tankId = activeTankId;
+      unawaited(
+        _enqueueLiveOperation(() async {
+          try {
+            await _stopLiveSession(clearRequest: true, tankIdOverride: tankId);
+          } finally {
+            _liveDisconnectRecoveryPending = false;
+          }
+        }),
+      );
+    }
+    _notify();
+  }
+
   void _handleLiveRequests(List<ProductionLiveRequest> requests) {
     _liveRequests = List.unmodifiable(requests);
     final canPublish =
@@ -802,12 +831,12 @@ class OceanEyesController extends ChangeNotifier {
         _publishingLive) {
       return;
     }
+    _viewingLive = true;
     var requestCreated = false;
     try {
       await repository.requestLive(tankId);
       requestCreated = true;
       await live.connect(tankId, role: OceanEyesLiveRole.viewer);
-      _viewingLive = true;
       _liveRequestHeartbeat?.cancel();
       _liveRequestHeartbeat = Timer.periodic(_liveRequestHeartbeatInterval, (
         _,
@@ -815,6 +844,9 @@ class OceanEyesController extends ChangeNotifier {
         _queueProductionWrite(() => repository.requestLive(tankId));
       });
     } catch (error, stackTrace) {
+      _viewingLive = false;
+      _liveRequestHeartbeat?.cancel();
+      _liveRequestHeartbeat = null;
       _recordProductionError(error, stackTrace);
       if (requestCreated) {
         try {
@@ -929,6 +961,9 @@ class OceanEyesController extends ChangeNotifier {
     _liveRequestLeaseSweep = null;
     final wasPublishing = _publishingLive;
     final wasViewing = _viewingLive;
+    _publishingLive = false;
+    _viewingLive = false;
+    _syncWakeLock();
     if (tankId != null && repository != null) {
       if (wasPublishing) {
         try {
@@ -950,9 +985,6 @@ class OceanEyesController extends ChangeNotifier {
     } catch (error, stackTrace) {
       _recordProductionError(error, stackTrace);
     }
-    _publishingLive = false;
-    _viewingLive = false;
-    _syncWakeLock();
     if (wasPublishing && resumeCamera) {
       try {
         if (_cameraGateway != null) {
@@ -1044,6 +1076,7 @@ class OceanEyesController extends ChangeNotifier {
   bool _captureInProgress = false;
   bool _publishingLive = false;
   bool _viewingLive = false;
+  bool _liveDisconnectRecoveryPending = false;
   bool _wakeLockRequested = false;
   int _pairingCameraSuspensionDepth = 0;
   bool _resumeCameraAfterPairing = false;
