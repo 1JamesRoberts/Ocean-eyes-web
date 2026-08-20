@@ -63,13 +63,18 @@ gestures unwind the same origin-aware route stack as visible back controls.
 
 ## Camera and backend boundary
 
-This repository implements the frontend state machine with a frozen camera
-fixture. The native project declares camera permissions and the UI auto-starts
-its camera state after permission is granted, but hardware capture and model/
-backend synchronization remain behind the unresolved production dependency
-identified in the migration plan. Replace the fixture transition in
-`OceanEyesController.requestCameraPermission` with the selected camera gateway
-without changing screen APIs.
+Production integrations are compiled behind an explicit
+`OCEANEYES_PRODUCTION=true` runtime switch. They include anonymous Firebase
+Auth with optional Google linking, typed Firestore repositories and schema
+mappers, QR tank pairing, camera capture, an on-device three-model ONNX
+pipeline, FCM, Cloud Functions alerting, and LiveKit streaming. Fixture URLs
+always bypass those services and retain the deterministic state machine.
+
+No Firebase configuration, API credentials, APNs keys, or ONNX binaries are
+tracked. Follow [`docs/production_setup.md`](docs/production_setup.md) to
+configure an environment. The audited source-to-target migration and exact
+legacy schema mappings are in
+[`docs/production_migration_plan.md`](docs/production_migration_plan.md).
 
 ## Visual parity
 

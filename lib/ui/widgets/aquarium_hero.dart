@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:livekit_client/livekit_client.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/oceaneyes_tokens.dart';
@@ -180,6 +181,29 @@ class AquariumStreamImage extends StatelessWidget {
     const greenLuminance = 0.7152;
     const blueLuminance = 0.0722;
 
+    final remoteTrack = controller.remoteVideoTrack;
+    final capturedFrame = controller.latestCameraFrameBytes;
+    final Widget streamImage;
+    if (remoteTrack is VideoTrack) {
+      streamImage = VideoTrackRenderer(
+        remoteTrack,
+        fit: fit == BoxFit.contain ? VideoViewFit.contain : VideoViewFit.cover,
+      );
+    } else if (capturedFrame != null) {
+      streamImage = Image.memory(
+        capturedFrame,
+        fit: fit,
+        alignment: alignment,
+        gaplessPlayback: true,
+      );
+    } else {
+      streamImage = Image.asset(
+        'assets/images/aquarium_hero.png',
+        fit: fit,
+        alignment: alignment,
+      );
+    }
+
     Widget image = ColorFiltered(
       colorFilter: ColorFilter.matrix([
         (redLuminance * inverseSaturation + saturation) * multiplier,
@@ -203,11 +227,7 @@ class AquariumStreamImage extends StatelessWidget {
         1,
         0,
       ]),
-      child: Image.asset(
-        'assets/images/aquarium_hero.png',
-        fit: fit,
-        alignment: alignment,
-      ),
+      child: streamImage,
     );
 
     if (controller.temperature != 0) {

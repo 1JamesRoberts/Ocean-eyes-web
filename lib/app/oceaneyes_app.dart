@@ -11,19 +11,25 @@ import '../ui/shell/oceaneyes_shell.dart';
 import '../view_models/oceaneyes_controller.dart';
 
 class OceanEyesApp extends StatefulWidget {
-  const OceanEyesApp({super.key, this.controller});
+  const OceanEyesApp({
+    super.key,
+    this.controller,
+    this.disposeController = false,
+  });
 
   final OceanEyesController? controller;
+  final bool disposeController;
 
   @override
   State<OceanEyesApp> createState() => _OceanEyesAppState();
 }
 
 class _OceanEyesAppState extends State<OceanEyesApp>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final OceanEyesController _controller =
       widget.controller ?? OceanEyesController();
-  late final bool _ownsController = widget.controller == null;
+  late final bool _ownsController =
+      widget.controller == null || widget.disposeController;
   late bool _showLogin = !_controller.isAuthenticated;
   bool _loginExiting = false;
   Timer? _loginExitTimer;
@@ -33,6 +39,7 @@ class _OceanEyesAppState extends State<OceanEyesApp>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _dashboardEntrance = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
@@ -58,12 +65,18 @@ class _OceanEyesAppState extends State<OceanEyesApp>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _loginExitTimer?.cancel();
     _dashboardOpacity.dispose();
     _dashboardEntrance.dispose();
     _controller.removeListener(_handleAuthentication);
     if (_ownsController) _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _controller.handleAppLifecycleState(state);
   }
 
   @override

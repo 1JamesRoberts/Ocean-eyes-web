@@ -1,15 +1,25 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../integrations/camera/camera_capture_gateway.dart';
+import '../integrations/firebase/firebase_notification_service.dart';
+import '../integrations/livekit/livekit_gateway.dart';
+import '../integrations/ml/onnx_fish_inference.dart';
+import '../integrations/power/wake_lock_gateway.dart';
 import '../models/analytics_series_service.dart';
 import '../models/aquarium_models.dart';
 import '../models/demo_fixtures.dart';
 import '../models/fish_insights_service.dart';
 import '../models/fish_inventory_repository.dart';
 import '../models/oceaneyes_settings_repository.dart';
+import '../models/production_auth.dart';
+import '../models/production_data.dart';
+import '../models/production_repository.dart';
+import '../models/tank_pairing_codec.dart';
 
 class OceanEyesController extends ChangeNotifier {
   OceanEyesController({
@@ -18,6 +28,19 @@ class OceanEyesController extends ChangeNotifier {
     OceanEyesSettingsRepository? settingsRepository,
     Uri? launchUri,
     bool requireLogin = false,
+    bool productionEnabled = false,
+    String? productionStartupError,
+    ProductionOceanEyesRepository? productionRepository,
+    ProductionAuthGateway? productionAuth,
+    CameraCaptureGateway? cameraGateway,
+    FishInferenceEngine? inferenceEngine,
+    NotificationServiceGateway? notificationService,
+    OceanEyesLiveGateway? liveGateway,
+    WakeLockGateway? wakeLockGateway,
+    CameraHandoffConfiguration cameraHandoffConfiguration =
+        const CameraHandoffConfiguration(),
+    CameraHandoffDelay? cameraHandoffDelay,
+    String webPushVapidKey = '',
   }) : _inventoryRepository =
            inventoryRepository ??
            (preferences == null
@@ -27,14 +50,30 @@ class OceanEyesController extends ChangeNotifier {
            settingsRepository ??
            (preferences == null
                ? null
-               : SharedPreferencesOceanEyesSettingsRepository(preferences)) {
+               : SharedPreferencesOceanEyesSettingsRepository(preferences)),
+       _preferences = preferences,
+       productionEnabled =
+           productionEnabled &&
+           !(launchUri ?? Uri.base).queryParameters.containsKey('fixture'),
+       productionError = productionStartupError,
+       _productionRepository = productionRepository,
+       _productionAuth = productionAuth,
+       _cameraGateway = cameraGateway,
+       _inferenceEngine = inferenceEngine,
+       _notificationService = notificationService,
+       _liveGateway = liveGateway,
+       _wakeLockGateway = wakeLockGateway,
+       _cameraHandoffConfiguration = cameraHandoffConfiguration,
+       _cameraHandoffDelay = cameraHandoffDelay ?? _defaultCameraHandoffDelay,
+       _webPushVapidKey = webPushVapidKey {
     final uri = launchUri ?? Uri.base;
     final requestedFixture = uri.queryParameters['fixture'];
     final forceLogin =
         requestedFixture?.toLowerCase().replaceAll('-', '_') == 'login' ||
         uri.queryParameters['route'] == 'login';
-    isAuthenticated =
-        !(forceLogin || (requireLogin && requestedFixture == null));
+    isAuthenticated = this.productionEnabled
+        ? productionAuth?.currentUser != null || productionStartupError != null
+        : !(forceLogin || (requireLogin && requestedFixture == null));
     if (requestedFixture == null || forceLogin) {
       _restorePreferences();
     } else {
@@ -59,6 +98,15 @@ class OceanEyesController extends ChangeNotifier {
     if (secondaryRoute == SecondaryRoute.alerts && requestedAlert != null) {
       selectedAlertId = requestedAlert;
     }
+    if (this.productionEnabled && productionStartupError != null) {
+      _clearProductionTankData();
+      activeTankId = null;
+      tankName = 'Aquarium';
+      tankConnected = false;
+      cameraStage = CameraStage.unavailable;
+      dashboardHealth = DashboardHealthState.waiting;
+      analyticsState = AnalyticsContentState.error;
+    }
   }
 
   static Future<OceanEyesController> bootstrap() async {
@@ -75,11 +123,980 @@ class OceanEyesController extends ChangeNotifier {
     );
   }
 
+  /// Starts production subscriptions after Firebase and anonymous auth have
+  /// been composed by the app bootstrap. This is deliberately separate from
+  /// the synchronous constructor used by unit tests and deterministic URLs.
+  Future<void> initializeProduction() async {
+    if (!productionEnabled || _productionInitialized || _disposed) return;
+    final repository = _productionRepository;
+    final auth = _productionAuth;
+    if (repository == null || auth == null) {
+      productionError ??= 'Production services are not available.';
+      _notify();
+      return;
+    }
+    _productionInitialized = true;
+    productionUser = auth.currentUser;
+    isAuthenticated = productionUser != null;
+    activeTankId = _preferences?.getString(_activeTankPreferenceKey);
+    tankConnected = false;
+    dashboardHealth = DashboardHealthState.waiting;
+    analyticsState = AnalyticsContentState.loading;
+    cameraStage = CameraStage.beforePermission;
+    _clearProductionTankData();
+
+    _productionSubscriptions.add(
+      auth.authStateChanges().listen((user) {
+        final previousUid = productionUser?.uid;
+        productionUser = user;
+        isAuthenticated = user != null;
+        if (previousUid != user?.uid) {
+          unawaited(_rebindLinkedTankIds(user?.uid));
+        }
+        _notify();
+      }, onError: _recordProductionError),
+    );
+    await _rebindLinkedTankIds(productionUser?.uid);
+    if (_disposed) return;
+
+    final camera = _cameraGateway;
+    if (camera != null) {
+      _applyCameraSnapshot(camera.snapshot);
+      _productionSubscriptions.add(
+        camera.states.listen(
+          _applyCameraSnapshot,
+          onError: _recordProductionError,
+        ),
+      );
+    }
+
+    final live = _liveGateway;
+    if (live != null) {
+      _productionSubscriptions.add(
+        live.snapshots.listen((snapshot) {
+          liveConnectionState = snapshot.state;
+          remoteVideoTrack = snapshot.remoteVideoTrack;
+          if (snapshot.error != null) {
+            productionError = 'Live stream: ${snapshot.error}';
+          }
+          _notify();
+        }, onError: _recordProductionError),
+      );
+    }
+
+    final notifications = _notificationService;
+    if (notifications != null) {
+      _productionSubscriptions.add(
+        notifications.openedRoutes.listen(
+          _openNotificationRoute,
+          onError: _recordProductionError,
+        ),
+      );
+      try {
+        await notifications.initialize(
+          saveToken: repository.saveFcmToken,
+          webVapidKey: _webPushVapidKey,
+        );
+      } catch (error, stackTrace) {
+        _recordProductionError(error, stackTrace);
+      }
+    }
+    _notify();
+  }
+
+  Future<void> _rebindLinkedTankIds(String? uid) {
+    final generation = ++_linkedTankSubscriptionGeneration;
+    _linkedTankTargetUid = uid;
+    _linkedTankRebindQueue = _linkedTankRebindQueue.then((_) async {
+      try {
+        if (_disposed || generation != _linkedTankSubscriptionGeneration) {
+          return;
+        }
+        final previous = _linkedTankIdsSubscription;
+        final previousUid = _linkedTankSubscriptionUid;
+        _linkedTankIdsSubscription = null;
+        if (previous != null) await previous.cancel();
+        if (_disposed ||
+            generation != _linkedTankSubscriptionGeneration ||
+            uid != _linkedTankTargetUid) {
+          return;
+        }
+        if (previousUid != null && previousUid != uid) {
+          await _clearTankForAuthChange();
+          if (_disposed ||
+              generation != _linkedTankSubscriptionGeneration ||
+              uid != _linkedTankTargetUid) {
+            return;
+          }
+        }
+        _linkedTankSubscriptionUid = null;
+        if (uid == null || uid.isEmpty) {
+          return;
+        }
+
+        // Establish the UID gate before listen: synchronous test/replay streams
+        // are allowed to emit their first snapshot from inside listen().
+        _linkedTankSubscriptionUid = uid;
+        final subscription = _productionRepository!.watchLinkedTankIds().listen(
+          (tankIds) {
+            if (_disposed ||
+                generation != _linkedTankSubscriptionGeneration ||
+                uid != _linkedTankSubscriptionUid) {
+              return;
+            }
+            _handleLinkedTankIds(tankIds);
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            if (!_disposed &&
+                generation == _linkedTankSubscriptionGeneration &&
+                uid == _linkedTankSubscriptionUid) {
+              _recordProductionError(error, stackTrace);
+            }
+          },
+        );
+        if (_disposed || generation != _linkedTankSubscriptionGeneration) {
+          await subscription.cancel();
+          return;
+        }
+        _linkedTankIdsSubscription = subscription;
+      } catch (error, stackTrace) {
+        if (!_disposed && generation == _linkedTankSubscriptionGeneration) {
+          _linkedTankSubscriptionUid = null;
+          _linkedTankIdsSubscription = null;
+          _recordProductionError(error, stackTrace);
+        }
+      }
+    });
+    return _linkedTankRebindQueue;
+  }
+
+  Future<void> _clearTankForAuthChange() async {
+    final previousTankId = activeTankId;
+    await _unbindTank(liveTankId: previousTankId);
+    if (_disposed) return;
+    activeTankId = null;
+    tankConnected = false;
+    cameraStage = CameraStage.unavailable;
+    analyticsState = AnalyticsContentState.empty;
+    _clearProductionTankData();
+    await _preferences?.remove(_activeTankPreferenceKey);
+    _notify();
+  }
+
+  void _handleLinkedTankIds(List<String> tankIds) {
+    if (_disposed) return;
+    final sorted = tankIds.toSet().toList()..sort();
+    if (sorted.isEmpty) {
+      unawaited(_unbindTank(liveTankId: activeTankId));
+      activeTankId = null;
+      tankConnected = false;
+      cameraStage = CameraStage.unavailable;
+      analyticsState = AnalyticsContentState.empty;
+      _clearProductionTankData();
+      _preferences?.remove(_activeTankPreferenceKey);
+      _notify();
+      return;
+    }
+    final requested = activeTankId;
+    final selected = requested != null && sorted.contains(requested)
+        ? requested
+        : sorted.first;
+    if (selected != activeTankId || _tankSubscriptions.isEmpty) {
+      unawaited(_bindTank(selected));
+    }
+  }
+
+  Future<void> _bindTank(String tankId) async {
+    final repository = _productionRepository;
+    if (repository == null || _disposed) return;
+    final previousTankId = activeTankId;
+    await _unbindTank(liveTankId: previousTankId);
+    if (_disposed) return;
+    activeTankId = tankId;
+    tankConnected = true;
+    dashboardHealth = DashboardHealthState.waiting;
+    analyticsState = AnalyticsContentState.loading;
+    _clearProductionTankData();
+    await _preferences?.setString(_activeTankPreferenceKey, tankId);
+
+    _tankSubscriptions.add(
+      repository.watchTank(tankId).listen((tank) {
+        if (tank == null) {
+          tankConnected = false;
+          _clearProductionTankData();
+          productionError = 'The selected tank is no longer available.';
+        } else {
+          tankConnected = true;
+          tankName = tank.name;
+          clarityThreshold = tank.thresholds.turbidityFnuMax;
+          visibleFishThreshold = tank.thresholds.visibleFishChangePercent;
+          _waterLineY = tank.waterLineY;
+          recalibrationRequested = tank.recalibrationRequested;
+          final userId = repository.currentUserId;
+          _tankRole = userId == null
+              ? ProductionTankMemberRole.none
+              : tank.roleFor(userId);
+          _handleLiveRequests(_liveRequests);
+        }
+        _notify();
+      }, onError: _recordProductionError),
+    );
+    _tankSubscriptions.add(
+      repository
+          .watchReadingBundle(tankId)
+          .listen(
+            (bundle) {
+              final latest = bundle.latestRealReading;
+              if (latest == null) {
+                dashboardHealth = DashboardHealthState.waiting;
+              } else {
+                _applyLatestReading(latest);
+              }
+              history = bundle.history;
+              final analytics = bundle.analytics;
+              _productionClaritySeries = analytics.claritySeries;
+              _productionFishCountSeries = analytics.fishCountSeries;
+              _productionSpeciesSeries = analytics.speciesSeries;
+              heatmapCenters = analytics.heatmapCenters;
+              final dimensions = analytics.heatmapSourceDimensions;
+              if (dimensions != null) heatmapSourceDimensions = dimensions;
+              analyticsState = analytics.points.isEmpty
+                  ? AnalyticsContentState.empty
+                  : AnalyticsContentState.populated;
+              _notify();
+            },
+            onError: (Object error, StackTrace stackTrace) {
+              analyticsState = AnalyticsContentState.error;
+              _recordProductionError(error, stackTrace);
+            },
+          ),
+    );
+    _tankSubscriptions.add(
+      repository.watchFishInventory(tankId).listen((inventory) {
+        fish = inventory
+            .map(
+              (entry) => entry.copyWith(
+                visible: _fishVisibilityById[entry.id] ?? entry.visible,
+              ),
+            )
+            .toList(growable: false);
+        for (final entry in fish) {
+          _fishVisibilityById[entry.id] = entry.visible;
+        }
+        _notify();
+      }, onError: _recordProductionError),
+    );
+    _tankSubscriptions.add(
+      repository.watchAlerts(tankId).listen((productionAlerts) {
+        alerts = productionAlerts
+            .map((productionAlert) => productionAlert.item)
+            .toList(growable: false);
+        _notify();
+      }, onError: _recordProductionError),
+    );
+    _tankSubscriptions.add(
+      repository.watchLiveState(tankId).listen((state) {
+        liveState = state;
+        _notify();
+      }, onError: _recordProductionError),
+    );
+    _tankSubscriptions.add(
+      repository
+          .watchLiveRequests(tankId)
+          .listen(_handleLiveRequests, onError: _recordProductionError),
+    );
+    _configureInferenceTimer();
+    _notify();
+  }
+
+  Future<void> _unbindTank({
+    bool disconnectLive = true,
+    String? liveTankId,
+  }) async {
+    _inferenceTimer?.cancel();
+    _inferenceTimer = null;
+    _syncWakeLock();
+    _liveHeartbeat?.cancel();
+    _liveHeartbeat = null;
+    for (final subscription in _tankSubscriptions) {
+      await subscription.cancel();
+    }
+    _tankSubscriptions.clear();
+    _tankRole = ProductionTankMemberRole.none;
+    _liveRequests = const [];
+    if (disconnectLive) {
+      await _enqueueLiveOperation(
+        () => _stopLiveSession(clearRequest: true, tankIdOverride: liveTankId),
+      );
+    }
+  }
+
+  void _clearProductionTankData() {
+    for (final entry in fish) {
+      _fishVisibilityById[entry.id] = entry.visible;
+    }
+    fish = const [];
+    alerts = const [];
+    history = const [];
+    heatmapCenters = const [];
+    _productionWaterMetrics = _unreportedWaterMetrics;
+    _productionClaritySeries = const [];
+    _productionFishCountSeries = const [];
+    _productionSpeciesSeries = const {};
+    heatmapSourceDimensions = const DetectionFrameDimensions(
+      width: 1,
+      height: 1,
+    );
+    latestCameraFrameBytes = null;
+    liveState = null;
+    remoteVideoTrack = null;
+    lastTurbidityResult = null;
+    _waterLineY = null;
+    recalibrationRequested = false;
+  }
+
+  void _applyLatestReading(ProductionReading reading) {
+    final threshold = clarityThreshold;
+    final turbidity = reading.turbidityFnu;
+    final temperature = reading.temperatureCelsius;
+    final ph = reading.ph;
+    final ammonia = reading.ammoniaPpm;
+    final nitrite = reading.nitritePpm;
+    final turbidityWarning = turbidity != null && turbidity > threshold;
+    final temperatureWarning =
+        temperature != null && (temperature < 23 || temperature > 28);
+    final phWarning = ph != null && (ph < 6.5 || ph > 8.2);
+    final ammoniaWarning = ammonia != null && ammonia > 0.1;
+    final nitriteWarning = nitrite != null && nitrite > 0.2;
+    _productionWaterMetrics = [
+      _productionMetric(
+        'Temperature',
+        temperature,
+        '°C',
+        warning: temperatureWarning,
+        safeStatus: 'Ideal',
+        warningStatus: 'Watch',
+      ),
+      _productionMetric(
+        'pH Level',
+        ph,
+        'pH',
+        warning: phWarning,
+        safeStatus: 'Balanced',
+        warningStatus: 'Watch',
+      ),
+      _productionMetric(
+        'Turbidity',
+        turbidity,
+        'FNU',
+        warning: turbidityWarning,
+        safeStatus: 'Clear',
+        warningStatus: 'Cloudy',
+      ),
+      _productionMetric(
+        'Ammonia',
+        ammonia,
+        'ppm',
+        warning: ammoniaWarning,
+        safeStatus: 'Safe',
+        warningStatus: 'Watch',
+      ),
+      _productionMetric(
+        'Nitrite',
+        nitrite,
+        'ppm',
+        warning: nitriteWarning,
+        safeStatus: 'Safe',
+        warningStatus: 'Watch',
+      ),
+    ];
+    dashboardHealth =
+        turbidityWarning ||
+            temperatureWarning ||
+            phWarning ||
+            ammoniaWarning ||
+            nitriteWarning
+        ? DashboardHealthState.warning
+        : DashboardHealthState.healthy;
+    if (turbidity != null) {
+      lastTurbidityResult = '${turbidity.toStringAsFixed(1)} FNU';
+    }
+    if (reading.detections.isNotEmpty) {
+      heatmapCenters = reading.detections;
+    }
+    final dimensions = reading.frameDimensions;
+    if (dimensions != null) heatmapSourceDimensions = dimensions;
+  }
+
+  WaterMetric _productionMetric(
+    String label,
+    double? value,
+    String unit, {
+    required bool warning,
+    required String safeStatus,
+    required String warningStatus,
+  }) => WaterMetric(
+    label: label,
+    value: value == null ? '--' : value.toStringAsFixed(2),
+    unit: unit,
+    status: value == null
+        ? 'Not reported'
+        : warning
+        ? warningStatus
+        : safeStatus,
+    isWarning: warning,
+  );
+
+  void _openNotificationRoute(NotificationRoute route) {
+    if (route.tankId != activeTankId) {
+      unawaited(_bindTank(route.tankId));
+    }
+    secondaryOrigin = activeTab;
+    secondaryRoute = SecondaryRoute.alerts;
+    selectedAlertId = route.alertId;
+    scrollEpoch += 1;
+    _notify();
+  }
+
+  void _recordProductionError(Object error, [StackTrace? stackTrace]) {
+    if (_disposed) return;
+    productionError = error.toString();
+    _notify();
+  }
+
+  void _applyCameraSnapshot(CameraCaptureSnapshot snapshot) {
+    if (_disposed || !productionEnabled || _captureInProgress) return;
+    usingFrontCamera = snapshot.activeLens?.facing == CameraLensFacing.front;
+    cameraStage = switch (snapshot.phase) {
+      CameraCapturePhase.idle => CameraStage.beforePermission,
+      CameraCapturePhase.requestingPermission ||
+      CameraCapturePhase.opening => CameraStage.requestingPermission,
+      CameraCapturePhase.ready => CameraStage.active,
+      CameraCapturePhase.capturing => CameraStage.aiProcessing,
+      CameraCapturePhase.permissionDenied => CameraStage.denied,
+      CameraCapturePhase.suspended => CameraStage.idle,
+      CameraCapturePhase.unavailable ||
+      CameraCapturePhase.failed ||
+      CameraCapturePhase.disposed => CameraStage.unavailable,
+    };
+    if (snapshot.errorMessage != null) {
+      productionError = snapshot.errorMessage;
+    }
+    final cannotRunInference = switch (snapshot.phase) {
+      CameraCapturePhase.idle ||
+      CameraCapturePhase.permissionDenied ||
+      CameraCapturePhase.suspended ||
+      CameraCapturePhase.unavailable ||
+      CameraCapturePhase.failed ||
+      CameraCapturePhase.disposed => true,
+      CameraCapturePhase.requestingPermission ||
+      CameraCapturePhase.opening ||
+      CameraCapturePhase.ready ||
+      CameraCapturePhase.capturing => false,
+    };
+    if (cannotRunInference) {
+      _inferenceTimer?.cancel();
+      _inferenceTimer = null;
+      _syncWakeLock();
+    }
+    _notify();
+  }
+
+  Future<void> _switchProductionCamera() async {
+    final camera = _cameraGateway;
+    if (camera == null) return;
+    try {
+      _applyCameraSnapshot(await camera.switchLens());
+      _savePreferences();
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    }
+  }
+
+  Future<void> _resumeProductionCamera() async {
+    final camera = _cameraGateway;
+    if (camera == null) return;
+    try {
+      _applyCameraSnapshot(await camera.resume());
+      _configureInferenceTimer();
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    }
+  }
+
+  Future<void> _captureAndAnalyze({required bool measurementOnly}) async {
+    final camera = _cameraGateway;
+    final inference = _inferenceEngine;
+    final repository = _productionRepository;
+    final tankId = activeTankId;
+    if (_captureInProgress ||
+        camera == null ||
+        inference == null ||
+        repository == null ||
+        tankId == null ||
+        camera.snapshot.phase != CameraCapturePhase.ready) {
+      return;
+    }
+    _captureInProgress = true;
+    productionError = null;
+    cameraStage = measurementOnly
+        ? CameraStage.measuringTurbidity
+        : CameraStage.aiProcessing;
+    if (measurementOnly) lastTurbidityResult = null;
+    _notify();
+    try {
+      final frame = await camera.capture(normalizedWaterLineY: _waterLineY);
+      if (frame == null) return;
+      latestCameraFrameBytes = Uint8List.fromList(frame.encodedBytes);
+      await inference.initialize();
+      final result = await inference.analyze(
+        detectionRegion: frame.waterRegion,
+        fullFrame: frame.fullFrame,
+        detectionRegionInFullFrame: NormalizedImageRegion.belowWaterLine(
+          frame.waterRegionTopNormalized,
+        ),
+        thresholds: FishInferenceThresholds(
+          detectionConfidence: detectionConfidenceThreshold,
+          classificationConfidence: speciesConfidenceThreshold,
+        ),
+      );
+      if (result == null) return;
+      lastTurbidityResult = '${result.turbidityFnu.toStringAsFixed(1)} FNU';
+      heatmapCenters = result.classifiedCenters
+          .map(
+            (center) => NormalizedDetectionCenter(
+              nx: center.nx,
+              ny: center.ny,
+              speciesId: center.speciesId,
+            ),
+          )
+          .toList(growable: false);
+      heatmapSourceDimensions = DetectionFrameDimensions(
+        width: frame.fullFrame.width,
+        height: frame.fullFrame.height,
+      );
+      await repository.writeReading(
+        ProductionReadingDraft(
+          tankId: tankId,
+          clarityScore: result.clarityScore,
+          turbidityFnu: result.turbidityFnu,
+          fishCount: result.fishCount,
+          fishCountConfidence: result.meanDetectionConfidence,
+          speciesDetected: result.speciesCounts,
+          detections: heatmapCenters,
+          frameDimensions: heatmapSourceDimensions,
+        ),
+      );
+      for (final entry in fish) {
+        final detected = (result.speciesCounts[entry.speciesId] ?? 0).clamp(
+          0,
+          entry.count,
+        );
+        await repository.updateDetectedFish(entry.id, detected);
+      }
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    } finally {
+      _captureInProgress = false;
+      if (!_disposed) {
+        _applyCameraSnapshot(camera.snapshot);
+        _notify();
+      }
+    }
+  }
+
+  void _configureInferenceTimer() {
+    _inferenceTimer?.cancel();
+    _inferenceTimer = null;
+    if (!productionEnabled ||
+        !aiEnabled ||
+        !autoConnect ||
+        activeTankId == null ||
+        _productionRepository == null ||
+        _inferenceEngine?.isSupported != true ||
+        _cameraGateway?.snapshot.phase != CameraCapturePhase.ready) {
+      _syncWakeLock();
+      return;
+    }
+    final interval = Duration(
+      milliseconds: pollingIntervalMs.round().clamp(1000, 3600000),
+    );
+    _inferenceTimer = Timer.periodic(interval, (_) {
+      if (cameraStage == CameraStage.active) {
+        unawaited(_captureAndAnalyze(measurementOnly: false));
+      }
+    });
+    _syncWakeLock();
+  }
+
+  void _syncWakeLock() {
+    final gateway = _wakeLockGateway;
+    if (gateway == null) return;
+    final shouldEnable =
+        !_disposed && (_inferenceTimer != null || _publishingLive);
+    if (shouldEnable == _wakeLockRequested) return;
+    _wakeLockRequested = shouldEnable;
+    _wakeLockQueue = _wakeLockQueue.then((_) async {
+      try {
+        await gateway.setEnabled(shouldEnable);
+      } catch (error, stackTrace) {
+        _recordProductionError(error, stackTrace);
+      }
+    });
+  }
+
+  void _handleLiveRequests(List<ProductionLiveRequest> requests) {
+    _liveRequests = List.unmodifiable(requests);
+    final canPublish =
+        _tankRole == ProductionTankMemberRole.owner ||
+        _tankRole == ProductionTankMemberRole.monitor;
+    _liveRequestLeaseSweep?.cancel();
+    _liveRequestLeaseSweep = null;
+    if (!canPublish) {
+      if (_publishingLive) unawaited(stopLiveStream());
+      return;
+    }
+    _evaluateLiveRequestLeases();
+    if (requests.isNotEmpty) {
+      _liveRequestLeaseSweep = Timer.periodic(
+        _liveRequestSweepInterval,
+        (_) => _evaluateLiveRequestLeases(),
+      );
+    }
+  }
+
+  void _evaluateLiveRequestLeases() {
+    if (_disposed) return;
+    final canPublish =
+        _tankRole == ProductionTankMemberRole.owner ||
+        _tankRole == ProductionTankMemberRole.monitor;
+    if (!canPublish) return;
+    final oldestAccepted = DateTime.now().subtract(_liveRequestLeaseDuration);
+    final hasFreshRequest = _liveRequests.any((request) {
+      final requestedAt = request.requestedAt;
+      return requestedAt != null && !requestedAt.isBefore(oldestAccepted);
+    });
+    if (hasFreshRequest && !_publishingLive) {
+      unawaited(startMonitorLiveStream());
+    } else if (!hasFreshRequest && _publishingLive) {
+      unawaited(stopLiveStream());
+    }
+    if (!hasFreshRequest) {
+      _liveRequestLeaseSweep?.cancel();
+      _liveRequestLeaseSweep = null;
+    }
+  }
+
+  Future<void> startViewerLiveStream() =>
+      _enqueueLiveOperation(_startViewerLiveStream);
+
+  Future<void> _startViewerLiveStream() async {
+    final tankId = activeTankId;
+    final repository = _productionRepository;
+    final live = _liveGateway;
+    if (!productionEnabled ||
+        tankId == null ||
+        repository == null ||
+        live == null ||
+        _viewingLive ||
+        _publishingLive) {
+      return;
+    }
+    var requestCreated = false;
+    try {
+      await repository.requestLive(tankId);
+      requestCreated = true;
+      await live.connect(tankId, role: OceanEyesLiveRole.viewer);
+      _viewingLive = true;
+      _liveRequestHeartbeat?.cancel();
+      _liveRequestHeartbeat = Timer.periodic(_liveRequestHeartbeatInterval, (
+        _,
+      ) {
+        _queueProductionWrite(() => repository.requestLive(tankId));
+      });
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+      if (requestCreated) {
+        try {
+          await repository.clearLiveRequest(tankId);
+        } catch (_) {
+          // The lease expires even if best-effort cleanup cannot reach Firebase.
+        }
+      }
+      try {
+        await live.disconnect();
+      } catch (_) {
+        // Preserve the connection failure as the user-facing error.
+      }
+    }
+  }
+
+  Future<void> startMonitorLiveStream() =>
+      _enqueueLiveOperation(_startMonitorLiveStream);
+
+  Future<void> _startMonitorLiveStream() async {
+    final tankId = activeTankId;
+    final repository = _productionRepository;
+    final camera = _cameraGateway;
+    final live = _liveGateway;
+    if (!productionEnabled ||
+        tankId == null ||
+        repository == null ||
+        live == null ||
+        _publishingLive ||
+        _viewingLive ||
+        (_tankRole != ProductionTankMemberRole.owner &&
+            _tankRole != ProductionTankMemberRole.monitor)) {
+      return;
+    }
+    _publishingLive = true;
+    _syncWakeLock();
+    var roomConnected = false;
+    try {
+      await camera?.suspend();
+      if (camera != null) {
+        await _settleCameraHandoff(
+          _cameraHandoffConfiguration.afterCameraRelease,
+        );
+      }
+      await live.connect(
+        tankId,
+        role: OceanEyesLiveRole.monitor,
+        useFrontCamera: usingFrontCamera,
+      );
+      roomConnected = true;
+      await repository.setLiveActive(tankId, true);
+      _liveHeartbeat?.cancel();
+      _liveHeartbeat = Timer.periodic(const Duration(seconds: 20), (_) {
+        _queueProductionWrite(() => repository.pingLive(tankId));
+      });
+    } catch (error, stackTrace) {
+      _publishingLive = false;
+      _syncWakeLock();
+      _recordProductionError(error, stackTrace);
+      if (roomConnected) {
+        try {
+          await repository.setLiveActive(tankId, false);
+        } catch (_) {
+          // Best effort: last_ping_at lets consumers reject a stale live flag.
+        }
+      }
+      try {
+        await live.disconnect();
+      } catch (_) {
+        // Preserve the original startup failure.
+      }
+      try {
+        if (camera != null) {
+          await _settleCameraHandoff(
+            _cameraHandoffConfiguration.afterLiveDisconnect,
+          );
+        }
+        await camera?.resume();
+      } catch (_) {
+        // Preserve the original startup failure.
+      }
+    }
+  }
+
+  Future<void> stopLiveStream() =>
+      _enqueueLiveOperation(() => _stopLiveSession(clearRequest: true));
+
+  Future<void> _enqueueLiveOperation(Future<void> Function() operation) {
+    final result = _liveOperationQueue.then((_) => operation());
+    _liveOperationQueue = result.then<void>(
+      (_) {},
+      onError: (Object error, StackTrace stackTrace) {
+        _recordProductionError(error, stackTrace);
+      },
+    );
+    return result;
+  }
+
+  Future<void> _stopLiveSession({
+    required bool clearRequest,
+    String? tankIdOverride,
+    bool resumeCamera = true,
+  }) async {
+    final tankId = tankIdOverride ?? activeTankId;
+    final repository = _productionRepository;
+    final live = _liveGateway;
+    _liveHeartbeat?.cancel();
+    _liveHeartbeat = null;
+    _liveRequestHeartbeat?.cancel();
+    _liveRequestHeartbeat = null;
+    _liveRequestLeaseSweep?.cancel();
+    _liveRequestLeaseSweep = null;
+    final wasPublishing = _publishingLive;
+    final wasViewing = _viewingLive;
+    if (tankId != null && repository != null) {
+      if (wasPublishing) {
+        try {
+          await repository.setLiveActive(tankId, false);
+        } catch (error, stackTrace) {
+          _recordProductionError(error, stackTrace);
+        }
+      }
+      if (clearRequest && wasViewing) {
+        try {
+          await repository.clearLiveRequest(tankId);
+        } catch (error, stackTrace) {
+          _recordProductionError(error, stackTrace);
+        }
+      }
+    }
+    try {
+      await live?.disconnect();
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    }
+    _publishingLive = false;
+    _viewingLive = false;
+    _syncWakeLock();
+    if (wasPublishing && resumeCamera) {
+      try {
+        if (_cameraGateway != null) {
+          await _settleCameraHandoff(
+            _cameraHandoffConfiguration.afterLiveDisconnect,
+          );
+        }
+        await _cameraGateway?.resume();
+      } catch (error, stackTrace) {
+        _recordProductionError(error, stackTrace);
+      }
+    }
+  }
+
+  Future<void> _settleCameraHandoff(Duration duration) {
+    if (duration == Duration.zero || duration.isNegative) {
+      return Future<void>.value();
+    }
+    return _cameraHandoffDelay(duration);
+  }
+
+  void _queueProductionWrite(Future<void> Function() operation) {
+    if (!productionEnabled || _productionRepository == null) return;
+    _productionWriteQueue = _productionWriteQueue.then((_) async {
+      try {
+        await operation();
+      } catch (error, stackTrace) {
+        _recordProductionError(error, stackTrace);
+      }
+    });
+  }
+
+  void _persistProductionThresholds() {
+    final tankId = activeTankId;
+    if (tankId == null || !canEditTankSettings) return;
+    _queueProductionWrite(
+      () => _productionRepository!.updateThresholds(
+        tankId,
+        ProductionTankThresholds(
+          turbidityFnuMax: clarityThreshold,
+          clarityScoreMin: ProductionTankThresholds.clarityScoreFromFnu(
+            clarityThreshold,
+          ),
+          visibleFishChangePercent: visibleFishThreshold,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _disconnectProductionTank(String tankId) async {
+    await _unbindTank(liveTankId: tankId);
+    final repository = _productionRepository;
+    if (repository == null) return;
+    try {
+      await repository.unlinkTank(tankId);
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    }
+  }
+
   final FishInventoryRepository? _inventoryRepository;
   final OceanEyesSettingsRepository? _settingsRepository;
+  final SharedPreferences? _preferences;
+  final ProductionOceanEyesRepository? _productionRepository;
+  final ProductionAuthGateway? _productionAuth;
+  final CameraCaptureGateway? _cameraGateway;
+  final FishInferenceEngine? _inferenceEngine;
+  final NotificationServiceGateway? _notificationService;
+  final OceanEyesLiveGateway? _liveGateway;
+  final WakeLockGateway? _wakeLockGateway;
+  final CameraHandoffConfiguration _cameraHandoffConfiguration;
+  final CameraHandoffDelay _cameraHandoffDelay;
+  final String _webPushVapidKey;
   Future<void> _inventoryWriteQueue = Future<void>.value();
   Future<void> _settingsWriteQueue = Future<void>.value();
+  Future<void> _productionWriteQueue = Future<void>.value();
+  Future<void> _liveOperationQueue = Future<void>.value();
+  Future<void> _wakeLockQueue = Future<void>.value();
+  Future<void> _linkedTankRebindQueue = Future<void>.value();
+  final List<StreamSubscription<dynamic>> _productionSubscriptions = [];
+  final List<StreamSubscription<dynamic>> _tankSubscriptions = [];
+  StreamSubscription<List<String>>? _linkedTankIdsSubscription;
+  Timer? _inferenceTimer;
+  Timer? _liveHeartbeat;
+  Timer? _liveRequestHeartbeat;
+  Timer? _liveRequestLeaseSweep;
   bool _disposed = false;
+  bool _productionInitialized = false;
+  bool _captureInProgress = false;
+  bool _publishingLive = false;
+  bool _viewingLive = false;
+  bool _wakeLockRequested = false;
+  int _pairingCameraSuspensionDepth = 0;
+  bool _resumeCameraAfterPairing = false;
+  int _linkedTankSubscriptionGeneration = 0;
+  String? _linkedTankTargetUid;
+  String? _linkedTankSubscriptionUid;
+  double? _waterLineY;
+  ProductionTankMemberRole _tankRole = ProductionTankMemberRole.none;
+  List<ProductionLiveRequest> _liveRequests = const [];
+  List<WaterMetric> _productionWaterMetrics = _unreportedWaterMetrics;
+
+  static const List<WaterMetric> _unreportedWaterMetrics = [
+    WaterMetric(
+      label: 'Temperature',
+      value: '--',
+      unit: '°C',
+      status: 'Not reported',
+    ),
+    WaterMetric(
+      label: 'pH Level',
+      value: '--',
+      unit: 'pH',
+      status: 'Not reported',
+    ),
+    WaterMetric(
+      label: 'Turbidity',
+      value: '--',
+      unit: 'FNU',
+      status: 'Not reported',
+    ),
+    WaterMetric(
+      label: 'Ammonia',
+      value: '--',
+      unit: 'ppm',
+      status: 'Not reported',
+    ),
+    WaterMetric(
+      label: 'Nitrite',
+      value: '--',
+      unit: 'ppm',
+      status: 'Not reported',
+    ),
+  ];
+  List<ChartPoint> _productionClaritySeries = const [];
+  List<ChartPoint> _productionFishCountSeries = const [];
+  Map<String, List<ChartPoint>> _productionSpeciesSeries = const {};
+  final Map<String, bool> _fishVisibilityById = {};
+
+  static const String _activeTankPreferenceKey =
+      'oceaneyes.production.active_tank.v1';
+  static const Duration _liveRequestHeartbeatInterval = Duration(seconds: 20);
+  static const Duration _liveRequestLeaseDuration = Duration(seconds: 60);
+  static const Duration _liveRequestSweepInterval = Duration(seconds: 5);
 
   PrimaryTab activeTab = PrimaryTab.dashboard;
   SecondaryRoute? secondaryRoute;
@@ -92,6 +1109,21 @@ class OceanEyesController extends ChangeNotifier {
 
   bool isAuthenticated = true;
   bool isAuthenticating = false;
+
+  /// True only for an explicitly enabled, successfully composed production
+  /// runtime. Fixture and directly constructed controllers always leave this
+  /// false and never touch platform plugins.
+  final bool productionEnabled;
+  String? productionError;
+  bool pairingInProgress = false;
+  bool recalibrationRequested = false;
+  String? activeTankId;
+  ProductionAuthUser? productionUser;
+  ProductionLiveState? liveState;
+  Object? remoteVideoTrack;
+  OceanEyesLiveConnectionState liveConnectionState =
+      OceanEyesLiveConnectionState.disconnected;
+  Uint8List? latestCameraFrameBytes;
 
   FixtureScenario fixtureScenario = FixtureScenario.dashboardWaiting;
   DashboardHealthState dashboardHealth = DashboardHealthState.waiting;
@@ -148,6 +1180,10 @@ class OceanEyesController extends ChangeNotifier {
   bool usingFrontCamera = false;
 
   Future<void> signInWithGoogle() async {
+    if (productionEnabled) {
+      await linkGoogleAccount();
+      return;
+    }
     if (isAuthenticated || isAuthenticating) return;
     isAuthenticating = true;
     _notify();
@@ -158,16 +1194,148 @@ class OceanEyesController extends ChangeNotifier {
     _notify();
   }
 
+  Future<void> linkGoogleAccount() async {
+    final auth = _productionAuth;
+    if (!productionEnabled || auth == null || isAuthenticating) return;
+    isAuthenticating = true;
+    productionError = null;
+    _notify();
+    final token = _notificationService?.currentToken;
+    try {
+      final result = await auth.linkGoogleAccount(fcmToken: token);
+      productionUser = result.user ?? auth.currentUser;
+      isAuthenticated = productionUser != null;
+      if (result.status == GoogleAccountLinkStatus.signedIntoExistingAccount) {
+        productionError = result.failedTankIds.isEmpty
+            ? 'Signed into the existing Google account. Previous anonymous '
+                  'tank ownership is not transferred; accessible tanks were '
+                  'rejoined as a viewer.'
+            : 'Signed into the existing Google account, but could not restore '
+                  '${result.failedTankIds.length} tank connection(s).';
+      } else if (result.failedTankIds.isNotEmpty) {
+        productionError =
+            'Linked the account, but could not restore '
+            '${result.failedTankIds.length} tank connection(s).';
+      }
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    } finally {
+      if (token != null && token.isNotEmpty) {
+        try {
+          await _productionRepository?.saveFcmToken(token);
+        } catch (error, stackTrace) {
+          _recordProductionError(error, stackTrace);
+        }
+      }
+      isAuthenticating = false;
+      _notify();
+    }
+  }
+
+  Future<bool> pairTankPayload(String value) async {
+    final repository = _productionRepository;
+    if (!productionEnabled || repository == null || pairingInProgress) {
+      return false;
+    }
+    pairingInProgress = true;
+    productionError = null;
+    _notify();
+    try {
+      final trimmed = value.trim();
+      final tankId = trimmed.startsWith('{')
+          ? TankPairingCodec.decode(trimmed).tankId
+          : TankPairingCodec.normalizeTankId(trimmed);
+      final joined = await repository.joinTank(tankId);
+      if (!joined) {
+        throw StateError('No tank was found for that pairing code.');
+      }
+      await _bindTank(tankId);
+      return true;
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+      return false;
+    } finally {
+      pairingInProgress = false;
+      _notify();
+    }
+  }
+
+  Future<String?> createProductionTank(String name) async {
+    final repository = _productionRepository;
+    if (!productionEnabled || repository == null || pairingInProgress) {
+      return null;
+    }
+    pairingInProgress = true;
+    productionError = null;
+    _notify();
+    try {
+      final tankId = await repository.createTank(name.trim());
+      await _bindTank(tankId);
+      return tankId;
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+      return null;
+    } finally {
+      pairingInProgress = false;
+      _notify();
+    }
+  }
+
+  void requestTankRecalibration() {
+    final tankId = activeTankId;
+    if (!productionEnabled || tankId == null || !canCalibrateTank) return;
+    recalibrationRequested = true;
+    _notify();
+    _queueProductionWrite(
+      () => _productionRepository!.requestRecalibration(tankId, true),
+    );
+  }
+
+  void setWaterLineCalibration(double normalizedY) {
+    final tankId = activeTankId;
+    if (!productionEnabled || tankId == null || !canCalibrateTank) return;
+    final waterLineY = normalizedY.clamp(0, 1).toDouble();
+    _waterLineY = waterLineY;
+    recalibrationRequested = false;
+    _notify();
+    _queueProductionWrite(() async {
+      await _productionRepository!.updateCalibration(tankId, waterLineY);
+      await _productionRepository.requestRecalibration(tankId, false);
+    });
+  }
+
+  void previewWaterLineCalibration(double normalizedY) {
+    final tankId = activeTankId;
+    if (!productionEnabled || tankId == null || !canCalibrateTank) return;
+    _waterLineY = normalizedY.clamp(0, 1).toDouble();
+    _notify();
+  }
+
   int get totalFish => fish.fold(0, (sum, entry) => sum + entry.count);
   int get detectedFish => fish.fold(0, (sum, entry) => sum + entry.detected);
-  List<WaterMetric> get waterMetrics =>
-      dashboardHealth == DashboardHealthState.warning
+  List<WaterMetric> get waterMetrics => productionEnabled
+      ? _productionWaterMetrics
+      : dashboardHealth == DashboardHealthState.warning
       ? DemoFixtures.warningWaterMetrics
       : DemoFixtures.waterMetrics;
   List<SpeciesOption> get availableSpecies => DemoFixtures.species;
-  List<ChartPoint> get claritySeries => DemoFixtures.claritySeries;
-  List<ChartPoint> get fishCountPoints =>
-      AnalyticsSeriesService.fishCount(fish, selectedSpecies);
+  List<ChartPoint> get claritySeries =>
+      productionEnabled ? _productionClaritySeries : DemoFixtures.claritySeries;
+  List<ChartPoint> get fishCountPoints {
+    if (productionEnabled) {
+      if (selectedSpecies == 'All species') {
+        return _productionFishCountSeries;
+      }
+      for (final entry in fish) {
+        if (entry.name == selectedSpecies) {
+          return _productionSpeciesSeries[entry.speciesId] ?? const [];
+        }
+      }
+      return const [];
+    }
+    return AnalyticsSeriesService.fishCount(fish, selectedSpecies);
+  }
+
   List<ChartPoint> get spreadPoints =>
       AnalyticsSeriesService.spread(fish, selectedSpecies);
   List<FishDiagnostic> get fishDiagnostics =>
@@ -202,6 +1370,20 @@ class OceanEyesController extends ChangeNotifier {
     }
     return null;
   }
+
+  bool get hasLinkedGoogleAccount =>
+      productionEnabled && (_productionAuth?.hasLinkedAccount ?? false);
+  String get tankReferenceCode => activeTankId ?? 'tank-demo';
+  bool get canEditTankSettings =>
+      !productionEnabled || _tankRole == ProductionTankMemberRole.owner;
+  bool get canCalibrateTank =>
+      !productionEnabled ||
+      _tankRole == ProductionTankMemberRole.owner ||
+      _tankRole == ProductionTankMemberRole.monitor;
+  double get waterLineCalibration =>
+      (_waterLineY ?? 0.42).clamp(0, 1).toDouble();
+  bool get isLiveConnected =>
+      liveConnectionState == OceanEyesLiveConnectionState.connected;
 
   void selectTab(PrimaryTab tab) {
     activeTab = tab;
@@ -311,6 +1493,14 @@ class OceanEyesController extends ChangeNotifier {
           );
         })
         .toList(growable: false);
+    if (productionEnabled) {
+      final updated = fish.where((entry) => entry.id == id).firstOrNull;
+      if (updated != null) {
+        _queueProductionWrite(
+          () => _productionRepository!.updateFishCount(id, updated.count),
+        );
+      }
+    }
     _savePreferences();
     _notify();
   }
@@ -322,6 +1512,9 @@ class OceanEyesController extends ChangeNotifier {
               entry.id == id ? entry.copyWith(visible: !entry.visible) : entry,
         )
         .toList(growable: false);
+    for (final entry in fish) {
+      if (entry.id == id) _fishVisibilityById[id] = entry.visible;
+    }
     _savePreferences();
     _notify();
   }
@@ -348,6 +1541,18 @@ class OceanEyesController extends ChangeNotifier {
         careLevel: species.careLevel,
       ),
     ];
+    final tankId = activeTankId;
+    if (productionEnabled && tankId != null) {
+      _queueProductionWrite(
+        () => _productionRepository!.addFish(
+          ProductionFishDraft(
+            tankId: tankId,
+            speciesId: species.id,
+            name: species.name,
+          ),
+        ),
+      );
+    }
     _savePreferences();
     _notify();
   }
@@ -359,6 +1564,9 @@ class OceanEyesController extends ChangeNotifier {
     fish = fish.where((entry) => entry.id != id).toList(growable: false);
     if (expandedFishId == id) expandedFishId = null;
     if (removedSelectedSpecies) selectedSpecies = 'All species';
+    if (productionEnabled) {
+      _queueProductionWrite(() => _productionRepository!.removeFish(id));
+    }
     _savePreferences();
     _notify();
   }
@@ -383,6 +1591,12 @@ class OceanEyesController extends ChangeNotifier {
     analyticsState = AnalyticsContentState.loading;
     heatmapCenters = const [];
     _notify();
+    if (productionEnabled) {
+      // Firestore snapshot streams retry transient failures themselves. Keep
+      // the production surface in its loading state until a real snapshot
+      // arrives; deterministic fixture values must never cross this boundary.
+      return;
+    }
     unawaited(
       _completeAfter(const Duration(milliseconds: 650), () {
         analyticsState = AnalyticsContentState.populated;
@@ -392,6 +1606,23 @@ class OceanEyesController extends ChangeNotifier {
   }
 
   Future<void> requestCameraPermission() async {
+    if (productionEnabled) {
+      final camera = _cameraGateway;
+      if (camera == null) {
+        cameraStage = CameraStage.unavailable;
+        productionError = 'Camera capture is not supported on this platform.';
+        _notify();
+        return;
+      }
+      try {
+        _applyCameraSnapshot(await camera.initialize());
+        _configureInferenceTimer();
+      } catch (error, stackTrace) {
+        _recordProductionError(error, stackTrace);
+        _applyCameraSnapshot(camera.snapshot);
+      }
+      return;
+    }
     cameraStage = CameraStage.requestingPermission;
     _notify();
     await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -403,6 +1634,10 @@ class OceanEyesController extends ChangeNotifier {
   }
 
   void retryCamera() {
+    if (productionEnabled) {
+      unawaited(requestCameraPermission());
+      return;
+    }
     cameraPermissionWillGrant = true;
     unawaited(requestCameraPermission());
   }
@@ -413,6 +1648,12 @@ class OceanEyesController extends ChangeNotifier {
   }
 
   void switchCamera() {
+    if (productionEnabled) {
+      final camera = _cameraGateway;
+      if (camera == null) return;
+      unawaited(_switchProductionCamera());
+      return;
+    }
     usingFrontCamera = !usingFrontCamera;
     _savePreferences();
     _notify();
@@ -420,6 +1661,15 @@ class OceanEyesController extends ChangeNotifier {
 
   void toggleAI(bool enabled) {
     aiEnabled = enabled;
+    if (productionEnabled) {
+      _savePreferences();
+      _configureInferenceTimer();
+      _notify();
+      if (enabled && cameraStage == CameraStage.active) {
+        unawaited(_captureAndAnalyze(measurementOnly: false));
+      }
+      return;
+    }
     if (enabled && cameraStage == CameraStage.active) {
       cameraStage = CameraStage.aiProcessing;
       _notify();
@@ -435,6 +1685,10 @@ class OceanEyesController extends ChangeNotifier {
   }
 
   void measureTurbidity() {
+    if (productionEnabled) {
+      unawaited(_captureAndAnalyze(measurementOnly: true));
+      return;
+    }
     cameraStage = CameraStage.measuringTurbidity;
     lastTurbidityResult = null;
     _notify();
@@ -450,6 +1704,13 @@ class OceanEyesController extends ChangeNotifier {
     fullscreenCamera = value;
     if (!value) inventoryDrawerOpen = false;
     _notify();
+    if (productionEnabled && _tankRole == ProductionTankMemberRole.viewer) {
+      if (value) {
+        unawaited(startViewerLiveStream());
+      } else {
+        unawaited(stopLiveStream());
+      }
+    }
   }
 
   void toggleInventoryDrawer() {
@@ -459,22 +1720,36 @@ class OceanEyesController extends ChangeNotifier {
 
   void renameTank(String value) {
     final trimmed = value.trim();
+    if (productionEnabled && !canEditTankSettings) return;
     if (trimmed.isEmpty || trimmed == tankName) return;
     tankName = trimmed;
+    final tankId = activeTankId;
+    if (productionEnabled && tankId != null) {
+      _queueProductionWrite(
+        () => _productionRepository!.updateTankName(tankId, trimmed),
+      );
+    }
     _savePreferences();
     _notify();
   }
 
   void disconnectTank() {
+    final tankId = activeTankId;
     tankConnected = false;
     cameraStage = CameraStage.unavailable;
     fullscreenCamera = false;
     inventoryDrawerOpen = false;
+    if (productionEnabled && tankId != null) {
+      activeTankId = null;
+      _preferences?.remove(_activeTankPreferenceKey);
+      unawaited(_disconnectProductionTank(tankId));
+    }
     _savePreferences();
     _notify();
   }
 
   void connectDemoTank() {
+    if (productionEnabled) return;
     tankConnected = true;
     cameraStage = CameraStage.active;
     _savePreferences();
@@ -485,6 +1760,9 @@ class OceanEyesController extends ChangeNotifier {
     alerts = alerts
         .map((alert) => alert.id == id ? alert.copyWith(resolved: true) : alert)
         .toList(growable: false);
+    if (productionEnabled) {
+      _queueProductionWrite(() => _productionRepository!.resolveAlert(id));
+    }
     _notify();
   }
 
@@ -517,6 +1795,13 @@ class OceanEyesController extends ChangeNotifier {
   void commitSetting(String name, double value) {
     _applySetting(name, value);
     _savePreferences();
+    if (productionEnabled &&
+        (name == 'clarityThreshold' || name == 'visibleFishThreshold')) {
+      _persistProductionThresholds();
+    }
+    if (productionEnabled && name == 'pollingIntervalMs') {
+      _configureInferenceTimer();
+    }
     _notify();
   }
 
@@ -594,6 +1879,7 @@ class OceanEyesController extends ChangeNotifier {
   void setAutoConnect(bool value) {
     autoConnect = value;
     _savePreferences();
+    if (productionEnabled) _configureInferenceTimer();
     _notify();
   }
 
@@ -763,6 +2049,9 @@ class OceanEyesController extends ChangeNotifier {
 
   void _restorePreferences() {
     fish = _inventoryRepository?.load() ?? fish;
+    for (final entry in fish) {
+      _fishVisibilityById[entry.id] = entry.visible;
+    }
     final settings = _settingsRepository?.load();
     if (settings == null) return;
     aiEnabled = settings.aiEnabled;
@@ -827,7 +2116,85 @@ class OceanEyesController extends ChangeNotifier {
 
   /// Waits for queued model-layer writes, primarily for lifecycle hooks/tests.
   Future<void> flushPersistence() async {
-    await Future.wait([_inventoryWriteQueue, _settingsWriteQueue]);
+    await Future.wait([
+      _inventoryWriteQueue,
+      _settingsWriteQueue,
+      _productionWriteQueue,
+    ]);
+  }
+
+  void handleAppLifecycleState(AppLifecycleState state) {
+    if (!productionEnabled || _cameraGateway == null) return;
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (!_publishingLive && tankConnected) {
+          unawaited(_resumeProductionCamera());
+        }
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        _inferenceTimer?.cancel();
+        _inferenceTimer = null;
+        _syncWakeLock();
+        if (!_publishingLive) unawaited(_cameraGateway.suspend());
+        break;
+    }
+  }
+
+  /// Temporarily releases the production camera for the QR scanner.
+  ///
+  /// Calls may be nested by presentation code. Only the outermost matching
+  /// resume reopens a camera that was active before pairing began.
+  Future<void> suspendCameraForPairing() async {
+    final camera = _cameraGateway;
+    if (!productionEnabled || camera == null || _disposed) return;
+    _pairingCameraSuspensionDepth += 1;
+    if (_pairingCameraSuspensionDepth > 1) return;
+
+    // LiveKit and the QR scanner cannot safely own the same hardware camera.
+    // The serialized stop also drains a connection that was still starting.
+    await stopLiveStream();
+    if (_disposed) return;
+    _inferenceTimer?.cancel();
+    _inferenceTimer = null;
+    _syncWakeLock();
+    _resumeCameraAfterPairing = switch (camera.snapshot.phase) {
+      CameraCapturePhase.requestingPermission ||
+      CameraCapturePhase.opening ||
+      CameraCapturePhase.ready ||
+      CameraCapturePhase.capturing => true,
+      _ => false,
+    };
+    if (!_resumeCameraAfterPairing) return;
+    try {
+      await camera.suspend();
+      await _settleCameraHandoff(
+        _cameraHandoffConfiguration.afterCameraRelease,
+      );
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    }
+  }
+
+  Future<void> resumeCameraAfterPairing() async {
+    final camera = _cameraGateway;
+    if (!productionEnabled || camera == null || _disposed) return;
+    if (_pairingCameraSuspensionDepth == 0) return;
+    _pairingCameraSuspensionDepth -= 1;
+    if (_pairingCameraSuspensionDepth > 0) return;
+
+    final shouldResume = _resumeCameraAfterPairing;
+    _resumeCameraAfterPairing = false;
+    if (shouldResume && !_publishingLive) {
+      try {
+        _applyCameraSnapshot(await camera.resume());
+      } catch (error, stackTrace) {
+        _recordProductionError(error, stackTrace);
+      }
+    }
+    _configureInferenceTimer();
   }
 
   void _notify() {
@@ -836,7 +2203,46 @@ class OceanEyesController extends ChangeNotifier {
 
   @override
   void dispose() {
+    final liveTankId = activeTankId;
     _disposed = true;
+    _linkedTankSubscriptionGeneration += 1;
+    _linkedTankTargetUid = null;
+    _linkedTankSubscriptionUid = null;
+    _inferenceTimer?.cancel();
+    _liveHeartbeat?.cancel();
+    _liveRequestHeartbeat?.cancel();
+    _liveRequestLeaseSweep?.cancel();
+    _syncWakeLock();
+    unawaited(_linkedTankIdsSubscription?.cancel());
+    _linkedTankIdsSubscription = null;
+    for (final subscription in _tankSubscriptions) {
+      unawaited(subscription.cancel());
+    }
+    for (final subscription in _productionSubscriptions) {
+      unawaited(subscription.cancel());
+    }
+    final liveCleanup = _enqueueLiveOperation(
+      () => _stopLiveSession(
+        clearRequest: true,
+        tankIdOverride: liveTankId,
+        resumeCamera: false,
+      ),
+    );
+    unawaited(
+      liveCleanup.whenComplete(() async {
+        await _liveGateway?.dispose();
+        await _cameraGateway?.dispose();
+      }),
+    );
+    unawaited(_notificationService?.dispose());
+    unawaited(_inferenceEngine?.dispose());
+    final wakeLock = _wakeLockGateway;
+    if (wakeLock != null) {
+      unawaited(_wakeLockQueue.whenComplete(wakeLock.dispose));
+    }
     super.dispose();
   }
 }
+
+Future<void> _defaultCameraHandoffDelay(Duration duration) =>
+    Future<void>.delayed(duration);

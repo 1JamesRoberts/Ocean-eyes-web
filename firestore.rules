@@ -1,0 +1,247 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function authed() {
+      return request.auth != null;
+    }
+
+    function tankPath(tankId) {
+      return /databases/$(database)/documents/tanks/$(tankId);
+    }
+
+    function tankExists(tankId) {
+      return exists(tankPath(tankId));
+    }
+
+    function tank(tankId) {
+      return get(tankPath(tankId)).data;
+    }
+
+    function tankExistsAfter(tankId) {
+      return existsAfter(tankPath(tankId));
+    }
+
+    function tankAfter(tankId) {
+      return getAfter(tankPath(tankId)).data;
+    }
+
+    function tankIsActive(tankId) {
+      return tankExists(tankId) &&
+        tank(tankId).get('deleting_at', null) == null;
+    }
+
+    function tankIsActiveAfter(tankId) {
+      return tankExistsAfter(tankId) &&
+        tankAfter(tankId).get('deleting_at', null) == null;
+    }
+
+    function isOwner(tankId) {
+      return authed() && tankIsActive(tankId) &&
+        tank(tankId).owner_id == request.auth.uid;
+    }
+
+    function isMonitor(tankId) {
+      return isOwner(tankId) ||
+        (authed() && tankIsActive(tankId) &&
+          request.auth.uid in tank(tankId).get('monitor_uids', []));
+    }
+
+    function isMonitorAfter(tankId) {
+      return authed() && tankIsActiveAfter(tankId) &&
+        (tankAfter(tankId).owner_id == request.auth.uid ||
+          request.auth.uid in tankAfter(tankId).get('monitor_uids', []));
+    }
+
+    function isMember(tankId) {
+      return isMonitor(tankId) ||
+        (authed() && tankIsActive(tankId) &&
+          request.auth.uid in tank(tankId).get('viewers', []));
+    }
+
+    function validFcmTokens() {
+      let tokens = request.resource.data.get('fcm_tokens', []);
+      return tokens is list && tokens.size() <= 10;
+    }
+
+    function selfJoinOnly() {
+      let oldViewers = resource.data.get('viewers', []);
+      let newViewers = request.resource.data.get('viewers', []);
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['viewers', 'updated_at']) &&
+        !(request.auth.uid in oldViewers) &&
+        request.auth.uid in newViewers &&
+        newViewers.size() == oldViewers.size() + 1 &&
+        newViewers.size() == newViewers.toSet().size() &&
+        newViewers.toSet().difference(oldViewers.toSet())
+          .hasOnly([request.auth.uid]) &&
+        newViewers.toSet().difference(oldViewers.toSet()).size() == 1 &&
+        oldViewers.toSet().difference(newViewers.toSet()).size() == 0;
+    }
+
+    function selfLeaveOnly() {
+      let oldViewers = resource.data.get('viewers', []);
+      let newViewers = request.resource.data.get('viewers', []);
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['viewers', 'updated_at']) &&
+        request.auth.uid in oldViewers &&
+        !(request.auth.uid in newViewers) &&
+        oldViewers.size() == newViewers.size() + 1 &&
+        newViewers.size() == newViewers.toSet().size() &&
+        oldViewers.toSet().difference(newViewers.toSet())
+          .hasOnly([request.auth.uid]) &&
+        newViewers.toSet().difference(oldViewers.toSet()).size() == 0;
+    }
+
+    match /users/{uid} {
+      allow read, delete: if authed() && request.auth.uid == uid;
+      allow create: if authed() && request.auth.uid == uid &&
+        validFcmTokens();
+      allow update: if authed() && request.auth.uid == uid && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'fcm_token',
+          'fcm_tokens'
+        ]) || validFcmTokens()
+      );
+    }
+
+    match /tanks/{tankId} {
+      allow create: if authed() &&
+        request.resource.data.owner_id == request.auth.uid &&
+        request.resource.data.viewers is list &&
+        request.resource.data.viewers.size() == 0 &&
+        request.resource.data.monitor_uids is list &&
+        request.resource.data.monitor_uids.size() == 1 &&
+        request.resource.data.monitor_uids[0] == request.auth.uid &&
+        request.resource.data.get('deleting_at', null) == null;
+
+      // A random tank ID is the v1 QR pairing capability. Listing tanks is
+      // never allowed; a signed-in scanner may only fetch a specific ID.
+      allow get: if authed();
+      allow list: if false;
+
+      allow update: if authed() && tankIsActive(tankId) && (
+        selfJoinOnly() ||
+        selfLeaveOnly() ||
+        (isMonitor(tankId) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'calibration',
+            'recalibrate_requested',
+            'updated_at'
+          ])) ||
+        (isOwner(tankId) &&
+          request.resource.data.owner_id == resource.data.owner_id &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'name',
+            'viewers',
+            'monitor_uids',
+            'thresholds',
+            'calibration',
+            'recalibrate_requested',
+            'updated_at'
+          ]))
+      );
+      // Deletion is an owner-authorized callable so dependent documents are
+      // tombstoned and removed by the Admin SDK instead of being orphaned.
+      allow delete: if false;
+    }
+
+    match /readings/{readingId} {
+      allow read: if isMember(resource.data.tank_id);
+      allow create: if isMonitorAfter(request.resource.data.tank_id);
+      allow update: if isOwner(resource.data.tank_id) &&
+        request.resource.data.tank_id == resource.data.tank_id;
+      allow delete: if isOwner(resource.data.tank_id);
+    }
+
+    match /tank_fish/{fishId} {
+      allow read: if isMember(resource.data.tank_id);
+      allow create: if isMember(request.resource.data.tank_id) ||
+        isMonitorAfter(request.resource.data.tank_id);
+      allow update: if isMember(resource.data.tank_id) &&
+        request.resource.data.tank_id == resource.data.tank_id &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'species_id', 'name', 'emoji', 'count', 'detected', 'updated_at'
+        ]);
+      allow delete: if isMember(resource.data.tank_id);
+    }
+
+    match /alerts/{alertId} {
+      allow read: if isMember(resource.data.tank_id);
+      // Alert creation is server-only. Admin SDK bypasses these rules.
+      allow create, delete: if false;
+      allow update: if
+        request.resource.data.tank_id == resource.data.tank_id && (
+          (isMember(resource.data.tank_id) &&
+            request.resource.data.resolved is bool &&
+            request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['resolved', 'updated_at'])) ||
+          (isMonitor(resource.data.tank_id) &&
+            request.resource.data.snoozed_until is timestamp &&
+            request.resource.data.snoozed_until >=
+              request.time - duration.value(5, 'm') &&
+            request.resource.data.snoozed_until <=
+              request.time + duration.value(24, 'h') &&
+            request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['snoozed_until', 'updated_at']))
+        );
+    }
+
+    match /live_state/{tankId} {
+      allow read: if isMember(tankId);
+      allow create: if isMonitorAfter(tankId) &&
+        request.resource.data.keys().hasOnly([
+          'is_live',
+          'started_at',
+          'last_ping_at',
+          'current_clarity',
+          'current_turbidity_fnu',
+          'current_fish_count',
+          'publisher_uid',
+          'updated_at'
+        ]);
+      allow update: if isMonitor(tankId) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'is_live',
+          'started_at',
+          'last_ping_at',
+          'current_clarity',
+          'current_turbidity_fnu',
+          'current_fish_count',
+          'publisher_uid',
+          'updated_at'
+        ]);
+      allow delete: if isOwner(tankId);
+
+      // A document per viewer avoids the legacy single requested=true flag,
+      // which lost concurrent viewers when any one of them disconnected.
+      match /requests/{uid} {
+        allow read: if isMember(tankId);
+        allow create, update: if isMember(tankId) &&
+          request.auth.uid == uid &&
+          request.resource.data.requester_uid == uid &&
+          request.resource.data.requested_at == request.time &&
+          request.resource.data.keys().hasOnly([
+            'requester_uid',
+            'requested_at'
+          ]);
+        allow delete: if isMember(tankId) && request.auth.uid == uid;
+      }
+    }
+
+    // Function-only deduplication state (Admin SDK bypasses rules).
+    match /alert_dedupe/{id} {
+      allow read, write: if false;
+    }
+
+    // Function-only delivery/revocation state. These documents may contain
+    // device routing or media-session identifiers and never enter clients.
+    match /notification_outbox/{id} {
+      allow read, write: if false;
+    }
+
+    match /livekit_identities/{id} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -3,14 +3,17 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../core/theme/oceaneyes_tokens.dart';
 import '../../models/aquarium_models.dart';
+import '../../models/tank_pairing_codec.dart';
 import '../../view_models/oceaneyes_controller.dart';
 import '../widgets/aquarium_hero.dart';
 import '../widgets/data_visuals.dart';
 import '../widgets/glass.dart';
 import '../widgets/screen_primitives.dart';
+import '../widgets/tank_pairing_sheet.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key, required this.controller});
@@ -24,6 +27,8 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   bool _renaming = false;
   bool _showDisconnectConfirmation = false;
+  bool _linkingGoogle = false;
+  String? _accountActionError;
   late final TextEditingController _tankNameController;
 
   OceanEyesController get controller => widget.controller;
@@ -48,6 +53,120 @@ class _AccountScreenState extends State<AccountScreen> {
       controller.renameTank(value);
     }
     setState(() => _renaming = false);
+  }
+
+  Future<void> _openTankPairing() async {
+    FocusScope.of(context).unfocus();
+    await controller.suspendCameraForPairing();
+    try {
+      if (!mounted) return;
+      await showTankPairingSheet(context: context, controller: controller);
+    } finally {
+      await controller.resumeCameraAfterPairing();
+    }
+    if (!mounted) return;
+    _tankNameController.text = controller.tankName;
+    setState(() {
+      _renaming = false;
+      _showDisconnectConfirmation = false;
+    });
+  }
+
+  Future<void> _linkGoogleAccount() async {
+    if (_linkingGoogle) return;
+    setState(() {
+      _linkingGoogle = true;
+      _accountActionError = null;
+    });
+    try {
+      await controller.linkGoogleAccount();
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _accountActionError =
+              'Google account linking failed. Please try again.';
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _linkingGoogle = false);
+    }
+  }
+
+  Future<void> _showTankPairingCode() async {
+    final tankId = controller.activeTankId;
+    if (tankId == null) return;
+    final payload = TankPairingCodec.encode(TankPairingPayload(tankId: tankId));
+    await showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: OceanColors.azureMist,
+        insetPadding: const EdgeInsets.all(24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(OceanRadii.card),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 340),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Tank pairing code', style: OceanTypography.title),
+                const SizedBox(height: 6),
+                Text(
+                  'Scan this only on a device you want to connect to ${controller.tankName}.',
+                  textAlign: TextAlign.center,
+                  style: OceanTypography.caption,
+                ),
+                const SizedBox(height: 16),
+                Semantics(
+                  image: true,
+                  label: 'QR code for tank $tankId',
+                  child: QrImageView(
+                    data: payload,
+                    size: 220,
+                    backgroundColor: Colors.white,
+                    eyeStyle: const QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: OceanColors.prussianBlue,
+                    ),
+                    dataModuleStyle: const QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: OceanColors.prussianBlue,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SelectableText(
+                  tankId,
+                  textAlign: TextAlign.center,
+                  style: OceanTypography.strong,
+                ),
+                const SizedBox(height: 16),
+                GlassButton(
+                  label: 'Done',
+                  compact: true,
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String get _tankReferenceCode {
+    if (!controller.productionEnabled) return 'tank-demo';
+    final code = controller.tankReferenceCode.trim();
+    return code.isEmpty ? 'Pending' : code;
+  }
+
+  String? get _productionErrorMessage {
+    final local = _accountActionError?.trim();
+    if (local != null && local.isNotEmpty) return local;
+    final production = controller.productionError?.trim();
+    return production == null || production.isEmpty ? null : production;
   }
 
   @override
@@ -83,6 +202,16 @@ class _AccountScreenState extends State<AccountScreen> {
             icon: LucideIcons.shieldAlert,
             divider: true,
           ),
+          if (controller.productionEnabled &&
+              _productionErrorMessage != null) ...[
+            _buildProductionError(_productionErrorMessage!),
+            const SizedBox(height: 12),
+          ],
+          if (controller.productionEnabled &&
+              !controller.hasLinkedGoogleAccount) ...[
+            _buildGoogleAccountLink(),
+            const SizedBox(height: 12),
+          ],
           if (!controller.tankConnected)
             GlassPanel(
               child: Row(
@@ -98,19 +227,27 @@ class _AccountScreenState extends State<AccountScreen> {
                           style: OceanTypography.strong,
                         ),
                         Text(
-                          'Reconnect the demo tank to resume monitoring.',
+                          controller.productionEnabled
+                              ? 'Scan its QR code, enter a tank ID, or create a new tank.'
+                              : 'Reconnect the demo tank to resume monitoring.',
                           style: OceanTypography.caption,
                         ),
                       ],
                     ),
                   ),
                   TextButton(
-                    onPressed: controller.connectDemoTank,
+                    onPressed: controller.productionEnabled
+                        ? (controller.pairingInProgress
+                              ? null
+                              : _openTankPairing)
+                        : controller.connectDemoTank,
                     style: TextButton.styleFrom(
                       minimumSize: const Size(48, 48),
                       foregroundColor: OceanColors.darkCyan,
                     ),
-                    child: const Text('Connect'),
+                    child: Text(
+                      controller.productionEnabled ? 'Pair' : 'Connect',
+                    ),
                   ),
                 ],
               ),
@@ -166,21 +303,37 @@ class _AccountScreenState extends State<AccountScreen> {
                                 style: OceanTypography.strong,
                               ),
                               Text(
-                                'Ref Code: tank-demo',
+                                'Ref Code: $_tankReferenceCode',
                                 style: OceanTypography.caption,
                               ),
                             ],
                           ),
                         ),
+                        if (controller.productionEnabled &&
+                            controller.canEditTankSettings) ...[
+                          GlassIconButton(
+                            icon: LucideIcons.qrCode,
+                            tooltip: 'Show tank pairing QR code',
+                            size: 40,
+                            iconSize: 17,
+                            onPressed: _showTankPairingCode,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
                         GlassButton(
                           label: 'Rename',
                           icon: LucideIcons.pencil,
                           compact: true,
                           style: GlassButtonStyle.outline,
-                          onPressed: () => setState(() {
-                            _tankNameController.text = controller.tankName;
-                            _renaming = true;
-                          }),
+                          onPressed:
+                              controller.productionEnabled &&
+                                  !controller.canEditTankSettings
+                              ? null
+                              : () => setState(() {
+                                  _tankNameController.text =
+                                      controller.tankName;
+                                  _renaming = true;
+                                }),
                         ),
                       ],
                     ),
@@ -189,13 +342,62 @@ class _AccountScreenState extends State<AccountScreen> {
             GlassPanel(
               color: OceanColors.verdigris.withValues(alpha: 0.08),
               borderColor: OceanColors.turquoise.withValues(alpha: 0.20),
+              onTap: controller.productionEnabled ? _openTankPairing : null,
               child: _StaticSettingsRow(
                 icon: LucideIcons.monitor,
                 title: 'IoT Scanner Console',
-                subtitle: 'Pair or review monitor hardware',
+                subtitle: controller.productionEnabled
+                    ? 'Scan, pair, or create monitor hardware'
+                    : 'Pair or review monitor hardware',
                 highlighted: true,
               ),
             ),
+            if (controller.productionEnabled &&
+                controller.canCalibrateTank) ...[
+              const SizedBox(height: 12),
+              GlassPanel(
+                child: Column(
+                  children: [
+                    _StaticSettingsRow(
+                      icon: LucideIcons.scanLine,
+                      title: 'Water-line calibration',
+                      subtitle: controller.recalibrationRequested
+                          ? 'Recalibration requested on the monitor'
+                          : 'Set where the below-water camera crop begins',
+                      highlighted: controller.recalibrationRequested,
+                    ),
+                    const SizedBox(height: 12),
+                    OceanSlider(
+                      label: 'Water line',
+                      value: controller.waterLineCalibration * 100,
+                      min: 0,
+                      max: 100,
+                      divisions: 100,
+                      valueLabel:
+                          '${(controller.waterLineCalibration * 100).round()}%',
+                      onChanged: (value) =>
+                          controller.previewWaterLineCalibration(value / 100),
+                      onChangeEnd: (value) =>
+                          controller.setWaterLineCalibration(value / 100),
+                    ),
+                    const SizedBox(height: 4),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: controller.recalibrationRequested
+                            ? null
+                            : controller.requestTankRecalibration,
+                        child: Text(
+                          controller.recalibrationRequested
+                              ? 'Calibration requested'
+                              : 'Request automatic calibration',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             DisclosureCard(
               title: 'Stream Image Adjustments',
@@ -292,7 +494,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'This will remove “${controller.tankName}” from your active monitoring dashboard. You can reconnect it later using the reference code: tank-demo.',
+                      'This will remove “${controller.tankName}” from your active monitoring dashboard. You can reconnect it later using the reference code: $_tankReferenceCode.',
                       style: OceanTypography.caption,
                     ),
                     const SizedBox(height: 12),
@@ -331,6 +533,77 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
               ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGoogleAccountLink() {
+    return GlassPanel(
+      color: OceanColors.verdigris.withValues(alpha: 0.08),
+      borderColor: OceanColors.turquoise.withValues(alpha: 0.20),
+      child: Row(
+        children: [
+          const SizedBox.square(
+            dimension: 36,
+            child: Center(
+              child: Icon(
+                LucideIcons.userRoundCheck,
+                size: 18,
+                color: OceanColors.darkCyan,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Protect this account', style: OceanTypography.strong),
+                Text(
+                  'Optionally link Google so this anonymous account can be recovered.',
+                  style: OceanTypography.caption,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          GlassButton(
+            label: 'Link Google',
+            icon: LucideIcons.link,
+            compact: true,
+            loading: _linkingGoogle,
+            onPressed: _linkingGoogle ? null : _linkGoogleAccount,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductionError(String message) {
+    return GlassPanel(
+      color: OceanColors.criticalInk.withValues(alpha: 0.08),
+      borderColor: OceanColors.criticalInk.withValues(alpha: 0.20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 1),
+            child: Icon(
+              LucideIcons.circleAlert,
+              size: 17,
+              color: OceanColors.critical,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: OceanTypography.caption.copyWith(
+                color: OceanColors.criticalInk,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -389,36 +662,52 @@ class _AccountScreenState extends State<AccountScreen> {
             icon: LucideIcons.bell,
             expanded: controller.thresholdSectionOpen,
             onChanged: (value) => controller.setDisclosure('threshold', value),
-            child: Column(
-              children: [
-                OceanSlider(
-                  label: 'Maximum FNU Threshold',
-                  value: controller.clarityThreshold,
-                  min: 1,
-                  max: 10,
-                  divisions: 18,
-                  valueLabel:
-                      '${controller.clarityThreshold.toStringAsFixed(1)} FNU',
-                  onChanged: (value) =>
-                      controller.previewSetting('clarityThreshold', value),
-                  onChangeEnd: (value) =>
-                      controller.commitSetting('clarityThreshold', value),
+            child: IgnorePointer(
+              ignoring:
+                  controller.productionEnabled &&
+                  !controller.canEditTankSettings,
+              child: Opacity(
+                opacity:
+                    controller.productionEnabled &&
+                        !controller.canEditTankSettings
+                    ? 0.55
+                    : 1,
+                child: Column(
+                  children: [
+                    OceanSlider(
+                      label: 'Maximum FNU Threshold',
+                      value: controller.clarityThreshold,
+                      min: 1,
+                      max: 10,
+                      divisions: 18,
+                      valueLabel:
+                          '${controller.clarityThreshold.toStringAsFixed(1)} FNU',
+                      onChanged: (value) =>
+                          controller.previewSetting('clarityThreshold', value),
+                      onChangeEnd: (value) =>
+                          controller.commitSetting('clarityThreshold', value),
+                    ),
+                    const SizedBox(height: 16),
+                    OceanSlider(
+                      label: 'Discrepancy Alarm Trigger',
+                      value: controller.visibleFishThreshold,
+                      min: 20,
+                      max: 80,
+                      divisions: 6,
+                      valueLabel:
+                          '${controller.visibleFishThreshold.round()}% visibility',
+                      onChanged: (value) => controller.previewSetting(
+                        'visibleFishThreshold',
+                        value,
+                      ),
+                      onChangeEnd: (value) => controller.commitSetting(
+                        'visibleFishThreshold',
+                        value,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                OceanSlider(
-                  label: 'Discrepancy Alarm Trigger',
-                  value: controller.visibleFishThreshold,
-                  min: 20,
-                  max: 80,
-                  divisions: 6,
-                  valueLabel:
-                      '${controller.visibleFishThreshold.round()}% visibility',
-                  onChanged: (value) =>
-                      controller.previewSetting('visibleFishThreshold', value),
-                  onChangeEnd: (value) =>
-                      controller.commitSetting('visibleFishThreshold', value),
-                ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: 12),

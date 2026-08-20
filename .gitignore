@@ -43,3 +43,25 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Production configuration generated or supplied per environment
+/lib/firebase_options.dart
+/android/app/google-services.json
+/ios/Runner/GoogleService-Info.plist
+/web/firebase-messaging-sw.js
+**/.env
+**/.env.*
+!**/.env.example
+/config/*.json
+!/config/production.example.json
+.runtimeconfig.json
+.secret.local
+*.p8
+*.p12
+*.jks
+*.keystore
+
+# On-device inference assets are distributed separately (roughly 285 MB)
+/assets/models/*.onnx
+/assets/models/*.ort
+/assets/models/*.tflite

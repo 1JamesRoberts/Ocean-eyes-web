@@ -1,0 +1,21 @@
+{
+  "OCEANEYES_PRODUCTION": true,
+  "OCEANEYES_APP_CHECK": true,
+  "OCEANEYES_APP_CHECK_DEBUG": false,
+  "OCEANEYES_FUNCTIONS_REGION": "us-central1",
+  "OCEANEYES_FIREBASE_API_KEY": "replace-with-your-web-or-platform-api-key",
+  "OCEANEYES_FIREBASE_PROJECT_ID": "replace-with-your-project-id",
+  "OCEANEYES_FIREBASE_MESSAGING_SENDER_ID": "replace-with-your-sender-id",
+  "OCEANEYES_FIREBASE_ANDROID_APP_ID": "replace-with-your-android-app-id",
+  "OCEANEYES_FIREBASE_IOS_APP_ID": "replace-with-your-ios-app-id",
+  "OCEANEYES_FIREBASE_WEB_APP_ID": "replace-with-your-web-app-id",
+  "OCEANEYES_FIREBASE_AUTH_DOMAIN": "replace-with-your-project.firebaseapp.com",
+  "OCEANEYES_FIREBASE_STORAGE_BUCKET": "replace-with-your-project.firebasestorage.app",
+  "OCEANEYES_FIREBASE_MEASUREMENT_ID": "replace-with-your-web-measurement-id",
+  "OCEANEYES_FIREBASE_IOS_BUNDLE_ID": "com.oceaneyes.oceaneyes",
+  "OCEANEYES_FIREBASE_IOS_CLIENT_ID": "replace-with-your-ios-oauth-client-id",
+  "OCEANEYES_FIREBASE_ANDROID_CLIENT_ID": "replace-with-your-android-oauth-client-id",
+  "OCEANEYES_GOOGLE_WEB_CLIENT_ID": "replace-with-your-web-oauth-client-id.apps.googleusercontent.com",
+  "OCEANEYES_FIREBASE_WEB_PUSH_VAPID_KEY": "replace-with-your-public-web-push-vapid-key",
+  "OCEANEYES_RECAPTCHA_V3_SITE_KEY": "replace-with-your-recaptcha-v3-site-key"
+}
