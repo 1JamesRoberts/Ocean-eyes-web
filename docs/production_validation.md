@@ -1,6 +1,6 @@
 # Production validation record
 
-Validation was performed on Windows on August 14, 2026. The source integration
+Validation was performed on Windows on August 20, 2026. The source integration
 was audited against `YoYo-XYZ/ocean-eyes` `dev-main` commit
 `0aae6ec10011741da4e22d36f214eb6dd458b132`.
 
@@ -16,15 +16,16 @@ flutter test
 flutter build web --release
 flutter build apk --debug
 npm --prefix functions test
+firebase emulators:exec --only firestore --project demo-oceaneyes "npm --prefix functions run test:rules"
 ```
 
 | Check | Result |
 | --- | --- |
-| Dart formatting | 70 files checked, no changes required |
+| Dart formatting | 72 files checked, no changes required |
 | Flutter analysis | No issues found |
-| Flutter unit/widget/golden suite | 86 tests passed |
-| Cloud Functions TypeScript/policy suite | Build passed; 4 tests passed |
-| Firestore rules/indexes | Firestore Emulator 1.22.0 started cleanly with the tracked configuration |
+| Flutter unit/widget/golden suite | 108 tests passed |
+| Cloud Functions TypeScript/policy suite | Build passed; 15 tests passed |
+| Firestore rules/indexes | Firestore Emulator 1.22.0; 8 authorization tests passed |
 | Android debug build | `app-debug.apk` produced successfully |
 | Flutter web release build | Build and WebAssembly dry run passed |
 
@@ -35,21 +36,31 @@ was a sync-file lock rather than a source or Gradle configuration problem.
 
 The Flutter suite includes the existing widget/golden coverage plus production
 mapper, auth, pairing, camera/ML contract, notification-route, and controller
-isolation tests. The Functions suite covers FNU/legacy clarity thresholds,
-seed readings, sustained missing-fish alerts, and fish-count drops.
+isolation tests, including camera serialization, wake-lock ownership, LiveKit
+leases/handoffs, and production-startup isolation. The Functions suite covers
+FNU/legacy clarity thresholds, server-triggered alert evaluation, cooldown
+dedupe, multicast chunking, stable LiveKit identities/revocation timestamps,
+seed readings, sustained missing-fish alerts, and fish-count drops. Emulator
+tests exercise exact self-join/leave set changes, bearer get/no-list pairing,
+monitor-only readings, tombstones, server-only state, alert permissions, FCM
+token caps, and live-request leases.
 
 The 39-state `integration_test/visual_matrix_test.dart` matrix still requires a
 supported device runner. The local Flutter tool reported that web devices are
 not supported for integration tests, and no Android/iOS device was attached;
-the fixture/golden widget coverage did run as part of the 86-test suite.
+the fixture/golden widget coverage did run as part of the 108-test suite.
+
+`npm ci` reports eight moderate transitive advisories below
+`firebase-admin` 12 and no high/critical advisories. npm's proposed complete
+remediation is a major move to `firebase-admin` 14/Node 22; the integration
+retains its validated Node 20 Firebase Functions runtime and records that
+runtime/dependency upgrade for a separately staged migration.
 
 ## Configuration-dependent checks
 
 These checks cannot be represented honestly without private external state and
 must be completed in the target staging project before release:
 
-- Exercise owner, monitor, viewer, and unauthenticated authorization cases
-  against the compiled rules in a Firebase Emulator Suite test harness.
 - Verify anonymous auth, Google linking, App Check, and account-collision tank
   restoration using staging Firebase apps.
 - Run camera plus all three approved ONNX models on physical Android and iOS
@@ -58,6 +69,7 @@ must be completed in the target staging project before release:
   web push over HTTPS.
 - Run a two-device LiveKit flow with one monitor publisher and one viewer,
   including reconnect, heartbeat expiry, and concurrent viewer requests.
+- Build/sign the Android release with the approved private keystore.
 - Build/sign iOS on macOS after installing CocoaPods and enabling the Push
   Notifications capability.
 
@@ -69,7 +81,8 @@ or WASM inference adapter is added.
 
 ## Repository hygiene
 
-Before release, confirm that tracked files contain none of the following:
+The final candidate scan confirmed that tracked integration files contain none
+of the following:
 
 - `google-services.json`, `GoogleService-Info.plist`, or generated
   `firebase_options.dart`
