@@ -37,10 +37,19 @@ lib/
   ui/widgets/    Glass primitives, charts, hero, controls
 ```
 
-The view model is the public state API consumed by screens. Models contain no
-Flutter widget dependencies. UI files own rendering and event wiring.
-Model-layer `SharedPreferences` repositories persist user-adjustable inventory
-and visual/AI settings, while pure model services derive care and chart data.
+`OceanEyesController` remains the public state API consumed by screens, but it
+is now a compatibility facade over responsibility-focused coordinators:
+
+- `OceanEyesNavigationCoordinator` owns route state and one-shot UI intents.
+- `OceanEyesPersistenceCoordinator` owns serialized local repository writes.
+- `OceanEyesFixtureCoordinator` builds deterministic fixture snapshots.
+- `OceanEyesProductionBindingCoordinator` owns auth, FCM, and subscriptions.
+- `OceanEyesCameraCoordinator` owns camera/ML lifecycle and inference timing.
+- `OceanEyesLiveSessionCoordinator` owns LiveKit sessions and request leases.
+- `OceanEyesWakeLockCoordinator` arbitrates camera and live wake-lock claims.
+
+Models contain no Flutter widget dependencies. UI files own rendering and event
+wiring, while pure model services derive care and chart data.
 
 Primary tabs do not push routes; they reset the shared screen scroller. Alerts,
 alert detail, and History are real Navigator pages, so Android back and iOS back

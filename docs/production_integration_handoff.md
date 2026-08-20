@@ -129,15 +129,17 @@ values are not exposed as live production data.
   current presentation/domain types.
 - Camera, inference, notifications, LiveKit, and wake lock use independently
   injectable gateways.
-- `OceanEyesController` binds gateway streams to its existing public fields and
-  retains all presentation behavior expected by current widgets.
+- `OceanEyesController` retains the stable public API expected by current
+  widgets. Navigation, fixtures, local persistence, production subscriptions,
+  camera/ML, LiveKit, and wake-lock concurrency are delegated to independently
+  testable coordinators behind it.
 
 Firebase SDK types, Firestore snapshots, camera plugin types, ONNX Runtime
 objects, and LiveKit room objects stay out of the UI.
 
 ### Production controller lifecycle
 
-The controller now:
+The production facade and its coordinators now:
 
 - Watches auth state and rebinds user/tank subscriptions when the Firebase UID
   changes.
