@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image/image.dart' as image;
 import 'package:oceaneyes/integrations/camera/camera_capture_gateway.dart';
 import 'package:oceaneyes/integrations/livekit/livekit_gateway.dart';
@@ -373,6 +374,44 @@ void main() {
     await auth.close();
   });
 
+  test(
+    'backgrounding resumes the camera and denied permission stays recoverable',
+    () async {
+      final repository = _FakeProductionRepository();
+      final auth = _FakeProductionAuth(user: _user);
+      final camera = _FakeCameraCaptureGateway();
+      final controller = _productionController(
+        repository,
+        auth,
+        cameraGateway: camera,
+      );
+
+      await controller.initializeProduction();
+      repository.emitLinkedTankIds(const ['tank-a']);
+      await _drainMicrotasks();
+
+      controller.handleAppLifecycleState(AppLifecycleState.paused);
+      await _drainMicrotasks();
+      expect(camera.suspendCalls, 1);
+
+      controller.handleAppLifecycleState(AppLifecycleState.resumed);
+      await _drainMicrotasks();
+      expect(camera.resumeCalls, 1);
+      expect(controller.cameraStage, CameraStage.active);
+
+      camera.emitPhase(CameraCapturePhase.permissionDenied);
+      await _drainMicrotasks();
+      expect(controller.cameraStage, CameraStage.denied);
+      await controller.requestCameraPermission();
+      expect(controller.cameraStage, CameraStage.denied);
+
+      controller.dispose();
+      await _drainMicrotasks();
+      await repository.close();
+      await auth.close();
+    },
+  );
+
   test('LiveKit publishing owns and releases the wake lock', () async {
     final repository = _FakeProductionRepository();
     final auth = _FakeProductionAuth(user: _user);
@@ -494,45 +533,54 @@ void main() {
     await auth.close();
   });
 
-  test('unexpected viewer disconnect clears its live request', () async {
-    final repository = _FakeProductionRepository();
-    final auth = _FakeProductionAuth(user: _user);
-    final live = _FakeLiveGateway();
-    final controller = _productionController(
-      repository,
-      auth,
-      liveGateway: live,
-    );
+  test(
+    'reconnect and token expiry leave viewer live session restartable',
+    () async {
+      final repository = _FakeProductionRepository();
+      final auth = _FakeProductionAuth(user: _user);
+      final live = _FakeLiveGateway();
+      final controller = _productionController(
+        repository,
+        auth,
+        liveGateway: live,
+      );
 
-    await controller.initializeProduction();
-    repository.emitLinkedTankIds(const ['tank-a']);
-    await _drainMicrotasks();
-    final disconnectsBeforeStart = live.disconnectCalls;
+      await controller.initializeProduction();
+      repository.emitLinkedTankIds(const ['tank-a']);
+      await _drainMicrotasks();
+      final disconnectsBeforeStart = live.disconnectCalls;
 
-    await controller.startViewerLiveStream();
-    live.emit(OceanEyesLiveConnectionState.connected);
-    live.emit(OceanEyesLiveConnectionState.disconnected);
+      await controller.startViewerLiveStream();
+      live.emit(OceanEyesLiveConnectionState.connected);
+      live.emit(OceanEyesLiveConnectionState.reconnecting);
+      live.emit(OceanEyesLiveConnectionState.connected);
+      expect(controller.isLiveConnected, isTrue);
+      live.emit(
+        OceanEyesLiveConnectionState.disconnected,
+        error: StateError('token expired'),
+      );
 
-    await _waitUntil(
-      () =>
-          repository.clearedLiveRequestTankIds.isNotEmpty &&
-          live.disconnectCalls == disconnectsBeforeStart + 1,
-    );
-    expect(repository.requestedLiveTankIds, const ['tank-a']);
-    expect(repository.clearedLiveRequestTankIds, const ['tank-a']);
-    expect(controller.isLiveConnected, isFalse);
+      await _waitUntil(
+        () =>
+            repository.clearedLiveRequestTankIds.isNotEmpty &&
+            live.disconnectCalls == disconnectsBeforeStart + 1,
+      );
+      expect(repository.requestedLiveTankIds, const ['tank-a']);
+      expect(repository.clearedLiveRequestTankIds, const ['tank-a']);
+      expect(controller.isLiveConnected, isFalse);
 
-    await controller.startViewerLiveStream();
-    expect(live.connectRoles, const [
-      OceanEyesLiveRole.viewer,
-      OceanEyesLiveRole.viewer,
-    ]);
+      await controller.startViewerLiveStream();
+      expect(live.connectRoles, const [
+        OceanEyesLiveRole.viewer,
+        OceanEyesLiveRole.viewer,
+      ]);
 
-    controller.dispose();
-    await live.disposed;
-    await repository.close();
-    await auth.close();
-  });
+      controller.dispose();
+      await live.disposed;
+      await repository.close();
+      await auth.close();
+    },
+  );
 
   test(
     'camera and LiveKit ownership handoffs use injected settle times',
@@ -710,6 +758,18 @@ void main() {
     await _waitUntil(() => live.connectRoles.isNotEmpty);
     expect(live.connectRoles, const [OceanEyesLiveRole.monitor]);
     expect(repository.liveActiveValues, const [true]);
+
+    // A viewer crash leaves its bearer request behind. The monitor must treat
+    // the timestamp as a lease and release publishing without waiting for a
+    // second viewer to connect.
+    streams.liveRequests.add([
+      ProductionLiveRequest(
+        userId: 'viewer-crashed',
+        requestedAt: DateTime.now().subtract(const Duration(minutes: 2)),
+      ),
+    ]);
+    await _waitUntil(() => repository.liveActiveValues.length == 2);
+    expect(repository.liveActiveValues, const [true, false]);
 
     controller.dispose();
     await live.disposed;

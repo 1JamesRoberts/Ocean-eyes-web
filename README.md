@@ -97,6 +97,11 @@ camera capture, an on-device three-model ONNX pipeline, FCM, Cloud Functions
 alerting, and LiveKit streaming. The default local preview keeps those
 services disabled and uses deterministic fixture state instead.
 
+The current cross-device and recovery evidence is recorded in
+[`docs/current_state_validation.md`](docs/current_state_validation.md). It
+includes a credential-free two-controller synchronization proof and clearly
+separates physical Firebase/LiveKit/device checks that still require staging.
+
 No Firebase configuration, API credentials, APNs keys, or ONNX binaries are
 tracked. Follow [`docs/production_setup.md`](docs/production_setup.md) to
 configure an environment. The audited source-to-target migration and exact

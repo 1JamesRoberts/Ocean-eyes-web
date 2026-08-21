@@ -1,5 +1,10 @@
 # Production validation record
 
+For the August 21, 2026 current-state follow-up—including the two-controller
+synchronization proof and explicit recovery assertions—see
+[`current_state_validation.md`](current_state_validation.md). This document
+retains the historical August 20 integration record and its staging checklist.
+
 Validation was performed on Windows on August 20, 2026. The source integration
 was audited against `YoYo-XYZ/ocean-eyes` `dev-main` commit
 `0aae6ec10011741da4e22d36f214eb6dd458b132`.
