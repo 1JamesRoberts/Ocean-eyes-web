@@ -208,7 +208,6 @@ class _AccountScreenState extends State<AccountScreen> {
             const SizedBox(height: 12),
           ],
           if (controller.productionEnabled &&
-              controller.productionServicesAvailable &&
               !controller.hasLinkedGoogleAccount) ...[
             _buildGoogleAccountLink(),
             const SizedBox(height: 12),
@@ -540,6 +539,7 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Widget _buildGoogleAccountLink() {
+    final servicesAvailable = controller.productionServicesAvailable;
     return GlassPanel(
       color: OceanColors.verdigris.withValues(alpha: 0.08),
       borderColor: OceanColors.turquoise.withValues(alpha: 0.20),
@@ -562,7 +562,9 @@ class _AccountScreenState extends State<AccountScreen> {
               children: [
                 Text('Protect this account', style: OceanTypography.strong),
                 Text(
-                  'Optionally link Google so this anonymous account can be recovered.',
+                  servicesAvailable
+                      ? 'Optionally link Google so this anonymous account can be recovered.'
+                      : 'Complete production setup to enable Google account recovery.',
                   style: OceanTypography.caption,
                 ),
               ],
@@ -574,7 +576,9 @@ class _AccountScreenState extends State<AccountScreen> {
             icon: LucideIcons.link,
             compact: true,
             loading: _linkingGoogle,
-            onPressed: _linkingGoogle ? null : _linkGoogleAccount,
+            onPressed: _linkingGoogle || !servicesAvailable
+                ? null
+                : _linkGoogleAccount,
           ),
         ],
       ),
