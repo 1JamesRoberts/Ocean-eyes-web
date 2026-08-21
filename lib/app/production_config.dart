@@ -146,10 +146,10 @@ class OceanEyesProductionConfig {
   final String webPushVapidKey;
 
   bool get hasDartDefinedFirebaseOptions =>
-      apiKey.isNotEmpty &&
-      projectId.isNotEmpty &&
-      messagingSenderId.isNotEmpty &&
-      _appIdForCurrentPlatform.isNotEmpty;
+      _isConfigured(apiKey) &&
+      _isConfigured(projectId) &&
+      _isConfigured(messagingSenderId) &&
+      _isConfigured(_appIdForCurrentPlatform);
 
   /// Returns null on native platforms when setup should be loaded from the
   /// generated Google service file. Web always requires explicit options.
@@ -187,18 +187,32 @@ class OceanEyesProductionConfig {
   /// A user-facing configuration problem, or null when startup can proceed.
   String? validate() {
     if (!enabled) return null;
+    if (!kIsWeb &&
+        defaultTargetPlatform != TargetPlatform.android &&
+        defaultTargetPlatform != TargetPlatform.iOS) {
+      return 'Production Google authentication is supported on Android, iOS, '
+          'and web. Run this app with "-d chrome" for browser testing.';
+    }
     if (kIsWeb && !hasDartDefinedFirebaseOptions) {
-      return 'Flutter web requires OCEANEYES_FIREBASE_* dart-defines.';
+      return 'Flutter web requires real Firebase dart-defines; the current '
+          'configuration is missing values or still contains placeholders.';
     }
-    if (kIsWeb && googleWebClientId.trim().isEmpty) {
-      return 'Web Google linking requires OCEANEYES_GOOGLE_WEB_CLIENT_ID.';
+    if (kIsWeb && !_isConfigured(googleWebClientId)) {
+      return 'Web Google linking requires a real '
+          'OCEANEYES_GOOGLE_WEB_CLIENT_ID.';
     }
-    if (kIsWeb && appCheckEnabled && recaptchaV3SiteKey.isEmpty) {
-      return 'Web App Check requires OCEANEYES_RECAPTCHA_V3_SITE_KEY.';
+    if (kIsWeb && appCheckEnabled && !_isConfigured(recaptchaV3SiteKey)) {
+      return 'Web App Check requires a real '
+          'OCEANEYES_RECAPTCHA_V3_SITE_KEY.';
     }
     if (functionsRegion.trim().isEmpty) {
       return 'OCEANEYES_FUNCTIONS_REGION cannot be empty.';
     }
     return null;
+  }
+
+  static bool _isConfigured(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized.isNotEmpty && !normalized.contains('replace-with-your');
   }
 }

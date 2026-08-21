@@ -208,6 +208,7 @@ class _AccountScreenState extends State<AccountScreen> {
             const SizedBox(height: 12),
           ],
           if (controller.productionEnabled &&
+              controller.productionServicesAvailable &&
               !controller.hasLinkedGoogleAccount) ...[
             _buildGoogleAccountLink(),
             const SizedBox(height: 12),

@@ -114,5 +114,8 @@ GoogleSignIn _googleSignInFor(OceanEyesProductionConfig config) {
 
 String? _nonEmpty(String value) {
   final trimmed = value.trim();
-  return trimmed.isEmpty ? null : trimmed;
+  if (trimmed.isEmpty || trimmed.toLowerCase().contains('replace-with-your')) {
+    return null;
+  }
+  return trimmed;
 }

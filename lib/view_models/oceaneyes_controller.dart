@@ -663,9 +663,14 @@ class OceanEyesController extends ChangeNotifier
   }
 
   Future<void> linkGoogleAccount() async {
-    if (!productionEnabled ||
-        !_productionBindings.isAvailable ||
-        isAuthenticating) {
+    if (!productionEnabled || isAuthenticating) {
+      return;
+    }
+    if (!_productionBindings.isAvailable) {
+      productionError ??=
+          'Google linking is unavailable because production services did not '
+          'start. Check the Firebase configuration and selected platform.';
+      _notify();
       return;
     }
     isAuthenticating = true;
@@ -846,6 +851,7 @@ class OceanEyesController extends ChangeNotifier
 
   bool get hasLinkedGoogleAccount =>
       productionEnabled && _productionBindings.hasLinkedAccount;
+  bool get productionServicesAvailable => _productionBindings.isAvailable;
   String get tankReferenceCode => activeTankId ?? 'tank-demo';
   bool get canEditTankSettings =>
       !productionEnabled || _tankRole == ProductionTankMemberRole.owner;

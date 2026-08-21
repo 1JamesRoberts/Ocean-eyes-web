@@ -42,8 +42,12 @@ fixture-only tests remain independent of Firebase. Copy
 placeholders, and run the supported application runtime with:
 
 ```powershell
-flutter run --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter run -d chrome --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
+
+The production Firebase/Google stack is supported on Android, iOS, and web.
+Do not launch the production configuration on the Windows desktop target; use
+`-d chrome` for browser testing or run it on a supported mobile device.
 
 Google linking needs OAuth client configuration in addition to Firebase app
 options. With native Google service files, keep the generated Android web

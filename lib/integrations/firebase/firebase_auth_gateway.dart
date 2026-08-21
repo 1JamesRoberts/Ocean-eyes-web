@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../models/production_auth.dart';
@@ -22,6 +23,15 @@ abstract interface class FirebaseAuthDriver {
   Future<void> signOutGoogle();
 
   Future<void> signOutFirebase();
+}
+
+/// Web Firebase Auth uses its popup flow directly so the browser receives an
+/// ID token. The legacy web GoogleSignIn.signIn() flow only returns an access
+/// token and is not sufficient for reliable Firebase credential linking.
+abstract interface class FirebaseGooglePopupAuthDriver {
+  Future<ProductionAuthUser> linkGoogleWithPopup();
+
+  Future<ProductionAuthUser> signInWithGooglePopup();
 }
 
 /// Internal collision signal carrying the credential Firebase says belongs to
@@ -94,6 +104,45 @@ class FirebaseAuthGateway implements ProductionAuthGateway {
   Future<GoogleAccountLinkResult> linkGoogleAccount({String? fcmToken}) async {
     var startingUser = _driver.currentUser;
     startingUser ??= await ensureAnonymousSession();
+
+    final popupDriver = _driver is FirebaseGooglePopupAuthDriver
+        ? _driver as FirebaseGooglePopupAuthDriver
+        : null;
+    if (popupDriver != null) {
+      if (startingUser.isAnonymous) {
+        try {
+          // Start the popup before the first await so the browser retains the
+          // click's user activation and does not block the new window.
+          final linkedUserFuture = popupDriver.linkGoogleWithPopup();
+          final linkedUser = await linkedUserFuture;
+          _log('Linked anonymous account without changing its uid.');
+          return GoogleAccountLinkResult(
+            status: GoogleAccountLinkStatus.linkedAnonymousAccount,
+            user: linkedUser,
+          );
+        } on FirebaseCredentialCollision catch (collision) {
+          return _recoverFromGoogleCollision(
+            startingUser: startingUser,
+            credential: collision.credential,
+            fcmToken: fcmToken,
+          );
+        }
+      }
+
+      // Start the popup before token cleanup for the same user-activation
+      // reason. Cleanup can safely happen after Firebase switches users.
+      final signedInUserFuture = popupDriver.signInWithGooglePopup();
+      final signedInUser = await signedInUserFuture;
+      final token = fcmToken?.trim();
+      if (token != null && token.isNotEmpty) {
+        await _accountData.removeFcmToken(token);
+      }
+      return GoogleAccountLinkResult(
+        status: GoogleAccountLinkStatus.signedIn,
+        user: signedInUser,
+      );
+    }
+
     // With an existing session this plugin call occurs before the first await,
     // preserving browser user activation for the Google chooser popup.
     final credentialFuture = _driver.requestGoogleCredential();
@@ -110,44 +159,10 @@ class FirebaseAuthGateway implements ProductionAuthGateway {
           user: linkedUser,
         );
       } on FirebaseCredentialCollision catch (collision) {
-        // This read must happen before switching credentials because locked
-        // rules only allow users/{uid} to be read by that same uid.
-        final previousTankIds = (await _accountData.linkedTankIdsForUser(
-          startingUser.uid,
-        )).toSet().toList()..sort();
-        if (token != null && token.isNotEmpty) {
-          // Do not switch UIDs unless the device token has been detached from
-          // the old account. The controller restores it in finally if this
-          // throws, or attaches it to the new account after a successful move.
-          await _accountData.removeFcmToken(token);
-        }
-        final existingUser = await _driver.signInWithCredential(
-          collision.credential,
-        );
-        final rejoined = <String>[];
-        final failed = <String>[];
-        for (final tankId in previousTankIds) {
-          try {
-            if (await _accountData.joinTank(tankId)) {
-              rejoined.add(tankId);
-            } else {
-              failed.add(tankId);
-            }
-          } catch (error) {
-            failed.add(tankId);
-            _log('Could not rejoin tank $tankId after auth collision: $error');
-          }
-        }
-        _log(
-          'Signed into an existing Google account; rejoined '
-          '${rejoined.length}/${previousTankIds.length} tanks. Ownership was '
-          'not transferred.',
-        );
-        return GoogleAccountLinkResult(
-          status: GoogleAccountLinkStatus.signedIntoExistingAccount,
-          user: existingUser,
-          rejoinedTankIds: List.unmodifiable(rejoined),
-          failedTankIds: List.unmodifiable(failed),
+        return _recoverFromGoogleCollision(
+          startingUser: startingUser,
+          credential: collision.credential,
+          fcmToken: token,
         );
       }
     }
@@ -161,6 +176,51 @@ class FirebaseAuthGateway implements ProductionAuthGateway {
     return GoogleAccountLinkResult(
       status: GoogleAccountLinkStatus.signedIn,
       user: startingUser,
+    );
+  }
+
+  Future<GoogleAccountLinkResult> _recoverFromGoogleCollision({
+    required ProductionAuthUser startingUser,
+    required Object credential,
+    String? fcmToken,
+  }) async {
+    // This read must happen before switching credentials because locked rules
+    // only allow users/{uid} to be read by that same uid.
+    final previousTankIds = (await _accountData.linkedTankIdsForUser(
+      startingUser.uid,
+    )).toSet().toList()..sort();
+    final token = fcmToken?.trim();
+    if (token != null && token.isNotEmpty) {
+      // Do not switch UIDs unless the device token has been detached from the
+      // old account. The controller restores it in finally if this throws, or
+      // attaches it to the new account after a successful move.
+      await _accountData.removeFcmToken(token);
+    }
+    final existingUser = await _driver.signInWithCredential(credential);
+    final rejoined = <String>[];
+    final failed = <String>[];
+    for (final tankId in previousTankIds) {
+      try {
+        if (await _accountData.joinTank(tankId)) {
+          rejoined.add(tankId);
+        } else {
+          failed.add(tankId);
+        }
+      } catch (error) {
+        failed.add(tankId);
+        _log('Could not rejoin tank $tankId after auth collision: $error');
+      }
+    }
+    _log(
+      'Signed into an existing Google account; rejoined '
+      '${rejoined.length}/${previousTankIds.length} tanks. Ownership was '
+      'not transferred.',
+    );
+    return GoogleAccountLinkResult(
+      status: GoogleAccountLinkStatus.signedIntoExistingAccount,
+      user: existingUser,
+      rejoinedTankIds: List.unmodifiable(rejoined),
+      failedTankIds: List.unmodifiable(failed),
     );
   }
 
@@ -182,7 +242,8 @@ class FirebaseAuthGateway implements ProductionAuthGateway {
   }
 }
 
-class _PluginFirebaseAuthDriver implements FirebaseAuthDriver {
+class _PluginFirebaseAuthDriver
+    implements FirebaseAuthDriver, FirebaseGooglePopupAuthDriver {
   _PluginFirebaseAuthDriver(this._auth, this._googleSignIn);
 
   final FirebaseAuth _auth;
@@ -210,6 +271,35 @@ class _PluginFirebaseAuthDriver implements FirebaseAuthDriver {
       accessToken: tokens.accessToken,
       idToken: tokens.idToken,
     );
+  }
+
+  @override
+  Future<ProductionAuthUser> linkGoogleWithPopup() async {
+    if (!kIsWeb) {
+      throw UnsupportedError('Firebase Google popup auth is web-only.');
+    }
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('An authenticated Firebase session is required.');
+    }
+    try {
+      final result = await user.linkWithPopup(GoogleAuthProvider());
+      return _requiredUser(result.user);
+    } on FirebaseAuthException catch (error) {
+      if (_isCredentialCollision(error) && error.credential != null) {
+        throw FirebaseCredentialCollision(error.credential!);
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<ProductionAuthUser> signInWithGooglePopup() async {
+    if (!kIsWeb) {
+      throw UnsupportedError('Firebase Google popup auth is web-only.');
+    }
+    final result = await _auth.signInWithPopup(GoogleAuthProvider());
+    return _requiredUser(result.user);
   }
 
   @override
@@ -254,6 +344,11 @@ class _PluginFirebaseAuthDriver implements FirebaseAuthDriver {
     }
     return credential;
   }
+
+  static bool _isCredentialCollision(FirebaseAuthException error) =>
+      error.code == 'credential-already-in-use' ||
+      error.code == 'email-already-in-use' ||
+      error.code == 'account-exists-with-different-credential';
 
   static ProductionAuthUser _requiredUser(User? user) {
     final mapped = _mapUser(user);

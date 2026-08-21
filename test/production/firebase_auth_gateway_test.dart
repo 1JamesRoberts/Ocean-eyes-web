@@ -4,6 +4,28 @@ import 'package:oceaneyes/models/production_auth.dart';
 
 void main() {
   group('FirebaseAuthGateway', () {
+    test('uses the Firebase popup driver for browser linking', () async {
+      final events = <String>[];
+      final driver = _FakePopupAuthDriver(
+        current: const ProductionAuthUser(
+          uid: 'anonymous-uid',
+          isAnonymous: true,
+        ),
+        events: events,
+      );
+      final gateway = FirebaseAuthGateway.withDriver(
+        driver,
+        accountData: _FakeAccountData(events: events),
+      );
+
+      final pending = gateway.linkGoogleAccount();
+      expect(events, <String>['web-link-google-popup']);
+
+      final result = await pending;
+      expect(result.status, GoogleAccountLinkStatus.linkedAnonymousAccount);
+      expect(result.user?.uid, 'anonymous-uid');
+    });
+
     test('creates one anonymous session before protected work', () async {
       final driver = _FakeAuthDriver();
       final gateway = FirebaseAuthGateway.withDriver(
@@ -268,6 +290,29 @@ class _FakeAuthDriver implements FirebaseAuthDriver {
   Future<void> signOutFirebase() async {
     events.add('firebase-sign-out');
     _current = null;
+  }
+}
+
+class _FakePopupAuthDriver extends _FakeAuthDriver
+    implements FirebaseGooglePopupAuthDriver {
+  _FakePopupAuthDriver({super.current, super.events});
+
+  @override
+  Future<ProductionAuthUser> linkGoogleWithPopup() async {
+    events.add('web-link-google-popup');
+    return _current = ProductionAuthUser(
+      uid: _current?.uid ?? 'linked-uid',
+      isAnonymous: false,
+    );
+  }
+
+  @override
+  Future<ProductionAuthUser> signInWithGooglePopup() async {
+    events.add('web-sign-in-google-popup');
+    return _current = const ProductionAuthUser(
+      uid: 'existing-google-uid',
+      isAnonymous: false,
+    );
   }
 }
 
