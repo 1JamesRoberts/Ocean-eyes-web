@@ -118,10 +118,12 @@ class OceanEyesController extends ChangeNotifier
     isAuthenticated = productionEnabled
         ? productionAuth?.currentUser != null || productionStartupError != null
         : !(forceLogin || (requireLogin && requestedFixture == null));
-    if (productionEnabled || requestedFixture == null || forceLogin) {
-      _restorePreferences();
-    } else {
+    final shouldApplyFixture =
+        !productionEnabled && requestedFixture != null && !forceLogin;
+    if (shouldApplyFixture) {
       applyFixtureName(requestedFixture, notify: false);
+    } else {
+      _restorePreferences();
     }
     _navigation.configureLaunch(uri);
     if (productionEnabled && productionStartupError != null) {
