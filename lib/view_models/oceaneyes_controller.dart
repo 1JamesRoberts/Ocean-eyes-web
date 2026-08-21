@@ -36,7 +36,7 @@ class OceanEyesController extends ChangeNotifier
     OceanEyesSettingsRepository? settingsRepository,
     Uri? launchUri,
     bool requireLogin = false,
-    bool productionEnabled = false,
+    this.productionEnabled = false,
     String? productionStartupError,
     ProductionOceanEyesRepository? productionRepository,
     ProductionAuthGateway? productionAuth,
@@ -62,9 +62,6 @@ class OceanEyesController extends ChangeNotifier
                  : SharedPreferencesOceanEyesSettingsRepository(preferences)),
        ),
        _preferences = preferences,
-       productionEnabled =
-           productionEnabled &&
-           !(launchUri ?? Uri.base).queryParameters.containsKey('fixture'),
        productionError = productionStartupError,
        _productionRepository = productionRepository,
        _cameraHandoffConfiguration = cameraHandoffConfiguration,
@@ -75,7 +72,7 @@ class OceanEyesController extends ChangeNotifier
       onError: _recordProductionError,
     );
     _camera = OceanEyesCameraCoordinator(
-      enabled: this.productionEnabled,
+      enabled: productionEnabled,
       host: this,
       repository: _productionRepository,
       gateway: cameraGateway,
@@ -90,7 +87,7 @@ class OceanEyesController extends ChangeNotifier
       onChanged: _notify,
     );
     _liveSession = OceanEyesLiveSessionCoordinator(
-      enabled: this.productionEnabled,
+      enabled: productionEnabled,
       repository: _productionRepository,
       camera: cameraGateway,
       gateway: liveGateway,
@@ -118,16 +115,16 @@ class OceanEyesController extends ChangeNotifier
     final forceLogin =
         requestedFixture?.toLowerCase().replaceAll('-', '_') == 'login' ||
         uri.queryParameters['route'] == 'login';
-    isAuthenticated = this.productionEnabled
+    isAuthenticated = productionEnabled
         ? productionAuth?.currentUser != null || productionStartupError != null
         : !(forceLogin || (requireLogin && requestedFixture == null));
-    if (requestedFixture == null || forceLogin) {
+    if (productionEnabled || requestedFixture == null || forceLogin) {
       _restorePreferences();
     } else {
       applyFixtureName(requestedFixture, notify: false);
     }
     _navigation.configureLaunch(uri);
-    if (this.productionEnabled && productionStartupError != null) {
+    if (productionEnabled && productionStartupError != null) {
       _clearProductionTankData();
       activeTankId = null;
       tankName = 'Aquarium';
@@ -136,20 +133,6 @@ class OceanEyesController extends ChangeNotifier
       dashboardHealth = DashboardHealthState.waiting;
       analyticsState = AnalyticsContentState.error;
     }
-  }
-
-  static Future<OceanEyesController> bootstrap() async {
-    final preferences = await SharedPreferences.getInstance();
-    return OceanEyesController(
-      preferences: preferences,
-      inventoryRepository: SharedPreferencesFishInventoryRepository(
-        preferences,
-      ),
-      settingsRepository: SharedPreferencesOceanEyesSettingsRepository(
-        preferences,
-      ),
-      requireLogin: true,
-    );
   }
 
   /// Starts production subscriptions after Firebase and anonymous auth have
@@ -578,9 +561,9 @@ class OceanEyesController extends ChangeNotifier
   bool isAuthenticated = true;
   bool isAuthenticating = false;
 
-  /// True only for an explicitly enabled, successfully composed production
-  /// runtime. Fixture and directly constructed controllers always leave this
-  /// false and never touch platform plugins.
+  /// True only when the application composition explicitly enables the
+  /// production runtime. Direct test controllers default to false and can
+  /// continue to use deterministic fixture URLs without platform plugins.
   final bool productionEnabled;
   @override
   String? productionError;
