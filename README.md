@@ -33,8 +33,9 @@ flutter build web --release
 flutter build apk --debug
 ```
 
-The web build supports deterministic fixture URLs documented in
-[`docs/visual_validation.md`](docs/visual_validation.md).
+The visual test harness supports deterministic fixture scenarios documented in
+[`docs/visual_validation.md`](docs/visual_validation.md); the shipped web app
+is not launched with those fixture URLs.
 
 ## Architecture
 

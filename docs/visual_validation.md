@@ -1,9 +1,10 @@
 # Visual validation workflow
 
-## Deterministic fixtures
+## Deterministic test fixtures
 
-Flutter web accepts fixture and destination query parameters, which are also
-usable in screenshot automation:
+The shipped application runtime is production-only. Screenshot automation
+constructs `OceanEyesController` directly and uses these query parameters as
+test-harness inputs; do not launch the shipped web app with a fixture URL:
 
 ```text
 /?fixture=login
@@ -88,7 +89,7 @@ substitute.
   begins at y=0 and does not include a synthetic status bar.
 - CSS inset shadows are rendered as clipped highlight layers with matching
   color, extent, and opacity.
-- The screenshot fixture uses `assets/images/aquarium_hero.png`; production
+- The test screenshot fixture uses `assets/images/aquarium_hero.png`; production
   camera frames are intentionally frozen during comparison.
 
 ## Smoke sizes

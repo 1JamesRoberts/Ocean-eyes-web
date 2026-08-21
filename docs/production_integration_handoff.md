@@ -27,7 +27,7 @@ The integration was validated on Windows on August 20, 2026.
 
 ## Outcome
 
-The current Flutter application now has an opt-in production runtime for:
+The current Flutter application now uses a production runtime for:
 
 - Firebase Core initialization and Firebase App Check.
 - Anonymous Firebase Authentication and optional Google account linking.
@@ -67,8 +67,9 @@ The following contracts were preserved:
 
 1. `OceanEyesController()` remains synchronous and injectable.
 2. `OceanEyesApp(controller: ...)` remains the widget-test seam.
-3. A launch URL containing `?fixture=...` never constructs or initializes
-   Firebase, camera, FCM, ONNX, LiveKit, or wake-lock plugins.
+3. The shipped application runtime always composes production services;
+   deterministic fixture scenarios are constructed directly by tests and never
+   initialize Firebase, camera, FCM, ONNX, LiveKit, or wake-lock plugins.
 4. Existing controller fields and commands remain the state API consumed by
    widgets.
 5. Existing deterministic fixtures continue to drive the visual matrix.
@@ -84,40 +85,29 @@ The following contracts were preserved:
 
 ## Architecture after migration
 
-### Runtime selection
+### Runtime composition
 
 `bootstrapOceanEyesController()` is the composition root:
 
 ```text
-launch URI + dart-defines
+private dart-defines and native service files
           |
           v
 OceanEyesProductionConfig
           |
-          +-- fixture query present or production disabled
-          |       -> synchronous/local controller
-          |       -> no production plugin construction
-          |
-          +-- production enabled
-                  -> validate platform configuration
-                  -> initialize Firebase and optional emulators
-                  -> activate App Check when enabled
-                  -> establish anonymous auth session
-                  -> construct typed production adapters
-                  -> inject adapters into OceanEyesController
-                  -> initialize production subscriptions
+          -> validate platform configuration
+          -> initialize Firebase and optional emulators
+          -> activate App Check when enabled
+          -> establish anonymous auth session
+          -> construct typed production adapters
+          -> inject adapters into OceanEyesController
+          -> initialize production subscriptions
 ```
 
-Production is disabled by default and enabled only with:
-
-```text
-OCEANEYES_PRODUCTION=true
-```
-
-Fixture mode takes priority over that define. If production startup fails, the
-returned error controller clears restored fish, readings, alerts, analytics,
-heatmap, tank calibration, tank identity, and turbidity state. Cached/demo
-values are not exposed as live production data.
+Deterministic fixtures remain a direct-controller test seam. If production
+startup fails, the returned error controller clears restored fish, readings,
+alerts, analytics, heatmap, tank calibration, tank identity, and turbidity
+state. Cached/demo values are not exposed as live production data.
 
 ### MVVM and data boundaries
 
@@ -780,7 +770,6 @@ and set real values there.
 
 | Define | Purpose/default |
 | --- | --- |
-| `OCEANEYES_PRODUCTION` | Must be `true` to enable production; otherwise off. |
 | `OCEANEYES_APP_CHECK` | Enables App Check; defaults to `true`. |
 | `OCEANEYES_APP_CHECK_DEBUG` | Selects native debug provider; defaults false. |
 | `OCEANEYES_RECAPTCHA_V3_SITE_KEY` | Required for web App Check. |
@@ -817,7 +806,6 @@ Emulator-only private define example:
 
 ```json
 {
-  "OCEANEYES_PRODUCTION": true,
   "OCEANEYES_FIREBASE_EMULATORS": true,
   "OCEANEYES_FIRESTORE_EMULATOR_HOST": "localhost",
   "OCEANEYES_FIRESTORE_EMULATOR_PORT": 8080,

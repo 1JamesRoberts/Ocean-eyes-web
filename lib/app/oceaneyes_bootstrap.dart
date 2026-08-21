@@ -19,28 +19,17 @@ import '../models/oceaneyes_settings_repository.dart';
 import '../view_models/oceaneyes_controller.dart';
 import 'production_config.dart';
 
-/// Selects the deterministic/local or production composition root.
-///
-/// Fixture URLs are rejected by [OceanEyesProductionConfig] before any
-/// Firebase, camera, messaging, ML, or LiveKit object is constructed.
+/// Composes the production Firebase/auth/Firestore/camera/ML/FCM/LiveKit/
+/// wake-lock stack for the running application.
 Future<OceanEyesController> bootstrapOceanEyesController({
   Uri? launchUri,
 }) async {
   final uri = launchUri ?? Uri.base;
+  final controllerUri = _productionControllerUri(uri);
   final preferences = await SharedPreferences.getInstance();
   final inventory = SharedPreferencesFishInventoryRepository(preferences);
   final settings = SharedPreferencesOceanEyesSettingsRepository(preferences);
-  final config = OceanEyesProductionConfig.fromEnvironment(launchUri: uri);
-
-  if (!config.enabled) {
-    return OceanEyesController(
-      preferences: preferences,
-      inventoryRepository: inventory,
-      settingsRepository: settings,
-      launchUri: uri,
-      requireLogin: true,
-    );
-  }
+  final config = OceanEyesProductionConfig.fromEnvironment();
 
   try {
     final bootstrap = await initializeOceanEyesFirebase(config);
@@ -67,7 +56,7 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       preferences: preferences,
       inventoryRepository: inventory,
       settingsRepository: settings,
-      launchUri: uri,
+      launchUri: controllerUri,
       productionEnabled: true,
       productionRepository: repository,
       productionAuth: auth,
@@ -88,11 +77,17 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       preferences: preferences,
       inventoryRepository: inventory,
       settingsRepository: settings,
-      launchUri: uri,
+      launchUri: controllerUri,
       productionEnabled: true,
       productionStartupError: error.toString(),
     );
   }
+}
+
+Uri _productionControllerUri(Uri uri) {
+  final queryParameters = Map<String, String>.from(uri.queryParameters)
+    ..remove('fixture');
+  return uri.replace(queryParameters: queryParameters);
 }
 
 GoogleSignIn _googleSignInFor(OceanEyesProductionConfig config) {

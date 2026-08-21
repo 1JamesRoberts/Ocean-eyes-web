@@ -10,10 +10,12 @@ production behavior and the deployed Firestore compatibility schema.
 
 ## Non-negotiable contracts
 
-- Keep `OceanEyesController()` synchronous and safe without Firebase.
+- Keep `OceanEyesController()` synchronous and safe without Firebase as the
+  test-double injection seam.
 - Keep `OceanEyesApp(controller: ...)` as the widget-test injection seam.
-- A `?fixture=...` launch must initialize no Firebase, camera, messaging,
-  LiveKit, or ONNX service and must preserve the existing deterministic data.
+- The shipped application runtime always uses the production composition root;
+  deterministic fixture scenarios are constructed directly by tests and must
+  initialize no Firebase, camera, messaging, LiveKit, or ONNX service.
 - Keep existing controller fields and commands consumed by the UI. Production
   adapters update those fields behind the controller instead of entering
   widgets directly.
@@ -26,7 +28,7 @@ production behavior and the deployed Firestore compatibility schema.
 
 | Legacy production source | Current/target file | Migration action |
 | --- | --- | --- |
-| `lib/main.dart` | `lib/main.dart`, `lib/app/oceaneyes_bootstrap.dart` | Move Firebase/App Check/auth startup behind runtime selection; leave system UI and app construction intact. |
+| `lib/main.dart` | `lib/main.dart`, `lib/app/oceaneyes_bootstrap.dart` | Make Firebase/App Check/auth startup the application composition root; leave system UI and app construction intact. |
 | `lib/services/auth_service.dart` | `lib/integrations/firebase/firebase_auth_gateway.dart` | Adapt anonymous-first auth, Google credential linking, collision recovery, and token cleanup behind an injectable gateway. |
 | `lib/services/firestore_service.dart` | `lib/integrations/firebase/firestore_oceaneyes_repository.dart` | Split raw Firestore access from mappings; expose typed streams/commands, not snapshots. |
 | Firestore factories in `lib/models/mock_data.dart` | `lib/integrations/firebase/firestore_schema_mapper.dart` | Replace snapshot factories with explicit, tolerant mappings to current `FishEntry`, `AlertItem`, `HistoryReading`, water metrics, and analytics projections. |
@@ -114,12 +116,14 @@ fall back safely.
 
 - Add compatible Firebase, camera, QR, ONNX, LiveKit, permissions, and image
   dependencies.
-- Add runtime configuration and composition without importing plugins on
-  fixture paths.
+- Add production runtime configuration and composition with emulator support;
+  keep plugin-free fixture paths in injected test doubles.
 - Add conditional native Firebase Gradle wiring and platform permissions.
 - Add credential/model ignores and setup documentation.
 
-Exit: ordinary fixture tests and a credential-free web build still run.
+Exit: ordinary fixture tests and a credential-free web build still compile;
+the application reports missing configuration until launched with private
+defines or emulators.
 
 ### 2. Auth and tank pairing
 
@@ -134,8 +138,8 @@ QR, missing tank, and unlink behavior.
 ### 3. Firestore repositories and controller integration
 
 - Add typed records/mappers and tank-scoped repository streams.
-- Bind/cancel streams in the controller while retaining synchronous fixture
-  state and optimistic UI mutations.
+- Bind/cancel streams in the controller while retaining synchronous test
+  doubles and optimistic UI mutations.
 - Persist inventory, alert resolution, tank name, thresholds, calibration,
   settings, readings, users, and live state remotely.
 
@@ -183,8 +187,8 @@ track selection, disconnect, heartbeat, and retry.
   Android/iOS/web smoke checks where credentials/hardware exist.
 - Record any hardware- or console-dependent validation that cannot run locally.
 
-Exit: fixture presentation is unchanged, production setup is reproducible,
-and no credentials or large models are tracked.
+Exit: test-fixture presentation is unchanged, production setup is
+reproducible, and no credentials or large models are tracked.
 
 ## Known legacy behavior intentionally not copied verbatim
 

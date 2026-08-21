@@ -85,6 +85,19 @@ void main() {
     await auth.close();
   });
 
+  test('production controllers ignore fixture query parameters', () {
+    final controller = OceanEyesController(
+      productionEnabled: true,
+      launchUri: Uri.parse('https://oceaneyes.test/?fixture=populated'),
+    );
+
+    expect(controller.productionEnabled, isTrue);
+    expect(controller.fixtureScenario, FixtureScenario.dashboardWaiting);
+    expect(controller.fish, isEmpty);
+
+    controller.dispose();
+  });
+
   test('production binding applies one reading bundle, fish, and alerts '
       'deterministically', () async {
     final repository = _FakeProductionRepository();

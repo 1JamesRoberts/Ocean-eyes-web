@@ -14,16 +14,13 @@ class FirebaseBootstrapResult {
   final bool appCheck;
 }
 
-/// Initializes Firebase only after the composition root has selected the
-/// production runtime. Merely importing this file performs no plugin calls.
+/// Initializes the Firebase services used by the production composition root.
+/// Merely importing this file performs no plugin calls.
 Future<FirebaseBootstrapResult> initializeOceanEyesFirebase(
   OceanEyesProductionConfig config,
 ) async {
   final validationError = config.validate();
   if (validationError != null) throw StateError(validationError);
-  if (!config.enabled) {
-    throw StateError('Firebase initialization requested outside production.');
-  }
 
   final existing = Firebase.apps;
   final app = existing.isNotEmpty

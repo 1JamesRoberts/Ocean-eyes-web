@@ -6,6 +6,11 @@ was audited against `YoYo-XYZ/ocean-eyes` `dev-main` commit
 
 ## Credential-free checks
 
+These checks use injected gateways and direct fixture-controller test seams;
+they do not make the shipped application runtime depend on a separate fixture
+mode. Running the application itself requires Firebase configuration or the
+documented Firebase emulators.
+
 The following checks require no Firebase project, LiveKit account, or ONNX
 model binaries. They passed against the final integration:
 
