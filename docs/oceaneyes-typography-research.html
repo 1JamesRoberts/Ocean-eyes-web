@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="A comparison of OceanEyes typography with published mobile health, wearable, and dashboard typography systems.">
+  <title>OceanEyes Typography Benchmark</title>
+  <style>
+    :root {
+      --navy-950: #041522;
+      --navy-900: #051e32;
+      --navy-800: #0b3048;
+      --ink: #092438;
+      --muted: #5f7380;
+      --muted-dark: #b5d0d2;
+      --aqua: #00c8b3;
+      --ice: #00ffe5;
+      --teal: #2f9b91;
+      --mint: #dff7f3;
+      --canvas: #f4fffe;
+      --surface: #ffffff;
+      --line: #d8e9e7;
+      --warning: #b86413;
+      --warning-bg: #fff2df;
+      --shadow: 0 18px 50px rgba(4, 21, 34, 0.12);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 92% 4%, rgba(0, 255, 229, 0.13), transparent 26rem),
+        linear-gradient(180deg, var(--canvas) 0%, #f7fbfb 48%, #edf8f6 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: #006b63;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    a:hover { color: #004b46; }
+
+    .container {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      padding: 72px 0 68px;
+      background:
+        radial-gradient(circle at 83% 18%, rgba(0, 255, 229, 0.28), transparent 18rem),
+        radial-gradient(circle at 10% 100%, rgba(50, 161, 152, 0.26), transparent 24rem),
+        linear-gradient(135deg, var(--navy-950), var(--navy-900) 60%, #0a3c50);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      right: -250px;
+      bottom: -360px;
+      border: 1px solid rgba(0, 255, 229, 0.28);
+      border-radius: 50%;
+      box-shadow: 0 0 0 34px rgba(0, 255, 229, 0.05), 0 0 0 70px rgba(0, 255, 229, 0.035);
+      pointer-events: none;
+    }
+
+    .hero-inner { position: relative; z-index: 1; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 18px;
+      color: var(--ice);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 22px;
+      height: 2px;
+      border-radius: 99px;
+      background: var(--ice);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 18px;
+      font-size: clamp(38px, 6vw, 72px);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+
+    .hero-lede {
+      max-width: 760px;
+      margin-bottom: 28px;
+      color: #d6eceb;
+      font-size: clamp(17px, 2vw, 20px);
+      line-height: 1.5;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: #c2dedf;
+      font-size: 13px;
+    }
+
+    .hero-meta span {
+      padding: 8px 12px;
+      border: 1px solid rgba(192, 232, 229, 0.22);
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    main { padding: 34px 0 76px; }
+
+    .section { margin-top: 48px; }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .section-heading h2 {
+      margin-bottom: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    .section-heading p {
+      max-width: 620px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .summary-card {
+      min-height: 160px;
+      padding: 22px;
+      border: 1px solid rgba(0, 200, 179, 0.22);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 10px 30px rgba(8, 57, 66, 0.05);
+    }
+
+    .summary-card .label {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .summary-card .value {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--navy-900);
+      font-size: 34px;
+      font-weight: 750;
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .summary-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .summary-card.accent {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(145deg, #00645a, #0b3048);
+    }
+
+    .summary-card.accent .label,
+    .summary-card.accent p { color: #bfe9e5; }
+
+    .summary-card.accent .value { color: var(--ice); }
+
+    .callout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: start;
+      padding: 22px 24px;
+      border: 1px solid #b6e6df;
+      border-radius: var(--radius-md);
+      background: linear-gradient(120deg, #effffc, #ffffff);
+    }
+
+    .callout-mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      color: var(--navy-900);
+      border-radius: 50%;
+      background: var(--ice);
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .callout h3 { margin-bottom: 5px; font-size: 17px; }
+    .callout p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+
+    .chart-card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 26px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 7px; }
+
+    .legend-swatch {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .legend-swatch.current { background: var(--navy-900); }
+    .legend-swatch.recommended { background: var(--aqua); }
+
+    .chart {
+      display: grid;
+      gap: 12px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: minmax(158px, 230px) minmax(0, 1fr) 70px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .chart-label {
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chart-label small {
+      display: block;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 400;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .track {
+      height: 14px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: #e4f0ee;
+    }
+
+    .bar {
+      width: var(--bar);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #49b9ad, var(--aqua));
+    }
+
+    .chart-row.current .bar { background: linear-gradient(90deg, #0b3048, #1f6072); }
+    .chart-row.recommended .bar { background: linear-gradient(90deg, #008c7e, var(--ice)); }
+
+    .chart-size {
+      color: var(--navy-900);
+      font-size: 14px;
+      font-weight: 750;
+      text-align: right;
+    }
+
+    .chart-axis {
+      display: flex;
+      justify-content: space-between;
+      margin: 16px 70px 0 244px;
+      color: #789198;
+      font-size: 11px;
+    }
+
+    .chart-note {
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .table-shell {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .table-scroll { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      min-width: 1050px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      padding: 15px 16px;
+      color: #dff8f4;
+      background: var(--navy-900);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: left;
+      text-transform: uppercase;
+      vertical-align: bottom;
+    }
+
+    td {
+      padding: 16px;
+      border-top: 1px solid #e4efed;
+      color: var(--ink);
+      vertical-align: top;
+    }
+
+    tbody tr:hover { background: #f4fffd; }
+
+    td:first-child { width: 24%; font-weight: 700; }
+    td:nth-child(2) { width: 17%; color: var(--muted); }
+    td:nth-child(3), td:nth-child(4), td:nth-child(5) { width: 17%; }
+    td:last-child { width: 8%; white-space: nowrap; }
+
+    .app-name { display: block; margin-bottom: 4px; }
+
+    .tag {
+      display: inline-flex;
+      padding: 3px 7px;
+      color: #1a645c;
+      border-radius: 99px;
+      background: var(--mint);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .tag.warn { color: var(--warning); background: var(--warning-bg); }
+
+    .size-line { display: block; margin-bottom: 3px; }
+    .size-line:last-child { margin-bottom: 0; }
+    .role { color: var(--muted); font-size: 11px; }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .panel h3 { margin-bottom: 16px; font-size: 21px; letter-spacing: -0.025em; }
+
+    .token-list {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+    }
+
+    .token-row {
+      display: grid;
+      grid-template-columns: minmax(90px, 1fr) auto;
+      gap: 16px;
+      align-items: baseline;
+      padding-bottom: 9px;
+      border-bottom: 1px dashed #d4e6e3;
+    }
+
+    .token-row:last-child { padding-bottom: 0; border-bottom: 0; }
+    .token-row dt { color: var(--muted); font-size: 13px; }
+    .token-row dd { margin: 0; color: var(--navy-900); font-size: 15px; font-weight: 750; }
+
+    .panel p { color: var(--muted); font-size: 14px; }
+
+    .panel ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .panel li + li { margin-top: 10px; }
+
+    .method {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .source-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding-left: 19px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .source-list li::marker { color: var(--aqua); }
+
+    .method-note {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      background: var(--navy-900);
+      color: #c8e3e2;
+      font-size: 13px;
+    }
+
+    .method-note strong { color: var(--ice); }
+
+    footer {
+      padding: 28px 0 42px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .decision-grid, .method { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .container { width: min(100% - 28px, 1180px); }
+      .hero { padding: 52px 0 48px; }
+      main { padding-top: 24px; }
+      .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .summary-card { min-height: 142px; padding: 16px; }
+      .summary-card .value { font-size: 28px; }
+      .summary-card p { font-size: 12px; }
+      .section-heading { display: block; }
+      .section-heading p { margin-top: 9px; }
+      .chart-card, .panel { padding: 18px; }
+      .chart-row { grid-template-columns: minmax(110px, 0.8fr) minmax(0, 1fr) 50px; gap: 9px; }
+      .chart-label { font-size: 12px; }
+      .chart-axis { margin-left: 119px; margin-right: 50px; }
+      .chart-note { font-size: 11px; }
+      .callout { padding: 18px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .hero { padding: 28px 0; color: #000; background: #eaf8f5; }
+      .hero-lede, .hero-meta { color: #3a4e55; }
+      .hero::after { display: none; }
+      .summary-card, .chart-card, .table-shell, .panel { box-shadow: none; }
+      .section { break-inside: avoid; }
+      a { color: inherit; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="container hero-inner">
+      <p class="eyebrow">OceanEyes design research</p>
+      <h1>Typography that reads like a health dashboard.</h1>
+      <p class="hero-lede">
+        A practical comparison of OceanEyes’ current type tokens against published
+        mobile, wearable, and dashboard typography systems from Apple, Google,
+        Samsung, Fitbit, Garmin, Microsoft, Atlassian, Shopify, IBM, GitHub, and Adobe.
+      </p>
+      <div class="hero-meta" aria-label="Research metadata">
+        <span>Reviewed 21 August 2026</span>
+        <span>14 public benchmarks</span>
+        <span>Self-contained HTML</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section aria-labelledby="summary-title">
+        <div class="section-heading">
+          <h2 id="summary-title">The short answer</h2>
+          <p>OceanEyes is close to the compact end of mainstream dashboard typography, with one notable exception.</p>
+        </div>
+        <div class="summary-grid">
+          <article class="summary-card accent">
+            <span class="label">OceanEyes body</span>
+            <span class="value">15px</span>
+            <p>Current default body size, with a 1.45 line-height.</p>
+          </article>
+          <article class="summary-card">
+            <span class="label">Common body center</span>
+            <span class="value">16px</span>
+            <p>The most reusable cross-platform baseline in the comparison.</p>
+          </article>
+          <article class="summary-card">
+            <span class="label">OceanEyes caption</span>
+            <span class="value">13px</span>
+            <p>Aligned with Apple footnotes and Fluent mobile captions.</p>
+          </article>
+          <article class="summary-card">
+            <span class="label">Navigation label</span>
+            <span class="value">10px</span>
+            <p>Below the published 11–13px range used by many mobile systems.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="finding-title">
+        <div class="callout">
+          <div class="callout-mark" aria-hidden="true">↗</div>
+          <div>
+            <h3 id="finding-title">Recommendation</h3>
+            <p>
+              Keep the 13px captions, 16px card titles, and 24px section headings. For a more
+              conventional health-app baseline, raise primary body copy to 16px/24px and
+              navigation labels to 11–12px/16px. That preserves density while improving
+              readability and alignment with Material, Fluent, and Apple conventions.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="chart-title">
+        <div class="section-heading">
+          <h2 id="chart-title">Primary body-size comparison</h2>
+          <p>Phone and dashboard references only. Wearable screens are listed separately because their pixel units are not directly comparable.</p>
+        </div>
+        <div class="chart-card">
+          <div class="chart-legend" aria-label="Chart legend">
+            <span class="legend-item"><span class="legend-swatch current"></span> Current OceanEyes</span>
+            <span class="legend-item"><span class="legend-swatch recommended"></span> Recommended OceanEyes target</span>
+            <span class="legend-item"><span class="legend-swatch"></span> Published benchmark</span>
+          </div>
+          <div class="chart" role="img" aria-label="Horizontal bar chart comparing primary body font sizes from 14 to 17 pixels">
+            <div class="chart-row current">
+              <div class="chart-label">OceanEyes<small>current body</small></div>
+              <div class="track"><div class="bar" style="--bar: 83.33%"></div></div>
+              <div class="chart-size">15px</div>
+            </div>
+            <div class="chart-row recommended">
+              <div class="chart-label">OceanEyes target<small>recommended body</small></div>
+              <div class="track"><div class="bar" style="--bar: 88.89%"></div></div>
+              <div class="chart-size">16px</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">Apple iOS<small>Body, default</small></div>
+              <div class="track"><div class="bar" style="--bar: 94.44%"></div></div>
+              <div class="chart-size">17pt</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">Apple watchOS<small>Body, large watch</small></div>
+              <div class="track"><div class="bar" style="--bar: 88.89%"></div></div>
+              <div class="chart-size">16pt</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">Material 3<small>bodyLarge</small></div>
+              <div class="track"><div class="bar" style="--bar: 88.89%"></div></div>
+              <div class="chart-size">16sp</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">Fluent iOS<small>Body 1</small></div>
+              <div class="track"><div class="bar" style="--bar: 94.44%"></div></div>
+              <div class="chart-size">17pt</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">Fluent Android<small>Body 1</small></div>
+              <div class="track"><div class="bar" style="--bar: 88.89%"></div></div>
+              <div class="chart-size">16sp</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">Atlassian<small>Body L</small></div>
+              <div class="track"><div class="bar" style="--bar: 88.89%"></div></div>
+              <div class="chart-size">16px</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">Shopify Polaris<small>Body L</small></div>
+              <div class="track"><div class="bar" style="--bar: 77.78%"></div></div>
+              <div class="chart-size">14px</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">IBM Carbon<small>Productive body</small></div>
+              <div class="track"><div class="bar" style="--bar: 77.78%"></div></div>
+              <div class="chart-size">14px</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">GitHub Primer<small>Default UI body</small></div>
+              <div class="track"><div class="bar" style="--bar: 77.78%"></div></div>
+              <div class="chart-size">14px</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-label">Adobe Spectrum<small>Mobile body M</small></div>
+              <div class="track"><div class="bar" style="--bar: 94.44%"></div></div>
+              <div class="chart-size">17px</div>
+            </div>
+          </div>
+          <div class="chart-axis" aria-hidden="true"><span>14</span><span>15</span><span>16</span><span>17</span><span>18px</span></div>
+          <p class="chart-note">The scale is normalized to 18px for visual comparison. Apple uses points, Android uses scalable pixels, and web systems use CSS pixels.</p>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="table-title">
+        <div class="section-heading">
+          <h2 id="table-title">Full comparison</h2>
+          <p>Values are shown as size/line-height when the source publishes both. A dash means the source defines a role or scaling behavior without a numeric mobile value.</p>
+        </div>
+        <div class="table-shell">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">App / ecosystem</th>
+                  <th scope="col">Context</th>
+                  <th scope="col">Body / reading</th>
+                  <th scope="col">Small / labels</th>
+                  <th scope="col">Titles / metrics</th>
+                  <th scope="col">Evidence</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="app-name">OceanEyes</span><span class="tag">Current</span></td>
+                  <td>Flutter mobile/web dashboard</td>
+                  <td><span class="size-line">Body 15 / 21.75</span><span class="size-line">Strong 15 / 20.25</span></td>
+                  <td><span class="size-line">Caption 13 / 17.55</span><span class="size-line">Navigation 10 / 10</span></td>
+                  <td><span class="size-line">Title 16 / 20.8</span><span class="size-line">Section 24 / 27.6</span></td>
+                  <td><a href="../lib/core/theme/oceaneyes_tokens.dart">Repo</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Apple Health / Fitness</span><span class="tag">iPhone</span></td>
+                  <td>iOS Dynamic Type, default Large setting</td>
+                  <td><span class="size-line">Body 17 / 22</span><span class="size-line">Callout 16 / 21</span></td>
+                  <td><span class="size-line">Subhead 15 / 20</span><span class="size-line">Footnote 13 / 18</span><span class="size-line">Caption 12 / 16, 11 / 13</span></td>
+                  <td><span class="size-line">Title 20 / 25</span><span class="size-line">Title 2 22 / 28</span><span class="size-line">Title 1 28 / 34</span><span class="size-line">Large Title 34 / 41</span></td>
+                  <td><a href="https://developer.apple.com/design/human-interface-guidelines/typography">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Apple Health / Fitness</span><span class="tag">Apple Watch</span></td>
+                  <td>watchOS, large 40–42mm watch</td>
+                  <td><span class="size-line">Body 16 / 18.5</span></td>
+                  <td><span class="size-line">Caption 15 / 17.5, 14 / 16.5</span><span class="size-line">Footnote 13 / 15.5, 12 / 14.5</span></td>
+                  <td><span class="size-line">Title 3 19 / 21.5</span><span class="size-line">Title 2 28 / 30.5</span><span class="size-line">Title 1 34 / 36.5</span><span class="size-line">Large Title 36 / 38.5</span></td>
+                  <td><a href="https://developer.apple.com/design/human-interface-guidelines/typography">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Google Fit / Android health baseline</span><span class="tag">Material 3</span></td>
+                  <td>Android app and dashboard conventions</td>
+                  <td><span class="size-line">bodyLarge 16 / 24</span><span class="size-line">bodyMedium 14 / 20</span><span class="size-line">bodySmall 12 / 16</span></td>
+                  <td><span class="size-line">labelLarge 14 / 20</span><span class="size-line">labelMedium 12 / 16</span><span class="size-line">labelSmall 11 / 16</span></td>
+                  <td><span class="size-line">titleLarge 22 / 28</span><span class="size-line">headlineSmall 24 / 32</span></td>
+                  <td><a href="https://developer.android.com/develop/ui/compose/designsystems/material3?hl=en">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Samsung Health</span><span class="tag warn">Role only</span></td>
+                  <td>One UI mobile guidance</td>
+                  <td><span class="size-line">Scalable pixel text</span><span class="size-line">No fixed public body value</span></td>
+                  <td><span class="size-line">Text should resize up to 200%</span></td>
+                  <td><span class="size-line">Titles and subtitles are hierarchy roles</span></td>
+                  <td><a href="https://developer.samsung.com/one-ui/accessibility/layout-and-typo.html">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Fitbit OS</span><span class="tag">Wearable</span></td>
+                  <td>Small-screen health and activity surfaces</td>
+                  <td><span class="size-line">p1 34 / 42</span><span class="size-line">p2 28 / 34</span><span class="size-line">p3 22 / 26</span></td>
+                  <td><span class="size-line">System font at any size</span></td>
+                  <td><span class="size-line">h1 80 / 100</span><span class="size-line">h2 50 / 60</span><span class="size-line">h3 34 / 42</span><span class="size-line">h4 28 / 34</span><span class="size-line">h5 22 / 26</span></td>
+                  <td><a href="https://dev.fitbit.com/build/guides/user-interface/css/">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">WHOOP</span><span class="tag warn">Role only</span></td>
+                  <td>Health-data integration and brand guidance</td>
+                  <td><span class="size-line">Body spans B1 Large to B4 Extra Small</span><span class="size-line">Proxima Nova, semibold</span></td>
+                  <td><span class="size-line">No numeric mobile values published</span></td>
+                  <td><span class="size-line">Uppercase headlines</span><span class="size-line">DINPro bold numbers</span><span class="size-line">10% headline tracking</span></td>
+                  <td><a href="https://developer.whoop.com/assets/files/WHOOP%20-%20Brand%20%26%20Design%20Guidelines-bdea3554e94b4ea09e68695b1e8dc8e7.pdf">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Garmin Connect IQ</span><span class="tag">Forerunner 55</span></td>
+                  <td>Fitness watch data fields</td>
+                  <td><span class="size-line">Text 22, 25, 27, 34</span></td>
+                  <td><span class="size-line">Glance 22</span></td>
+                  <td><span class="size-line">Number mild 37</span><span class="size-line">Number medium 79</span><span class="size-line">Number hot 90</span></td>
+                  <td><a href="https://developer.garmin.com/connect-iq/device-reference/fr55/">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Garmin Connect IQ</span><span class="tag">Edge 520</span></td>
+                  <td>Bike and sensor dashboard</td>
+                  <td><span class="size-line">Text 12, 17, 19, 22, 36</span></td>
+                  <td><span class="size-line">Smallest text 12</span></td>
+                  <td><span class="size-line">Number mild 34</span><span class="size-line">Number medium 39</span><span class="size-line">Number hot 50</span><span class="size-line">Thai hot 56</span></td>
+                  <td><a href="https://developer.garmin.com/connect-iq/device-reference/edge-520/">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Microsoft Fluent</span><span class="tag">iOS</span></td>
+                  <td>Mobile product and data apps</td>
+                  <td><span class="size-line">Body 1 17 / 22</span><span class="size-line">Body 2 15 / 20</span></td>
+                  <td><span class="size-line">Caption 2 12 / 16</span><span class="size-line">Caption 1 13 / 18</span></td>
+                  <td><span class="size-line">Titles 20, 22, 28, 34</span><span class="size-line">Display 60 / 70</span></td>
+                  <td><a href="https://fluent2.microsoft.design/typography">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Microsoft Fluent</span><span class="tag">Android</span></td>
+                  <td>Mobile product and data apps</td>
+                  <td><span class="size-line">Body 1 16 / 24</span><span class="size-line">Body 2 14 / 20</span></td>
+                  <td><span class="size-line">Caption 2 12 / 16</span><span class="size-line">Caption 1 13 / 18</span></td>
+                  <td><span class="size-line">Titles 18, 20, 24, 34</span><span class="size-line">Display 60 / 72</span></td>
+                  <td><a href="https://fluent2.microsoft.design/typography">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Atlassian Design</span><span class="tag">Jira / dashboard</span></td>
+                  <td>Dense product and project dashboards</td>
+                  <td><span class="size-line">Body L 16 / 24</span><span class="size-line">Body M 14 / 20</span><span class="size-line">Body S 12 / 16</span></td>
+                  <td><span class="size-line">Chart and legend text 12 / 16</span></td>
+                  <td><span class="size-line">Metric S 16 / 20</span><span class="size-line">Metric M 24 / 28</span><span class="size-line">Metric L 28 / 32</span></td>
+                  <td><a href="https://atlassian.design/foundations/typography/">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Shopify Polaris</span><span class="tag">Admin dashboard</span></td>
+                  <td>High-density commerce admin</td>
+                  <td><span class="size-line">Body L 14 / 20</span><span class="size-line">Body M 13 / 20</span><span class="size-line">Body S 12 / 16</span><span class="size-line">Body XS 11</span></td>
+                  <td><span class="size-line">Body XS 11 for compact UI</span></td>
+                  <td><span class="size-line">Headings 12, 13, 14, 20, 24, 30, 36</span></td>
+                  <td><a href="https://polaris-react.shopify.com/components/typography/text">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">IBM Carbon</span><span class="tag">Productive</span></td>
+                  <td>Complex product dashboards</td>
+                  <td><span class="size-line">Body 01 14 / 20</span><span class="size-line">Compact 01 14 / 18</span></td>
+                  <td><span class="size-line">Label 01 12 / 16</span></td>
+                  <td><span class="size-line">Heading compact 14 / 18</span><span class="size-line">Scale extends through 24px+</span></td>
+                  <td><a href="https://carbondesignsystem.com/elements/typography/type-sets/">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">GitHub Primer</span><span class="tag">Dashboard UI</span></td>
+                  <td>Issue, project, and developer dashboards</td>
+                  <td><span class="size-line">Body large 16 / 24</span><span class="size-line">Body medium 14 / 20</span><span class="size-line">Body small 12 / 20</span></td>
+                  <td><span class="size-line">Caption 12 / 16</span></td>
+                  <td><span class="size-line">Title styles use 20px+ separately</span></td>
+                  <td><a href="https://next.primer.style/product/primitives/typography/">Published</a></td>
+                </tr>
+                <tr>
+                  <td><span class="app-name">Adobe Spectrum</span><span class="tag">Mobile system</span></td>
+                  <td>Cross-platform creative/product UI</td>
+                  <td><span class="size-line">Mobile body S 15</span><span class="size-line">Mobile body M 17</span><span class="size-line">Mobile body L 19</span></td>
+                  <td><span class="size-line">Mobile extra-small 12–13</span></td>
+                  <td><span class="size-line">Mobile headings scale from 17px upward</span></td>
+                  <td><a href="https://opensource.adobe.com/spectrum-design-data/tokens/typography/">Published</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="decision-title">
+        <div class="section-heading">
+          <h2 id="decision-title">What OceanEyes should use</h2>
+          <p>A compact, readable hybrid of Material 3, Fluent mobile, and dashboard systems.</p>
+        </div>
+        <div class="decision-grid">
+          <article class="panel">
+            <h3>Recommended type tokens</h3>
+            <dl class="token-list">
+              <div class="token-row"><dt>Body</dt><dd>16px / 24px · regular</dd></div>
+              <div class="token-row"><dt>Strong body</dt><dd>16px / 24px · 600</dd></div>
+              <div class="token-row"><dt>Card title</dt><dd>16–18px / 22–24px · 600</dd></div>
+              <div class="token-row"><dt>Caption</dt><dd>12–13px / 16–18px · 500</dd></div>
+              <div class="token-row"><dt>Section</dt><dd>24px / 28–32px · 700</dd></div>
+              <div class="token-row"><dt>Navigation</dt><dd>11–12px / 16px · 600</dd></div>
+              <div class="token-row"><dt>Metric</dt><dd>28–40px+ · bold/tabular</dd></div>
+            </dl>
+          </article>
+          <article class="panel">
+            <h3>How the current tokens compare</h3>
+            <ul>
+              <li><strong>Body 15px:</strong> valid for dense cards and matches Fluent iOS Body 2, but below the default Apple iOS and Material reading baseline.</li>
+              <li><strong>Caption 13px:</strong> a strong choice for secondary metadata.</li>
+              <li><strong>Title 16px:</strong> appropriate for card and row titles, not a full page heading.</li>
+              <li><strong>Section 24px:</strong> aligned with common dashboard heading sizes.</li>
+              <li><strong>Navigation 10px:</strong> the clearest candidate for an accessibility/readability increase.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="method-title">
+        <div class="section-heading">
+          <h2 id="method-title">Method and sources</h2>
+          <p>What the numbers mean—and where the public evidence stops.</p>
+        </div>
+        <div class="method">
+          <article class="panel">
+            <h3>Research sources</h3>
+            <ul class="source-list">
+              <li><a href="https://developer.apple.com/design/human-interface-guidelines/typography">Apple Human Interface Guidelines — Typography</a></li>
+              <li><a href="https://developer.android.com/develop/ui/compose/designsystems/material3?hl=en">Android Developers — Material 3 typography</a></li>
+              <li><a href="https://developer.samsung.com/one-ui/accessibility/layout-and-typo.html">Samsung Developer — One UI layout and typography</a></li>
+              <li><a href="https://dev.fitbit.com/build/guides/user-interface/css/">Fitbit Developer — CSS helper typography</a></li>
+              <li><a href="https://developer.whoop.com/docs/developing/design-guidelines/">WHOOP Developer — design guidelines</a></li>
+              <li><a href="https://developer.garmin.com/connect-iq/device-reference/fr55/">Garmin Developer — Forerunner 55 device reference</a></li>
+              <li><a href="https://developer.garmin.com/connect-iq/device-reference/edge-520/">Garmin Developer — Edge 520 device reference</a></li>
+              <li><a href="https://fluent2.microsoft.design/typography">Microsoft Fluent 2 — typography</a></li>
+              <li><a href="https://atlassian.design/foundations/typography/">Atlassian Design — typography</a></li>
+              <li><a href="https://polaris-react.shopify.com/components/typography/text">Shopify Polaris — Text component</a></li>
+              <li><a href="https://carbondesignsystem.com/elements/typography/type-sets/">IBM Carbon — type sets</a></li>
+              <li><a href="https://next.primer.style/product/primitives/typography/">GitHub Primer — typography</a></li>
+              <li><a href="https://opensource.adobe.com/spectrum-design-data/tokens/typography/">Adobe Spectrum Design Data — typography tokens</a></li>
+            </ul>
+          </article>
+          <aside class="method-note">
+            <p><strong>Evidence boundary.</strong></p>
+            <p>
+              Apple, Material, Fluent, Atlassian, Shopify, Carbon, Primer, Adobe, Fitbit,
+              and Garmin publish numeric values. Samsung and WHOOP publish roles and scaling
+              guidance but not a complete current mobile pixel scale. Private production apps
+              can override their platform system, so these are defensible benchmarks—not a
+              claim that every screen in each app uses one identical size.
+            </p>
+            <p>
+              OceanEyes’ current values come from
+              <a href="../lib/core/theme/oceaneyes_tokens.dart">lib/core/theme/oceaneyes_tokens.dart</a>
+              and <a href="visual_tokens.md">docs/visual_tokens.md</a>.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    OceanEyes Typography Benchmark · Prepared from published design guidance · August 2026
+  </footer>
+</body>
+</html>

@@ -7,6 +7,7 @@ import 'package:oceaneyes/models/demo_fixtures.dart';
 import 'package:oceaneyes/ui/widgets/glass.dart';
 import 'package:oceaneyes/ui/widgets/screen_primitives.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -128,6 +129,31 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
     expect(find.byKey(const ValueKey('tank-pairing-sheet')), findsOneWidget);
     expect(find.text('Connect a tank'), findsOneWidget);
+  });
+
+  testWidgets('fixture tank controls expose a local demo pairing QR', (
+    tester,
+  ) async {
+    final controller = OceanEyesController();
+    addTearDown(controller.dispose);
+    await pumpAccount(tester, controller);
+
+    final qrButton = find.byTooltip('Show tank pairing QR code');
+    expect(qrButton, findsOneWidget);
+
+    await tester.tap(qrButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tank pairing code'), findsOneWidget);
+    expect(find.text('tank-demo'), findsOneWidget);
+    final qr = find.byType(QrImageView);
+    expect(qr, findsOneWidget);
+    final qrSemantics = tester
+        .widgetList<Semantics>(
+          find.ancestor(of: qr, matching: find.byType(Semantics)),
+        )
+        .map((semantics) => semantics.properties.label);
+    expect(qrSemantics, contains('QR code for tank tank-demo'));
   });
 
   testWidgets('disconnect keeps shared settings available in fixture mode', (

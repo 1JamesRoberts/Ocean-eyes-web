@@ -93,7 +93,9 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _showTankPairingCode() async {
-    final tankId = controller.activeTankId;
+    final tankId = controller.productionEnabled
+        ? controller.activeTankId
+        : 'tank-demo';
     if (tankId == null) return;
     final payload = TankPairingCodec.encode(TankPairingPayload(tankId: tankId));
     await showDialog<void>(
@@ -311,8 +313,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             ],
                           ),
                         ),
-                        if (controller.productionEnabled &&
-                            controller.canEditTankSettings) ...[
+                        if (controller.canEditTankSettings) ...[
                           GlassIconButton(
                             icon: LucideIcons.qrCode,
                             tooltip: 'Show tank pairing QR code',
