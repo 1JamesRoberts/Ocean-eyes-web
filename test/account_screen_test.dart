@@ -3,6 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
+import 'package:oceaneyes/models/demo_fixtures.dart';
+import 'package:oceaneyes/ui/widgets/glass.dart';
+import 'package:oceaneyes/ui/widgets/screen_primitives.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 
 void main() {
@@ -45,6 +48,62 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
     expect(find.byKey(const ValueKey('tank-pairing-sheet')), findsOneWidget);
     expect(find.text('Connect a tank'), findsOneWidget);
+  });
+
+  testWidgets('Account screen subcards use transparent surfaces', (
+    tester,
+  ) async {
+    final controller = OceanEyesController();
+    addTearDown(controller.dispose);
+    await pumpAccount(tester, controller);
+
+    final panels = tester.widgetList<GlassPanel>(find.byType(GlassPanel));
+    expect(panels, isNotEmpty);
+    expect(
+      panels.every(
+        (panel) =>
+            panel.color == Colors.transparent &&
+            panel.borderColor == Colors.transparent,
+      ),
+      isTrue,
+    );
+
+    final disclosures = tester.widgetList<DisclosureCard>(
+      find.byType(DisclosureCard),
+    );
+    expect(disclosures, hasLength(4));
+    expect(
+      disclosures.every(
+        (disclosure) =>
+            disclosure.panelColor == Colors.transparent &&
+            disclosure.panelBorderColor == Colors.transparent,
+      ),
+      isTrue,
+    );
+  });
+
+  testWidgets('AI species entries keep their borders', (tester) async {
+    final controller = OceanEyesController()
+      ..cameraStage = CameraStage.active
+      ..fish = DemoFixtures.populatedFish();
+    addTearDown(controller.dispose);
+    await pumpAccount(tester, controller);
+
+    final speciesPanel = find.ancestor(
+      of: find.text('Species Breakdown'),
+      matching: find.byType(GlassPanel),
+    );
+    expect(speciesPanel, findsOneWidget);
+    final panel = tester.widget<GlassPanel>(speciesPanel);
+    expect(panel.color, Colors.transparent);
+    expect(panel.borderColor, Colors.transparent);
+
+    for (final fish in controller.fish) {
+      final speciesEntry = find.byKey(ValueKey('account-species-${fish.id}'));
+      expect(speciesEntry, findsOneWidget);
+      final decoration = tester.widget<DecoratedBox>(speciesEntry).decoration;
+      expect((decoration as BoxDecoration).border, isNotNull);
+    }
   });
 
   testWidgets('fixture pairing entry opens the shared pairing sheet', (

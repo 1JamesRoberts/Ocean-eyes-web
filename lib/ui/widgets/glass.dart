@@ -70,7 +70,13 @@ class GlassCard extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                Padding(padding: padding, child: child),
+                Padding(
+                  padding: padding,
+                  // Stack lays out non-positioned children with loose
+                  // constraints. Keep the card content at the full inner
+                  // width so centered layouts align with the card itself.
+                  child: SizedBox(width: double.infinity, child: child),
+                ),
                 Positioned.fill(
                   child: IgnorePointer(
                     child: CustomPaint(

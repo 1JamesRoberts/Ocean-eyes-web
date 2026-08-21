@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
+import 'package:oceaneyes/ui/widgets/screen_primitives.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 
 void main() {
@@ -77,6 +78,12 @@ void main() {
     controller.selectTab(PrimaryTab.myFish);
     await tester.pumpAndSettle();
     expect(find.text('No fish in your inventory'), findsOneWidget);
+    final emptyStateCard = find.byType(StateCard);
+    expect(emptyStateCard, findsOneWidget);
+    expect(
+      tester.getCenter(find.text('No fish in your inventory')).dx,
+      closeTo(tester.getCenter(emptyStateCard).dx, 0.5),
+    );
 
     controller.applyFixture(FixtureScenario.analyticsError);
     controller.selectTab(PrimaryTab.analytics);

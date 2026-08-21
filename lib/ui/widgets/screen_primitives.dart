@@ -213,6 +213,8 @@ class DisclosureCard extends StatelessWidget {
     this.enabled = true,
     this.badge,
     this.iconColor,
+    this.panelColor,
+    this.panelBorderColor,
   });
 
   final String title;
@@ -224,10 +226,14 @@ class DisclosureCard extends StatelessWidget {
   final bool enabled;
   final Widget? badge;
   final Color? iconColor;
+  final Color? panelColor;
+  final Color? panelBorderColor;
 
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
+      color: panelColor,
+      borderColor: panelBorderColor,
       child: Column(
         children: [
           Semantics(

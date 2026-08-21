@@ -216,6 +216,8 @@ class _AccountScreenState extends State<AccountScreen> {
           ],
           if (!controller.tankConnected)
             GlassPanel(
+              color: Colors.transparent,
+              borderColor: Colors.transparent,
               child: Row(
                 children: [
                   const Icon(LucideIcons.unplug, size: 20),
@@ -252,6 +254,8 @@ class _AccountScreenState extends State<AccountScreen> {
             )
           else ...[
             GlassPanel(
+              color: Colors.transparent,
+              borderColor: Colors.transparent,
               child: _renaming
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,8 +342,8 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
             const SizedBox(height: 12),
             GlassPanel(
-              color: OceanColors.verdigris.withValues(alpha: 0.08),
-              borderColor: OceanColors.turquoise.withValues(alpha: 0.20),
+              color: Colors.transparent,
+              borderColor: Colors.transparent,
               onTap: _openTankPairing,
               child: const _StaticSettingsRow(
                 icon: LucideIcons.monitor,
@@ -352,6 +356,8 @@ class _AccountScreenState extends State<AccountScreen> {
                 controller.canCalibrateTank) ...[
               const SizedBox(height: 12),
               GlassPanel(
+                color: Colors.transparent,
+                borderColor: Colors.transparent,
                 child: Column(
                   children: [
                     _StaticSettingsRow(
@@ -399,10 +405,7 @@ class _AccountScreenState extends State<AccountScreen> {
               Container(
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
                 decoration: BoxDecoration(
-                  color: OceanColors.criticalInk.withValues(alpha: 0.08),
-                  border: Border.all(
-                    color: OceanColors.criticalInk.withValues(alpha: 0.20),
-                  ),
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -438,8 +441,8 @@ class _AccountScreenState extends State<AccountScreen> {
               )
             else
               GlassPanel(
-                color: OceanColors.criticalInk.withValues(alpha: 0.08),
-                borderColor: OceanColors.criticalInk.withValues(alpha: 0.20),
+                color: Colors.transparent,
+                borderColor: Colors.transparent,
                 onTap: () => setState(() => _showDisconnectConfirmation = true),
                 child: const _StaticSettingsRow(
                   icon: LucideIcons.x,
@@ -457,8 +460,8 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _buildGoogleAccountLink() {
     final servicesAvailable = controller.productionServicesAvailable;
     return GlassPanel(
-      color: OceanColors.verdigris.withValues(alpha: 0.08),
-      borderColor: OceanColors.turquoise.withValues(alpha: 0.20),
+      color: Colors.transparent,
+      borderColor: Colors.transparent,
       child: Row(
         children: [
           const SizedBox.square(
@@ -512,6 +515,8 @@ class _AccountScreenState extends State<AccountScreen> {
             divider: true,
           ),
           DisclosureCard(
+            panelColor: Colors.transparent,
+            panelBorderColor: Colors.transparent,
             title: 'Stream Image Adjustments',
             subtitle:
                 'Contrast ${(controller.contrast * 100).round()}%, brightness ${(controller.brightness * 100).round()}%, saturation ${(controller.saturation * 100).round()}%',
@@ -583,6 +588,8 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           const SizedBox(height: 12),
           DisclosureCard(
+            panelColor: Colors.transparent,
+            panelBorderColor: Colors.transparent,
             title: 'Background Canvas',
             subtitle: 'Video and background transition controls',
             icon: LucideIcons.image,
@@ -597,8 +604,8 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Widget _buildProductionError(String message) {
     return GlassPanel(
-      color: OceanColors.criticalInk.withValues(alpha: 0.08),
-      borderColor: OceanColors.criticalInk.withValues(alpha: 0.20),
+      color: Colors.transparent,
+      borderColor: Colors.transparent,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -671,6 +678,8 @@ class _AccountScreenState extends State<AccountScreen> {
             divider: true,
           ),
           DisclosureCard(
+            panelColor: Colors.transparent,
+            panelBorderColor: Colors.transparent,
             title: 'Alert sensitivity',
             subtitle:
                 '${controller.clarityThreshold.toStringAsFixed(1)} FNU turbidity max, ${controller.visibleFishThreshold.round()}% fish visibility change',
@@ -727,6 +736,8 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           const SizedBox(height: 12),
           GlassPanel(
+            color: Colors.transparent,
+            borderColor: Colors.transparent,
             onTap: controller.openAlerts,
             child: const _StaticSettingsRow(
               icon: LucideIcons.bell,
@@ -736,6 +747,8 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           const SizedBox(height: 12),
           DisclosureCard(
+            panelColor: Colors.transparent,
+            panelBorderColor: Colors.transparent,
             title: 'AI Preferences',
             subtitle:
                 '${controller.autoConnect ? 'Auto-start enabled' : 'Auto-start disabled'}, ${(controller.pollingIntervalMs / 1000).round()}s polling',
@@ -841,6 +854,8 @@ class _AIAnalysisCard extends StatelessWidget {
             children: [
               Expanded(
                 child: GlassPanel(
+                  color: Colors.transparent,
+                  borderColor: Colors.transparent,
                   child: _MetricValue(
                     label: 'Fish Detected',
                     value: controller.aiEnabled
@@ -852,6 +867,8 @@ class _AIAnalysisCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: GlassPanel(
+                  color: Colors.transparent,
+                  borderColor: Colors.transparent,
                   child: _MetricValue(
                     label: 'FNU',
                     value: _fnuValue(controller.lastTurbidityResult),
@@ -862,6 +879,8 @@ class _AIAnalysisCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           GlassPanel(
+            color: Colors.transparent,
+            borderColor: Colors.transparent,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -881,39 +900,54 @@ class _AIAnalysisCard extends StatelessWidget {
                           index < controller.fish.length;
                           index++
                         )
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
+                          DecoratedBox(
+                            key: ValueKey(
+                              'account-species-${controller.fish[index].id}',
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color:
-                                        SpeciesDonut.colors[index %
-                                            SpeciesDonut.colors.length],
-                                  ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: OceanColors.white.withValues(
+                                  alpha: 0.25,
                                 ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  controller.fish[index].name,
-                                  style: OceanTypography.caption.copyWith(
-                                    color: OceanColors.ink,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                OceanRadii.pill,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          SpeciesDonut.colors[index %
+                                              SpeciesDonut.colors.length],
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${controller.fish[index].detected}',
-                                  style: OceanTypography.caption.copyWith(
-                                    color: OceanColors.ink,
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    controller.fish[index].name,
+                                    style: OceanTypography.caption.copyWith(
+                                      color: OceanColors.ink,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '${controller.fish[index].detected}',
+                                    style: OceanTypography.caption.copyWith(
+                                      color: OceanColors.ink,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                       ],
@@ -924,6 +958,8 @@ class _AIAnalysisCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           GlassPanel(
+            color: Colors.transparent,
+            borderColor: Colors.transparent,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
