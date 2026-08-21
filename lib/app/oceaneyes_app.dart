@@ -7,6 +7,7 @@ import '../core/theme/oceaneyes_tokens.dart';
 import '../models/aquarium_models.dart';
 import '../ui/screens/account_screen.dart';
 import '../ui/screens/login_screen.dart';
+import '../ui/screens/startup_error_screen.dart';
 import '../ui/shell/oceaneyes_shell.dart';
 import '../view_models/oceaneyes_controller.dart';
 
@@ -22,6 +23,27 @@ class OceanEyesApp extends StatefulWidget {
 
   @override
   State<OceanEyesApp> createState() => _OceanEyesAppState();
+}
+
+/// The only surface shown when a customer release cannot compose its
+/// production services. It deliberately does not construct an
+/// [OceanEyesController], so a broken release cannot look like the fixture
+/// app or expose partially initialized production controls.
+class OceanEyesStartupErrorApp extends StatelessWidget {
+  const OceanEyesStartupErrorApp({super.key, required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'OceanEyes',
+      debugShowCheckedModeBanner: false,
+      theme: OceanEyesTheme.light,
+      themeMode: ThemeMode.light,
+      home: StartupErrorScreen(message: message),
+    );
+  }
 }
 
 class _OceanEyesAppState extends State<OceanEyesApp>

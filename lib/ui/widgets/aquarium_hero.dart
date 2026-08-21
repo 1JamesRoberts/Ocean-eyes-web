@@ -196,6 +196,8 @@ class AquariumStreamImage extends StatelessWidget {
         alignment: alignment,
         gaplessPlayback: true,
       );
+    } else if (controller.productionEnabled) {
+      streamImage = const _ProductionUnavailableFeed();
     } else {
       streamImage = Image.asset(
         'assets/images/aquarium_hero.png',
@@ -257,6 +259,65 @@ class AquariumStreamImage extends StatelessWidget {
       );
     }
     return image;
+  }
+}
+
+class _ProductionUnavailableFeed extends StatelessWidget {
+  const _ProductionUnavailableFeed();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'Live feed unavailable',
+      container: true,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact =
+              constraints.maxWidth < 180 || constraints.maxHeight < 120;
+          return ColoredBox(
+            key: const ValueKey('production-live-feed-unavailable'),
+            color: OceanColors.prussianBlue,
+            child: Center(
+              child: compact
+                  ? const Icon(
+                      Icons.videocam_off_outlined,
+                      color: OceanColors.pearlAqua,
+                      size: 24,
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(OceanSpacing.lg),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.videocam_off_outlined,
+                            color: OceanColors.pearlAqua,
+                            size: 32,
+                          ),
+                          const SizedBox(height: OceanSpacing.sm),
+                          Text(
+                            'Live feed unavailable',
+                            textAlign: TextAlign.center,
+                            style: OceanTypography.strong.copyWith(
+                              color: OceanColors.white,
+                            ),
+                          ),
+                          const SizedBox(height: OceanSpacing.xs),
+                          Text(
+                            'Connect a monitor or retry the camera connection.',
+                            textAlign: TextAlign.center,
+                            style: OceanTypography.caption.copyWith(
+                              color: OceanColors.pearlAqua,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }
 

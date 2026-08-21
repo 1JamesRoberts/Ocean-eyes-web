@@ -16,6 +16,17 @@ Future<void> main() async {
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
-  final controller = await bootstrapOceanEyesController();
-  runApp(OceanEyesApp(controller: controller, disposeController: true));
+  try {
+    final controller = await bootstrapOceanEyesController();
+    runApp(OceanEyesApp(controller: controller, disposeController: true));
+  } on OceanEyesBootstrapException catch (error) {
+    runApp(OceanEyesStartupErrorApp(message: error.message));
+  } catch (error, stackTrace) {
+    debugPrint('OceanEyes startup failed: $error\n$stackTrace');
+    runApp(
+      const OceanEyesStartupErrorApp(
+        message: 'OceanEyes could not start. Check the app configuration.',
+      ),
+    );
+  }
 }

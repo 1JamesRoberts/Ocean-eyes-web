@@ -19,6 +19,19 @@ import '../models/oceaneyes_settings_repository.dart';
 import '../view_models/oceaneyes_controller.dart';
 import 'production_config.dart';
 
+/// A production build cannot safely fall back to the fixture shell when its
+/// Firebase or service configuration is invalid. The app catches this error
+/// at the composition root and renders a blocking startup screen instead.
+class OceanEyesBootstrapException implements Exception {
+  const OceanEyesBootstrapException(this.message, {this.cause});
+
+  final String message;
+  final Object? cause;
+
+  @override
+  String toString() => message;
+}
+
 /// Composes the production Firebase/auth/Firestore/camera/ML/FCM/LiveKit/
 /// wake-lock stack for the running application.
 Future<OceanEyesController> bootstrapOceanEyesController({
@@ -38,6 +51,11 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       settingsRepository: settings,
       launchUri: uri,
     );
+  }
+
+  final validationError = config.validate();
+  if (validationError != null) {
+    throw OceanEyesBootstrapException(validationError);
   }
 
   try {
@@ -82,13 +100,10 @@ Future<OceanEyesController> bootstrapOceanEyesController({
     return controller;
   } catch (error, stackTrace) {
     debugPrint('OceanEyes production startup failed: $error\n$stackTrace');
-    return OceanEyesController(
-      preferences: preferences,
-      inventoryRepository: inventory,
-      settingsRepository: settings,
-      launchUri: controllerUri,
-      productionEnabled: true,
-      productionStartupError: error.toString(),
+    throw OceanEyesBootstrapException(
+      'OceanEyes could not start the customer release services. '
+      'Check the private production configuration and service availability.',
+      cause: error,
     );
   }
 }

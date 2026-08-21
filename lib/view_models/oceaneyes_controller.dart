@@ -37,7 +37,6 @@ class OceanEyesController extends ChangeNotifier
     Uri? launchUri,
     bool requireLogin = false,
     this.productionEnabled = false,
-    String? productionStartupError,
     ProductionOceanEyesRepository? productionRepository,
     ProductionAuthGateway? productionAuth,
     CameraCaptureGateway? cameraGateway,
@@ -62,7 +61,6 @@ class OceanEyesController extends ChangeNotifier
                  : SharedPreferencesOceanEyesSettingsRepository(preferences)),
        ),
        _preferences = preferences,
-       productionError = productionStartupError,
        _productionRepository = productionRepository,
        _cameraHandoffConfiguration = cameraHandoffConfiguration,
        _cameraHandoffDelay = cameraHandoffDelay ?? _defaultCameraHandoffDelay {
@@ -116,7 +114,7 @@ class OceanEyesController extends ChangeNotifier
         requestedFixture?.toLowerCase().replaceAll('-', '_') == 'login' ||
         uri.queryParameters['route'] == 'login';
     isAuthenticated = productionEnabled
-        ? productionAuth?.currentUser != null || productionStartupError != null
+        ? productionAuth?.currentUser != null
         : !(forceLogin || (requireLogin && requestedFixture == null));
     final shouldApplyFixture =
         !productionEnabled && requestedFixture != null && !forceLogin;
@@ -126,15 +124,6 @@ class OceanEyesController extends ChangeNotifier
       _restorePreferences();
     }
     _navigation.configureLaunch(uri);
-    if (productionEnabled && productionStartupError != null) {
-      _clearProductionTankData();
-      activeTankId = null;
-      tankName = 'Aquarium';
-      tankConnected = false;
-      cameraStage = CameraStage.unavailable;
-      dashboardHealth = DashboardHealthState.waiting;
-      analyticsState = AnalyticsContentState.error;
-    }
   }
 
   /// Starts production subscriptions after Firebase and anonymous auth have

@@ -1,14 +1,12 @@
 # Production setup
 
-OceanEyes keeps production integrations behind the explicit
-`OCEANEYES_PRODUCTION=true` runtime switch. The default `flutter run` command
-uses the deterministic local preview and does not access Firebase, camera,
-messaging, LiveKit, or ONNX Runtime. The configured production runtime
-initializes those services with the private Dart-define file below.
+OceanEyes has two supported workflows. Dev mode uses the deterministic local
+preview and does not access Firebase, camera, messaging, LiveKit, or ONNX
+Runtime. Customer mode is the release build produced with
+`OCEANEYES_PRODUCTION=true` and a private Dart-define file.
 
-For local integration, use the same production runtime against the Firebase
-Auth, Firestore, and Functions emulators. Never put real values in the tracked
-example files.
+Firebase Auth, Firestore, and Functions emulators are internal engineering
+infrastructure only. Never put real values in the tracked example files.
 
 ## 1. Firebase applications
 
@@ -38,16 +36,17 @@ The repository ignores:
 The app does not import `firebase_options.dart`; it can initialize from the
 native files or from Dart defines. This keeps credentials out of tracked source;
 fixture-only tests remain independent of Firebase. Copy
-`config/production.example.json` outside the repository, replace the
-placeholders, and run the supported application runtime with:
+`config/production.example.json` outside the repository and replace the
+placeholders. Customer artifacts are built with:
 
 ```powershell
-flutter run -d chrome --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build web --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
 
 The production Firebase/Google stack is supported on Android, iOS, and web.
-Do not launch the production configuration on the Windows desktop target; use
-`-d chrome` for browser testing or run it on a supported mobile device.
+The Windows desktop target is not a customer production target.
 
 Google linking needs OAuth client configuration in addition to Firebase app
 options. With native Google service files, keep the generated Android web
@@ -119,16 +118,15 @@ To use local emulators, add these defines to a private configuration file:
 }
 ```
 
-Start the emulators, then launch the app with that private file:
+Start the emulators for internal engineering validation:
 
 ```powershell
 firebase emulators:start --only auth,firestore,functions --project demo-oceaneyes
-flutter run --dart-define-from-file=C:\secure\oceaneyes-emulator.json
 ```
 
 Use `10.0.2.2` instead of `localhost` from an Android emulator. This emulator
-path is the recommended local integration workflow; it exercises the shipped
-production runtime without connecting to the staging or production project.
+configuration is consumed only by internal validation and does not create a
+third customer-facing app mode.
 
 ## 4. LiveKit
 
@@ -200,11 +198,12 @@ Credential-free checks:
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze
 flutter test
-flutter build web --release
-flutter build apk --debug
 npm --prefix functions test
 firebase emulators:exec --only firestore --project demo-oceaneyes "npm --prefix functions run test:rules"
 ```
+
+Use the private production configuration and the release commands above for
+customer artifacts; an unconfigured release build is not a customer build.
 
 Configured validation additionally needs physical Android/iOS devices for App
 Check, Google linking, camera/ONNX memory and thermal behavior, background FCM,

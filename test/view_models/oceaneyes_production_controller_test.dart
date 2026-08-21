@@ -8,8 +8,6 @@ import 'package:oceaneyes/integrations/livekit/livekit_gateway.dart';
 import 'package:oceaneyes/integrations/ml/onnx_fish_inference.dart';
 import 'package:oceaneyes/integrations/power/wake_lock_gateway.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
-import 'package:oceaneyes/models/fish_inventory_repository.dart';
-import 'package:oceaneyes/models/oceaneyes_settings_repository.dart';
 import 'package:oceaneyes/models/production_auth.dart';
 import 'package:oceaneyes/models/production_data.dart';
 import 'package:oceaneyes/models/production_repository.dart';
@@ -17,47 +15,6 @@ import 'package:oceaneyes/models/tank_pairing_codec.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 
 void main() {
-  test(
-    'production startup errors expose no cached or demo tank data',
-    () async {
-      final repository = _FakeProductionRepository();
-      final auth = _FakeProductionAuth(user: _user);
-      final controller = OceanEyesController(
-        productionEnabled: true,
-        productionStartupError: 'Firebase initialization failed',
-        productionRepository: repository,
-        productionAuth: auth,
-        inventoryRepository: _StaticFishInventoryRepository(const [
-          _remoteFish,
-        ]),
-        settingsRepository: const _StaticSettingsRepository(
-          OceanEyesSettings(tankName: 'Cached Demo Reef', tankConnected: true),
-        ),
-        launchUri: Uri.parse('https://oceaneyes.test/'),
-      );
-
-      expect(controller.tankConnected, isFalse);
-      expect(controller.activeTankId, isNull);
-      expect(controller.tankName, 'Aquarium');
-      expect(controller.fish, isEmpty);
-      expect(controller.alerts, isEmpty);
-      expect(controller.history, isEmpty);
-      expect(controller.claritySeries, isEmpty);
-      expect(controller.heatmapCenters, isEmpty);
-      expect(controller.lastTurbidityResult, isNull);
-      expect(
-        controller.waterMetrics.map((metric) => metric.value),
-        everyElement('--'),
-      );
-      expect(controller.analyticsState, AnalyticsContentState.error);
-
-      controller.dispose();
-      await _drainMicrotasks();
-      await repository.close();
-      await auth.close();
-    },
-  );
-
   test('direct and fixture controllers perform no production work', () async {
     final repository = _FakeProductionRepository();
     final auth = _FakeProductionAuth(user: _user);
@@ -1170,30 +1127,6 @@ final class _FakeProductionRepository implements ProductionOceanEyesRepository {
       await streams.close();
     }
   }
-}
-
-final class _StaticFishInventoryRepository implements FishInventoryRepository {
-  const _StaticFishInventoryRepository(this.value);
-
-  final List<FishEntry> value;
-
-  @override
-  List<FishEntry> load() => value;
-
-  @override
-  Future<void> save(List<FishEntry> fish) async {}
-}
-
-final class _StaticSettingsRepository implements OceanEyesSettingsRepository {
-  const _StaticSettingsRepository(this.value);
-
-  final OceanEyesSettings value;
-
-  @override
-  OceanEyesSettings load() => value;
-
-  @override
-  Future<void> save(OceanEyesSettings settings) async {}
 }
 
 final class _TankStreams {

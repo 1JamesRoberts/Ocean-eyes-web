@@ -23,8 +23,6 @@ model binaries. They passed against the final integration:
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze
 flutter test
-flutter build web --release
-flutter build apk --debug
 npm --prefix functions test
 firebase emulators:exec --only firestore --project demo-oceaneyes "npm --prefix functions run test:rules"
 ```
@@ -36,13 +34,10 @@ firebase emulators:exec --only firestore --project demo-oceaneyes "npm --prefix 
 | Flutter unit/widget/golden suite | 108 tests passed |
 | Cloud Functions TypeScript/policy suite | Build passed; 15 tests passed |
 | Firestore rules/indexes | Firestore Emulator 1.22.0; 8 authorization tests passed |
-| Android debug build | `app-debug.apk` produced successfully |
-| Flutter web release build | Build and WebAssembly dry run passed |
+| Customer release artifacts | Require the private customer configuration and the release commands in `docs/production_setup.md` |
 
-The Android and web builds were run from an otherwise identical temporary
-copy outside OneDrive because OneDrive held generated Gradle assets open during
-cleanup in the workspace. The clean-copy Android build confirms that failure
-was a sync-file lock rather than a source or Gradle configuration problem.
+Customer release artifact validation is intentionally separate from these
+credential-free checks and must use the private production configuration.
 
 The Flutter suite includes the existing widget/golden coverage plus production
 mapper, auth, pairing, camera/ML contract, notification-route, and controller

@@ -796,13 +796,15 @@ and set real values there.
 | `OCEANEYES_GOOGLE_WEB_CLIENT_ID` | Web client ID; Android `serverClientId`. |
 | `OCEANEYES_FIREBASE_WEB_PUSH_VAPID_KEY` | Public web-push VAPID key. |
 
-Launch example:
+Customer release builds:
 
 ```powershell
-flutter run --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build web --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
 
-Emulator-only private define example:
+Internal emulator-only private define example:
 
 ```json
 {
@@ -918,8 +920,6 @@ These commands passed against the final integration:
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze
 flutter test
-flutter build web --release
-flutter build apk --debug
 npm --prefix functions test
 firebase emulators:exec --only firestore --project demo-oceaneyes "npm --prefix functions run test:rules"
 ```
@@ -931,14 +931,11 @@ firebase emulators:exec --only firestore --project demo-oceaneyes "npm --prefix 
 | Flutter unit/widget/golden suite | 108/108 tests passed |
 | Functions TypeScript/policy suite | Build passed; 15/15 tests passed |
 | Firestore authorization suite | Emulator 1.22.0; 8/8 tests passed |
-| Android debug build | `app-debug.apk` produced successfully |
-| Flutter web release build | Release build and Wasm dry run passed |
 | Git diff hygiene | Passed; expected Windows line-ending warnings only |
 | Protected-file scan | No credentials, signing keys, or models tracked |
 
-Android/web builds were run from an identical temporary copy outside OneDrive
-because OneDrive held generated Gradle assets open during cleanup. The clean
-copy confirmed a sync lock rather than a source/Gradle problem.
+Customer release artifact validation requires the private production
+configuration and the release commands documented above.
 
 Production tests cover:
 

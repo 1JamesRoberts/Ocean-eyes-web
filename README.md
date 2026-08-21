@@ -7,36 +7,36 @@ camera-control states, Alerts, and History.
 
 ## Run
 
-The default `flutter run` command launches the deterministic local preview, so
-the UI can be exercised without Firebase credentials or camera hardware. Its
-`Connect Stream` action transitions the simulated camera feed.
+OceanEyes has two supported workflows. Dev mode is the deterministic local
+preview and does not require Firebase credentials or camera hardware. The
+customer mode is built as a release artifact with the private production
+configuration.
 
 ```powershell
 flutter pub get
-flutter run -d chrome
+flutter run -d edge
 ```
 
-Production integrations are opt-in. Copy `config/production.example.json` to a
-secure location outside the repository, replace its placeholders with the
-intended Firebase values, keep `OCEANEYES_PRODUCTION` set to `true`, and launch
-the app with that private configuration:
+For the customer release, copy `config/production.example.json` to a secure
+location outside the repository, replace its placeholders with the intended
+Firebase values, keep `OCEANEYES_PRODUCTION` set to `true`, and build the
+target artifact with that private configuration:
 
 ```powershell
-flutter run --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build web --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
 
-For local Firebase integration work, point the same production runtime at the Firebase Auth,
-Firestore, and Functions emulators as described in
-[`docs/production_setup.md`](docs/production_setup.md). Deterministic fixtures
-can also be selected with `?fixture=...` in the local preview.
+The Firebase emulator configuration is internal engineering/test
+infrastructure and is not a third app mode. Deterministic fixtures can be
+selected with `?fixture=...` in Dev mode.
 
 Common validation commands:
 
 ```powershell
 flutter analyze
 flutter test
-flutter build web --release
-flutter build apk --debug
 ```
 
 The visual test harness supports deterministic fixture scenarios documented in
