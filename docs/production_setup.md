@@ -1,10 +1,10 @@
 # Production setup
 
-OceanEyes ships with production integrations as its only application runtime.
-The configured runtime initializes Firebase, camera, messaging, LiveKit, and
-ONNX Runtime. Deterministic fixtures are test-only: tests construct
-`OceanEyesController` instances directly or use test doubles, and never expose
-a separate fixture app mode.
+OceanEyes keeps production integrations behind the explicit
+`OCEANEYES_PRODUCTION=true` runtime switch. The default `flutter run` command
+uses the deterministic local preview and does not access Firebase, camera,
+messaging, LiveKit, or ONNX Runtime. The configured production runtime
+initializes those services with the private Dart-define file below.
 
 For local integration, use the same production runtime against the Firebase
 Auth, Firestore, and Functions emulators. Never put real values in the tracked
@@ -104,6 +104,7 @@ To use local emulators, add these defines to a private configuration file:
 
 ```json
 {
+  "OCEANEYES_PRODUCTION": true,
   "OCEANEYES_FIREBASE_EMULATORS": true,
   "OCEANEYES_FIRESTORE_EMULATOR_HOST": "localhost",
   "OCEANEYES_FIRESTORE_EMULATOR_PORT": 8080,

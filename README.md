@@ -7,22 +7,28 @@ camera-control states, Alerts, and History.
 
 ## Run
 
-The shipped application runtime is production-only. Copy
-`config/production.example.json` to a secure location outside the repository,
-replace its placeholders with the intended Firebase values, and launch the app
-with that private configuration:
+The default `flutter run` command launches the deterministic local preview, so
+the UI can be exercised without Firebase credentials or camera hardware. Its
+`Connect Stream` action transitions the simulated camera feed.
 
 ```powershell
 flutter pub get
+flutter run -d chrome
+```
+
+Production integrations are opt-in. Copy `config/production.example.json` to a
+secure location outside the repository, replace its placeholders with the
+intended Firebase values, keep `OCEANEYES_PRODUCTION` set to `true`, and launch
+the app with that private configuration:
+
+```powershell
 flutter run --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
 
-For local integration work, point the same runtime at the Firebase Auth,
+For local Firebase integration work, point the same production runtime at the Firebase Auth,
 Firestore, and Functions emulators as described in
 [`docs/production_setup.md`](docs/production_setup.md). Deterministic fixtures
-are test-only: widget, unit, and visual harnesses construct
-`OceanEyesController` instances directly and inject fixture state. The shipped
-web app is not launched with `?fixture=...` URLs.
+can also be selected with `?fixture=...` in the local preview.
 
 Common validation commands:
 
@@ -85,11 +91,11 @@ gestures unwind the same origin-aware route stack as visible back controls.
 
 ## Camera and backend boundary
 
-The shipped runtime uses anonymous Firebase Auth with optional Google linking,
-typed Firestore repositories and schema mappers, QR tank pairing, camera
-capture, an on-device three-model ONNX pipeline, FCM, Cloud Functions alerting,
-and LiveKit streaming. Deterministic fixture controllers remain available only
-to tests and never construct those production services.
+The production runtime uses anonymous Firebase Auth with optional Google
+linking, typed Firestore repositories and schema mappers, QR tank pairing,
+camera capture, an on-device three-model ONNX pipeline, FCM, Cloud Functions
+alerting, and LiveKit streaming. The default local preview keeps those
+services disabled and uses deterministic fixture state instead.
 
 No Firebase configuration, API credentials, APNs keys, or ONNX binaries are
 tracked. Follow [`docs/production_setup.md`](docs/production_setup.md) to

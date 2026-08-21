@@ -31,6 +31,15 @@ Future<OceanEyesController> bootstrapOceanEyesController({
   final settings = SharedPreferencesOceanEyesSettingsRepository(preferences);
   final config = OceanEyesProductionConfig.fromEnvironment();
 
+  if (!config.enabled) {
+    return OceanEyesController(
+      preferences: preferences,
+      inventoryRepository: inventory,
+      settingsRepository: settings,
+      launchUri: uri,
+    );
+  }
+
   try {
     final bootstrap = await initializeOceanEyesFirebase(config);
     final firebaseAuth = FirebaseAuth.instanceFor(app: bootstrap.app);
