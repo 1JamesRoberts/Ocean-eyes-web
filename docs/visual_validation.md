@@ -45,7 +45,8 @@ The test locks the surface to 393 × 852 logical pixels and names captures as:
 393x852__<screen>__<state>.png
 ```
 
-It covers Login idle; Dashboard waiting/healthy/warning/no-alerts; My Fish empty/populated/
+It covers Login idle; Onboarding welcome/choice/join-manual/owner-success and the
+limited no-tank dashboard; Dashboard waiting/healthy/warning/no-alerts; My Fish empty/populated/
 expanded, add-species, count adjustment, and delete confirmation; Analytics
 loading/empty/error/populated plus the species, calendar, and time-wheel
 selectors; Account permission/denied/unavailable/active, AI-disabled,

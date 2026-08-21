@@ -7,6 +7,7 @@ import '../core/theme/oceaneyes_tokens.dart';
 import '../models/aquarium_models.dart';
 import '../ui/screens/account_screen.dart';
 import '../ui/screens/login_screen.dart';
+import '../ui/screens/onboarding_screen.dart';
 import '../ui/screens/startup_error_screen.dart';
 import '../ui/shell/oceaneyes_shell.dart';
 import '../view_models/oceaneyes_controller.dart';
@@ -134,6 +135,7 @@ class _OceanEyesAppState extends State<OceanEyesApp>
         builder: (context, _) {
           final handlesBack =
               _controller.fullscreenCamera ||
+              _controller.shouldShowOnboarding ||
               _controller.secondaryRoute != null;
           return Stack(
             fit: StackFit.expand,
@@ -151,6 +153,8 @@ class _OceanEyesAppState extends State<OceanEyesApp>
                         } else {
                           _controller.setFullscreenCamera(false);
                         }
+                      } else if (_controller.shouldShowOnboarding) {
+                        _controller.handleOnboardingBack();
                       } else if (_controller.selectedAlertId != null) {
                         _controller.popAlertDetail();
                       } else {
@@ -226,6 +230,15 @@ class _OceanEyesAppState extends State<OceanEyesApp>
         break;
       case null:
         break;
+    }
+    if (_controller.shouldShowOnboarding) {
+      pages.add(
+        MaterialPage<void>(
+          key: ValueKey('onboarding'),
+          name: '/onboarding',
+          child: OceanEyesOnboardingScreen(controller: _controller),
+        ),
+      );
     }
     return pages;
   }

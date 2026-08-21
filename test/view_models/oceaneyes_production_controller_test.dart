@@ -85,6 +85,51 @@ void main() {
     },
   );
 
+  test('production onboarding waits for the linked-tank lookup', () async {
+    final repository = _FakeProductionRepository();
+    final auth = _FakeProductionAuth(user: _user);
+    final controller = _productionController(repository, auth);
+
+    await controller.initializeProduction();
+    expect(controller.shouldShowOnboarding, isFalse);
+
+    repository.emitLinkedTankIds(const []);
+    await _drainMicrotasks();
+    expect(controller.shouldShowOnboarding, isTrue);
+    expect(controller.showTankSetupBanner, isTrue);
+
+    controller.postponeOnboarding();
+    expect(controller.shouldShowOnboarding, isFalse);
+    expect(controller.showTankSetupBanner, isTrue);
+
+    controller.dispose();
+    await _drainMicrotasks();
+    await repository.close();
+    await auth.close();
+  });
+
+  test(
+    'existing linked tanks bypass onboarding and keep selection behavior',
+    () async {
+      final repository = _FakeProductionRepository();
+      final auth = _FakeProductionAuth(user: _user);
+      final controller = _productionController(repository, auth);
+
+      await controller.initializeProduction();
+      repository.emitLinkedTankIds(const ['tank-existing']);
+      await _drainMicrotasks();
+
+      expect(controller.shouldShowOnboarding, isFalse);
+      expect(controller.activeTankId, 'tank-existing');
+      expect(controller.tankConnected, isTrue);
+
+      controller.dispose();
+      await _drainMicrotasks();
+      await repository.close();
+      await auth.close();
+    },
+  );
+
   test('production controllers ignore fixture query parameters', () {
     final controller = OceanEyesController(
       productionEnabled: true,

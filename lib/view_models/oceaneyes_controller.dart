@@ -16,6 +16,8 @@ import '../models/demo_fixtures.dart';
 import '../models/fish_insights_service.dart';
 import '../models/fish_inventory_repository.dart';
 import '../models/oceaneyes_settings_repository.dart';
+import '../models/onboarding_models.dart';
+import '../models/onboarding_repository.dart';
 import '../models/production_auth.dart';
 import '../models/production_data.dart';
 import '../models/production_repository.dart';
@@ -24,6 +26,7 @@ import 'oceaneyes_camera_coordinator.dart';
 import 'oceaneyes_fixture_coordinator.dart';
 import 'oceaneyes_live_session_coordinator.dart';
 import 'oceaneyes_navigation_coordinator.dart';
+import 'oceaneyes_onboarding_coordinator.dart';
 import 'oceaneyes_persistence_coordinator.dart';
 import 'oceaneyes_production_binding_coordinator.dart';
 import 'oceaneyes_wake_lock_coordinator.dart';
@@ -34,6 +37,7 @@ class OceanEyesController extends ChangeNotifier
     SharedPreferences? preferences,
     FishInventoryRepository? inventoryRepository,
     OceanEyesSettingsRepository? settingsRepository,
+    OnboardingRepository? onboardingRepository,
     Uri? launchUri,
     bool requireLogin = false,
     this.productionEnabled = false,
@@ -59,6 +63,13 @@ class OceanEyesController extends ChangeNotifier
              (preferences == null
                  ? null
                  : SharedPreferencesOceanEyesSettingsRepository(preferences)),
+       ),
+       _onboarding = OceanEyesOnboardingCoordinator(
+         repository:
+             onboardingRepository ??
+             (preferences == null
+                 ? InMemoryOnboardingRepository()
+                 : SharedPreferencesOnboardingRepository(preferences)),
        ),
        _preferences = preferences,
        _productionRepository = productionRepository,
@@ -123,6 +134,8 @@ class OceanEyesController extends ChangeNotifier
     } else {
       _restorePreferences();
     }
+    _onboarding.loadForAccount(_onboardingAccountNamespace);
+    _onboarding.setLocalTankAvailability(tankConnected);
     _navigation.configureLaunch(uri);
   }
 
@@ -139,6 +152,8 @@ class OceanEyesController extends ChangeNotifier
     _productionInitialized = true;
     productionUser = _productionBindings.currentUser;
     isAuthenticated = productionUser != null;
+    _onboarding.loadForAccount(_onboardingAccountNamespace);
+    _onboarding.beginTankLookup();
     activeTankId = _preferences?.getString(_activeTankPreferenceKey);
     tankConnected = false;
     dashboardHealth = DashboardHealthState.waiting;
@@ -150,6 +165,8 @@ class OceanEyesController extends ChangeNotifier
       onAuthChanged: (user) {
         productionUser = user;
         isAuthenticated = user != null;
+        _onboarding.handleAccountIdentityChange(_onboardingAccountNamespace);
+        _onboarding.beginTankLookup();
         _notify();
       },
       clearTankForAuthChange: _clearTankForAuthChange,
@@ -171,6 +188,7 @@ class OceanEyesController extends ChangeNotifier
     cameraStage = CameraStage.unavailable;
     analyticsState = AnalyticsContentState.empty;
     _clearProductionTankData();
+    _onboarding.beginTankLookup();
     await _preferences?.remove(_activeTankPreferenceKey);
     _notify();
   }
@@ -178,6 +196,7 @@ class OceanEyesController extends ChangeNotifier
   void _handleLinkedTankIds(List<String> tankIds) {
     if (_disposed) return;
     final sorted = tankIds.toSet().toList()..sort();
+    _onboarding.resolveTankLookup(sorted);
     if (sorted.isEmpty) {
       unawaited(_unbindTank(liveTankId: activeTankId));
       activeTankId = null;
@@ -474,6 +493,7 @@ class OceanEyesController extends ChangeNotifier
   }
 
   final OceanEyesPersistenceCoordinator _persistence;
+  final OceanEyesOnboardingCoordinator _onboarding;
   final SharedPreferences? _preferences;
   final ProductionOceanEyesRepository? _productionRepository;
   late final OceanEyesCameraCoordinator _camera;
@@ -486,6 +506,10 @@ class OceanEyesController extends ChangeNotifier
   bool _disposed = false;
   bool _productionInitialized = false;
   double? _waterLineY;
+
+  String get _onboardingAccountNamespace =>
+      productionUser?.uid ??
+      OceanEyesOnboardingCoordinator.previewAccountNamespace;
   @override
   double? get cameraWaterLineY => _waterLineY;
 
@@ -704,6 +728,7 @@ class OceanEyesController extends ChangeNotifier
     if ((productionEnabled && repository == null) || pairingInProgress) {
       return false;
     }
+    final keepOnboardingOpen = shouldShowOnboarding;
     pairingInProgress = true;
     productionError = null;
     _notify();
@@ -714,6 +739,7 @@ class OceanEyesController extends ChangeNotifier
           : TankPairingCodec.normalizeTankId(trimmed);
       if (!productionEnabled) {
         _connectFixtureTank();
+        _onboarding.markJoined(keepRouteOpen: keepOnboardingOpen);
         return true;
       }
       final productionRepository = repository;
@@ -723,6 +749,7 @@ class OceanEyesController extends ChangeNotifier
         throw StateError('No tank was found for that pairing code.');
       }
       await _bindTank(tankId);
+      _onboarding.markJoined(keepRouteOpen: keepOnboardingOpen);
       return true;
     } catch (error, stackTrace) {
       _recordProductionError(error, stackTrace);
@@ -738,6 +765,7 @@ class OceanEyesController extends ChangeNotifier
     if ((productionEnabled && repository == null) || pairingInProgress) {
       return null;
     }
+    final keepOnboardingOpen = shouldShowOnboarding;
     pairingInProgress = true;
     productionError = null;
     _notify();
@@ -748,12 +776,14 @@ class OceanEyesController extends ChangeNotifier
       }
       if (!productionEnabled) {
         _connectFixtureTank(name: trimmedName);
+        _onboarding.markCreated(keepRouteOpen: keepOnboardingOpen);
         return 'tank-demo';
       }
       final productionRepository = repository;
       if (productionRepository == null) return null;
       final tankId = await productionRepository.createTank(trimmedName);
       await _bindTank(tankId);
+      _onboarding.markCreated(keepRouteOpen: keepOnboardingOpen);
       return tankId;
     } catch (error, stackTrace) {
       _recordProductionError(error, stackTrace);
@@ -762,6 +792,50 @@ class OceanEyesController extends ChangeNotifier
       pairingInProgress = false;
       _notify();
     }
+  }
+
+  OnboardingState get onboardingState => _onboarding.state;
+  bool get shouldShowOnboarding => _onboarding.showRoute;
+  bool get showTankSetupBanner =>
+      !tankConnected && (!productionEnabled || _onboarding.showSetupBanner);
+
+  void openOnboarding() {
+    if (tankConnected) return;
+    if (!productionEnabled) {
+      _onboarding.setLocalTankAvailability(false);
+    } else if (!_onboarding.tankLookupResolved) {
+      return;
+    }
+    _onboarding.open();
+    _notify();
+  }
+
+  void continueOnboardingFromWelcome() {
+    _onboarding.continueFromWelcome();
+    _notify();
+  }
+
+  void chooseOnboardingPath(OnboardingPath path) {
+    _onboarding.choosePath(path);
+    _notify();
+  }
+
+  void postponeOnboarding() {
+    if (pairingInProgress) return;
+    _onboarding.postpone();
+    _notify();
+  }
+
+  void finishOnboarding() {
+    _onboarding.finishRoute();
+    closeSecondaryRoute();
+    selectTab(PrimaryTab.dashboard);
+    _notify();
+  }
+
+  void handleOnboardingBack() {
+    if (pairingInProgress) return;
+    if (_onboarding.back()) _notify();
   }
 
   void requestTankRecalibration() {
@@ -1174,6 +1248,7 @@ class OceanEyesController extends ChangeNotifier
   }
 
   void disconnectTank() {
+    final onboardingLookupResolved = _onboarding.tankLookupResolved;
     final tankId = activeTankId;
     tankConnected = false;
     cameraStage = CameraStage.unavailable;
@@ -1182,9 +1257,17 @@ class OceanEyesController extends ChangeNotifier
     if (tankId != null) {
       activeTankId = null;
       if (productionEnabled) {
+        _clearProductionTankData();
+        dashboardHealth = DashboardHealthState.waiting;
+        analyticsState = AnalyticsContentState.empty;
         _preferences?.remove(_activeTankPreferenceKey);
         unawaited(_disconnectProductionTank(tankId));
       }
+    }
+    _onboarding.resetForDisconnectedTank();
+    _onboarding.setLocalTankAvailability(false);
+    if (productionEnabled && !onboardingLookupResolved) {
+      _onboarding.beginTankLookup();
     }
     _savePreferences();
     _notify();
@@ -1201,6 +1284,7 @@ class OceanEyesController extends ChangeNotifier
     activeTankId = null;
     tankConnected = true;
     cameraStage = CameraStage.active;
+    _onboarding.setLocalTankAvailability(true);
     _savePreferences();
   }
 
@@ -1464,7 +1548,11 @@ class OceanEyesController extends ChangeNotifier
 
   /// Waits for queued model-layer writes, primarily for lifecycle hooks/tests.
   Future<void> flushPersistence() async {
-    await Future.wait([_persistence.flush(), _productionWriteQueue]);
+    await Future.wait([
+      _persistence.flush(),
+      _productionWriteQueue,
+      _onboarding.flush(),
+    ]);
   }
 
   void handleAppLifecycleState(AppLifecycleState state) {

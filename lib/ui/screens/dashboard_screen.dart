@@ -37,7 +37,20 @@ class _DashboardBody extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (waiting)
+        if (controller.showTankSetupBanner) ...[
+          StateCard(
+            icon: LucideIcons.link,
+            title: 'Connect a tank',
+            description:
+                'Set up a new tank or join an existing one to start seeing aquarium data here.',
+            action: GlassButton(
+              label: 'Connect a tank',
+              icon: LucideIcons.qrCode,
+              expanded: true,
+              onPressed: controller.openOnboarding,
+            ),
+          ),
+        ] else if (waiting)
           const _DashboardStateCard(
             icon: LucideIcons.radio,
             title: 'Waiting for monitor data',

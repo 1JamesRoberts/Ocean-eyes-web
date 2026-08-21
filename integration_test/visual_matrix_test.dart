@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
+import 'package:oceaneyes/models/onboarding_models.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 
 void main() {
@@ -86,6 +87,39 @@ void main() {
       ),
       'login__idle',
     );
+
+    final onboardingWelcome = OceanEyesController()..disconnectTank();
+    onboardingWelcome.openOnboarding();
+    await capture(tester, onboardingWelcome, 'onboarding__welcome');
+
+    final onboardingChoice = OceanEyesController()..disconnectTank();
+    onboardingChoice.openOnboarding();
+    onboardingChoice.continueOnboardingFromWelcome();
+    await capture(tester, onboardingChoice, 'onboarding__choice');
+
+    final onboardingManual = OceanEyesController()..disconnectTank();
+    onboardingManual.openOnboarding();
+    onboardingManual.continueOnboardingFromWelcome();
+    onboardingManual.chooseOnboardingPath(OnboardingPath.joinExisting);
+    await capture(
+      tester,
+      onboardingManual,
+      'onboarding__join-manual',
+      prepare: (tester, _) async {
+        await tester.tap(find.text('Enter tank ID manually').first);
+        await pumpBounded(tester, duration: const Duration(milliseconds: 240));
+      },
+    );
+
+    final onboardingOwner = OceanEyesController()..disconnectTank();
+    onboardingOwner.openOnboarding();
+    onboardingOwner.continueOnboardingFromWelcome();
+    onboardingOwner.chooseOnboardingPath(OnboardingPath.newTank);
+    await onboardingOwner.createProductionTank('My Aquarium');
+    await capture(tester, onboardingOwner, 'onboarding__owner-success');
+
+    final noTankDashboard = OceanEyesController()..disconnectTank();
+    await capture(tester, noTankDashboard, 'dashboard__no-tank');
 
     for (final entry in <(FixtureScenario, String)>[
       (FixtureScenario.dashboardWaiting, 'dashboard__waiting'),

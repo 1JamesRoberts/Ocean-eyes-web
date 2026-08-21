@@ -7,6 +7,7 @@ import '../../models/aquarium_models.dart';
 import '../../view_models/oceaneyes_controller.dart';
 import '../widgets/data_visuals.dart';
 import '../widgets/glass.dart';
+import '../widgets/screen_primitives.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key, required this.controller});
@@ -15,6 +16,18 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!controller.tankConnected) {
+      return StateCard(
+        icon: LucideIcons.link,
+        title: 'Connect a tank',
+        description: 'History will appear after a tank is connected.',
+        action: GlassButton(
+          label: 'Connect a tank',
+          icon: LucideIcons.qrCode,
+          onPressed: controller.openOnboarding,
+        ),
+      );
+    }
     final readings = controller.history;
     final chartPoints = readings
         .take(7)

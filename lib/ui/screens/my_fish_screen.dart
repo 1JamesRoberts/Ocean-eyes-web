@@ -163,48 +163,63 @@ class _MyFishScreenState extends State<MyFishScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _AquariumOverviewCard(
-              fish: fish,
-              stats: widget.controller.tankStats,
-              expanded: _overviewExpanded,
-              onToggle: () {
-                setState(() => _overviewExpanded = !_overviewExpanded);
-              },
-            ),
-            const SizedBox(height: OceanSpacing.md),
-            if (fish.isEmpty)
+            if (!widget.controller.tankConnected)
               StateCard(
-                icon: LucideIcons.fish,
-                title: 'No fish in your inventory',
-                description: 'Build your tank profile one species at a time.',
+                icon: LucideIcons.link,
+                title: 'Connect a tank',
+                description:
+                    'Connect a tank before building an aquarium inventory.',
                 action: GlassButton(
-                  label: 'Add your first fish',
-                  icon: LucideIcons.plus,
-                  onPressed: _openAddSpecies,
+                  label: 'Connect a tank',
+                  icon: LucideIcons.qrCode,
+                  onPressed: widget.controller.openOnboarding,
                 ),
               )
-            else
-              for (var index = 0; index < fish.length; index++) ...[
-                _FishCard(
-                  fish: fish[index],
-                  facts: widget.controller.speciesFactsFor(
-                    fish[index].speciesId,
+            else ...[
+              _AquariumOverviewCard(
+                fish: fish,
+                stats: widget.controller.tankStats,
+                expanded: _overviewExpanded,
+                onToggle: () {
+                  setState(() => _overviewExpanded = !_overviewExpanded);
+                },
+              ),
+              const SizedBox(height: OceanSpacing.md),
+              if (fish.isEmpty)
+                StateCard(
+                  icon: LucideIcons.fish,
+                  title: 'No fish in your inventory',
+                  description: 'Build your tank profile one species at a time.',
+                  action: GlassButton(
+                    label: 'Add your first fish',
+                    icon: LucideIcons.plus,
+                    onPressed: _openAddSpecies,
                   ),
-                  compatibilities: widget.controller.compatibilitiesFor(
-                    fish[index].id,
+                )
+              else
+                for (var index = 0; index < fish.length; index++) ...[
+                  _FishCard(
+                    fish: fish[index],
+                    facts: widget.controller.speciesFactsFor(
+                      fish[index].speciesId,
+                    ),
+                    compatibilities: widget.controller.compatibilitiesFor(
+                      fish[index].id,
+                    ),
+                    expanded:
+                        widget.controller.expandedFishId == fish[index].id,
+                    onToggle: () =>
+                        widget.controller.toggleFishExpanded(fish[index].id),
+                    onIncrement: () =>
+                        widget.controller.adjustFishCount(fish[index].id, 1),
+                    onDecrement: () =>
+                        widget.controller.adjustFishCount(fish[index].id, -1),
+                    onDelete: () => _requestDelete(fish[index]),
                   ),
-                  expanded: widget.controller.expandedFishId == fish[index].id,
-                  onToggle: () =>
-                      widget.controller.toggleFishExpanded(fish[index].id),
-                  onIncrement: () =>
-                      widget.controller.adjustFishCount(fish[index].id, 1),
-                  onDecrement: () =>
-                      widget.controller.adjustFishCount(fish[index].id, -1),
-                  onDelete: () => _requestDelete(fish[index]),
-                ),
-                if (index != fish.length - 1)
-                  const SizedBox(height: OceanSpacing.md),
-              ],
+                  if (index != fish.length - 1)
+                    const SizedBox(height: OceanSpacing.md),
+                ],
+            ],
           ],
         );
       },

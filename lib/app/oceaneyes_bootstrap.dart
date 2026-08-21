@@ -16,6 +16,7 @@ import '../integrations/ml/onnx_fish_inference.dart';
 import '../integrations/power/wake_lock_gateway.dart';
 import '../models/fish_inventory_repository.dart';
 import '../models/oceaneyes_settings_repository.dart';
+import '../models/onboarding_repository.dart';
 import '../view_models/oceaneyes_controller.dart';
 import 'production_config.dart';
 
@@ -49,6 +50,7 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       preferences: preferences,
       inventoryRepository: inventory,
       settingsRepository: settings,
+      onboardingRepository: SharedPreferencesOnboardingRepository(preferences),
       launchUri: uri,
     );
   }
@@ -83,6 +85,7 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       preferences: preferences,
       inventoryRepository: inventory,
       settingsRepository: settings,
+      onboardingRepository: SharedPreferencesOnboardingRepository(preferences),
       launchUri: controllerUri,
       productionEnabled: true,
       productionRepository: repository,

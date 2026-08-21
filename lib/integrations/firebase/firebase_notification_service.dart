@@ -128,14 +128,9 @@ class FirebaseNotificationService implements NotificationServiceGateway {
       oceanEyesFirebaseMessagingBackgroundHandler,
     );
 
-    final settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
-    );
-    if (settings.authorizationStatus == AuthorizationStatus.denied) return;
-
+    // Permission is intentionally not requested during bootstrap. Onboarding
+    // must stay focused on tank connection; a notification-related feature
+    // can request permission later when the user explicitly opts in.
     _tokenRefreshSubscription = _messaging.onTokenRefresh.listen((token) {
       _token = token;
       _scheduleTokenSave(token, saveToken);
@@ -147,21 +142,10 @@ class FirebaseNotificationService implements NotificationServiceGateway {
       _emitRoute,
     );
 
-    try {
-      _token = await _messaging.getToken(
-        vapidKey: kIsWeb && (webVapidKey?.isNotEmpty ?? false)
-            ? webVapidKey
-            : null,
-      );
-      final token = _token;
-      if (token != null && token.isNotEmpty) {
-        _scheduleTokenSave(token, saveToken);
-      }
-    } on FirebaseException catch (error) {
-      // Apple devices can reach this before APNs has supplied its token. The
-      // token-refresh stream will retry once native registration completes.
-      debugPrint('[fcm] initial token unavailable: ${error.code}');
-    }
+    // Do not call getToken here. Firebase web can trigger a browser
+    // Notification.requestPermission from getToken, which would violate the
+    // explicit-intent boundary during onboarding. A notification feature can
+    // request permission and then perform the first token sync later.
     final initial = await _messaging.getInitialMessage();
     if (initial != null) _emitRoute(initial);
   }

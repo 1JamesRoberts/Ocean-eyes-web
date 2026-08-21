@@ -20,7 +20,18 @@ class AlertsScreen extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (alerts.isEmpty)
+        if (!controller.tankConnected)
+          StateCard(
+            icon: LucideIcons.link,
+            title: 'Connect a tank',
+            description: 'Alerts will appear after a tank is connected.',
+            action: GlassButton(
+              label: 'Connect a tank',
+              icon: LucideIcons.qrCode,
+              onPressed: controller.openOnboarding,
+            ),
+          )
+        else if (alerts.isEmpty)
           const StateCard(
             icon: LucideIcons.bellOff,
             title: 'No alerts yet',

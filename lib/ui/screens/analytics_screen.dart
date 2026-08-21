@@ -10,6 +10,7 @@ import '../../models/aquarium_models.dart';
 import '../../view_models/oceaneyes_controller.dart';
 import '../widgets/data_visuals.dart';
 import '../widgets/glass.dart';
+import '../widgets/screen_primitives.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key, required this.controller});
@@ -63,6 +64,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _stateContent(OceanEyesController controller) {
+    if (!controller.tankConnected) {
+      return StateCard(
+        icon: LucideIcons.link,
+        title: 'Connect a tank',
+        description: 'Analytics will appear after a tank is connected.',
+        action: GlassButton(
+          label: 'Connect a tank',
+          icon: LucideIcons.qrCode,
+          onPressed: controller.openOnboarding,
+        ),
+      );
+    }
     return switch (controller.analyticsState) {
       AnalyticsContentState.loading => const _AnalyticsLoadingState(),
       AnalyticsContentState.empty => _AnalyticsEmptyState(
