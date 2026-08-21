@@ -1038,6 +1038,32 @@ class OceanEyesController extends ChangeNotifier
     _notify();
   }
 
+  /// Connects the camera feed from whatever non-streaming state it is in.
+  ///
+  /// Production camera state is owned by [OceanEyesCameraCoordinator]. The
+  /// fixture path mirrors the same transitions without touching platform
+  /// camera plugins.
+  Future<void> connectStream() async {
+    switch (cameraStage) {
+      case CameraStage.requestingPermission:
+      case CameraStage.active:
+      case CameraStage.aiProcessing:
+      case CameraStage.measuringTurbidity:
+        return;
+      case CameraStage.idle:
+        if (productionEnabled) {
+          await _camera.resume();
+        } else {
+          setCameraStage(CameraStage.active);
+        }
+      case CameraStage.beforePermission:
+        await requestCameraPermission();
+      case CameraStage.denied:
+      case CameraStage.unavailable:
+        retryCamera();
+    }
+  }
+
   void retryCamera() {
     if (productionEnabled) {
       unawaited(requestCameraPermission());

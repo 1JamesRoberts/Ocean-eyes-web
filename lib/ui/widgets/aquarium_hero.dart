@@ -646,12 +646,9 @@ class _CameraStateMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final connect = switch (controller.cameraStage) {
-      CameraStage.beforePermission => controller.requestCameraPermission,
-      CameraStage.denied || CameraStage.unavailable => controller.retryCamera,
-      CameraStage.requestingPermission => null,
-      _ => () => controller.setCameraStage(CameraStage.active),
-    };
+    final connect = controller.cameraStage == CameraStage.requestingPermission
+        ? null
+        : controller.connectStream;
     final isLoading =
         controller.cameraStage == CameraStage.requestingPermission;
     return Center(

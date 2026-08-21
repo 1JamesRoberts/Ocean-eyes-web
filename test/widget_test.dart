@@ -119,14 +119,24 @@ void main() {
   ) async {
     final controller = await pumpReferenceApp(tester);
     controller.applyFixture(FixtureScenario.cameraPermission);
-    controller.selectTab(PrimaryTab.account);
+    controller.selectTab(PrimaryTab.dashboard);
     await tester.pumpAndSettle();
     expect(find.text('Connect Stream'), findsOneWidget);
 
     await tester.tap(find.text('Connect Stream'));
     await tester.pump(const Duration(milliseconds: 550));
     expect(controller.cameraStage, CameraStage.active);
+    expect(controller.activeTab, PrimaryTab.dashboard);
 
+    controller.setCameraStage(CameraStage.idle);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Connect Stream'));
+    await tester.pump();
+    expect(controller.cameraStage, CameraStage.active);
+    expect(controller.activeTab, PrimaryTab.dashboard);
+
+    controller.selectTab(PrimaryTab.account);
+    await tester.pumpAndSettle();
     controller.openAlerts();
     controller.openAlertDetail('alert-turbidity');
     await tester.pumpAndSettle();

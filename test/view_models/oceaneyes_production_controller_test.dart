@@ -416,6 +416,31 @@ void main() {
     await auth.close();
   });
 
+  test('connecting an idle camera resumes the production gateway', () async {
+    final repository = _FakeProductionRepository();
+    final auth = _FakeProductionAuth(user: _user);
+    final camera = _FakeCameraCaptureGateway();
+    final controller = _productionController(
+      repository,
+      auth,
+      cameraGateway: camera,
+    );
+
+    await controller.initializeProduction();
+    camera.emitPhase(CameraCapturePhase.suspended);
+    expect(controller.cameraStage, CameraStage.idle);
+
+    await controller.connectStream();
+
+    expect(camera.resumeCalls, 1);
+    expect(controller.cameraStage, CameraStage.active);
+
+    controller.dispose();
+    await _drainMicrotasks();
+    await repository.close();
+    await auth.close();
+  });
+
   test('unexpected publisher disconnect fully releases live session', () async {
     final repository = _FakeProductionRepository();
     final auth = _FakeProductionAuth(user: _user);
