@@ -7,10 +7,22 @@ camera-control states, Alerts, and History.
 
 ## Run
 
+The shipped application runtime is production-only. Copy
+`config/production.example.json` to a secure location outside the repository,
+replace its placeholders with the intended Firebase values, and launch the app
+with that private configuration:
+
 ```powershell
 flutter pub get
-flutter run
+flutter run --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
+
+For local integration work, point the same runtime at the Firebase Auth,
+Firestore, and Functions emulators as described in
+[`docs/production_setup.md`](docs/production_setup.md). Deterministic fixtures
+are test-only: widget, unit, and visual harnesses construct
+`OceanEyesController` instances directly and inject fixture state. The shipped
+web app is not launched with `?fixture=...` URLs.
 
 Common validation commands:
 
@@ -30,7 +42,7 @@ The web build supports deterministic fixture URLs documented in
 lib/
   app/           MaterialApp and Navigator page stack
   core/theme/    OceanEyes visual tokens and Flutter theme
-  models/        Domain entities and deterministic fixtures
+  models/        Domain entities, repositories, and test fixtures
   view_models/   App state, transitions, persistence, route intent
   ui/screens/    Route/tab content
   ui/shell/      Persistent hero, scroll viewport, navigation
@@ -72,12 +84,11 @@ gestures unwind the same origin-aware route stack as visible back controls.
 
 ## Camera and backend boundary
 
-Production integrations are compiled behind an explicit
-`OCEANEYES_PRODUCTION=true` runtime switch. They include anonymous Firebase
-Auth with optional Google linking, typed Firestore repositories and schema
-mappers, QR tank pairing, camera capture, an on-device three-model ONNX
-pipeline, FCM, Cloud Functions alerting, and LiveKit streaming. Fixture URLs
-always bypass those services and retain the deterministic state machine.
+The shipped runtime uses anonymous Firebase Auth with optional Google linking,
+typed Firestore repositories and schema mappers, QR tank pairing, camera
+capture, an on-device three-model ONNX pipeline, FCM, Cloud Functions alerting,
+and LiveKit streaming. Deterministic fixture controllers remain available only
+to tests and never construct those production services.
 
 No Firebase configuration, API credentials, APNs keys, or ONNX binaries are
 tracked. Follow [`docs/production_setup.md`](docs/production_setup.md) to

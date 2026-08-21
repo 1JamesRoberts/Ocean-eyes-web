@@ -1,12 +1,14 @@
 # Production setup
 
-OceanEyes ships with production integrations compiled in but disabled by
-default. Deterministic fixtures and ordinary tests do not initialize Firebase,
-camera, messaging, LiveKit, or ONNX Runtime.
+OceanEyes ships with production integrations as its only application runtime.
+The configured runtime initializes Firebase, camera, messaging, LiveKit, and
+ONNX Runtime. Deterministic fixtures are test-only: tests construct
+`OceanEyesController` instances directly or use test doubles, and never expose
+a separate fixture app mode.
 
-Enable the production composition root with
-`OCEANEYES_PRODUCTION=true`. Never put real values in the tracked example
-files.
+For local integration, use the same production runtime against the Firebase
+Auth, Firestore, and Functions emulators. Never put real values in the tracked
+example files.
 
 ## 1. Firebase applications
 
@@ -34,9 +36,10 @@ The repository ignores:
 - `ios/Runner/GoogleService-Info.plist`
 
 The app does not import `firebase_options.dart`; it can initialize from the
-native files or from Dart defines. This keeps credential-free fixture builds
-working. Copy `config/production.example.json` outside the repository, replace
-the placeholders, and run:
+native files or from Dart defines. This keeps credentials out of tracked source;
+fixture-only tests remain independent of Firebase. Copy
+`config/production.example.json` outside the repository, replace the
+placeholders, and run the supported application runtime with:
 
 ```powershell
 flutter run --dart-define-from-file=C:\secure\oceaneyes-production.json
@@ -101,7 +104,6 @@ To use local emulators, add these defines to a private configuration file:
 
 ```json
 {
-  "OCEANEYES_PRODUCTION": true,
   "OCEANEYES_FIREBASE_EMULATORS": true,
   "OCEANEYES_FIRESTORE_EMULATOR_HOST": "localhost",
   "OCEANEYES_FIRESTORE_EMULATOR_PORT": 8080,
@@ -112,7 +114,16 @@ To use local emulators, add these defines to a private configuration file:
 }
 ```
 
-Use `10.0.2.2` instead of `localhost` from an Android emulator.
+Start the emulators, then launch the app with that private file:
+
+```powershell
+firebase emulators:start --only auth,firestore,functions --project demo-oceaneyes
+flutter run --dart-define-from-file=C:\secure\oceaneyes-emulator.json
+```
+
+Use `10.0.2.2` instead of `localhost` from an Android emulator. This emulator
+path is the recommended local integration workflow; it exercises the shipped
+production runtime without connecting to the staging or production project.
 
 ## 4. LiveKit
 
@@ -172,9 +183,9 @@ water_clarity.onnx
 
 They total roughly 285 MB and must be distributed through approved artifact
 storage, not Git. See `assets/models/README.md` for model I/O, preprocessing,
-class ordering, and checksum guidance. A build without the files remains valid;
-the ML gateway reports unavailable and the deterministic fixture UI continues
-to work.
+class ordering, and checksum guidance. A production build without the files can
+compile, but the ML gateway reports unavailable and the build is not
+release-ready. Fixture-only tests do not require the private model binaries.
 
 ## 7. Validation
 
