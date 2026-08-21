@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
@@ -33,8 +34,10 @@ void main() {
     expect(find.text('IoT Scanner Console'), findsOneWidget);
     expect(find.text('Scan, pair, or create monitor hardware'), findsOneWidget);
     expect(find.text('Disconnect from Tank'), findsOneWidget);
+    expect(find.text('Appearance'), findsOneWidget);
     expect(find.text('Stream Image Adjustments'), findsOneWidget);
     expect(find.text('Background Canvas'), findsOneWidget);
+    expect(find.byIcon(LucideIcons.image), findsOneWidget);
     expect(find.text('Protect this account'), findsNothing);
 
     await tester.ensureVisible(find.text('IoT Scanner Console'));
@@ -58,6 +61,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Pair'), findsOneWidget);
+    expect(find.text('Appearance'), findsOneWidget);
     expect(find.text('Stream Image Adjustments'), findsOneWidget);
     expect(find.text('Background Canvas'), findsOneWidget);
 

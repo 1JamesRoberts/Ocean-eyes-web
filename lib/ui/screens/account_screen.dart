@@ -506,6 +506,11 @@ class _AccountScreenState extends State<AccountScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
       child: Column(
         children: [
+          const CardHeader(
+            title: 'Appearance',
+            icon: LucideIcons.palette,
+            divider: true,
+          ),
           DisclosureCard(
             title: 'Stream Image Adjustments',
             subtitle:
@@ -580,8 +585,7 @@ class _AccountScreenState extends State<AccountScreen> {
           DisclosureCard(
             title: 'Background Canvas',
             subtitle: 'Video and background transition controls',
-            icon: LucideIcons.bug,
-            iconColor: OceanColors.warningInk,
+            icon: LucideIcons.image,
             expanded: controller.debugSectionOpen,
             onChanged: (value) => controller.setDisclosure('debug', value),
             child: _BackgroundDebugControls(controller: controller),
