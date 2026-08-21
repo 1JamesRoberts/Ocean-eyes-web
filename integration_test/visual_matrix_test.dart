@@ -140,6 +140,30 @@ void main() {
       await capture(tester, controller, entry.$2);
     }
 
+    final disconnectedAccount = OceanEyesController()
+      ..activeTab = PrimaryTab.account
+      ..tankConnected = false
+      ..cameraStage = CameraStage.unavailable;
+    await capture(tester, disconnectedAccount, 'account__disconnected');
+
+    final pairingSheet = OceanEyesController()
+      ..activeTab = PrimaryTab.account
+      ..tankConnected = false
+      ..cameraStage = CameraStage.unavailable;
+    await capture(
+      tester,
+      pairingSheet,
+      'account__pairing-sheet',
+      prepare: (tester, _) async {
+        await tester.tap(find.text('Pair'));
+        await pumpBounded(tester, duration: const Duration(milliseconds: 360));
+        expect(
+          find.byKey(const ValueKey('tank-pairing-sheet')),
+          findsOneWidget,
+        );
+      },
+    );
+
     final streamDisclosure = OceanEyesController()
       ..activeTab = PrimaryTab.account;
     await capture(

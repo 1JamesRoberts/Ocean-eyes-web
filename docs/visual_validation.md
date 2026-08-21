@@ -56,7 +56,9 @@ empty/populated.
 Global captures exercise a 280px keyboard inset, 47px top and 34px bottom safe
 areas, 1.6x platform text scaling, and reduced-motion accessibility settings.
 The capture helper intentionally advances a bounded number of frames so finite
-route, sheet, and chart transitions settle deterministically.
+route, sheet, and chart transitions settle deterministically. Account coverage
+also includes disconnected and pairing-sheet states so the shared pairing UX
+and always-available visual settings remain in the visual matrix.
 
 ## Compare
 

@@ -701,7 +701,7 @@ class OceanEyesController extends ChangeNotifier
 
   Future<bool> pairTankPayload(String value) async {
     final repository = _productionRepository;
-    if (!productionEnabled || repository == null || pairingInProgress) {
+    if ((productionEnabled && repository == null) || pairingInProgress) {
       return false;
     }
     pairingInProgress = true;
@@ -712,7 +712,13 @@ class OceanEyesController extends ChangeNotifier
       final tankId = trimmed.startsWith('{')
           ? TankPairingCodec.decode(trimmed).tankId
           : TankPairingCodec.normalizeTankId(trimmed);
-      final joined = await repository.joinTank(tankId);
+      if (!productionEnabled) {
+        _connectFixtureTank();
+        return true;
+      }
+      final productionRepository = repository;
+      if (productionRepository == null) return false;
+      final joined = await productionRepository.joinTank(tankId);
       if (!joined) {
         throw StateError('No tank was found for that pairing code.');
       }
@@ -729,14 +735,24 @@ class OceanEyesController extends ChangeNotifier
 
   Future<String?> createProductionTank(String name) async {
     final repository = _productionRepository;
-    if (!productionEnabled || repository == null || pairingInProgress) {
+    if ((productionEnabled && repository == null) || pairingInProgress) {
       return null;
     }
     pairingInProgress = true;
     productionError = null;
     _notify();
     try {
-      final tankId = await repository.createTank(name.trim());
+      final trimmedName = name.trim();
+      if (trimmedName.isEmpty) {
+        throw ArgumentError('Tank name cannot be empty.');
+      }
+      if (!productionEnabled) {
+        _connectFixtureTank(name: trimmedName);
+        return 'tank-demo';
+      }
+      final productionRepository = repository;
+      if (productionRepository == null) return null;
+      final tankId = await productionRepository.createTank(trimmedName);
       await _bindTank(tankId);
       return tankId;
     } catch (error, stackTrace) {
@@ -1163,10 +1179,12 @@ class OceanEyesController extends ChangeNotifier
     cameraStage = CameraStage.unavailable;
     fullscreenCamera = false;
     inventoryDrawerOpen = false;
-    if (productionEnabled && tankId != null) {
+    if (tankId != null) {
       activeTankId = null;
-      _preferences?.remove(_activeTankPreferenceKey);
-      unawaited(_disconnectProductionTank(tankId));
+      if (productionEnabled) {
+        _preferences?.remove(_activeTankPreferenceKey);
+        unawaited(_disconnectProductionTank(tankId));
+      }
     }
     _savePreferences();
     _notify();
@@ -1174,10 +1192,16 @@ class OceanEyesController extends ChangeNotifier
 
   void connectDemoTank() {
     if (productionEnabled) return;
+    _connectFixtureTank();
+    _notify();
+  }
+
+  void _connectFixtureTank({String? name}) {
+    if (name != null) tankName = name;
+    activeTankId = null;
     tankConnected = true;
     cameraStage = CameraStage.active;
     _savePreferences();
-    _notify();
   }
 
   void resolveAlert(String id) {

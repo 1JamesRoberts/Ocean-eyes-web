@@ -179,6 +179,8 @@ class _AccountScreenState extends State<AccountScreen> {
           const SizedBox(height: 16),
         ],
         _buildTankManagement(context),
+        const SizedBox(height: 12),
+        _buildSharedVisualSettings(),
         const SizedBox(height: 16),
         _buildAlertsAndThresholds(context),
       ],
@@ -227,26 +229,22 @@ class _AccountScreenState extends State<AccountScreen> {
                           style: OceanTypography.strong,
                         ),
                         Text(
-                          controller.productionEnabled
-                              ? 'Scan its QR code, enter a tank ID, or create a new tank.'
-                              : 'Reconnect the demo tank to resume monitoring.',
+                          'Scan its QR code, enter a tank ID, or create a new tank.',
                           style: OceanTypography.caption,
                         ),
                       ],
                     ),
                   ),
-                  TextButton(
-                    onPressed: controller.productionEnabled
-                        ? (controller.pairingInProgress
-                              ? null
-                              : _openTankPairing)
-                        : controller.connectDemoTank,
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(48, 48),
-                      foregroundColor: OceanColors.darkCyan,
-                    ),
-                    child: Text(
-                      controller.productionEnabled ? 'Pair' : 'Connect',
+                  Flexible(
+                    child: TextButton(
+                      onPressed: controller.pairingInProgress
+                          ? null
+                          : _openTankPairing,
+                      style: TextButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                        foregroundColor: OceanColors.darkCyan,
+                      ),
+                      child: const Text('Pair'),
                     ),
                   ),
                 ],
@@ -342,13 +340,11 @@ class _AccountScreenState extends State<AccountScreen> {
             GlassPanel(
               color: OceanColors.verdigris.withValues(alpha: 0.08),
               borderColor: OceanColors.turquoise.withValues(alpha: 0.20),
-              onTap: controller.productionEnabled ? _openTankPairing : null,
-              child: _StaticSettingsRow(
+              onTap: _openTankPairing,
+              child: const _StaticSettingsRow(
                 icon: LucideIcons.monitor,
                 title: 'IoT Scanner Console',
-                subtitle: controller.productionEnabled
-                    ? 'Scan, pair, or create monitor hardware'
-                    : 'Pair or review monitor hardware',
+                subtitle: 'Scan, pair, or create monitor hardware',
                 highlighted: true,
               ),
             ),
@@ -399,87 +395,6 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             ],
             const SizedBox(height: 12),
-            DisclosureCard(
-              title: 'Stream Image Adjustments',
-              subtitle:
-                  'Contrast ${(controller.contrast * 100).round()}%, brightness ${(controller.brightness * 100).round()}%, saturation ${(controller.saturation * 100).round()}%',
-              icon: LucideIcons.slidersHorizontal,
-              expanded: controller.streamSectionOpen,
-              onChanged: (value) => controller.setDisclosure('stream', value),
-              child: Column(
-                children: [
-                  _settingSlider(
-                    label: 'Contrast',
-                    setting: 'contrast',
-                    value: controller.contrast * 100,
-                    min: 50,
-                    max: 150,
-                    divisions: 20,
-                    divisor: 100,
-                    suffix: '%',
-                  ),
-                  const SizedBox(height: 16),
-                  _settingSlider(
-                    label: 'Brightness',
-                    setting: 'brightness',
-                    value: controller.brightness * 100,
-                    min: 70,
-                    max: 130,
-                    divisions: 12,
-                    divisor: 100,
-                    suffix: '%',
-                  ),
-                  const SizedBox(height: 16),
-                  _settingSlider(
-                    label: 'Saturation',
-                    setting: 'saturation',
-                    value: controller.saturation * 100,
-                    min: 50,
-                    max: 150,
-                    divisions: 20,
-                    divisor: 100,
-                    suffix: '%',
-                  ),
-                  const SizedBox(height: 16),
-                  OceanSlider(
-                    label: 'Temperature (Cool / Warm)',
-                    value: controller.temperature,
-                    min: -80,
-                    max: 80,
-                    divisions: 32,
-                    valueLabel: _temperatureLabel(controller.temperature),
-                    onChanged: (value) =>
-                        controller.previewSetting('temperature', value),
-                    onChangeEnd: (value) =>
-                        controller.commitSetting('temperature', value),
-                  ),
-                  const SizedBox(height: 16),
-                  OceanSlider(
-                    label: 'Tint (Green / Magenta)',
-                    value: controller.tint,
-                    min: -80,
-                    max: 80,
-                    divisions: 32,
-                    valueLabel: _tintLabel(controller.tint),
-                    onChanged: (value) =>
-                        controller.previewSetting('tint', value),
-                    onChangeEnd: (value) =>
-                        controller.commitSetting('tint', value),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            DisclosureCard(
-              title: 'Background Canvas',
-              subtitle: 'Video and background transition controls',
-              icon: LucideIcons.bug,
-              iconColor: OceanColors.warningInk,
-              expanded: controller.debugSectionOpen,
-              onChanged: (value) => controller.setDisclosure('debug', value),
-              child: _BackgroundDebugControls(controller: controller),
-            ),
-            const SizedBox(height: 12),
             if (_showDisconnectConfirmation)
               Container(
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
@@ -498,7 +413,9 @@ class _AccountScreenState extends State<AccountScreen> {
                       style: OceanTypography.caption,
                     ),
                     const SizedBox(height: 12),
-                    Row(
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 8,
                       children: [
                         GlassButton(
                           label: 'Cancel',
@@ -508,7 +425,6 @@ class _AccountScreenState extends State<AccountScreen> {
                             () => _showDisconnectConfirmation = false,
                           ),
                         ),
-                        const SizedBox(width: 10),
                         GlassButton(
                           label: 'Yes, Disconnect',
                           compact: true,
@@ -579,6 +495,96 @@ class _AccountScreenState extends State<AccountScreen> {
             onPressed: _linkingGoogle || !servicesAvailable
                 ? null
                 : _linkGoogleAccount,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSharedVisualSettings() {
+    return GlassCard(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      child: Column(
+        children: [
+          DisclosureCard(
+            title: 'Stream Image Adjustments',
+            subtitle:
+                'Contrast ${(controller.contrast * 100).round()}%, brightness ${(controller.brightness * 100).round()}%, saturation ${(controller.saturation * 100).round()}%',
+            icon: LucideIcons.slidersHorizontal,
+            expanded: controller.streamSectionOpen,
+            onChanged: (value) => controller.setDisclosure('stream', value),
+            child: Column(
+              children: [
+                _settingSlider(
+                  label: 'Contrast',
+                  setting: 'contrast',
+                  value: controller.contrast * 100,
+                  min: 50,
+                  max: 150,
+                  divisions: 20,
+                  divisor: 100,
+                  suffix: '%',
+                ),
+                const SizedBox(height: 16),
+                _settingSlider(
+                  label: 'Brightness',
+                  setting: 'brightness',
+                  value: controller.brightness * 100,
+                  min: 70,
+                  max: 130,
+                  divisions: 12,
+                  divisor: 100,
+                  suffix: '%',
+                ),
+                const SizedBox(height: 16),
+                _settingSlider(
+                  label: 'Saturation',
+                  setting: 'saturation',
+                  value: controller.saturation * 100,
+                  min: 50,
+                  max: 150,
+                  divisions: 20,
+                  divisor: 100,
+                  suffix: '%',
+                ),
+                const SizedBox(height: 16),
+                OceanSlider(
+                  label: 'Temperature (Cool / Warm)',
+                  value: controller.temperature,
+                  min: -80,
+                  max: 80,
+                  divisions: 32,
+                  valueLabel: _temperatureLabel(controller.temperature),
+                  onChanged: (value) =>
+                      controller.previewSetting('temperature', value),
+                  onChangeEnd: (value) =>
+                      controller.commitSetting('temperature', value),
+                ),
+                const SizedBox(height: 16),
+                OceanSlider(
+                  label: 'Tint (Green / Magenta)',
+                  value: controller.tint,
+                  min: -80,
+                  max: 80,
+                  divisions: 32,
+                  valueLabel: _tintLabel(controller.tint),
+                  onChanged: (value) =>
+                      controller.previewSetting('tint', value),
+                  onChangeEnd: (value) =>
+                      controller.commitSetting('tint', value),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          DisclosureCard(
+            title: 'Background Canvas',
+            subtitle: 'Video and background transition controls',
+            icon: LucideIcons.bug,
+            iconColor: OceanColors.warningInk,
+            expanded: controller.debugSectionOpen,
+            onChanged: (value) => controller.setDisclosure('debug', value),
+            child: _BackgroundDebugControls(controller: controller),
           ),
         ],
       ),
