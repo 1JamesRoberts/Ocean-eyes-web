@@ -337,6 +337,17 @@ class GlassButton extends StatelessWidget {
       GlassButtonStyle.destructive => const <BoxShadow>[],
     };
 
+    final textButton = TextButton(
+      onPressed: loading ? null : onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: foreground,
+        disabledForegroundColor: foreground.withValues(alpha: 0.45),
+        padding: padding,
+        shape: const StadiumBorder(),
+      ),
+      child: child,
+    );
+
     final button = ConstrainedBox(
       constraints: const BoxConstraints(
         minHeight: OceanGeometry.minimumTouchTarget,
@@ -364,19 +375,11 @@ class GlassButton extends StatelessWidget {
                     : null,
               ),
               child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  TextButton(
-                    onPressed: loading ? null : onPressed,
-                    style: TextButton.styleFrom(
-                      foregroundColor: foreground,
-                      disabledForegroundColor: foreground.withValues(
-                        alpha: 0.45,
-                      ),
-                      padding: padding,
-                      shape: const StadiumBorder(),
-                    ),
-                    child: child,
-                  ),
+                  expanded
+                      ? SizedBox(width: double.infinity, child: textButton)
+                      : textButton,
                   if (style == GlassButtonStyle.outline)
                     const Positioned.fill(
                       child: IgnorePointer(child: _InlineInsetHighlights()),
