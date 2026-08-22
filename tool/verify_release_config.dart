@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:oceaneyes/app/release_config_guard.dart';
+
 import 'release_config_io.dart';
 
 Future<void> main(List<String> args) async {
@@ -10,7 +12,13 @@ Future<void> main(List<String> args) async {
       'Missing --config. Pass the private production JSON file.',
     );
     final target = parseReleaseTarget(optionValue(args, '--target') ?? 'all');
-    final errors = await validateReleaseConfig(configPath, target);
+    final errors = await validateCustomerReleasePrerequisites(
+      configPath,
+      target,
+      requireAndroidArtifact:
+          target == OceanEyesReleaseTarget.android ||
+          target == OceanEyesReleaseTarget.all,
+    );
     if (writeReleaseConfigErrors(errors)) {
       exitCode = 1;
       return;

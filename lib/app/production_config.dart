@@ -56,6 +56,10 @@ class OceanEyesProductionConfig {
     required this.androidClientId,
     required this.googleWebClientId,
     required this.webPushVapidKey,
+    required this.buildName,
+    required this.buildNumber,
+    required this.privacyPolicyUrl,
+    required this.termsOfServiceUrl,
   });
 
   factory OceanEyesProductionConfig.fromEnvironment() {
@@ -144,6 +148,14 @@ class OceanEyesProductionConfig {
       webPushVapidKey: const String.fromEnvironment(
         'OCEANEYES_FIREBASE_WEB_PUSH_VAPID_KEY',
       ),
+      buildName: const String.fromEnvironment('OCEANEYES_BUILD_NAME'),
+      buildNumber: const String.fromEnvironment('OCEANEYES_BUILD_NUMBER'),
+      privacyPolicyUrl: const String.fromEnvironment(
+        'OCEANEYES_PRIVACY_POLICY_URL',
+      ),
+      termsOfServiceUrl: const String.fromEnvironment(
+        'OCEANEYES_TERMS_OF_SERVICE_URL',
+      ),
     );
   }
 
@@ -174,6 +186,10 @@ class OceanEyesProductionConfig {
   final String androidClientId;
   final String googleWebClientId;
   final String webPushVapidKey;
+  final String buildName;
+  final String buildNumber;
+  final String privacyPolicyUrl;
+  final String termsOfServiceUrl;
 
   /// Set only by the guarded release build command/CI job.
   static const bool releaseArtifactGuardPresent = bool.fromEnvironment(
@@ -303,6 +319,10 @@ class OceanEyesProductionConfig {
     'OCEANEYES_GOOGLE_WEB_CLIENT_ID': googleWebClientId,
     'OCEANEYES_FIREBASE_WEB_PUSH_VAPID_KEY': webPushVapidKey,
     'OCEANEYES_RECAPTCHA_V3_SITE_KEY': recaptchaV3SiteKey,
+    'OCEANEYES_BUILD_NAME': buildName,
+    'OCEANEYES_BUILD_NUMBER': buildNumber,
+    'OCEANEYES_PRIVACY_POLICY_URL': privacyPolicyUrl,
+    'OCEANEYES_TERMS_OF_SERVICE_URL': termsOfServiceUrl,
   };
 
   static bool _isConfigured(String value) {

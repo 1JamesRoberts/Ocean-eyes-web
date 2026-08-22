@@ -15,6 +15,31 @@ if (releaseKeystorePropertiesFile.exists()) {
     FileInputStream(releaseKeystorePropertiesFile).use {
         releaseKeystoreProperties.load(it)
     }
+    listOf("storeFile", "storePassword", "keyAlias", "keyPassword").forEach {
+        if (releaseKeystoreProperties.getProperty(it).isNullOrBlank()) {
+            throw GradleException("android/key.properties is missing $it")
+        }
+    }
+    val configuredStoreFile = releaseKeystoreProperties.getProperty("storeFile")
+    val releaseKeystoreFile = if (File(configuredStoreFile).isAbsolute) {
+        File(configuredStoreFile)
+    } else {
+        file(configuredStoreFile)
+    }
+    if (!releaseKeystoreFile.isFile) {
+        throw GradleException(
+            "The release keystore was not found at ${releaseKeystoreFile.absolutePath}",
+        )
+    }
+}
+
+val releaseTaskRequested = gradle.startParameter.taskNames.any {
+    it.contains("Release", ignoreCase = true)
+}
+if (releaseTaskRequested && !releaseKeystorePropertiesFile.isFile) {
+    throw GradleException(
+        "Customer release builds require android/key.properties and an approved release keystore.",
+    )
 }
 
 // Keep credential-free fixture and CI builds working. Production setups place
@@ -101,8 +126,6 @@ android {
 
     buildTypes {
         release {
-            // Credential-free builds remain unsigned. A production release is
-            // signed only when the gitignored android/key.properties exists.
             if (releaseKeystorePropertiesFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }

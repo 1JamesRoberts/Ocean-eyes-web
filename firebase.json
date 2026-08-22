@@ -3,7 +3,7 @@
     "providers": {
       "anonymous": true,
       "googleSignIn": {
-        "oAuthBrandDisplayName": "OceanEyes Staging",
+        "oAuthBrandDisplayName": "OceanEyes",
         "supportEmail": "thammatorn.j@gmail.com"
       }
     }
@@ -37,19 +37,19 @@
       "android": {
         "buildConfigurations": {
           ".": {
-            "projectId": "ocean-eyes-staging",
-            "appId": "1:334233524069:android:edbaf4dcc435756b72f38c",
+            "projectId": "ocean-eyes-webapp",
+            "appId": "1:1072877532089:android:d7aac1fb54b47d8d2fbc68",
             "fileOutput": "android/app/google-services.json"
           }
         }
       },
       "dart": {
         "lib/firebase_options.dart": {
-          "projectId": "ocean-eyes-staging",
+          "projectId": "ocean-eyes-webapp",
           "configurations": {
-            "android": "1:334233524069:android:edbaf4dcc435756b72f38c",
-            "ios": "1:334233524069:ios:5faa6ceea13df02172f38c",
-            "web": "1:334233524069:web:69d238a8b6f5468e72f38c"
+            "android": "1:1072877532089:android:d7aac1fb54b47d8d2fbc68",
+            "ios": "1:1072877532089:ios:360237b46af319ea2fbc68",
+            "web": "1:1072877532089:web:4c99a42a94950cb72fbc68"
           }
         }
       }

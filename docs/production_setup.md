@@ -16,6 +16,11 @@ native identifiers are:
 - Android application ID: `com.oceaneyes.oceaneyes`
 - iOS bundle ID: `com.oceaneyes.oceaneyes`
 
+The configured customer Firebase project is `ocean-eyes-webapp`. Its Android
+app is `1:1072877532089:android:d7aac1fb54b47d8d2fbc68`; verify that the package
+name remains `com.oceaneyes.oceaneyes` before every release. The staging project
+must never be used by a customer build.
+
 Enable Anonymous and Google providers under Firebase Authentication. Add the
 Android SHA-1/SHA-256 signing fingerprints and the iOS URL scheme required by
 the generated Google configuration.
@@ -61,6 +66,12 @@ Check debug mode are rejected. Do not replace the guarded command with a raw
 `flutter build --release`; a release binary without the guard cannot enter
 fixture mode, but it is not a customer artifact.
 
+The private release file must also contain an approved `OCEANEYES_BUILD_NAME`,
+positive `OCEANEYES_BUILD_NUMBER`, and real HTTPS values for
+`OCEANEYES_PRIVACY_POLICY_URL` and `OCEANEYES_TERMS_OF_SERVICE_URL`. The
+validator rejects staging IDs, emulator hosts, insecure/example legal URLs, and
+disabled App Check.
+
 The production Firebase/Google stack is supported on Android, iOS, and web.
 The Windows desktop target is not a customer production target.
 
@@ -69,9 +80,14 @@ options. With native Google service files, keep the generated Android web
 client entry and iOS URL scheme. For a Dart-define-only build, set
 `OCEANEYES_GOOGLE_WEB_CLIENT_ID` to the **Web application** OAuth client ID
 (Android uses it as `serverClientId`), set
-`OCEANEYES_FIREBASE_IOS_CLIENT_ID` to the iOS OAuth client ID, and add that iOS
-client's reversed-ID URL scheme to the Runner target. The Android OAuth client
-ID is not a substitute for the web/server client ID.
+  `OCEANEYES_FIREBASE_IOS_CLIENT_ID` to the iOS OAuth client ID, and add that iOS
+  client's reversed-ID URL scheme to the Runner target. The Android OAuth client
+  ID is not a substitute for the web/server client ID.
+
+The release certificate SHA-1 and SHA-256 fingerprints must be registered on
+the production Android app. Firebase Auth Google sign-in and Play Integrity
+App Check both depend on the approved release certificate; a debug or
+unregistered certificate is not a release configuration.
 
 Web requires the Dart-defined Firebase values. Copy
 `web/firebase-messaging-sw.example.js` to the gitignored
@@ -171,7 +187,10 @@ TTL where server-side token revocation is unavailable.
 ## 5. FCM and platform capabilities
 
 Android declares runtime notification, camera, internet, and wake-lock
-permissions. Users still must grant camera and notification access at runtime.
+permissions. The Account screen requests notification access through the
+explicit **Enable** action after production sign-in; users still must grant
+camera access when starting a camera flow. Verify the Android 13+ notification
+prompt, denied state, and Settings re-enable path during the device smoke test.
 
 For iOS, enable **Push Notifications** and **Background Modes > Remote
 notifications** in the Runner target, upload an APNs authentication key to
@@ -183,8 +202,10 @@ Android release builds are never signed with the debug key. Create an approved
 release keystore outside the repository, then add an untracked
 `android/key.properties` with `storeFile`, `storePassword`, `keyAlias`, and
 `keyPassword`. Use an absolute `storeFile` path or a path relative to
-`android/app`. Without that file, release output is unsigned; debug builds keep
-using the normal debug signing setup. Never commit the keystore or properties.
+`android/app`. The guarded `appbundle` command refuses to run when the file,
+keystore, or any of the three ONNX model assets is missing. Direct release
+Gradle tasks also fail closed instead of producing an unsigned artifact. Never
+commit the keystore or properties.
 
 For web, configure a VAPID key in Firebase Messaging and pass it through the
 deployment environment when requesting a browser token. Background delivery
@@ -203,15 +224,16 @@ water_clarity.onnx
 They total roughly 285 MB and must be distributed through approved artifact
 storage, not Git. See `assets/models/README.md` for model I/O, preprocessing,
 class ordering, and checksum guidance. A production build without the files can
-compile, but the ML gateway reports unavailable and the build is not
-release-ready. Fixture-only tests do not require the private model binaries.
+compile through diagnostics, but the guarded customer `appbundle` command
+rejects it and the ML gateway reports unavailable. Fixture-only tests do not
+require the private model binaries.
 
 ## 7. Validation
 
 Credential-free checks:
 
 ```powershell
-dart format --output=none --set-exit-if-changed lib test
+dart format --output=none --set-exit-if-changed lib test tool
 flutter analyze
 flutter test
 npm --prefix functions test

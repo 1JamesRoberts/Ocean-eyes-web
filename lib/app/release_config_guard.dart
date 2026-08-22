@@ -12,6 +12,10 @@ final class OceanEyesReleaseConfigGuard {
   static const appCheckDefine = 'OCEANEYES_APP_CHECK';
   static const appCheckDebugDefine = 'OCEANEYES_APP_CHECK_DEBUG';
   static const firebaseEmulatorsDefine = 'OCEANEYES_FIREBASE_EMULATORS';
+  static const buildNameDefine = 'OCEANEYES_BUILD_NAME';
+  static const buildNumberDefine = 'OCEANEYES_BUILD_NUMBER';
+  static const privacyPolicyUrlDefine = 'OCEANEYES_PRIVACY_POLICY_URL';
+  static const termsOfServiceUrlDefine = 'OCEANEYES_TERMS_OF_SERVICE_URL';
 
   static const _booleanDefines = <String>[
     appCheckDefine,
@@ -28,6 +32,11 @@ final class OceanEyesReleaseConfigGuard {
     'OCEANEYES_FIREBASE_API_KEY',
     'OCEANEYES_FIREBASE_PROJECT_ID',
     'OCEANEYES_FIREBASE_MESSAGING_SENDER_ID',
+    'OCEANEYES_FUNCTIONS_REGION',
+    buildNameDefine,
+    buildNumberDefine,
+    privacyPolicyUrlDefine,
+    termsOfServiceUrlDefine,
   ];
 
   static const _webRequired = <String>[
@@ -69,6 +78,13 @@ final class OceanEyesReleaseConfigGuard {
       }
     }
 
+    if (!_isTrue(defines[appCheckDefine])) {
+      errors.add(
+        '$appCheckDefine must be explicitly set to true for a customer '
+        'release.',
+      );
+    }
+
     final required = <String>{..._coreRequired, ..._requiredForTarget(target)};
     final appCheckEnabled = _readBoolean(defines[appCheckDefine]) ?? true;
     if (_includesWeb(target) && appCheckEnabled) {
@@ -81,6 +97,13 @@ final class OceanEyesReleaseConfigGuard {
         errors.add('$key must be a non-empty production value.');
       } else if (isPlaceholder(value)) {
         errors.add('$key still contains an example/placeholder value.');
+      } else if (key == privacyPolicyUrlDefine ||
+          key == termsOfServiceUrlDefine) {
+        if (!_isSecureHttpsUrl(value)) {
+          errors.add('$key must be a real HTTPS URL.');
+        }
+      } else if (key == buildNumberDefine && !_isPositiveInteger(value)) {
+        errors.add('$key must be a positive integer.');
       }
     }
 
@@ -90,6 +113,11 @@ final class OceanEyesReleaseConfigGuard {
           isPlaceholder(value) &&
           !required.contains(entry.key)) {
         errors.add('${entry.key} still contains an example/placeholder value.');
+      }
+      if (value is String && _containsDevelopmentMarker(value)) {
+        errors.add(
+          '${entry.key} contains a staging, emulator, or development value.',
+        );
       }
     }
 
@@ -117,9 +145,36 @@ final class OceanEyesReleaseConfigGuard {
       'dummy',
       'example.com',
       'example.org',
+      '.example',
+      '.test',
+      '.invalid',
       'todo',
     ];
     return markers.any(normalized.contains);
+  }
+
+  static bool _containsDevelopmentMarker(String value) {
+    final normalized = value.trim().toLowerCase();
+    const markers = <String>[
+      'staging',
+      'demo-',
+      'localhost',
+      '127.0.0.1',
+      '10.0.2.2',
+    ];
+    return markers.any(normalized.contains);
+  }
+
+  static bool _isSecureHttpsUrl(String value) {
+    final uri = Uri.tryParse(value.trim());
+    return uri != null &&
+        uri.scheme.toLowerCase() == 'https' &&
+        uri.host.trim().isNotEmpty;
+  }
+
+  static bool _isPositiveInteger(String value) {
+    final number = int.tryParse(value.trim());
+    return number != null && number > 0;
   }
 
   static Iterable<String> _requiredForTarget(OceanEyesReleaseTarget target) =>

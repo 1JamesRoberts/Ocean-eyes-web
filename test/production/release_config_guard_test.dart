@@ -69,6 +69,33 @@ void main() {
       'OCEANEYES_APP_CHECK must be a boolean true/false value.',
     ]);
   });
+
+  test('requires release approval metadata and secure legal destinations', () {
+    final defines = _validDefines()
+      ..['OCEANEYES_BUILD_NUMBER'] = '0'
+      ..['OCEANEYES_PRIVACY_POLICY_URL'] = 'http://legal.oceaneyes.app/privacy'
+      ..['OCEANEYES_TERMS_OF_SERVICE_URL'] = 'replace-with-real-terms-url';
+
+    _expectErrors(defines, [
+      'OCEANEYES_BUILD_NUMBER must be a positive integer.',
+      'OCEANEYES_PRIVACY_POLICY_URL must be a real HTTPS URL.',
+      'OCEANEYES_TERMS_OF_SERVICE_URL still contains an example/placeholder '
+          'value.',
+    ]);
+  });
+
+  test(
+    'rejects staging project values even when they are not placeholders',
+    () {
+      final defines = _validDefines()
+        ..['OCEANEYES_FIREBASE_PROJECT_ID'] = 'ocean-eyes-staging';
+
+      _expectErrors(defines, [
+        'OCEANEYES_FIREBASE_PROJECT_ID contains a staging, emulator, or '
+            'development value.',
+      ]);
+    },
+  );
 }
 
 void _expectErrors(
@@ -87,6 +114,11 @@ Map<String, Object?> _validDefines() => <String, Object?>{
   'OCEANEYES_APP_CHECK': true,
   'OCEANEYES_APP_CHECK_DEBUG': false,
   'OCEANEYES_FIREBASE_EMULATORS': false,
+  'OCEANEYES_FUNCTIONS_REGION': 'us-central1',
+  'OCEANEYES_BUILD_NAME': '1.0.0',
+  'OCEANEYES_BUILD_NUMBER': '1',
+  'OCEANEYES_PRIVACY_POLICY_URL': 'https://oceaneyes.app/privacy',
+  'OCEANEYES_TERMS_OF_SERVICE_URL': 'https://oceaneyes.app/terms',
   'OCEANEYES_FIREBASE_API_KEY': 'AIzaSyA-valid-production-key',
   'OCEANEYES_FIREBASE_PROJECT_ID': 'oceaneyes-production',
   'OCEANEYES_FIREBASE_MESSAGING_SENDER_ID': '123456789012',

@@ -32,15 +32,12 @@ flutter test test/view_models/oceaneyes_production_controller_test.dart
 | Token expiry | Expiry-shaped LiveKit disconnect clears the viewer request and permits a fresh start | Pass |
 | One-phone crash/disappearance | Stale viewer request lease stops monitor publishing; abrupt publisher disconnect releases live state and camera | Pass at the coordinator/lease boundary |
 
-The full credential-free Flutter suite passes with 120 tests. `flutter analyze`
+The full credential-free Flutter suite passes with 169 tests. `flutter analyze`
 passes with no issues. The Functions TypeScript build and unit suite passes
-with 15 tests. Firestore emulator rules remain covered by the existing rules
-suite: exact self-join/leave, no tank listing, monitor-only readings,
-server-created alerts, self-owned live-request leases, token caps, tombstones,
-and server-only LiveKit state. The rules suite was not rerun in this pass:
-`npx firebase-tools` was available, but the emulator could not start because
-Java is not installed on this workstation; the previous validation record
-documents its earlier 8-test emulator pass.
+with 15 tests. The Firestore emulator rules suite passes with 8 tests: exact
+self-join/leave, no tank listing, monitor-only readings, server-created alerts,
+self-owned live-request leases, token caps, tombstones, and server-only
+LiveKit state.
 
 ## What this proves about the current implementation
 

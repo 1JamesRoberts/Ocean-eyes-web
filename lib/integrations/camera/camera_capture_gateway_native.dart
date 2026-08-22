@@ -256,7 +256,8 @@ final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
       _emit(
         _snapshot.copyWith(
           phase: CameraCapturePhase.ready,
-          errorMessage: 'Camera capture failed: $error',
+          errorMessage:
+              'Camera capture failed. Check camera access and try again.',
         ),
       );
       if (error is CameraCaptureException) rethrow;
@@ -316,7 +317,7 @@ final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
         return _emit(_snapshot.copyWith(zoom: clamped, clearError: true));
       } catch (error) {
         return _emit(
-          _snapshot.copyWith(errorMessage: 'Could not change zoom: $error'),
+          _snapshot.copyWith(errorMessage: 'Could not change camera zoom.'),
         );
       }
     });
@@ -398,7 +399,7 @@ final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
     return _emit(
       _snapshot.copyWith(
         phase: CameraCapturePhase.failed,
-        errorMessage: '$message $error',
+        errorMessage: message,
       ),
     );
   }

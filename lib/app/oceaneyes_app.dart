@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/oceaneyes_theme.dart';
 import '../core/theme/oceaneyes_tokens.dart';
+import 'production_config.dart';
 import '../models/aquarium_models.dart';
 import '../ui/screens/account_screen.dart';
 import '../ui/screens/login_screen.dart';
@@ -53,6 +54,8 @@ class _OceanEyesAppState extends State<OceanEyesApp>
       widget.controller ?? OceanEyesController();
   late final bool _ownsController =
       widget.controller == null || widget.disposeController;
+  late final OceanEyesProductionConfig _productionConfig =
+      OceanEyesProductionConfig.fromEnvironment();
   late bool _showLogin = !_controller.isAuthenticated;
   bool _loginExiting = false;
   Timer? _loginExitTimer;
@@ -173,6 +176,8 @@ class _OceanEyesAppState extends State<OceanEyesApp>
                     isLoading: _controller.isAuthenticating,
                     isExiting: _loginExiting,
                     onSignIn: _controller.signInWithGoogle,
+                    privacyPolicyUrl: _productionConfig.privacyPolicyUrl,
+                    termsOfServiceUrl: _productionConfig.termsOfServiceUrl,
                   ),
                 ),
             ],

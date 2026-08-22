@@ -52,6 +52,69 @@ Future<List<String>> validateReleaseConfig(
   return OceanEyesReleaseConfigGuard.validate(defines, target: target);
 }
 
+Future<List<String>> validateCustomerReleasePrerequisites(
+  String path,
+  OceanEyesReleaseTarget target, {
+  required bool requireAndroidArtifact,
+}) async {
+  final errors = await validateReleaseConfig(path, target);
+  if (!requireAndroidArtifact) return errors;
+
+  final keyPropertiesFile = File('android/key.properties');
+  if (!await keyPropertiesFile.exists()) {
+    errors.add(
+      'android/key.properties is required for a signed customer appbundle.',
+    );
+  } else {
+    final properties = await _readKeyProperties(keyPropertiesFile);
+    for (final key in const [
+      'storeFile',
+      'storePassword',
+      'keyAlias',
+      'keyPassword',
+    ]) {
+      if ((properties[key] ?? '').trim().isEmpty) {
+        errors.add('android/key.properties is missing "$key".');
+      }
+    }
+    final storeFile = properties['storeFile']?.trim() ?? '';
+    if (storeFile.isNotEmpty) {
+      final resolved = File(storeFile).isAbsolute
+          ? File(storeFile)
+          : File('android/app/$storeFile');
+      if (!await resolved.exists()) {
+        errors.add('The release keystore was not found at ${resolved.path}.');
+      }
+    }
+  }
+
+  for (final model in const [
+    'fish_detector.onnx',
+    'species_classifier.onnx',
+    'water_clarity.onnx',
+  ]) {
+    final file = File('assets/models/$model');
+    if (!await file.exists() || await file.length() == 0) {
+      errors.add('Missing production model asset: ${file.path}.');
+    }
+  }
+  return errors;
+}
+
+Future<Map<String, String>> _readKeyProperties(File file) async {
+  final properties = <String, String>{};
+  for (final line in await file.readAsLines()) {
+    final trimmed = line.trim();
+    if (trimmed.isEmpty || trimmed.startsWith('#')) continue;
+    final separator = trimmed.indexOf('=');
+    if (separator <= 0) continue;
+    properties[trimmed.substring(0, separator).trim()] = trimmed
+        .substring(separator + 1)
+        .trim();
+  }
+  return properties;
+}
+
 bool writeReleaseConfigErrors(Iterable<String> errors) {
   if (errors.isEmpty) return false;
 

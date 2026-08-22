@@ -216,6 +216,10 @@ class _AccountScreenState extends State<AccountScreen> {
             _buildGoogleAccountLink(),
             const SizedBox(height: 12),
           ],
+          if (controller.productionEnabled) ...[
+            _buildNotificationPermission(),
+            const SizedBox(height: 12),
+          ],
           if (!controller.tankConnected)
             GlassPanel(
               color: Colors.transparent,
@@ -499,6 +503,57 @@ class _AccountScreenState extends State<AccountScreen> {
             onPressed: _linkingGoogle || !servicesAvailable
                 ? null
                 : _linkGoogleAccount,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationPermission() {
+    final servicesAvailable = controller.productionServicesAvailable;
+    final enabled = controller.notificationPermissionGranted;
+    return GlassPanel(
+      color: Colors.transparent,
+      borderColor: Colors.transparent,
+      child: Row(
+        children: [
+          const SizedBox.square(
+            dimension: 36,
+            child: Center(
+              child: Icon(
+                LucideIcons.bell,
+                size: 18,
+                color: OceanColors.darkCyan,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Safety notifications',
+                  style: OceanTypography.strong,
+                ),
+                Text(
+                  enabled
+                      ? 'Alert notifications are enabled on this device.'
+                      : 'Enable alerts for water and fish safety events.',
+                  style: OceanTypography.caption,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          GlassButton(
+            label: enabled ? 'Enabled' : 'Enable',
+            icon: enabled ? LucideIcons.check : LucideIcons.bell,
+            compact: true,
+            loading: controller.notificationPermissionRequesting,
+            onPressed: enabled || !servicesAvailable
+                ? null
+                : controller.requestNotificationPermission,
           ),
         ],
       ),

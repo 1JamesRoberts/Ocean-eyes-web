@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/theme/oceaneyes_tokens.dart';
 import '../widgets/glass.dart';
@@ -10,11 +11,15 @@ class LoginScreen extends StatefulWidget {
     required this.isLoading,
     required this.isExiting,
     required this.onSignIn,
+    this.privacyPolicyUrl = '',
+    this.termsOfServiceUrl = '',
   });
 
   final bool isLoading;
   final bool isExiting;
   final VoidCallback onSignIn;
+  final String privacyPolicyUrl;
+  final String termsOfServiceUrl;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -159,7 +164,10 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                           ),
                           const SizedBox(height: 20),
-                          const _LegalText(),
+                          _LegalText(
+                            privacyPolicyUrl: widget.privacyPolicyUrl,
+                            termsOfServiceUrl: widget.termsOfServiceUrl,
+                          ),
                         ],
                       ),
                     ),
@@ -354,7 +362,13 @@ class _GoogleButtonState extends State<_GoogleButton>
 }
 
 class _LegalText extends StatelessWidget {
-  const _LegalText();
+  const _LegalText({
+    required this.privacyPolicyUrl,
+    required this.termsOfServiceUrl,
+  });
+
+  final String privacyPolicyUrl;
+  final String termsOfServiceUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -383,13 +397,21 @@ class _LegalText extends StatelessWidget {
               WidgetSpan(
                 alignment: PlaceholderAlignment.baseline,
                 baseline: TextBaseline.alphabetic,
-                child: _LegalLink(label: 'Privacy Policy', style: link),
+                child: _LegalLink(
+                  label: 'Privacy Policy',
+                  style: link,
+                  url: privacyPolicyUrl,
+                ),
               ),
               const TextSpan(text: ' and '),
               WidgetSpan(
                 alignment: PlaceholderAlignment.baseline,
                 baseline: TextBaseline.alphabetic,
-                child: _LegalLink(label: 'Terms of Service', style: link),
+                child: _LegalLink(
+                  label: 'Terms of Service',
+                  style: link,
+                  url: termsOfServiceUrl,
+                ),
               ),
             ],
           ),
@@ -401,10 +423,15 @@ class _LegalText extends StatelessWidget {
 }
 
 class _LegalLink extends StatefulWidget {
-  const _LegalLink({required this.label, required this.style});
+  const _LegalLink({
+    required this.label,
+    required this.style,
+    required this.url,
+  });
 
   final String label;
   final TextStyle style;
+  final String url;
 
   @override
   State<_LegalLink> createState() => _LegalLinkState();
@@ -414,19 +441,41 @@ class _LegalLinkState extends State<_LegalLink> {
   bool _hovered = false;
   bool _focused = false;
 
+  Uri? get _uri {
+    final value = Uri.tryParse(widget.url.trim());
+    if (value == null || value.scheme != 'https' || value.host.isEmpty) {
+      return null;
+    }
+    return value;
+  }
+
+  Future<void> _open() async {
+    final uri = _uri;
+    if (uri == null) return;
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open ${widget.label}. Try again.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      link: true,
-      label: '${widget.label} (placeholder)',
+      link: _uri != null,
+      enabled: _uri != null,
+      label: _uri == null ? '${widget.label} is not configured' : widget.label,
       child: Focus(
         onFocusChange: (value) => setState(() => _focused = value),
         child: MouseRegion(
-          cursor: SystemMouseCursors.click,
+          cursor: _uri == null
+              ? SystemMouseCursors.basic
+              : SystemMouseCursors.click,
           onEnter: (_) => setState(() => _hovered = true),
           onExit: (_) => setState(() => _hovered = false),
           child: GestureDetector(
-            onTap: () {},
+            onTap: _uri == null ? null : _open,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(2),

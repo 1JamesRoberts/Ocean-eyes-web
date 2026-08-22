@@ -44,6 +44,11 @@ abstract interface class NotificationServiceGateway {
     String? webVapidKey,
   });
 
+  Future<bool> requestPermission({
+    required Future<void> Function(String token) saveToken,
+    String? webVapidKey,
+  });
+
   Future<void> dispose();
 }
 
@@ -148,6 +153,34 @@ class FirebaseNotificationService implements NotificationServiceGateway {
     // request permission and then perform the first token sync later.
     final initial = await _messaging.getInitialMessage();
     if (initial != null) _emitRoute(initial);
+  }
+
+  @override
+  Future<bool> requestPermission({
+    required Future<void> Function(String token) saveToken,
+    String? webVapidKey,
+  }) async {
+    if (_disposed) return false;
+    final settings = await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      provisional: false,
+    );
+    final authorized =
+        settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional;
+    if (!authorized) return false;
+
+    final token = await _messaging.getToken(
+      vapidKey: webVapidKey == null || webVapidKey.trim().isEmpty
+          ? null
+          : webVapidKey,
+    );
+    if (token == null || token.isEmpty) return true;
+    _token = token;
+    await persistFcmTokenWithRetry(token, saveToken);
+    return true;
   }
 
   void _scheduleTokenSave(

@@ -106,6 +106,18 @@ class OceanEyesProductionBindingCoordinator {
     return auth.linkGoogleAccount(fcmToken: fcmToken);
   }
 
+  Future<bool> requestNotificationPermission() {
+    final notifications = _notifications;
+    final repository = _repository;
+    if (notifications == null || repository == null) {
+      return Future<bool>.value(false);
+    }
+    return notifications.requestPermission(
+      saveToken: repository.saveFcmToken,
+      webVapidKey: _webPushVapidKey,
+    );
+  }
+
   Future<void> bindTank({
     required String tankId,
     required void Function(ProductionTank?) onTank,

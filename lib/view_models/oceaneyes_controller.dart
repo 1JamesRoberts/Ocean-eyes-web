@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show debugPrint, kReleaseMode;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../integrations/camera/camera_capture_gateway.dart';
@@ -13,6 +14,7 @@ import '../integrations/power/wake_lock_gateway.dart';
 import '../models/analytics_series_service.dart';
 import '../models/aquarium_models.dart';
 import '../models/demo_fixtures.dart';
+import '../models/customer_error_message.dart';
 import '../models/fish_insights_service.dart';
 import '../models/fish_inventory_repository.dart';
 import '../models/oceaneyes_settings_repository.dart';
@@ -454,7 +456,12 @@ class OceanEyesController extends ChangeNotifier
 
   void _recordProductionError(Object error, [StackTrace? stackTrace]) {
     if (_disposed) return;
-    productionError = error.toString();
+    if (!kReleaseMode) {
+      debugPrint(
+        '[production] $error${stackTrace == null ? '' : '\n$stackTrace'}',
+      );
+    }
+    productionError = oceanEyesCustomerErrorMessage(error);
     _notify();
   }
 
@@ -588,6 +595,8 @@ class OceanEyesController extends ChangeNotifier
 
   bool isAuthenticated = true;
   bool isAuthenticating = false;
+  bool notificationPermissionGranted = false;
+  bool notificationPermissionRequesting = false;
 
   /// True only when the application composition explicitly enables the
   /// production runtime. Direct test controllers default to false and can
@@ -732,6 +741,31 @@ class OceanEyesController extends ChangeNotifier
         }
       }
       isAuthenticating = false;
+      _notify();
+    }
+  }
+
+  Future<void> requestNotificationPermission() async {
+    if (!productionEnabled ||
+        notificationPermissionRequesting ||
+        !_productionBindings.isAvailable) {
+      return;
+    }
+    notificationPermissionRequesting = true;
+    productionError = null;
+    _notify();
+    try {
+      notificationPermissionGranted = await _productionBindings
+          .requestNotificationPermission();
+      if (!notificationPermissionGranted) {
+        productionError =
+            'Notifications are disabled. Enable them in Android Settings '
+            'to receive aquarium alerts.';
+      }
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    } finally {
+      notificationPermissionRequesting = false;
       _notify();
     }
   }

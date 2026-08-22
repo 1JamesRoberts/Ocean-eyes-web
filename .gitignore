@@ -47,6 +47,7 @@ app.*.map.json
 # Production configuration generated or supplied per environment
 /lib/firebase_options.dart
 /android/app/google-services.json
+/android/key.properties
 /ios/Runner/GoogleService-Info.plist
 /web/firebase-messaging-sw.js
 **/.env

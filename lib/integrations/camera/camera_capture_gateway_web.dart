@@ -281,7 +281,9 @@ final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
         _emit(
           _snapshot.copyWith(
             phase: CameraCapturePhase.ready,
-            errorMessage: 'Browser camera capture failed: $error',
+            errorMessage:
+                'Browser camera capture failed. Check camera access '
+                'and try again.',
           ),
         );
       }
@@ -358,7 +360,7 @@ final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
             minimumZoom: 1,
             maximumZoom: 1,
             zoom: 1,
-            errorMessage: 'Browser camera zoom is unavailable: $error',
+            errorMessage: 'Browser camera zoom is unavailable.',
           ),
         );
       }
@@ -457,8 +459,8 @@ final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
   CameraCaptureSnapshot _fail(String message, Object error) {
     final rendered = error is plugin.CameraException
         ? _browserErrorMessage(error)
-        : '$message $error';
-    _log?.call(rendered);
+        : message;
+    _log?.call('$rendered $error');
     return _emit(
       _snapshot.copyWith(
         phase: CameraCapturePhase.failed,
