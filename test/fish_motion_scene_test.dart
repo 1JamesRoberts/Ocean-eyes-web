@@ -20,6 +20,55 @@ void main() {
     );
   });
 
+  test('cruise speed is inversely proportional to fish size', () {
+    const baseSpeed = 10.0;
+    final smallFish = FishMotionMath.calculateSizeAdjustedCruiseSpeed(
+      baseSpeed,
+      5,
+    );
+    final referenceFish = FishMotionMath.calculateSizeAdjustedCruiseSpeed(
+      baseSpeed,
+      10,
+    );
+    final largeFish = FishMotionMath.calculateSizeAdjustedCruiseSpeed(
+      baseSpeed,
+      20,
+    );
+
+    expect(smallFish, closeTo(20, 1e-9));
+    expect(referenceFish, closeTo(10, 1e-9));
+    expect(largeFish, closeTo(5, 1e-9));
+    expect(smallFish * 5, closeTo(referenceFish * 10, 1e-9));
+    expect(referenceFish * 10, closeTo(largeFish * 20, 1e-9));
+  });
+
+  test('cruise speed falls back to the reference size for invalid lengths', () {
+    for (final lengthCm in <double?>[
+      null,
+      0.0,
+      -1.0,
+      double.nan,
+      double.infinity,
+      double.negativeInfinity,
+    ]) {
+      expect(
+        FishMotionMath.calculateSizeAdjustedCruiseSpeed(10, lengthCm),
+        closeTo(10, 1e-9),
+      );
+    }
+  });
+
+  test('scene profiles contain size-adjusted seeded cruise speeds', () {
+    final scene = FishMotionSceneBuilder.build(DemoFixtures.populatedFish());
+
+    for (final sprite in scene.swimmers) {
+      final normalizedBaseSpeed =
+          sprite.motion.cruiseSpeed * sprite.lengthCm / 10;
+      expect(normalizedBaseSpeed, greaterThanOrEqualTo(7));
+      expect(normalizedBaseSpeed, lessThan(12));
+    }
+  });
+
   test('hero scene profiles and render math stay deterministic', () {
     final first = FishMotionSceneBuilder.build(DemoFixtures.populatedFish());
     final second = FishMotionSceneBuilder.build(DemoFixtures.populatedFish());

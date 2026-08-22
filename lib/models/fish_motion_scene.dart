@@ -224,6 +224,7 @@ abstract final class FishMotionSceneBuilder {
       '${entry.fish.id}:${entry.fish.speciesId}:$ordinal',
     );
     final reversalInterval = 5 + (_unitFromSeed(seed, 8) * 4).floor();
+    final baseCruiseSpeed = 7 + _unitFromSeed(seed, 2) * 5;
     return FishMotionSprite(
       key: '${entry.fish.id}:$ordinal',
       speciesId: entry.fish.speciesId,
@@ -232,7 +233,10 @@ abstract final class FishMotionSceneBuilder {
       motion: FishMotionProfile(
         pathSeed: _unitFromSeed(seed, 13) * 1000,
         initialDirection: _unitFromSeed(seed, 1) < 0.5 ? -1 : 1,
-        cruiseSpeed: 7 + _unitFromSeed(seed, 2) * 5,
+        cruiseSpeed: FishMotionMath.calculateSizeAdjustedCruiseSpeed(
+          baseCruiseSpeed,
+          entry.lengthCm,
+        ),
         timelineOffset: _unitFromSeed(seed, 5),
         verticalSpan: 0.18 + _unitFromSeed(seed, 10) * 0.1,
         reversalInterval: reversalInterval,
@@ -346,6 +350,17 @@ abstract final class FishMotionMath {
   static const double _maxOffscreenGapSeconds = 4;
   static const double _paceVariation = 0.15;
   static const double _maxPitchRadians = math.pi / 15;
+
+  static double calculateSizeAdjustedCruiseSpeed(
+    double baseCruiseSpeed,
+    double? lengthCm,
+  ) {
+    final resolvedLengthCm =
+        lengthCm != null && lengthCm.isFinite && lengthCm > 0
+        ? lengthCm
+        : _referenceFishLengthCm;
+    return baseCruiseSpeed * _referenceFishLengthCm / resolvedLengthCm;
+  }
 
   static FishBodyDimensions calculateBodyDimensions(
     FishMotionViewport viewport,
