@@ -946,6 +946,7 @@ class _DetectionBoxes extends StatelessWidget {
           top: 0.33,
           width: 0.15,
           height: 0.18,
+          speciesId: 'cardinal_tetra',
           label: 'Cardinal Tetra 94%',
         ),
         _DetectionBox(
@@ -953,6 +954,7 @@ class _DetectionBoxes extends StatelessWidget {
           top: 0.44,
           width: 0.18,
           height: 0.20,
+          speciesId: 'guppy',
           label: 'Guppy 89%',
         ),
         _DetectionBox(
@@ -960,6 +962,7 @@ class _DetectionBoxes extends StatelessWidget {
           top: 0.25,
           width: 0.13,
           height: 0.17,
+          speciesId: 'corydoras',
           label: 'Corydoras 82%',
         ),
       ],
@@ -973,6 +976,7 @@ class _DetectionBox extends StatelessWidget {
     required this.top,
     required this.width,
     required this.height,
+    required this.speciesId,
     required this.label,
   });
 
@@ -980,6 +984,7 @@ class _DetectionBox extends StatelessWidget {
   final double top;
   final double width;
   final double height;
+  final String speciesId;
   final String label;
 
   @override
@@ -988,44 +993,47 @@ class _DetectionBox extends StatelessWidget {
       MediaQuery.sizeOf(context).width,
       OceanGeometry.referenceWidth,
     );
+    final boxWidth = referenceWidth * width;
+    final fontSize = (boxWidth * 0.12).clamp(10.0, 22.0).toDouble();
+    final boxColor = SpeciesDonut.colorForSpeciesId(speciesId);
+
     return Positioned(
       left: referenceWidth * left,
       top: OceanGeometry.heroHeight * top,
-      width: referenceWidth * width,
+      width: boxWidth,
       height: OceanGeometry.heroHeight * height,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          border: Border.all(color: OceanColors.neonIce, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: OceanColors.neonIce.withValues(alpha: 0.22),
-              blurRadius: 5,
-            ),
-          ],
+          border: Border.all(color: boxColor, width: 1),
         ),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: Transform.translate(
-            offset: const Offset(-1.5, -16),
-            child: DecoratedBox(
-              decoration: const BoxDecoration(color: OceanColors.neonIce),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.clip,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 8,
-                    height: 1.2,
-                    color: OceanColors.prussianBlue,
-                    fontWeight: FontWeight.w600,
-                  ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              left: 2,
+              top: -(fontSize + 4),
+              child: Text(
+                label,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.visible,
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: fontSize,
+                  height: 1.2,
+                  color: boxColor.withValues(alpha: 0.85),
+                  fontWeight: FontWeight.w400,
+                  shadows: const [
+                    Shadow(
+                      color: Color(0x99000000),
+                      offset: Offset(0, 1),
+                      blurRadius: 2,
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

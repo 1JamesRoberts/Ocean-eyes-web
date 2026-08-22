@@ -115,19 +115,18 @@ Future<void> _showAnalyticsRangeEditor(
   BuildContext context,
   OceanEyesController controller,
 ) async {
-  final result = await _showAnalyticsOverlay<_RangeSelection>(
+  await _showAnalyticsOverlay<void>(
     context: context,
     child: _DateRangeEditorDialog(
       range: controller.analyticsRange,
       startTime: controller.analyticsStartTime,
       endTime: controller.analyticsEndTime,
+      onChanged: (selection) => controller.setAnalyticsRange(
+        selection.range,
+        start: selection.startTime,
+        end: selection.endTime,
+      ),
     ),
-  );
-  if (result == null) return;
-  controller.setAnalyticsRange(
-    result.range,
-    start: result.startTime,
-    end: result.endTime,
   );
 }
 
@@ -148,18 +147,15 @@ Future<T?> _showAnalyticsOverlay<T>({
       final resolvedTop = math
           .min(anchoredTop, math.max(16, size.height - 96))
           .toDouble();
-      return Material(
-        color: Colors.transparent,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16, resolvedTop, 16, 16),
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: math.min(
-                OceanGeometry.referenceWidth - 32,
-                size.width - 32,
-              ),
-              child: Align(alignment: alignment, child: child),
+      return Padding(
+        padding: EdgeInsets.fromLTRB(16, resolvedTop, 16, 16),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: math.min(OceanGeometry.referenceWidth - 32, size.width - 32),
+            child: Align(
+              alignment: alignment,
+              child: Material(color: Colors.transparent, child: child),
             ),
           ),
         ),
@@ -883,11 +879,13 @@ class _DateRangeEditorDialog extends StatefulWidget {
     required this.range,
     required this.startTime,
     required this.endTime,
+    required this.onChanged,
   });
 
   final DateTimeRange range;
   final TimeOfDay startTime;
   final TimeOfDay endTime;
+  final ValueChanged<_RangeSelection> onChanged;
 
   @override
   State<_DateRangeEditorDialog> createState() => _DateRangeEditorDialogState();
@@ -984,27 +982,6 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
                 ),
               ),
             ],
-            const SizedBox(height: OceanSpacing.sm),
-            Row(
-              children: [
-                Expanded(
-                  child: GlassButton(
-                    label: 'Cancel',
-                    style: GlassButtonStyle.outline,
-                    expanded: true,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
-                const SizedBox(width: OceanSpacing.xs),
-                Expanded(
-                  child: GlassButton(
-                    label: 'Apply',
-                    expanded: true,
-                    onPressed: _apply,
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -1016,56 +993,42 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
       _RangeField.startDate => _OceanCalendar(
         key: const ValueKey('start-calendar'),
         selectedDate: _startDate,
-        onSelected: (date) {
-          setState(() {
-            _startDate = DateUtils.dateOnly(date);
-            _validationError = _rangeValidationMessage();
-          });
-        },
+        onSelected: (date) =>
+            _updateDraft(() => _startDate = DateUtils.dateOnly(date)),
       ),
       _RangeField.endDate => _OceanCalendar(
         key: const ValueKey('end-calendar'),
         selectedDate: _endDate,
-        onSelected: (date) {
-          setState(() {
-            _endDate = DateUtils.dateOnly(date);
-            _validationError = _rangeValidationMessage();
-          });
-        },
+        onSelected: (date) =>
+            _updateDraft(() => _endDate = DateUtils.dateOnly(date)),
       ),
       _RangeField.startTime => _OceanTimeWheel(
         key: const ValueKey('start-time-wheel'),
         initialTime: _startTime,
         semanticLabel: 'Start time',
-        onChanged: (time) => setState(() {
-          _startTime = time;
-          _validationError = _rangeValidationMessage();
-        }),
+        onChanged: (time) => _updateDraft(() => _startTime = time),
         onDone: () => setState(() => _activeField = null),
       ),
       _RangeField.endTime => _OceanTimeWheel(
         key: const ValueKey('end-time-wheel'),
         initialTime: _endTime,
         semanticLabel: 'End time',
-        onChanged: (time) => setState(() {
-          _endTime = time;
-          _validationError = _rangeValidationMessage();
-        }),
+        onChanged: (time) => _updateDraft(() => _endTime = time),
         onDone: () => setState(() => _activeField = null),
       ),
       null => const SizedBox.shrink(),
     };
   }
 
-  void _apply() {
-    final validationError = _rangeValidationMessage();
-    if (validationError != null) {
-      setState(() => _validationError = validationError);
-      return;
-    }
+  void _updateDraft(VoidCallback update) {
+    setState(() {
+      update();
+      _validationError = _rangeValidationMessage();
+    });
+    if (_validationError != null) return;
     final start = _combine(_startDate, _startTime);
     final end = _combine(_endDate, _endTime);
-    Navigator.of(context).pop(
+    widget.onChanged(
       _RangeSelection(
         range: DateTimeRange(start: start, end: end),
         startTime: _startTime,

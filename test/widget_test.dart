@@ -179,6 +179,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('analytics-date-filter')));
     await tester.pumpAndSettle();
     expect(find.text('Date & time range'), findsOneWidget);
+    expect(find.text('Cancel'), findsNothing);
+    expect(find.text('Apply'), findsNothing);
     expect(controller.activeTab, PrimaryTab.analytics);
     expect(tester.takeException(), isNull);
   });
@@ -207,7 +209,10 @@ void main() {
       expect(find.text('End must be after start.'), findsOneWidget);
       expect(controller.analyticsRange.start, originalStart);
 
-      await tester.tap(find.text('Cancel'));
+      final editorRect = tester.getRect(
+        find.byKey(const ValueKey('analytics-range-editor')),
+      );
+      await tester.tapAt(Offset(editorRect.left - 4, editorRect.center.dy));
       await tester.pumpAndSettle();
       expect(
         find.byKey(const ValueKey('analytics-range-editor')),
@@ -217,6 +222,84 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('range changes apply live and outside tap closes the editor', (
+    tester,
+  ) async {
+    final controller = await pumpReferenceApp(tester);
+    controller.selectTab(PrimaryTab.analytics);
+    await tester.pump(const Duration(milliseconds: 600));
+
+    await tester.tap(find.byKey(const ValueKey('analytics-date-filter')));
+    await tester.pumpAndSettle();
+    final originalRange = controller.analyticsRange;
+
+    await tester.tap(find.bySemanticsLabel('Ends date'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('end-calendar')), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Saturday, 1 August 2026'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('analytics-range-editor')),
+      findsOneWidget,
+    );
+    expect(controller.analyticsRange.start, originalRange.start);
+    expect(controller.analyticsRange.end, DateTime(2026, 8, 1, 23, 59));
+
+    await tester.tap(find.bySemanticsLabel('Starts time'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('ocean-time-wheel')), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Minute 01'));
+    await tester.pumpAndSettle();
+    expect(controller.analyticsRange.start, DateTime(2026, 7, 31, 0, 1));
+    expect(controller.analyticsStartTime, const TimeOfDay(hour: 0, minute: 1));
+
+    final editorRect = tester.getRect(
+      find.byKey(const ValueKey('analytics-range-editor')),
+    );
+    final outsidePoint = Offset(
+      editorRect.left > 8 ? editorRect.left - 4 : editorRect.right + 4,
+      editorRect.center.dy,
+    );
+    await tester.tapAt(outsidePoint);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('analytics-range-editor')), findsNothing);
+    expect(controller.analyticsRange.start, DateTime(2026, 7, 31, 0, 1));
+    expect(controller.analyticsRange.end, DateTime(2026, 8, 1, 23, 59));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('range editor closes from Back in nested controls', (
+    tester,
+  ) async {
+    final controller = await pumpReferenceApp(tester);
+    controller.selectTab(PrimaryTab.analytics);
+    await tester.pump(const Duration(milliseconds: 600));
+
+    await tester.tap(find.byKey(const ValueKey('analytics-date-filter')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Starts date'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('start-calendar')), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('analytics-range-editor')), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('analytics-date-filter')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Starts time'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('ocean-time-wheel')), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('analytics-range-editor')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('fullscreen back closes drawer before the camera overlay', (
     tester,
