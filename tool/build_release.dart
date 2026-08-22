@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:oceaneyes/app/release_config_guard.dart';
-
 import 'release_config_io.dart';
 
 /// Builds a customer artifact only after the same config checks used by CI.
@@ -12,30 +10,23 @@ import 'release_config_io.dart';
 /// Extra Flutter build arguments may be supplied after `--`.
 Future<void> main(List<String> args) async {
   try {
-    final artifactName = optionValue(args, '--target');
-    if (artifactName == null) {
-      throw const FormatException(
-        'Missing --target. Use web, appbundle, apk, ipa, or ios.',
-      );
-    }
-    final configPath = optionValue(args, '--config');
-    if (configPath == null) {
-      throw const FormatException(
-        'Missing --config. Pass the private production JSON file.',
-      );
-    }
+    final artifactName = requiredOptionValue(
+      args,
+      '--target',
+      'Missing --target. Use web, appbundle, apk, ipa, or ios.',
+    );
+    final configPath = requiredOptionValue(
+      args,
+      '--config',
+      'Missing --config. Pass the private production JSON file.',
+    );
 
     final artifact = parseArtifactTarget(artifactName);
-    final defines = await readReleaseDefines(configPath);
-    final errors = OceanEyesReleaseConfigGuard.validate(
-      defines,
-      target: artifact.configTarget,
+    final errors = await validateReleaseConfig(
+      configPath,
+      artifact.configTarget,
     );
-    if (errors.isNotEmpty) {
-      stderr.writeln('Customer release configuration rejected:');
-      for (final error in errors) {
-        stderr.writeln(' - $error');
-      }
+    if (writeReleaseConfigErrors(errors)) {
       exitCode = 1;
       return;
     }

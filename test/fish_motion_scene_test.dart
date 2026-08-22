@@ -24,25 +24,33 @@ void main() {
 
   test('cruise speed follows inverse visual-size scaling', () {
     const baseSpeed = 10.0;
+    const smallLengthCm = 5.0;
+    const referenceLengthCm = 10.0;
+    const largeLengthCm = 20.0;
     final smallFish = FishMotionMath.calculateSizeAdjustedCruiseSpeed(
       baseSpeed,
-      5,
+      smallLengthCm,
     );
     final referenceFish = FishMotionMath.calculateSizeAdjustedCruiseSpeed(
       baseSpeed,
-      10,
+      referenceLengthCm,
     );
     final largeFish = FishMotionMath.calculateSizeAdjustedCruiseSpeed(
       baseSpeed,
-      20,
+      largeLengthCm,
     );
 
-    expect(smallFish, closeTo(10 * math.sqrt(2), 1e-9));
-    expect(referenceFish, closeTo(10, 1e-9));
-    expect(largeFish, closeTo(10 / math.sqrt(2), 1e-9));
-    expect(smallFish * smallFish * 5, closeTo(1000, 1e-9));
-    expect(referenceFish * referenceFish * 10, closeTo(1000, 1e-9));
-    expect(largeFish * largeFish * 20, closeTo(1000, 1e-9));
+    expect(smallFish, closeTo(baseSpeed * math.sqrt(2), 1e-9));
+    expect(referenceFish, closeTo(baseSpeed, 1e-9));
+    expect(largeFish, closeTo(baseSpeed / math.sqrt(2), 1e-9));
+    const expectedInvariant = baseSpeed * baseSpeed * referenceLengthCm;
+    for (final (speed, lengthCm) in [
+      (smallFish, smallLengthCm),
+      (referenceFish, referenceLengthCm),
+      (largeFish, largeLengthCm),
+    ]) {
+      expect(speed * speed * lengthCm, closeTo(expectedInvariant, 1e-9));
+    }
   });
 
   test('cruise speed falls back to the reference size for invalid lengths', () {
@@ -66,7 +74,7 @@ void main() {
 
     for (final sprite in scene.swimmers) {
       final normalizedBaseSpeed =
-          sprite.motion.cruiseSpeed * math.sqrt(sprite.lengthCm / 10);
+          sprite.motion.cruiseSpeed * math.sqrt(sprite.lengthCm / 10.0);
       expect(normalizedBaseSpeed, greaterThanOrEqualTo(7));
       expect(normalizedBaseSpeed, lessThan(12));
     }

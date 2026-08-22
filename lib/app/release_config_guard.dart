@@ -13,6 +13,17 @@ final class OceanEyesReleaseConfigGuard {
   static const appCheckDebugDefine = 'OCEANEYES_APP_CHECK_DEBUG';
   static const firebaseEmulatorsDefine = 'OCEANEYES_FIREBASE_EMULATORS';
 
+  static const _booleanDefines = <String>[
+    appCheckDefine,
+    appCheckDebugDefine,
+    firebaseEmulatorsDefine,
+  ];
+
+  static const _forbiddenInCustomerRelease = <String>[
+    firebaseEmulatorsDefine,
+    appCheckDebugDefine,
+  ];
+
   static const _coreRequired = <String>[
     'OCEANEYES_FIREBASE_API_KEY',
     'OCEANEYES_FIREBASE_PROJECT_ID',
@@ -48,21 +59,14 @@ final class OceanEyesReleaseConfigGuard {
       errors.add('$productionDefine must be explicitly set to true.');
     }
 
-    _validateBoolean(defines, appCheckDefine, errors);
-    _validateBoolean(defines, appCheckDebugDefine, errors);
-    _validateBoolean(defines, firebaseEmulatorsDefine, errors);
-
-    if (_isTrue(defines[firebaseEmulatorsDefine])) {
-      errors.add(
-        '$firebaseEmulatorsDefine must be false or omitted for a customer '
-        'release.',
-      );
+    for (final key in _booleanDefines) {
+      _validateBoolean(defines, key, errors);
     }
-    if (_isTrue(defines[appCheckDebugDefine])) {
-      errors.add(
-        '$appCheckDebugDefine must be false or omitted for a customer '
-        'release.',
-      );
+
+    for (final key in _forbiddenInCustomerRelease) {
+      if (_isTrue(defines[key])) {
+        errors.add('$key must be false or omitted for a customer release.');
+      }
     }
 
     final required = <String>{..._coreRequired, ..._requiredForTarget(target)};
@@ -73,19 +77,18 @@ final class OceanEyesReleaseConfigGuard {
 
     for (final key in required) {
       final value = defines[key];
-      if (!_isConfiguredString(value)) {
+      if (value is! String || value.trim().isEmpty) {
         errors.add('$key must be a non-empty production value.');
-      } else if (isPlaceholder(value as String)) {
+      } else if (isPlaceholder(value)) {
         errors.add('$key still contains an example/placeholder value.');
       }
     }
 
-    final requiredKeys = required;
     for (final entry in defines.entries) {
       final value = entry.value;
       if (value is String &&
           isPlaceholder(value) &&
-          !requiredKeys.contains(entry.key)) {
+          !required.contains(entry.key)) {
         errors.add('${entry.key} still contains an example/placeholder value.');
       }
     }
@@ -119,23 +122,17 @@ final class OceanEyesReleaseConfigGuard {
     return markers.any(normalized.contains);
   }
 
-  static List<String> _requiredForTarget(OceanEyesReleaseTarget target) {
-    final required = <String>{};
-    switch (target) {
-      case OceanEyesReleaseTarget.all:
-        required
-          ..addAll(_webRequired)
-          ..addAll(_androidRequired)
-          ..addAll(_iosRequired);
-      case OceanEyesReleaseTarget.web:
-        required.addAll(_webRequired);
-      case OceanEyesReleaseTarget.android:
-        required.addAll(_androidRequired);
-      case OceanEyesReleaseTarget.ios:
-        required.addAll(_iosRequired);
-    }
-    return required.toList(growable: false);
-  }
+  static Iterable<String> _requiredForTarget(OceanEyesReleaseTarget target) =>
+      switch (target) {
+        OceanEyesReleaseTarget.all => <String>{
+          ..._webRequired,
+          ..._androidRequired,
+          ..._iosRequired,
+        },
+        OceanEyesReleaseTarget.web => _webRequired,
+        OceanEyesReleaseTarget.android => _androidRequired,
+        OceanEyesReleaseTarget.ios => _iosRequired,
+      };
 
   static bool _includesWeb(OceanEyesReleaseTarget target) =>
       target == OceanEyesReleaseTarget.all ||
@@ -151,21 +148,15 @@ final class OceanEyesReleaseConfigGuard {
     }
   }
 
-  static bool _isConfiguredString(Object? value) =>
-      value is String && value.trim().isNotEmpty;
-
   static bool _isTrue(Object? value) => _readBoolean(value) == true;
 
   static bool? _readBoolean(Object? value) {
     if (value is bool) return value;
-    if (value is String) {
-      switch (value.trim().toLowerCase()) {
-        case 'true':
-          return true;
-        case 'false':
-          return false;
-      }
-    }
-    return null;
+    if (value is! String) return null;
+    return switch (value.trim().toLowerCase()) {
+      'true' => true,
+      'false' => false,
+      _ => null,
+    };
   }
 }

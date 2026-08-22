@@ -16,19 +16,11 @@ Future<Map<String, Object?>> readReleaseDefines(String path) async {
     );
   }
 
-  final defines = <String, Object?>{};
-  for (final entry in decoded.entries) {
-    if (entry.key is! String) {
-      throw const FormatException(
-        'Every production configuration key must be a string.',
-      );
-    }
-    defines[entry.key as String] = entry.value;
-  }
-  return defines;
+  return Map<String, Object?>.from(decoded);
 }
 
 String? optionValue(List<String> args, String option) {
+  final prefix = '$option=';
   for (var index = 0; index < args.length; index += 1) {
     final argument = args[index];
     if (argument == option) {
@@ -37,7 +29,6 @@ String? optionValue(List<String> args, String option) {
       }
       return args[index + 1];
     }
-    final prefix = '$option=';
     if (argument.startsWith(prefix)) {
       final value = argument.substring(prefix.length);
       if (value.isEmpty) throw ArgumentError('$option requires a value.');
@@ -45,6 +36,30 @@ String? optionValue(List<String> args, String option) {
     }
   }
   return null;
+}
+
+String requiredOptionValue(
+  List<String> args,
+  String option,
+  String missingMessage,
+) => optionValue(args, option) ?? (throw FormatException(missingMessage));
+
+Future<List<String>> validateReleaseConfig(
+  String path,
+  OceanEyesReleaseTarget target,
+) async {
+  final defines = await readReleaseDefines(path);
+  return OceanEyesReleaseConfigGuard.validate(defines, target: target);
+}
+
+bool writeReleaseConfigErrors(Iterable<String> errors) {
+  if (errors.isEmpty) return false;
+
+  stderr.writeln('Customer release configuration rejected:');
+  for (final error in errors) {
+    stderr.writeln(' - $error');
+  }
+  return true;
 }
 
 OceanEyesReleaseTarget parseReleaseTarget(String value) {
@@ -71,29 +86,17 @@ final class ReleaseArtifactTarget {
 }
 
 ReleaseArtifactTarget parseArtifactTarget(String value) {
-  return switch (value.trim().toLowerCase()) {
-    'web' => const ReleaseArtifactTarget(
-      flutterTarget: 'web',
-      configTarget: OceanEyesReleaseTarget.web,
-    ),
-    'appbundle' => const ReleaseArtifactTarget(
-      flutterTarget: 'appbundle',
-      configTarget: OceanEyesReleaseTarget.android,
-    ),
-    'apk' => const ReleaseArtifactTarget(
-      flutterTarget: 'apk',
-      configTarget: OceanEyesReleaseTarget.android,
-    ),
-    'ipa' => const ReleaseArtifactTarget(
-      flutterTarget: 'ipa',
-      configTarget: OceanEyesReleaseTarget.ios,
-    ),
-    'ios' => const ReleaseArtifactTarget(
-      flutterTarget: 'ios',
-      configTarget: OceanEyesReleaseTarget.ios,
-    ),
+  final normalized = value.trim().toLowerCase();
+  final configTarget = switch (normalized) {
+    'web' => OceanEyesReleaseTarget.web,
+    'appbundle' || 'apk' => OceanEyesReleaseTarget.android,
+    'ipa' || 'ios' => OceanEyesReleaseTarget.ios,
     _ => throw ArgumentError(
       'Unknown artifact "$value". Use web, appbundle, apk, ipa, or ios.',
     ),
   };
+  return ReleaseArtifactTarget(
+    flutterTarget: normalized,
+    configTarget: configTarget,
+  );
 }

@@ -224,17 +224,19 @@ class OceanEyesProductionConfig {
 
   /// A user-facing configuration problem, or null when startup can proceed.
   String? validate() {
-    if (kReleaseMode && productionDefineValue.isEmpty) {
-      return 'Customer release artifacts require an explicit '
-          'OCEANEYES_PRODUCTION=true define; fixture mode is not allowed.';
-    }
-    if (kReleaseMode && !enabled) {
-      return 'Customer release artifacts require '
-          'OCEANEYES_PRODUCTION=true; fixture mode is not allowed.';
-    }
-    if (kReleaseMode && !releaseArtifactGuardPresent) {
-      return 'This release was not built by the guarded release command. '
-          'Run tool/build_release.dart with the private production file.';
+    if (kReleaseMode) {
+      if (productionDefineValue.isEmpty) {
+        return 'Customer release artifacts require an explicit '
+            'OCEANEYES_PRODUCTION=true define; fixture mode is not allowed.';
+      }
+      if (!enabled) {
+        return 'Customer release artifacts require '
+            'OCEANEYES_PRODUCTION=true; fixture mode is not allowed.';
+      }
+      if (!releaseArtifactGuardPresent) {
+        return 'This release was not built by the guarded release command. '
+            'Run tool/build_release.dart with the private production file.';
+      }
     }
     if (!enabled) return null;
     if (!kIsWeb &&
@@ -258,17 +260,14 @@ class OceanEyesProductionConfig {
     if (functionsRegion.trim().isEmpty) {
       return 'OCEANEYES_FUNCTIONS_REGION cannot be empty.';
     }
-    if (kReleaseMode) {
-      final releaseErrors = OceanEyesReleaseConfigGuard.validate(
-        _dartDefines,
-        target: _releaseTarget,
-      );
-      if (releaseErrors.isNotEmpty) {
-        return 'Customer release configuration is invalid:\n'
-            '${releaseErrors.map((error) => '- $error').join('\n')}';
-      }
-    }
-    return null;
+    if (!kReleaseMode) return null;
+    final releaseErrors = OceanEyesReleaseConfigGuard.validate(
+      _dartDefines,
+      target: _releaseTarget,
+    );
+    if (releaseErrors.isEmpty) return null;
+    return 'Customer release configuration is invalid:\n'
+        '${releaseErrors.map((error) => '- $error').join('\n')}';
   }
 
   OceanEyesReleaseTarget get _releaseTarget {
@@ -307,8 +306,7 @@ class OceanEyesProductionConfig {
   };
 
   static bool _isConfigured(String value) {
-    final normalized = value.trim().toLowerCase();
-    return normalized.isNotEmpty &&
-        !OceanEyesReleaseConfigGuard.isPlaceholder(normalized);
+    return value.trim().isNotEmpty &&
+        !OceanEyesReleaseConfigGuard.isPlaceholder(value);
   }
 }

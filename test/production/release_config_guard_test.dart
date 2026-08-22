@@ -11,12 +11,9 @@ void main() {
   test('requires an explicit production define', () {
     final defines = _validDefines()..remove('OCEANEYES_PRODUCTION');
 
-    final errors = OceanEyesReleaseConfigGuard.validate(defines);
-
-    expect(
-      errors,
-      contains('OCEANEYES_PRODUCTION must be explicitly set to true.'),
-    );
+    _expectErrors(defines, [
+      'OCEANEYES_PRODUCTION must be explicitly set to true.',
+    ]);
   });
 
   test('rejects tracked example placeholders, including optional values', () {
@@ -24,22 +21,12 @@ void main() {
       ..['OCEANEYES_FIREBASE_PROJECT_ID'] = 'replace-with-your-project-id'
       ..['OCEANEYES_FUNCTIONS_REGION'] = 'replace-me';
 
-    final errors = OceanEyesReleaseConfigGuard.validate(defines);
-
-    expect(
-      errors,
-      contains(
-        'OCEANEYES_FIREBASE_PROJECT_ID still contains an example/placeholder '
-        'value.',
-      ),
-    );
-    expect(
-      errors,
-      contains(
-        'OCEANEYES_FUNCTIONS_REGION still contains an example/placeholder '
-        'value.',
-      ),
-    );
+    _expectErrors(defines, [
+      'OCEANEYES_FIREBASE_PROJECT_ID still contains an example/placeholder '
+          'value.',
+      'OCEANEYES_FUNCTIONS_REGION still contains an example/placeholder '
+          'value.',
+    ]);
   });
 
   test('rejects emulator and App Check debug settings', () {
@@ -47,40 +34,22 @@ void main() {
       ..['OCEANEYES_FIREBASE_EMULATORS'] = true
       ..['OCEANEYES_APP_CHECK_DEBUG'] = true;
 
-    final errors = OceanEyesReleaseConfigGuard.validate(defines);
-
-    expect(
-      errors,
-      contains(
-        'OCEANEYES_FIREBASE_EMULATORS must be false or omitted for a customer '
-        'release.',
-      ),
-    );
-    expect(
-      errors,
-      contains(
-        'OCEANEYES_APP_CHECK_DEBUG must be false or omitted for a customer '
-        'release.',
-      ),
-    );
+    _expectErrors(defines, [
+      'OCEANEYES_FIREBASE_EMULATORS must be false or omitted for a customer '
+          'release.',
+      'OCEANEYES_APP_CHECK_DEBUG must be false or omitted for a customer '
+          'release.',
+    ]);
   });
 
   test('requires target-specific values', () {
     final defines = _validDefines()
       ..remove('OCEANEYES_FIREBASE_WEB_PUSH_VAPID_KEY');
 
-    final errors = OceanEyesReleaseConfigGuard.validate(
-      defines,
-      target: OceanEyesReleaseTarget.web,
-    );
-
-    expect(
-      errors,
-      contains(
-        'OCEANEYES_FIREBASE_WEB_PUSH_VAPID_KEY must be a non-empty production '
-        'value.',
-      ),
-    );
+    _expectErrors(defines, [
+      'OCEANEYES_FIREBASE_WEB_PUSH_VAPID_KEY must be a non-empty production '
+          'value.',
+    ], target: OceanEyesReleaseTarget.web);
   });
 
   test('allows optional Firebase metadata to be omitted', () {
@@ -90,21 +59,27 @@ void main() {
       ..remove('OCEANEYES_FIREBASE_IOS_BUNDLE_ID')
       ..remove('OCEANEYES_FIREBASE_ANDROID_CLIENT_ID');
 
-    final errors = OceanEyesReleaseConfigGuard.validate(defines);
-
-    expect(errors, isEmpty);
+    expect(OceanEyesReleaseConfigGuard.validate(defines), isEmpty);
   });
 
   test('rejects malformed boolean values', () {
     final defines = _validDefines()..['OCEANEYES_APP_CHECK'] = 'enabled';
 
-    final errors = OceanEyesReleaseConfigGuard.validate(defines);
-
-    expect(
-      errors,
-      contains('OCEANEYES_APP_CHECK must be a boolean true/false value.'),
-    );
+    _expectErrors(defines, [
+      'OCEANEYES_APP_CHECK must be a boolean true/false value.',
+    ]);
   });
+}
+
+void _expectErrors(
+  Map<String, Object?> defines,
+  Iterable<String> expected, {
+  OceanEyesReleaseTarget target = OceanEyesReleaseTarget.all,
+}) {
+  final errors = OceanEyesReleaseConfigGuard.validate(defines, target: target);
+  for (final message in expected) {
+    expect(errors, contains(message));
+  }
 }
 
 Map<String, Object?> _validDefines() => <String, Object?>{

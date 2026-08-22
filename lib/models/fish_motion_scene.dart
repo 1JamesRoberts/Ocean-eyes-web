@@ -355,10 +355,7 @@ abstract final class FishMotionMath {
     double baseCruiseSpeed,
     double? lengthCm,
   ) {
-    final resolvedLengthCm =
-        lengthCm != null && lengthCm.isFinite && lengthCm > 0
-        ? lengthCm
-        : _referenceFishLengthCm;
+    final resolvedLengthCm = _resolveLengthCm(lengthCm);
     return baseCruiseSpeed *
         math.sqrt(_referenceFishLengthCm / resolvedLengthCm);
   }
@@ -367,10 +364,7 @@ abstract final class FishMotionMath {
     FishMotionViewport viewport,
     double? lengthCm,
   ) {
-    final resolvedLengthCm =
-        lengthCm != null && lengthCm.isFinite && lengthCm > 0
-        ? lengthCm
-        : _referenceFishLengthCm;
+    final resolvedLengthCm = _resolveLengthCm(lengthCm);
     final baseWidth = (viewport.width * _baseBodyWidthViewportRatio).clamp(
       _minBaseBodyWidth,
       _maxBaseBodyWidth,
@@ -379,6 +373,11 @@ abstract final class FishMotionMath {
         baseWidth * math.sqrt(resolvedLengthCm / _referenceFishLengthCm);
     return FishBodyDimensions(width: width, height: width * _bodyHeightRatio);
   }
+
+  static double _resolveLengthCm(double? lengthCm) =>
+      lengthCm != null && lengthCm.isFinite && lengthCm > 0
+      ? lengthCm
+      : _referenceFishLengthCm;
 
   static FishMotionPoint calculateMotionPoint(double modelX, double frame) {
     final drivenTime = _timeOffset + frame * _driverMultiplier / _timeDivider;
