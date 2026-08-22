@@ -26,12 +26,30 @@ void main() {
       onChanged: () => changes += 1,
     );
 
-    navigation.requestAddFish();
+    navigation
+      ..requestAddFish()
+      ..requestAnalyticsSpecies()
+      ..requestAnalyticsRange();
 
     expect(navigation.activeTab, PrimaryTab.myFish);
-    expect(navigation.consumeAddFishRequest(), isTrue);
-    expect(navigation.consumeAddFishRequest(), isFalse);
-    expect(changes, 1);
+    for (final consume in [
+      navigation.consumeAddFishRequest,
+      navigation.consumeAnalyticsSpeciesRequest,
+      navigation.consumeAnalyticsRangeRequest,
+    ]) {
+      expect(consume(), isTrue);
+      expect(consume(), isFalse);
+    }
+    expect(changes, 3);
+  });
+
+  test('preserves the route origin while changing alert details', () {
+    final navigation = OceanEyesNavigationCoordinator(onChanged: () {});
+    navigation.openAlerts(origin: PrimaryTab.analytics);
+
+    navigation.openAlertDetail('a-2');
+    expect(navigation.secondaryOrigin, PrimaryTab.analytics);
+    expect(navigation.selectedAlertId, 'a-2');
   });
 
   test('restores the route origin when a secondary route closes', () {

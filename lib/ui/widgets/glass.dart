@@ -53,7 +53,7 @@ class GlassCard extends StatelessWidget {
                   offset: const Offset(0, 8),
                 ),
               ]
-            : null,
+            : const [OceanShadows.card],
       ),
       child: ClipRRect(
         borderRadius: borderRadius,
@@ -61,6 +61,10 @@ class GlassCard extends StatelessWidget {
           filter: ImageFilter.blur(
             sigmaX: overlay ? 12 : 2,
             sigmaY: overlay ? 12 : 2,
+            // Clamp repeats the filter layer's outermost pixels. On web, a
+            // rounded clipped card can stretch one of those pixels into a
+            // full-width seam. Decal makes out-of-bounds samples transparent.
+            tileMode: TileMode.decal,
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(

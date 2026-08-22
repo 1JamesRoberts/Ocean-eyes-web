@@ -50,6 +50,14 @@ abstract final class OceanRadii {
   static const pill = 999.0;
 }
 
+abstract final class OceanShadows {
+  static const card = BoxShadow(
+    color: Color(0x1F051E32),
+    blurRadius: 50,
+    offset: Offset(0, 18),
+  );
+}
+
 abstract final class OceanGeometry {
   static const referenceWidth = 393.0;
   static const referenceHeight = 852.0;

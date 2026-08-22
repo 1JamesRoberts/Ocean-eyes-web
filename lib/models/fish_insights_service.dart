@@ -31,6 +31,20 @@ class SpeciesFacts {
     required this.swimZone,
   });
 
+  SpeciesFacts._fromCatalog(SpeciesCatalogFacts facts)
+    : sizeCm = facts.sizeCm,
+      tankLitres = facts.tankLitres,
+      tempMin = facts.tempMin,
+      tempMax = facts.tempMax,
+      phMin = facts.phMin,
+      phMax = facts.phMax,
+      availability = facts.availability,
+      aggression = facts.aggression,
+      aggressionLabel = facts.aggressionLabel,
+      behavior = facts.behavior,
+      behaviorLabel = facts.behaviorLabel,
+      swimZone = facts.swimZone;
+
   final double sizeCm;
   final int tankLitres;
   final double tempMin;
@@ -57,22 +71,10 @@ abstract final class FishInsightsService {
   static SpeciesFacts? factsFor(String speciesId) {
     final fixtureFacts = _speciesFacts[speciesId];
     if (fixtureFacts != null) return fixtureFacts;
-    final facts = SpeciesCatalog.facts[speciesId];
-    if (facts == null) return null;
-    return SpeciesFacts(
-      sizeCm: facts.sizeCm,
-      tankLitres: facts.tankLitres,
-      tempMin: facts.tempMin,
-      tempMax: facts.tempMax,
-      phMin: facts.phMin,
-      phMax: facts.phMax,
-      availability: facts.availability,
-      aggression: facts.aggression,
-      aggressionLabel: facts.aggressionLabel,
-      behavior: facts.behavior,
-      behaviorLabel: facts.behaviorLabel,
-      swimZone: facts.swimZone,
-    );
+    final catalogFacts = SpeciesCatalog.facts[speciesId];
+    return catalogFacts == null
+        ? null
+        : SpeciesFacts._fromCatalog(catalogFacts);
   }
 
   static List<FishCompatibility> compatibilitiesFor(
@@ -80,15 +82,9 @@ abstract final class FishInsightsService {
     String fishId,
   ) {
     final entries = tankFish.toList(growable: false);
-    FishEntry? selected;
-    for (final entry in entries) {
-      if (entry.id == fishId) {
-        selected = entry;
-        break;
-      }
-    }
-    if (selected == null) return const [];
-    final selectedFacts = factsFor(selected.speciesId);
+    final selectedIndex = entries.indexWhere((entry) => entry.id == fishId);
+    if (selectedIndex < 0) return const [];
+    final selectedFacts = factsFor(entries[selectedIndex].speciesId);
     final result = entries
         .where((entry) => entry.id != fishId)
         .map(
@@ -98,28 +94,16 @@ abstract final class FishInsightsService {
           ),
         )
         .toList(growable: false);
-    result.sort((first, second) {
-      final firstScore = first.score;
-      final secondScore = second.score;
-      if (firstScore == null && secondScore == null) {
-        return first.fish.name.compareTo(second.fish.name);
-      }
-      if (firstScore == null) return 1;
-      if (secondScore == null) return -1;
-      final scoreOrder = firstScore.compareTo(secondScore);
-      return scoreOrder == 0
-          ? first.fish.name.compareTo(second.fish.name)
-          : scoreOrder;
-    });
+    result.sort(_compareCompatibility);
     return result;
   }
 
   static TankStats tankStats(Iterable<FishEntry> fish) {
     final entries = fish.toList(growable: false);
-    final mappedFacts = entries
+    final facts = entries
         .map((entry) => factsFor(entry.speciesId))
+        .whereType<SpeciesFacts>()
         .toList(growable: false);
-    final facts = mappedFacts.whereType<SpeciesFacts>().toList(growable: false);
     if (facts.isEmpty) {
       return TankStats(
         idealTankLitres: null,
@@ -131,72 +115,66 @@ abstract final class FishInsightsService {
 
     final idealTank = facts
         .map((item) => item.tankLitres)
-        .reduce((a, b) => a > b ? a : b);
+        .reduce((first, second) => first > second ? first : second);
     final temperature = _intersect(
-      facts.map((item) => (item.tempMin, item.tempMax)).toList(),
+      facts.map((item) => (item.tempMin, item.tempMax)),
       unit: '°C',
     );
-    final ph = _intersect(
-      facts.map((item) => (item.phMin, item.phMax)).toList(),
-    );
-
-    var total = 0;
-    var pairs = 0;
+    final ph = _intersect(facts.map((item) => (item.phMin, item.phMax)));
+    var total = 0, pairs = 0;
     for (var first = 0; first < facts.length; first += 1) {
       for (var second = first + 1; second < facts.length; second += 1) {
-        final score = pairCompatibility(facts[first], facts[second]);
-        if (score != null) {
-          total += score;
-          pairs += 1;
-        }
+        total += pairCompatibility(facts[first], facts[second])!;
+        pairs += 1;
       }
     }
+    final compatibility = facts.length != entries.length
+        ? null
+        : pairs == 0
+        ? 100
+        : (total / pairs).round();
     return TankStats(
       idealTankLitres: idealTank,
       temperatureRange: temperature,
       phRange: ph,
-      compatibility: mappedFacts.any((facts) => facts == null)
-          ? null
-          : pairs == 0
-          ? 100
-          : (total / pairs).round(),
+      compatibility: compatibility,
     );
   }
 
   static int? pairCompatibility(SpeciesFacts? first, SpeciesFacts? second) {
     if (first == null || second == null) return null;
-    var score = 100;
     final temperatureOverlap =
         (first.tempMax < second.tempMax ? first.tempMax : second.tempMax) -
         (first.tempMin > second.tempMin ? first.tempMin : second.tempMin);
     if (temperatureOverlap <= 0) return 0;
-    if (temperatureOverlap < 3) {
-      score -= 40;
-    } else if (temperatureOverlap < 5) {
-      score -= 20;
-    }
+    var score = 100;
+    score -= temperatureOverlap < 3
+        ? 40
+        : temperatureOverlap < 5
+        ? 20
+        : 0;
 
     final phOverlap =
         (first.phMax < second.phMax ? first.phMax : second.phMax) -
         (first.phMin > second.phMin ? first.phMin : second.phMin);
     if (phOverlap <= 0) return 0;
-    if (phOverlap < 0.5) {
-      score -= 30;
-    } else if (phOverlap < 1) {
-      score -= 15;
-    }
-
-    final aggressions = {first.aggression, second.aggression};
-    if (aggressions.contains('aggressive') &&
-        aggressions.contains('peaceful')) {
-      score -= 25;
-    } else if (aggressions.contains('aggressive') &&
-        aggressions.contains('mostly_peaceful')) {
-      score -= 15;
-    } else if (aggressions.contains('mostly_peaceful') &&
-        aggressions.contains('peaceful')) {
-      score -= 5;
-    }
+    score -= phOverlap < 0.5
+        ? 30
+        : phOverlap < 1
+        ? 15
+        : 0;
+    final aggressions = (first.aggression, second.aggression);
+    score -= switch ((
+      aggressions.$1 == 'aggressive' || aggressions.$2 == 'aggressive',
+      aggressions.$1 == 'peaceful' || aggressions.$2 == 'peaceful',
+      aggressions.$1 == 'mostly_peaceful' ||
+          aggressions.$2 == 'mostly_peaceful',
+    )) {
+      (true, true, _) => 25,
+      (true, false, true) => 15,
+      (false, true, true) => 5,
+      _ => 0,
+    };
     if ((first.behavior == 'solitary' && second.behavior == 'schooling') ||
         (first.behavior == 'schooling' && second.behavior == 'solitary')) {
       score -= 10;
@@ -204,9 +182,26 @@ abstract final class FishInsightsService {
     return score.clamp(0, 100);
   }
 
-  static String _intersect(List<(double, double)> ranges, {String unit = ''}) {
-    var low = ranges.first.$1;
-    var high = ranges.first.$2;
+  static int _compareCompatibility(
+    FishCompatibility first,
+    FishCompatibility second,
+  ) {
+    const unknownScore = 101;
+    final scoreOrder = (first.score ?? unknownScore).compareTo(
+      second.score ?? unknownScore,
+    );
+    return scoreOrder == 0
+        ? first.fish.name.compareTo(second.fish.name)
+        : scoreOrder;
+  }
+
+  static String _intersect(
+    Iterable<(double, double)> ranges, {
+    String unit = '',
+  }) {
+    final first = ranges.first;
+    var low = first.$1;
+    var high = first.$2;
     for (final range in ranges.skip(1)) {
       if (range.$1 > low) low = range.$1;
       if (range.$2 < high) high = range.$2;

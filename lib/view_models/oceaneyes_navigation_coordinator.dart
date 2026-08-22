@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 import '../models/aquarium_models.dart';
 
+enum _NavigationIntent { addFish, analyticsSpecies, analyticsRange }
+
 /// Owns route state and one-shot presentation intents for OceanEyes.
 ///
 /// Keeping this state out of [OceanEyesController] makes navigation transitions
@@ -18,9 +20,7 @@ class OceanEyesNavigationCoordinator {
   PrimaryTab secondaryOrigin = PrimaryTab.dashboard;
   int scrollEpoch = 0;
 
-  bool _addFishRequestPending = false;
-  bool _analyticsSpeciesRequestPending = false;
-  bool _analyticsRangeRequestPending = false;
+  final Set<_NavigationIntent> _pendingIntents = {};
 
   void configureLaunch(Uri uri) {
     activeTab = switch (uri.queryParameters['tab']) {
@@ -51,39 +51,22 @@ class OceanEyesNavigationCoordinator {
     _onChanged();
   }
 
-  void openAlerts({PrimaryTab? origin}) {
-    secondaryOrigin = origin ?? PrimaryTab.dashboard;
-    secondaryRoute = SecondaryRoute.alerts;
-    selectedAlertId = null;
-    scrollEpoch += 1;
-    _onChanged();
-  }
+  void openAlerts({PrimaryTab? origin}) => _openSecondaryRoute(
+    SecondaryRoute.alerts,
+    origin ?? PrimaryTab.dashboard,
+  );
 
-  void openHistory() {
-    secondaryOrigin = PrimaryTab.dashboard;
-    secondaryRoute = SecondaryRoute.history;
-    selectedAlertId = null;
-    scrollEpoch += 1;
-    _onChanged();
-  }
+  void openHistory() =>
+      _openSecondaryRoute(SecondaryRoute.history, PrimaryTab.dashboard);
 
-  void openAlertDetail(String id) {
-    if (secondaryRoute != SecondaryRoute.alerts) {
-      secondaryOrigin = activeTab;
-    }
-    secondaryRoute = SecondaryRoute.alerts;
-    selectedAlertId = id;
-    scrollEpoch += 1;
-    _onChanged();
-  }
+  void openAlertDetail(String id) => _openSecondaryRoute(
+    SecondaryRoute.alerts,
+    secondaryRoute == SecondaryRoute.alerts ? secondaryOrigin : activeTab,
+    id,
+  );
 
-  void openNotificationAlert(String alertId) {
-    secondaryOrigin = activeTab;
-    secondaryRoute = SecondaryRoute.alerts;
-    selectedAlertId = alertId;
-    scrollEpoch += 1;
-    _onChanged();
-  }
+  void openNotificationAlert(String alertId) =>
+      _openSecondaryRoute(SecondaryRoute.alerts, activeTab, alertId);
 
   void popAlertDetail() {
     if (selectedAlertId == null) return;
@@ -107,43 +90,46 @@ class OceanEyesNavigationCoordinator {
       selectedAlertId = null;
       scrollEpoch += 1;
     }
-    _addFishRequestPending = true;
-    _onChanged();
+    _requestIntent(_NavigationIntent.addFish);
   }
 
-  bool consumeAddFishRequest() {
-    if (!_addFishRequestPending) return false;
-    _addFishRequestPending = false;
-    return true;
-  }
+  bool consumeAddFishRequest() => _consumeIntent(_NavigationIntent.addFish);
 
-  void requestAnalyticsSpecies() {
-    _analyticsSpeciesRequestPending = true;
-    _onChanged();
-  }
+  void requestAnalyticsSpecies() =>
+      _requestIntent(_NavigationIntent.analyticsSpecies);
 
-  bool consumeAnalyticsSpeciesRequest() {
-    if (!_analyticsSpeciesRequestPending) return false;
-    _analyticsSpeciesRequestPending = false;
-    return true;
-  }
+  bool consumeAnalyticsSpeciesRequest() =>
+      _consumeIntent(_NavigationIntent.analyticsSpecies);
 
-  void requestAnalyticsRange() {
-    _analyticsRangeRequestPending = true;
-    _onChanged();
-  }
+  void requestAnalyticsRange() =>
+      _requestIntent(_NavigationIntent.analyticsRange);
 
-  bool consumeAnalyticsRangeRequest() {
-    if (!_analyticsRangeRequestPending) return false;
-    _analyticsRangeRequestPending = false;
-    return true;
-  }
+  bool consumeAnalyticsRangeRequest() =>
+      _consumeIntent(_NavigationIntent.analyticsRange);
 
   void resetTransientIntents() {
     selectedAlertId = null;
-    _addFishRequestPending = false;
-    _analyticsSpeciesRequestPending = false;
-    _analyticsRangeRequestPending = false;
+    _pendingIntents.clear();
     scrollEpoch += 1;
   }
+
+  void _openSecondaryRoute(
+    SecondaryRoute route,
+    PrimaryTab origin, [
+    String? alertId,
+  ]) {
+    secondaryOrigin = origin;
+    secondaryRoute = route;
+    selectedAlertId = alertId;
+    scrollEpoch += 1;
+    _onChanged();
+  }
+
+  void _requestIntent(_NavigationIntent intent) {
+    _pendingIntents.add(intent);
+    _onChanged();
+  }
+
+  bool _consumeIntent(_NavigationIntent intent) =>
+      _pendingIntents.remove(intent);
 }
