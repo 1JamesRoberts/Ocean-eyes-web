@@ -23,10 +23,8 @@ abstract final class OceanColors {
   static const warningInk = warning;
   static const criticalInk = critical;
 
-  static const canvas = azureMist;
   static const ink = prussianBlue;
   static const inkMuted = slateGrey;
-  static const accent = verdigris;
   static const accentSecondary = turquoise;
   static const action = prussianBlue;
   static const navigationActive = darkCyan;
@@ -39,7 +37,6 @@ abstract final class OceanSpacing {
   static const md = 16.0;
   static const lg = 20.0;
   static const xl = 24.0;
-  static const xxl = 32.0;
 }
 
 abstract final class OceanRadii {
@@ -60,7 +57,6 @@ abstract final class OceanShadows {
 
 abstract final class OceanGeometry {
   static const referenceWidth = 393.0;
-  static const referenceHeight = 852.0;
   static const heroHeight = 221.0;
   static const heroBlendExtension = 56.0;
   // The React shell starts inside a 16 px padded main element. Its rounded
@@ -73,19 +69,12 @@ abstract final class OceanGeometry {
   static const navigationSide = 16.0;
   static const navigationBottom = 12.0;
   static const minimumTouchTarget = 44.0;
-
-  static double navigationHeightFor(BuildContext context) {
-    final scaledLabel = MediaQuery.textScalerOf(context).scale(10);
-    final extra = (scaledLabel - 10) * 1.5;
-    return (navigationHeight + extra).clamp(navigationHeight, 82);
-  }
 }
 
 abstract final class OceanMotion {
   static const smooth = Duration(milliseconds: 250);
   static const fade = Duration(milliseconds: 200);
   static const sheet = Duration(milliseconds: 180);
-  static const donut = Duration(milliseconds: 480);
 
   static const smoothCurve = Cubic(0.4, 0, 0.2, 1);
   static const emphasizedCurve = Cubic(0.22, 1, 0.36, 1);

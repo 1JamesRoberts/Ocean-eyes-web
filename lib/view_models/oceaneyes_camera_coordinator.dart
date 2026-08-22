@@ -90,8 +90,6 @@ class OceanEyesCameraCoordinator {
   int _pairingSuspensionDepth = 0;
   bool _resumeAfterPairing = false;
 
-  bool get isSupported => _gateway != null;
-
   void initialize() {
     final gateway = _gateway;
     if (!_enabled || gateway == null || _subscription != null) return;

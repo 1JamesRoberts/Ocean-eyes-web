@@ -77,7 +77,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
                   minimum: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                   child: Column(
                     children: [
-                      _buildHeader(context),
+                      _buildHeader(),
                       const SizedBox(height: OceanSpacing.sm),
                       Expanded(
                         child: SingleChildScrollView(
@@ -125,7 +125,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
     });
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader() {
     final canGoBack = state.step != OnboardingStep.welcome;
     return Row(
       children: [
@@ -179,16 +179,16 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
 
   Widget _buildStep(BuildContext context) {
     return switch (state.step) {
-      OnboardingStep.welcome => _buildWelcome(context),
-      OnboardingStep.choosePath => _buildChoosePath(context),
-      OnboardingStep.createTank => _buildCreateTank(context),
-      OnboardingStep.joinTank => _buildJoinTank(context),
+      OnboardingStep.welcome => _buildWelcome(),
+      OnboardingStep.choosePath => _buildChoosePath(),
+      OnboardingStep.createTank => _buildCreateTank(),
+      OnboardingStep.joinTank => _buildJoinTank(),
       OnboardingStep.ownerPairing => _buildOwnerPairing(context),
-      OnboardingStep.success => _buildSuccess(context),
+      OnboardingStep.success => _buildSuccess(),
     };
   }
 
-  Widget _buildWelcome(BuildContext context) {
+  Widget _buildWelcome() {
     return _OnboardingCard(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -226,7 +226,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
     );
   }
 
-  Widget _buildChoosePath(BuildContext context) {
+  Widget _buildChoosePath() {
     return _OnboardingCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -262,7 +262,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
     );
   }
 
-  Widget _buildCreateTank(BuildContext context) {
+  Widget _buildCreateTank() {
     return _OnboardingCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -316,7 +316,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
     );
   }
 
-  Widget _buildJoinTank(BuildContext context) {
+  Widget _buildJoinTank() {
     return _OnboardingCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -328,10 +328,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
                 'Scanning is the quickest option. Camera access is requested only when you start the scanner.',
           ),
           const SizedBox(height: OceanSpacing.lg),
-          if (_manualEntry)
-            _buildManualEntry(context)
-          else
-            _buildScannerEntry(context),
+          if (_manualEntry) _buildManualEntry() else _buildScannerEntry(),
           if (_errorMessage case final message?) ...[
             const SizedBox(height: OceanSpacing.sm),
             _InlineError(message: message),
@@ -341,7 +338,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
     );
   }
 
-  Widget _buildScannerEntry(BuildContext context) {
+  Widget _buildScannerEntry() {
     if (!_scannerStarted) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -422,7 +419,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
     );
   }
 
-  Widget _buildManualEntry(BuildContext context) {
+  Widget _buildManualEntry() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -584,7 +581,7 @@ class _OceanEyesOnboardingScreenState extends State<OceanEyesOnboardingScreen> {
     );
   }
 
-  Widget _buildSuccess(BuildContext context) {
+  Widget _buildSuccess() {
     return _OnboardingCard(
       child: Column(
         mainAxisSize: MainAxisSize.min,

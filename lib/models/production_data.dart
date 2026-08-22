@@ -66,9 +66,6 @@ class ProductionTank {
   final double? waterLineY;
   final bool recalibrationRequested;
 
-  bool isMember(String userId) =>
-      roleFor(userId) != ProductionTankMemberRole.none;
-
   ProductionTankMemberRole roleFor(String userId) {
     if (userId.isEmpty) return ProductionTankMemberRole.none;
     if (ownerId == userId) return ProductionTankMemberRole.owner;

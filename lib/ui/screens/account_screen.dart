@@ -180,11 +180,11 @@ class _AccountScreenState extends State<AccountScreen> {
           _AIAnalysisCard(controller: controller),
           const SizedBox(height: 16),
         ],
-        _buildTankManagement(context),
+        _buildTankManagement(),
         const SizedBox(height: 12),
         _buildSharedVisualSettings(),
         const SizedBox(height: 16),
-        _buildAlertsAndThresholds(context),
+        _buildAlertsAndThresholds(),
       ],
     );
   }
@@ -196,7 +196,7 @@ class _AccountScreenState extends State<AccountScreen> {
     _ => false,
   };
 
-  Widget _buildTankManagement(BuildContext context) {
+  Widget _buildTankManagement() {
     return GlassCard(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
       child: Column(
@@ -668,7 +668,7 @@ class _AccountScreenState extends State<AccountScreen> {
     return 'Neutral';
   }
 
-  Widget _buildAlertsAndThresholds(BuildContext context) {
+  Widget _buildAlertsAndThresholds() {
     return GlassCard(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
       child: Column(

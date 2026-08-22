@@ -894,8 +894,8 @@ class _DateRangeEditorDialog extends StatefulWidget {
 class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
   late DateTime _startDate = DateUtils.dateOnly(widget.range.start);
   late DateTime _endDate = DateUtils.dateOnly(widget.range.end);
-  late TimeOfDay _startTime = _normalizeWheelTime(widget.startTime);
-  late TimeOfDay _endTime = _normalizeWheelTime(widget.endTime);
+  late TimeOfDay _startTime = widget.startTime;
+  late TimeOfDay _endTime = widget.endTime;
   _RangeField? _activeField;
   String? _validationError;
 
@@ -1757,10 +1757,6 @@ class _TealOutlinePainter extends CustomPainter {
 
 DateTime _combine(DateTime date, TimeOfDay time) {
   return DateTime(date.year, date.month, date.day, time.hour, time.minute);
-}
-
-TimeOfDay _normalizeWheelTime(TimeOfDay time) {
-  return time;
 }
 
 String _fullDate(DateTime date) => DateFormat('MMM dd, yyyy').format(date);

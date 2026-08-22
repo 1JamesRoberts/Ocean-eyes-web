@@ -73,7 +73,6 @@ class OceanEyesLiveSessionCoordinator {
       OceanEyesLiveConnectionState.disconnected;
 
   bool get isPublishing => _publishing;
-  bool get isViewing => _viewing;
   bool get isConnected =>
       connectionState == OceanEyesLiveConnectionState.connected;
 

@@ -28,7 +28,6 @@ class OceanEyesOnboardingCoordinator {
   OnboardingState get state => _state;
   bool get tankLookupResolved => _tankLookupResolved;
   bool get hasLinkedTank => _hasLinkedTank;
-  bool get routeOpen => _routeOpen;
   bool get showRoute =>
       _routeOpen && _tankLookupResolved && (!_hasLinkedTank || _handoffVisible);
   bool get showSetupBanner => _tankLookupResolved && !_hasLinkedTank;

@@ -557,32 +557,3 @@ class GlassPill extends StatelessWidget {
     );
   }
 }
-
-Future<T?> showOceanDialog<T>({
-  required BuildContext context,
-  required Widget child,
-  bool barrierDismissible = true,
-}) {
-  return showGeneralDialog<T>(
-    context: context,
-    barrierDismissible: barrierDismissible,
-    barrierLabel: 'Dismiss dialog',
-    barrierColor: OceanColors.prussianBlue.withValues(alpha: 0.50),
-    transitionDuration: OceanMotion.responsive(context, OceanMotion.sheet),
-    pageBuilder: (_, _, _) => SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Material(color: Colors.transparent, child: child),
-        ),
-      ),
-    ),
-    transitionBuilder: (context, animation, _, child) => FadeTransition(
-      opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
-      child: ScaleTransition(
-        scale: Tween<double>(begin: 0.98, end: 1).animate(animation),
-        child: child,
-      ),
-    ),
-  );
-}
