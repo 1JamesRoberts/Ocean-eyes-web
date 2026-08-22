@@ -211,10 +211,11 @@ class AlertItem {
 }
 
 class ChartPoint {
-  const ChartPoint(this.label, this.value);
+  const ChartPoint(this.label, this.value, {this.timestamp});
 
   final String label;
   final double value;
+  final DateTime? timestamp;
 }
 
 class FishDiagnostic {

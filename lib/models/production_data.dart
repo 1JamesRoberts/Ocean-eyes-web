@@ -251,6 +251,8 @@ class ProductionAnalyticsPoint {
     required this.clarityPercent,
     required this.fishCount,
     required this.speciesDetected,
+    this.detections = const [],
+    this.frameDimensions,
   });
 
   final DateTime timestamp;
@@ -258,6 +260,8 @@ class ProductionAnalyticsPoint {
   final double clarityPercent;
   final int fishCount;
   final Map<String, int> speciesDetected;
+  final List<NormalizedDetectionCenter> detections;
+  final DetectionFrameDimensions? frameDimensions;
 }
 
 class ProductionAnalyticsData {
@@ -285,6 +289,86 @@ class ProductionAnalyticsData {
   final Map<String, List<ChartPoint>> speciesSeries;
   final List<NormalizedDetectionCenter> heatmapCenters;
   final DetectionFrameDimensions? heatmapSourceDimensions;
+
+  ProductionAnalyticsData filteredByRange({
+    required DateTime rangeStart,
+    required DateTime rangeEnd,
+  }) {
+    final filteredPoints = points
+        .where(
+          (point) =>
+              !point.timestamp.isBefore(rangeStart) &&
+              !point.timestamp.isAfter(rangeEnd),
+        )
+        .toList(growable: false);
+    if (filteredPoints.isEmpty) return empty;
+    if (filteredPoints.length == points.length) return this;
+
+    final speciesIds = <String>{};
+    for (final point in filteredPoints) {
+      speciesIds.addAll(point.speciesDetected.keys);
+    }
+    final speciesSeries = <String, List<ChartPoint>>{
+      for (final speciesId in speciesIds)
+        speciesId: List.unmodifiable(
+          filteredPoints.map(
+            (point) => ChartPoint(
+              point.label,
+              (point.speciesDetected[speciesId] ?? 0).toDouble(),
+              timestamp: point.timestamp,
+            ),
+          ),
+        ),
+    };
+
+    ProductionAnalyticsPoint? latestWithDetections;
+    for (final point in filteredPoints.reversed) {
+      if (point.detections.isNotEmpty) {
+        latestWithDetections = point;
+        break;
+      }
+    }
+    final hasPointDetectionMetadata = points.any(
+      (point) => point.detections.isNotEmpty || point.frameDimensions != null,
+    );
+    final includesAllPoints = filteredPoints.length == points.length;
+    final List<NormalizedDetectionCenter> filteredHeatmapCenters =
+        hasPointDetectionMetadata
+        ? latestWithDetections?.detections ?? const []
+        : includesAllPoints
+        ? heatmapCenters
+        : const [];
+    final filteredHeatmapDimensions = hasPointDetectionMetadata
+        ? latestWithDetections?.frameDimensions
+        : includesAllPoints
+        ? heatmapSourceDimensions
+        : null;
+
+    return ProductionAnalyticsData(
+      points: filteredPoints,
+      claritySeries: List.unmodifiable(
+        filteredPoints.map(
+          (point) => ChartPoint(
+            point.label,
+            point.clarityPercent,
+            timestamp: point.timestamp,
+          ),
+        ),
+      ),
+      fishCountSeries: List.unmodifiable(
+        filteredPoints.map(
+          (point) => ChartPoint(
+            point.label,
+            point.fishCount.toDouble(),
+            timestamp: point.timestamp,
+          ),
+        ),
+      ),
+      speciesSeries: Map.unmodifiable(speciesSeries),
+      heatmapCenters: filteredHeatmapCenters,
+      heatmapSourceDimensions: filteredHeatmapDimensions,
+    );
+  }
 }
 
 class ProductionLiveState {

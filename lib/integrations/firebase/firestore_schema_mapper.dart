@@ -230,6 +230,8 @@ class FirestoreSchemaMapper {
           clarityPercent: (reading.clarityScore! * 10).clamp(0, 100),
           fishCount: reading.fishCount,
           speciesDetected: reading.speciesDetected,
+          detections: reading.detections,
+          frameDimensions: reading.frameDimensions,
         ),
       );
     }
@@ -241,6 +243,7 @@ class FirestoreSchemaMapper {
             (point) => ChartPoint(
               point.label,
               (point.speciesDetected[speciesId] ?? 0).toDouble(),
+              timestamp: point.timestamp,
             ),
           ),
         ),
@@ -255,11 +258,21 @@ class FirestoreSchemaMapper {
     return ProductionAnalyticsData(
       points: List.unmodifiable(points),
       claritySeries: List.unmodifiable(
-        points.map((point) => ChartPoint(point.label, point.clarityPercent)),
+        points.map(
+          (point) => ChartPoint(
+            point.label,
+            point.clarityPercent,
+            timestamp: point.timestamp,
+          ),
+        ),
       ),
       fishCountSeries: List.unmodifiable(
         points.map(
-          (point) => ChartPoint(point.label, point.fishCount.toDouble()),
+          (point) => ChartPoint(
+            point.label,
+            point.fishCount.toDouble(),
+            timestamp: point.timestamp,
+          ),
         ),
       ),
       speciesSeries: Map.unmodifiable(speciesSeries),

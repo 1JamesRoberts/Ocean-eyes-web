@@ -899,6 +899,7 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
   late TimeOfDay _startTime = _normalizeWheelTime(widget.startTime);
   late TimeOfDay _endTime = _normalizeWheelTime(widget.endTime);
   _RangeField? _activeField;
+  String? _validationError;
 
   @override
   Widget build(BuildContext context) {
@@ -973,6 +974,37 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
                 ),
               ),
             ],
+            if (_validationError case final error?) ...[
+              const SizedBox(height: OceanSpacing.xs),
+              Text(
+                error,
+                textAlign: TextAlign.center,
+                style: OceanTypography.caption.copyWith(
+                  color: OceanColors.critical,
+                ),
+              ),
+            ],
+            const SizedBox(height: OceanSpacing.sm),
+            Row(
+              children: [
+                Expanded(
+                  child: GlassButton(
+                    label: 'Cancel',
+                    style: GlassButtonStyle.outline,
+                    expanded: true,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                const SizedBox(width: OceanSpacing.xs),
+                Expanded(
+                  child: GlassButton(
+                    label: 'Apply',
+                    expanded: true,
+                    onPressed: _apply,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -987,9 +1019,8 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
         onSelected: (date) {
           setState(() {
             _startDate = DateUtils.dateOnly(date);
-            if (_startDate.isAfter(_endDate)) _endDate = _startDate;
+            _validationError = _rangeValidationMessage();
           });
-          _apply();
         },
       ),
       _RangeField.endDate => _OceanCalendar(
@@ -998,45 +1029,59 @@ class _DateRangeEditorDialogState extends State<_DateRangeEditorDialog> {
         onSelected: (date) {
           setState(() {
             _endDate = DateUtils.dateOnly(date);
-            if (_endDate.isBefore(_startDate)) _startDate = _endDate;
+            _validationError = _rangeValidationMessage();
           });
-          _apply();
         },
       ),
       _RangeField.startTime => _OceanTimeWheel(
         key: const ValueKey('start-time-wheel'),
         initialTime: _startTime,
         semanticLabel: 'Start time',
-        onChanged: (time) => _startTime = time,
-        onDone: _apply,
+        onChanged: (time) => setState(() {
+          _startTime = time;
+          _validationError = _rangeValidationMessage();
+        }),
+        onDone: () => setState(() => _activeField = null),
       ),
       _RangeField.endTime => _OceanTimeWheel(
         key: const ValueKey('end-time-wheel'),
         initialTime: _endTime,
         semanticLabel: 'End time',
-        onChanged: (time) => _endTime = time,
-        onDone: _apply,
+        onChanged: (time) => setState(() {
+          _endTime = time;
+          _validationError = _rangeValidationMessage();
+        }),
+        onDone: () => setState(() => _activeField = null),
       ),
       null => const SizedBox.shrink(),
     };
   }
 
   void _apply() {
-    var startTime = _startTime;
-    var endTime = _endTime;
-    var start = _combine(_startDate, startTime);
-    var end = _combine(_endDate, endTime);
-    if (end.isBefore(start)) {
-      endTime = startTime;
-      end = start;
+    final validationError = _rangeValidationMessage();
+    if (validationError != null) {
+      setState(() => _validationError = validationError);
+      return;
     }
+    final start = _combine(_startDate, _startTime);
+    final end = _combine(_endDate, _endTime);
     Navigator.of(context).pop(
       _RangeSelection(
         range: DateTimeRange(start: start, end: end),
-        startTime: startTime,
-        endTime: endTime,
+        startTime: _startTime,
+        endTime: _endTime,
       ),
     );
+  }
+
+  String? _rangeValidationMessage() {
+    final start = _combine(_startDate, _startTime);
+    final end = _combine(_endDate, _endTime);
+    if (end.isBefore(start)) return 'End must be after start.';
+    if (end.isAtSameMomentAs(start)) {
+      return 'Choose a range longer than zero minutes.';
+    }
+    return null;
   }
 }
 
@@ -1499,7 +1544,7 @@ class _OceanTimeWheelState extends State<_OceanTimeWheel> {
         ? 12
         : widget.initialTime.hourOfPeriod;
     _hourIndex = displayHour - 1;
-    _minuteIndex = (widget.initialTime.minute / 5).round().clamp(0, 11).toInt();
+    _minuteIndex = widget.initialTime.minute;
     _periodIndex = widget.initialTime.period == DayPeriod.am ? 0 : 1;
     _hourController = FixedExtentScrollController(initialItem: _hourIndex);
     _minuteController = FixedExtentScrollController(initialItem: _minuteIndex);
@@ -1574,10 +1619,10 @@ class _OceanTimeWheelState extends State<_OceanTimeWheel> {
                       Expanded(
                         child: _WheelColumn(
                           controller: _minuteController,
-                          itemCount: 12,
+                          itemCount: 60,
                           selectedIndex: _minuteIndex,
                           labelForIndex: (index) =>
-                              (index * 5).toString().padLeft(2, '0'),
+                              index.toString().padLeft(2, '0'),
                           semanticPrefix: 'Minute',
                           onSelected: (index) {
                             setState(() => _minuteIndex = index);
@@ -1645,7 +1690,7 @@ class _OceanTimeWheelState extends State<_OceanTimeWheel> {
     final hour = _periodIndex == 0
         ? (hour12 == 12 ? 0 : hour12)
         : (hour12 == 12 ? 12 : hour12 + 12);
-    widget.onChanged(TimeOfDay(hour: hour, minute: _minuteIndex * 5));
+    widget.onChanged(TimeOfDay(hour: hour, minute: _minuteIndex));
   }
 }
 
@@ -1752,8 +1797,7 @@ DateTime _combine(DateTime date, TimeOfDay time) {
 }
 
 TimeOfDay _normalizeWheelTime(TimeOfDay time) {
-  final minuteIndex = (time.minute / 5).round().clamp(0, 11).toInt();
-  return TimeOfDay(hour: time.hour, minute: minuteIndex * 5);
+  return time;
 }
 
 String _fullDate(DateTime date) => DateFormat('MMM dd, yyyy').format(date);

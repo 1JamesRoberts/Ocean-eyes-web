@@ -152,35 +152,35 @@ abstract final class DemoFixtures {
     ),
   ];
 
-  static const fishCountSeries = <ChartPoint>[
-    ChartPoint('12a', 18),
-    ChartPoint('4a', 19),
-    ChartPoint('8a', 18),
-    ChartPoint('12p', 20),
-    ChartPoint('4p', 20),
-    ChartPoint('8p', 19),
-    ChartPoint('Now', 20),
-  ];
+  static final fishCountSeries = List<ChartPoint>.unmodifiable([
+    ChartPoint('12a', 18, timestamp: DateTime(2026, 7, 31)),
+    ChartPoint('4a', 19, timestamp: DateTime(2026, 7, 31, 4)),
+    ChartPoint('8a', 18, timestamp: DateTime(2026, 7, 31, 8)),
+    ChartPoint('12p', 20, timestamp: DateTime(2026, 7, 31, 12)),
+    ChartPoint('4p', 20, timestamp: DateTime(2026, 7, 31, 16)),
+    ChartPoint('8p', 19, timestamp: DateTime(2026, 7, 31, 20)),
+    ChartPoint('Now', 20, timestamp: DateTime(2026, 7, 31, 23, 59)),
+  ]);
 
-  static const spreadSeries = <ChartPoint>[
-    ChartPoint('12a', 42),
-    ChartPoint('4a', 48),
-    ChartPoint('8a', 37),
-    ChartPoint('12p', 61),
-    ChartPoint('4p', 56),
-    ChartPoint('8p', 64),
-    ChartPoint('Now', 58),
-  ];
+  static final spreadSeries = List<ChartPoint>.unmodifiable([
+    ChartPoint('12a', 42, timestamp: DateTime(2026, 7, 31)),
+    ChartPoint('4a', 48, timestamp: DateTime(2026, 7, 31, 4)),
+    ChartPoint('8a', 37, timestamp: DateTime(2026, 7, 31, 8)),
+    ChartPoint('12p', 61, timestamp: DateTime(2026, 7, 31, 12)),
+    ChartPoint('4p', 56, timestamp: DateTime(2026, 7, 31, 16)),
+    ChartPoint('8p', 64, timestamp: DateTime(2026, 7, 31, 20)),
+    ChartPoint('Now', 58, timestamp: DateTime(2026, 7, 31, 23, 59)),
+  ]);
 
-  static const claritySeries = <ChartPoint>[
-    ChartPoint('12a', 92),
-    ChartPoint('4a', 91),
-    ChartPoint('8a', 94),
-    ChartPoint('12p', 90),
-    ChartPoint('4p', 88),
-    ChartPoint('8p', 91),
-    ChartPoint('Now', 93),
-  ];
+  static final claritySeries = List<ChartPoint>.unmodifiable([
+    ChartPoint('12a', 92, timestamp: DateTime(2026, 7, 31)),
+    ChartPoint('4a', 91, timestamp: DateTime(2026, 7, 31, 4)),
+    ChartPoint('8a', 94, timestamp: DateTime(2026, 7, 31, 8)),
+    ChartPoint('12p', 90, timestamp: DateTime(2026, 7, 31, 12)),
+    ChartPoint('4p', 88, timestamp: DateTime(2026, 7, 31, 16)),
+    ChartPoint('8p', 91, timestamp: DateTime(2026, 7, 31, 20)),
+    ChartPoint('Now', 93, timestamp: DateTime(2026, 7, 31, 23, 59)),
+  ]);
 
   static List<HistoryReading> history() => [
     HistoryReading(

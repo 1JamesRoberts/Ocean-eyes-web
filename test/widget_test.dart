@@ -183,6 +183,41 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+    'range editing stays open, validates ordering, and keeps minutes',
+    (tester) async {
+      final controller = await pumpReferenceApp(tester);
+      tester.view.physicalSize = const Size(360, 640);
+      await tester.pump();
+      controller.selectTab(PrimaryTab.analytics);
+      await tester.pump(const Duration(milliseconds: 600));
+
+      await tester.tap(find.byKey(const ValueKey('analytics-date-filter')));
+      await tester.pumpAndSettle();
+      expect(find.text('11:59 PM'), findsOneWidget);
+
+      final originalStart = controller.analyticsRange.start;
+      await tester.tap(find.bySemanticsLabel('Starts date'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('start-calendar')), findsOneWidget);
+
+      await tester.tap(find.text('1').last);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('start-calendar')), findsOneWidget);
+      expect(find.text('End must be after start.'), findsOneWidget);
+      expect(controller.analyticsRange.start, originalStart);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('analytics-range-editor')),
+        findsNothing,
+      );
+      expect(controller.analyticsRange.start, originalStart);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('fullscreen back closes drawer before the camera overlay', (
     tester,
   ) async {

@@ -261,13 +261,22 @@ class OceanEyesController extends ChangeNotifier
         }
         history = bundle.history;
         final analytics = bundle.analytics;
-        _productionClaritySeries = analytics.claritySeries;
-        _productionFishCountSeries = analytics.fishCountSeries;
-        _productionSpeciesSeries = analytics.speciesSeries;
-        heatmapCenters = analytics.heatmapCenters;
-        final dimensions = analytics.heatmapSourceDimensions;
-        if (dimensions != null) heatmapSourceDimensions = dimensions;
-        analyticsState = analytics.points.isEmpty
+        if (!_analyticsRangeEdited && analytics.points.isNotEmpty) {
+          final first = analytics.points.first.timestamp;
+          var last = analytics.points.last.timestamp;
+          if (!last.isAfter(first)) {
+            last = first.add(const Duration(minutes: 1));
+          }
+          analyticsRange = DateTimeRange(start: first, end: last);
+          analyticsStartTime = TimeOfDay(
+            hour: first.hour,
+            minute: first.minute,
+          );
+          analyticsEndTime = TimeOfDay(hour: last.hour, minute: last.minute);
+        }
+        _productionAnalytics = analytics;
+        final visibleAnalytics = _refreshProductionAnalyticsProjection();
+        analyticsState = visibleAnalytics.points.isEmpty
             ? AnalyticsContentState.empty
             : AnalyticsContentState.populated;
         _notify();
@@ -322,11 +331,13 @@ class OceanEyesController extends ChangeNotifier
     for (final entry in fish) {
       _fishVisibilityById[entry.id] = entry.visible;
     }
+    _analyticsRangeEdited = false;
     fish = const [];
     alerts = const [];
     history = const [];
     heatmapCenters = const [];
     _productionWaterMetrics = _unreportedWaterMetrics;
+    _productionAnalytics = ProductionAnalyticsData.empty;
     _productionClaritySeries = const [];
     _productionFishCountSeries = const [];
     _productionSpeciesSeries = const {};
@@ -505,6 +516,7 @@ class OceanEyesController extends ChangeNotifier
   Future<void> _productionWriteQueue = Future<void>.value();
   bool _disposed = false;
   bool _productionInitialized = false;
+  bool _analyticsRangeEdited = false;
   double? _waterLineY;
 
   String get _onboardingAccountNamespace =>
@@ -553,6 +565,7 @@ class OceanEyesController extends ChangeNotifier
   List<ChartPoint> _productionClaritySeries = const [];
   List<ChartPoint> _productionFishCountSeries = const [];
   Map<String, List<ChartPoint>> _productionSpeciesSeries = const {};
+  ProductionAnalyticsData _productionAnalytics = ProductionAnalyticsData.empty;
   final Map<String, bool> _fishVisibilityById = {};
 
   static const String _activeTankPreferenceKey =
@@ -876,8 +889,13 @@ class OceanEyesController extends ChangeNotifier
       ? DemoFixtures.warningWaterMetrics
       : DemoFixtures.waterMetrics;
   List<SpeciesOption> get availableSpecies => DemoFixtures.species;
-  List<ChartPoint> get claritySeries =>
-      productionEnabled ? _productionClaritySeries : DemoFixtures.claritySeries;
+  List<ChartPoint> get claritySeries => productionEnabled
+      ? _productionClaritySeries
+      : AnalyticsSeriesService.filterByRange(
+          DemoFixtures.claritySeries,
+          rangeStart: analyticsRange.start,
+          rangeEnd: analyticsRange.end,
+        );
   List<ChartPoint> get fishCountPoints {
     if (productionEnabled) {
       if (selectedSpecies == 'All species') {
@@ -890,13 +908,27 @@ class OceanEyesController extends ChangeNotifier
       }
       return const [];
     }
-    return AnalyticsSeriesService.fishCount(fish, selectedSpecies);
+    return AnalyticsSeriesService.fishCount(
+      fish,
+      selectedSpecies,
+      rangeStart: analyticsRange.start,
+      rangeEnd: analyticsRange.end,
+    );
   }
 
-  List<ChartPoint> get spreadPoints =>
-      AnalyticsSeriesService.spread(fish, selectedSpecies);
+  List<ChartPoint> get spreadPoints => AnalyticsSeriesService.spread(
+    fish,
+    selectedSpecies,
+    rangeStart: analyticsRange.start,
+    rangeEnd: analyticsRange.end,
+  );
   List<FishDiagnostic> get fishDiagnostics =>
-      AnalyticsSeriesService.diagnostics(fish, selectedSpecies);
+      AnalyticsSeriesService.diagnostics(
+        fish,
+        selectedSpecies,
+        rangeStart: analyticsRange.start,
+        rangeEnd: analyticsRange.end,
+      );
   List<NormalizedDetectionCenter> get selectedHeatmapCenters {
     if (selectedSpecies == 'All species') return heatmapCenters;
 
@@ -1084,10 +1116,40 @@ class OceanEyesController extends ChangeNotifier
     TimeOfDay? start,
     TimeOfDay? end,
   }) {
+    if (!range.end.isAfter(range.start)) {
+      throw ArgumentError.value(
+        range,
+        'range',
+        'Analytics range must have an end after its start.',
+      );
+    }
+    _analyticsRangeEdited = true;
     analyticsRange = range;
-    analyticsStartTime = start ?? analyticsStartTime;
-    analyticsEndTime = end ?? analyticsEndTime;
+    analyticsStartTime =
+        start ?? TimeOfDay(hour: range.start.hour, minute: range.start.minute);
+    analyticsEndTime =
+        end ?? TimeOfDay(hour: range.end.hour, minute: range.end.minute);
+    if (productionEnabled && _productionAnalytics.points.isNotEmpty) {
+      final visibleAnalytics = _refreshProductionAnalyticsProjection();
+      analyticsState = visibleAnalytics.points.isEmpty
+          ? AnalyticsContentState.empty
+          : AnalyticsContentState.populated;
+    }
     _notify();
+  }
+
+  ProductionAnalyticsData _refreshProductionAnalyticsProjection() {
+    final visibleAnalytics = _productionAnalytics.filteredByRange(
+      rangeStart: analyticsRange.start,
+      rangeEnd: analyticsRange.end,
+    );
+    _productionClaritySeries = visibleAnalytics.claritySeries;
+    _productionFishCountSeries = visibleAnalytics.fishCountSeries;
+    _productionSpeciesSeries = visibleAnalytics.speciesSeries;
+    heatmapCenters = visibleAnalytics.heatmapCenters;
+    final dimensions = visibleAnalytics.heatmapSourceDimensions;
+    if (dimensions != null) heatmapSourceDimensions = dimensions;
+    return visibleAnalytics;
   }
 
   void retryAnalytics() {
@@ -1429,6 +1491,7 @@ class OceanEyesController extends ChangeNotifier
     final snapshot = _fixtures.build(scenario);
     fixtureScenario = snapshot.scenario;
     selectedSpecies = 'All species';
+    _analyticsRangeEdited = false;
     analyticsRange = snapshot.analyticsRange;
     analyticsStartTime = const TimeOfDay(hour: 0, minute: 0);
     analyticsEndTime = const TimeOfDay(hour: 23, minute: 59);
