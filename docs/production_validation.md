@@ -34,10 +34,12 @@ firebase emulators:exec --only firestore --project demo-oceaneyes "npm --prefix 
 | Flutter unit/widget/golden suite | 108 tests passed |
 | Cloud Functions TypeScript/policy suite | Build passed; 15 tests passed |
 | Firestore rules/indexes | Firestore Emulator 1.22.0; 8 authorization tests passed |
-| Customer release artifacts | Require the private customer configuration and the release commands in `docs/production_setup.md` |
+| Customer release artifacts | Require the private customer configuration and the guarded release commands in `docs/production_setup.md` |
 
 Customer release artifact validation is intentionally separate from these
-credential-free checks and must use the private production configuration.
+credential-free checks and must use the private production configuration plus
+the release/CI guard. The guard rejects placeholders, emulator/debug settings,
+and any configuration that could select fixture mode.
 
 The Flutter suite includes the existing widget/golden coverage plus production
 mapper, auth, pairing, camera/ML contract, notification-route, and controller

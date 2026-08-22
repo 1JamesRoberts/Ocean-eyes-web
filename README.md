@@ -19,14 +19,21 @@ flutter run -d edge
 
 For the customer release, copy `config/production.example.json` to a secure
 location outside the repository, replace its placeholders with the intended
-Firebase values, keep `OCEANEYES_PRODUCTION` set to `true`, and build the
-target artifact with that private configuration:
+Firebase values, keep `OCEANEYES_PRODUCTION` set to `true`, and use the
+guarded release command. It validates the private configuration before
+Flutter runs and prevents a release artifact from starting in fixture mode:
 
 ```powershell
-flutter build web --release --dart-define-from-file=C:\secure\oceaneyes-production.json
-flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-production.json
-flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target web --config C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target appbundle --config C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target ipa --config C:\secure\oceaneyes-production.json
 ```
+
+CI may run the same check explicitly with
+`dart run tool/verify_release_config.dart --target web --config <private-file>`.
+The tracked example file is intentionally rejected because it contains
+placeholders. Raw `flutter build --release` is for local diagnostics only; an
+unconfigured release fails compilation and cannot start the fixture app.
 
 The Firebase emulator configuration is internal engineering/test
 infrastructure and is not a third app mode. Deterministic fixtures can be

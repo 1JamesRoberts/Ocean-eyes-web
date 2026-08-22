@@ -359,7 +359,8 @@ abstract final class FishMotionMath {
         lengthCm != null && lengthCm.isFinite && lengthCm > 0
         ? lengthCm
         : _referenceFishLengthCm;
-    return baseCruiseSpeed * _referenceFishLengthCm / resolvedLengthCm;
+    return baseCruiseSpeed *
+        math.sqrt(_referenceFishLengthCm / resolvedLengthCm);
   }
 
   static FishBodyDimensions calculateBodyDimensions(

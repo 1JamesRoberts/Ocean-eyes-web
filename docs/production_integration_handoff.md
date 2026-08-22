@@ -799,10 +799,16 @@ and set real values there.
 Customer release builds:
 
 ```powershell
-flutter build web --release --dart-define-from-file=C:\secure\oceaneyes-production.json
-flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-production.json
-flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target web --config C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target appbundle --config C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target ipa --config C:\secure\oceaneyes-production.json
 ```
+
+The release wrapper is mandatory: it rejects missing or placeholder defines,
+disallows emulator/debug settings, and passes the marker required to keep a
+release artifact out of fixture mode. CI can run
+`dart run tool/verify_release_config.dart --target <web|appbundle|ipa> --config <private-file>`
+as a separate gate.
 
 Internal emulator-only private define example:
 

@@ -33,17 +33,33 @@ The repository ignores:
 - `android/app/google-services.json`
 - `ios/Runner/GoogleService-Info.plist`
 
-The app does not import `firebase_options.dart`; it can initialize from the
-native files or from Dart defines. This keeps credentials out of tracked source;
-fixture-only tests remain independent of Firebase. Copy
+The app does not import `firebase_options.dart`; engineering/native builds can
+initialize from the generated native files or from Dart defines. Customer
+releases must still provide the private Dart-define file so the release guard
+can validate the complete target configuration. This keeps credentials out of
+tracked source; fixture-only tests remain independent of Firebase. Copy
 `config/production.example.json` outside the repository and replace the
-placeholders. Customer artifacts are built with:
+placeholders. Customer artifacts must go through the guarded release command;
+it validates the file before Flutter runs and injects the release marker that
+prevents fixture startup:
 
 ```powershell
-flutter build web --release --dart-define-from-file=C:\secure\oceaneyes-production.json
-flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-production.json
-flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target web --config C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target appbundle --config C:\secure\oceaneyes-production.json
+dart run tool/build_release.dart --target ipa --config C:\secure\oceaneyes-production.json
 ```
+
+CI can run the validator as a separate required step before the build:
+
+```powershell
+dart run tool/verify_release_config.dart --target web --config C:\secure\oceaneyes-production.json
+```
+
+The validator requires `OCEANEYES_PRODUCTION=true`, target-specific Firebase
+and Google values, and real non-placeholder values. Emulator mode and App
+Check debug mode are rejected. Do not replace the guarded command with a raw
+`flutter build --release`; a release binary without the guard cannot enter
+fixture mode, but it is not a customer artifact.
 
 The production Firebase/Google stack is supported on Android, iOS, and web.
 The Windows desktop target is not a customer production target.
@@ -202,8 +218,11 @@ npm --prefix functions test
 firebase emulators:exec --only firestore --project demo-oceaneyes "npm --prefix functions run test:rules"
 ```
 
-Use the private production configuration and the release commands above for
-customer artifacts; an unconfigured release build is not a customer build.
+Use the private production configuration and the guarded release commands
+above for customer artifacts. An unconfigured release build is rejected by
+the CI check and, if built directly, fails the release compilation rather than
+falling back to the fixture app; it is not a customer build. Invalid values
+that get past compilation still show the blocking startup error.
 
 Configured validation additionally needs physical Android/iOS devices for App
 Check, Google linking, camera/ONNX memory and thermal behavior, background FCM,

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/models/demo_fixtures.dart';
 import 'package:oceaneyes/models/fish_motion_scene.dart';
@@ -20,7 +22,7 @@ void main() {
     );
   });
 
-  test('cruise speed is inversely proportional to fish size', () {
+  test('cruise speed follows inverse visual-size scaling', () {
     const baseSpeed = 10.0;
     final smallFish = FishMotionMath.calculateSizeAdjustedCruiseSpeed(
       baseSpeed,
@@ -35,11 +37,12 @@ void main() {
       20,
     );
 
-    expect(smallFish, closeTo(20, 1e-9));
+    expect(smallFish, closeTo(10 * math.sqrt(2), 1e-9));
     expect(referenceFish, closeTo(10, 1e-9));
-    expect(largeFish, closeTo(5, 1e-9));
-    expect(smallFish * 5, closeTo(referenceFish * 10, 1e-9));
-    expect(referenceFish * 10, closeTo(largeFish * 20, 1e-9));
+    expect(largeFish, closeTo(10 / math.sqrt(2), 1e-9));
+    expect(smallFish * smallFish * 5, closeTo(1000, 1e-9));
+    expect(referenceFish * referenceFish * 10, closeTo(1000, 1e-9));
+    expect(largeFish * largeFish * 20, closeTo(1000, 1e-9));
   });
 
   test('cruise speed falls back to the reference size for invalid lengths', () {
@@ -63,7 +66,7 @@ void main() {
 
     for (final sprite in scene.swimmers) {
       final normalizedBaseSpeed =
-          sprite.motion.cruiseSpeed * sprite.lengthCm / 10;
+          sprite.motion.cruiseSpeed * math.sqrt(sprite.lengthCm / 10);
       expect(normalizedBaseSpeed, greaterThanOrEqualTo(7));
       expect(normalizedBaseSpeed, lessThan(12));
     }

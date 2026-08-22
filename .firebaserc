@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "ocean-eyes-webapp"
+    "default": "ocean-eyes-staging",
+    "staging": "ocean-eyes-staging",
+    "production": "ocean-eyes-webapp"
   }
 }
