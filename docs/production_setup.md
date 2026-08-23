@@ -45,6 +45,11 @@ flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-pr
 flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
 
+The shared VS Code Run/Debug configuration launches `lib/main.dart` in debug
+mode with `C:\secure\oceaneyes-staging.json`. Keep that private staging file at
+the configured path; it remains outside version control. A bare `flutter run`
+still intentionally fails closed when required OAuth values are absent.
+
 The application validates these values before initializing Firebase. There is
 no separate production flag, release guard, emulator mode, or wrapper script.
 
