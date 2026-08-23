@@ -79,7 +79,7 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       googleSignIn: _googleSignInFor(config),
       log: debugPrint,
     );
-    await auth.ensureAnonymousSession();
+    await auth.enforceGoogleOnlySession();
 
     final controller = OceanEyesController(
       preferences: preferences,

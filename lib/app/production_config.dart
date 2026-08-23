@@ -266,7 +266,7 @@ class OceanEyesProductionConfig {
           'configuration is missing values or still contains placeholders.';
     }
     if (kIsWeb && !_isConfigured(googleWebClientId)) {
-      return 'Web Google linking requires a real '
+      return 'Web Google sign-in requires a real '
           'OCEANEYES_GOOGLE_WEB_CLIENT_ID.';
     }
     if (kIsWeb && appCheckEnabled && !_isConfigured(recaptchaV3SiteKey)) {

@@ -27,7 +27,7 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   bool _renaming = false;
   bool _showDisconnectConfirmation = false;
-  bool _linkingGoogle = false;
+  bool _signingOut = false;
   String? _accountActionError;
   late final TextEditingController _tankNameController;
 
@@ -72,23 +72,22 @@ class _AccountScreenState extends State<AccountScreen> {
     });
   }
 
-  Future<void> _linkGoogleAccount() async {
-    if (_linkingGoogle) return;
+  Future<void> _signOut() async {
+    if (_signingOut) return;
     setState(() {
-      _linkingGoogle = true;
+      _signingOut = true;
       _accountActionError = null;
     });
     try {
-      await controller.linkGoogleAccount();
+      await controller.signOut();
     } catch (_) {
       if (mounted) {
         setState(() {
-          _accountActionError =
-              'Google account linking failed. Please try again.';
+          _accountActionError = 'Sign-out failed. Please try again.';
         });
       }
     } finally {
-      if (mounted) setState(() => _linkingGoogle = false);
+      if (mounted) setState(() => _signingOut = false);
     }
   }
 
@@ -211,12 +210,9 @@ class _AccountScreenState extends State<AccountScreen> {
             _buildProductionError(_productionErrorMessage!),
             const SizedBox(height: 12),
           ],
-          if (controller.productionEnabled &&
-              !controller.hasLinkedGoogleAccount) ...[
-            _buildGoogleAccountLink(),
-            const SizedBox(height: 12),
-          ],
           if (controller.productionEnabled) ...[
+            _buildGoogleAccount(),
+            const SizedBox(height: 12),
             _buildNotificationPermission(),
             const SizedBox(height: 12),
           ],
@@ -462,8 +458,13 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildGoogleAccountLink() {
-    final servicesAvailable = controller.productionServicesAvailable;
+  Widget _buildGoogleAccount() {
+    final user = controller.productionUser;
+    final accountLabel = user?.email?.trim().isNotEmpty ?? false
+        ? user!.email!.trim()
+        : user?.displayName?.trim().isNotEmpty ?? false
+        ? user!.displayName!.trim()
+        : 'Google account';
     return GlassPanel(
       color: Colors.transparent,
       borderColor: Colors.transparent,
@@ -484,25 +485,19 @@ class _AccountScreenState extends State<AccountScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Protect this account', style: OceanTypography.strong),
-                Text(
-                  servicesAvailable
-                      ? 'Optionally link Google so this anonymous account can be recovered.'
-                      : 'Complete production setup to enable Google account recovery.',
-                  style: OceanTypography.caption,
-                ),
+                Text('Signed in with Google', style: OceanTypography.strong),
+                Text(accountLabel, style: OceanTypography.caption),
               ],
             ),
           ),
           const SizedBox(width: 8),
           GlassButton(
-            label: 'Link Google',
-            icon: LucideIcons.link,
+            label: 'Sign out',
+            icon: LucideIcons.logOut,
             compact: true,
-            loading: _linkingGoogle,
-            onPressed: _linkingGoogle || !servicesAvailable
-                ? null
-                : _linkGoogleAccount,
+            style: GlassButtonStyle.outline,
+            loading: _signingOut,
+            onPressed: _signingOut ? null : _signOut,
           ),
         ],
       ),

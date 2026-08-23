@@ -141,8 +141,8 @@ class OceanEyesController extends ChangeNotifier
     _navigation.configureLaunch(uri);
   }
 
-  /// Starts production subscriptions after Firebase and anonymous auth have
-  /// been composed by the app bootstrap. This is deliberately separate from
+  /// Starts production subscriptions after Firebase auth has been composed by
+  /// the app bootstrap. This is deliberately separate from
   /// the synchronous constructor used by unit tests and deterministic URLs.
   Future<void> initializeProduction() async {
     if (!productionEnabled || _productionInitialized || _disposed) return;
@@ -155,7 +155,7 @@ class OceanEyesController extends ChangeNotifier
     productionUser = _productionBindings.currentUser;
     isAuthenticated = productionUser != null;
     _onboarding.loadForAccount(_onboardingAccountNamespace);
-    _onboarding.beginTankLookup();
+    if (productionUser != null) _onboarding.beginTankLookup();
     activeTankId = _preferences?.getString(_activeTankPreferenceKey);
     tankConnected = false;
     dashboardHealth = DashboardHealthState.waiting;
@@ -168,7 +168,7 @@ class OceanEyesController extends ChangeNotifier
         productionUser = user;
         isAuthenticated = user != null;
         _onboarding.handleAccountIdentityChange(_onboardingAccountNamespace);
-        _onboarding.beginTankLookup();
+        if (user != null) _onboarding.beginTankLookup();
         _notify();
       },
       clearTankForAuthChange: _clearTankForAuthChange,
@@ -684,7 +684,7 @@ class OceanEyesController extends ChangeNotifier
 
   Future<void> signInWithGoogle() async {
     if (productionEnabled) {
-      await linkGoogleAccount();
+      await _signInProductionWithGoogle();
       return;
     }
     if (isAuthenticated || isAuthenticating) return;
@@ -697,13 +697,13 @@ class OceanEyesController extends ChangeNotifier
     _notify();
   }
 
-  Future<void> linkGoogleAccount() async {
-    if (!productionEnabled || isAuthenticating) {
+  Future<void> _signInProductionWithGoogle() async {
+    if (!productionEnabled || isAuthenticated || isAuthenticating) {
       return;
     }
     if (!_productionBindings.isAvailable) {
       productionError ??=
-          'Google linking is unavailable because production services did not '
+          'Google sign-in is unavailable because production services did not '
           'start. Check the Firebase configuration and selected platform.';
       _notify();
       return;
@@ -713,27 +713,13 @@ class OceanEyesController extends ChangeNotifier
     _notify();
     final token = _productionBindings.currentNotificationToken;
     try {
-      final result = await _productionBindings.linkGoogleAccount(
-        fcmToken: token,
-      );
+      final result = await _productionBindings.signInWithGoogle();
       productionUser = result.user ?? _productionBindings.currentUser;
       isAuthenticated = productionUser != null;
-      if (result.status == GoogleAccountLinkStatus.signedIntoExistingAccount) {
-        productionError = result.failedTankIds.isEmpty
-            ? 'Signed into the existing Google account. Previous anonymous '
-                  'tank ownership is not transferred; accessible tanks were '
-                  'rejoined as a viewer.'
-            : 'Signed into the existing Google account, but could not restore '
-                  '${result.failedTankIds.length} tank connection(s).';
-      } else if (result.failedTankIds.isNotEmpty) {
-        productionError =
-            'Linked the account, but could not restore '
-            '${result.failedTankIds.length} tank connection(s).';
-      }
     } catch (error, stackTrace) {
       _recordProductionError(error, stackTrace);
     } finally {
-      if (token != null && token.isNotEmpty) {
+      if (isAuthenticated && token != null && token.isNotEmpty) {
         try {
           await _productionRepository?.saveFcmToken(token);
         } catch (error, stackTrace) {
@@ -745,8 +731,34 @@ class OceanEyesController extends ChangeNotifier
     }
   }
 
+  Future<void> signOut() async {
+    if (!productionEnabled || !isAuthenticated || isAuthenticating) return;
+    if (!_productionBindings.isAvailable) {
+      productionError =
+          'Sign-out is unavailable because authentication did not start.';
+      _notify();
+      return;
+    }
+    isAuthenticating = true;
+    productionError = null;
+    _notify();
+    try {
+      await _productionBindings.signOut(
+        fcmToken: _productionBindings.currentNotificationToken,
+      );
+      productionUser = null;
+      isAuthenticated = false;
+    } catch (error, stackTrace) {
+      _recordProductionError(error, stackTrace);
+    } finally {
+      isAuthenticating = false;
+      _notify();
+    }
+  }
+
   Future<void> requestNotificationPermission() async {
     if (!productionEnabled ||
+        !isAuthenticated ||
         notificationPermissionRequesting ||
         !_productionBindings.isAvailable) {
       return;
@@ -994,8 +1006,6 @@ class OceanEyesController extends ChangeNotifier
     return null;
   }
 
-  bool get hasLinkedGoogleAccount =>
-      productionEnabled && _productionBindings.hasLinkedAccount;
   bool get productionServicesAvailable => _productionBindings.isAvailable;
   String get tankReferenceCode => activeTankId ?? 'tank-demo';
   bool get canEditTankSettings =>

@@ -32,18 +32,17 @@ flutter test test/view_models/oceaneyes_production_controller_test.dart
 | Token expiry | Expiry-shaped LiveKit disconnect clears the viewer request and permits a fresh start | Pass |
 | One-phone crash/disappearance | Stale viewer request lease stops monitor publishing; abrupt publisher disconnect releases live state and camera | Pass at the coordinator/lease boundary |
 
-The full credential-free Flutter suite passes with 169 tests. `flutter analyze`
+The full credential-free Flutter suite passes with 170 tests. `flutter analyze`
 passes with no issues. The Functions TypeScript build and unit suite passes
-with 15 tests. The Firestore emulator rules suite passes with 8 tests: exact
-self-join/leave, no tank listing, monitor-only readings, server-created alerts,
-self-owned live-request leases, token caps, tombstones, and server-only
-LiveKit state.
+with 16 tests. The Firestore emulator rules suite covers 9 tests: Google-only
+provider enforcement, exact self-join/leave, no tank listing, monitor-only
+readings, server-created alerts, self-owned live-request leases, token caps,
+tombstones, and server-only LiveKit state.
 
 ## What this proves about the current implementation
 
-- Google linking preserves the anonymous UID when possible and handles an
-  existing-account collision by detaching the old token before switching,
-  then rejoining accessible tanks.
+- Google sign-in resolves returning users through Firebase to their stable UID;
+  sign-out detaches the device token and returns the client to the login gate.
 - Pairing is a validated version-1 bearer payload. A viewer can read shared
   tank state and request a stream, but cannot edit owner-only settings.
 - Reading, inventory, alert, and live-state streams are tank-scoped and feed
@@ -61,7 +60,7 @@ LiveKit state.
 
 The following cannot be honestly proven by the repository-only tests:
 
-- Google OAuth, anonymous auth restoration, App Check, and collision recovery
+- Google OAuth persistence/sign-out, non-Google token rejection, and App Check
   against the deployed Firebase project on Android, iOS, and web.
 - QR scanning with the native camera on two physical phones.
 - A real two-device LiveKit room with monitor camera publishing, viewer track

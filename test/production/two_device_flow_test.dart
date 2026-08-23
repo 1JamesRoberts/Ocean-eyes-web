@@ -12,7 +12,7 @@ import 'package:oceaneyes/models/tank_pairing_codec.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 
 void main() {
-  test('Phone A links Google and creates a tank, while Phone B pairs, views, '
+  test('Phone A creates a tank, while Phone B pairs, views, '
       'and synchronizes shared state', () async {
     final backend = _SharedProductionBackend();
     final authA = _DeviceAuth('phone-a');
@@ -32,9 +32,6 @@ void main() {
       ]);
       await _drainMicrotasks();
 
-      await monitor.linkGoogleAccount();
-      expect(authA.googleLinkCalls, 1);
-      expect(monitor.hasLinkedGoogleAccount, isTrue);
       expect(monitor.productionUser?.uid, 'phone-a');
 
       final tankId = await monitor.createProductionTank('Office Reef');
@@ -198,46 +195,33 @@ Future<void> _waitUntil(bool Function() condition) async {
 
 final class _DeviceAuth implements ProductionAuthGateway {
   _DeviceAuth(String uid)
-    : _user = ProductionAuthUser(uid: uid, isAnonymous: true),
+    : _user = ProductionAuthUser(uid: uid, providerIds: const ['google.com']),
       _states = StreamController<ProductionAuthUser?>.broadcast(sync: true);
 
-  ProductionAuthUser _user;
+  ProductionAuthUser? _user;
   final StreamController<ProductionAuthUser?> _states;
-  int googleLinkCalls = 0;
 
   @override
-  ProductionAuthUser get currentUser => _user;
+  ProductionAuthUser? get currentUser => _user;
 
   @override
-  bool get hasLinkedAccount => !_user.isAnonymous;
+  bool get isSignedIn => _user != null;
 
   @override
   Stream<ProductionAuthUser?> authStateChanges() => _states.stream;
 
   @override
-  Future<ProductionAuthUser> ensureAnonymousSession() async => _user;
+  Future<void> enforceGoogleOnlySession() async {}
 
   @override
-  Future<GoogleAccountLinkResult> linkGoogleAccount({String? fcmToken}) async {
-    googleLinkCalls += 1;
-    _user = ProductionAuthUser(
-      uid: _user.uid,
-      isAnonymous: false,
-      displayName: 'Phone A Google user',
-      providerIds: const ['google.com'],
-    );
-    _states.add(_user);
-    return GoogleAccountLinkResult(
-      status: GoogleAccountLinkStatus.linkedAnonymousAccount,
-      user: _user,
-    );
+  Future<GoogleSignInResult> signInWithGoogle() async {
+    return GoogleSignInResult(status: GoogleSignInStatus.signedIn, user: _user);
   }
 
   @override
-  Future<ProductionAuthUser> signOutToAnonymous({String? fcmToken}) async {
-    _user = ProductionAuthUser(uid: _user.uid, isAnonymous: true);
-    _states.add(_user);
-    return _user;
+  Future<void> signOut({String? fcmToken}) async {
+    _user = null;
+    _states.add(null);
   }
 
   Future<void> close() => _states.close();

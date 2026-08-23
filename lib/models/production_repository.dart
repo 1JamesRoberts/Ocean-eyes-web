@@ -7,7 +7,7 @@ import 'production_data.dart';
 /// This remains separate from the synchronous SharedPreferences repositories.
 /// Firebase SDK snapshots and sentinel values must not cross this boundary.
 abstract interface class ProductionOceanEyesRepository
-    implements AuthAccountDataPort {
+    implements AuthTokenDataPort {
   String? get currentUserId;
 
   Stream<ProductionTank?> watchTank(String tankId);
@@ -45,7 +45,6 @@ abstract interface class ProductionOceanEyesRepository
 
   Future<String> createTank(String name);
 
-  @override
   Future<bool> joinTank(String tankId);
 
   Future<void> unlinkTank(String tankId);
@@ -84,7 +83,6 @@ abstract interface class ProductionOceanEyesRepository
   @override
   Future<void> removeFcmToken(String token);
 
-  @override
   Future<List<String>> linkedTankIdsForUser(String userId);
 
   Future<void> requestLive(String tankId);

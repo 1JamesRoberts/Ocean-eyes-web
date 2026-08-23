@@ -26,9 +26,11 @@ import {
 } from "./alert_policy";
 import { shouldSuppressAlertDedupe } from "./alert_dedupe";
 import {
+  AuthContextData,
   TankMemberRole,
   TankMembershipData,
   canEvaluateAlerts,
+  hasGoogleSignInProvider,
   isTankActive,
   memberRole,
 } from "./authorization";
@@ -66,7 +68,7 @@ export const getLiveKitToken = onCall(
     secrets: [livekitApiKey, livekitApiSecret],
   },
   async (request) => {
-    const uid = requireUid(request.auth?.uid);
+    const uid = requireGoogleUid(request.auth);
     const tankId = requireTankId(request.data?.tankId);
     const requestedRole: TankMemberRole =
       request.data?.role === "monitor" ? "monitor" : "viewer";
@@ -125,7 +127,7 @@ export const getLiveKitToken = onCall(
 export const evaluateAlertConditions = onCall(
   { region: REGION, enforceAppCheck: true },
   async (request) => {
-    const uid = requireUid(request.auth?.uid);
+    const uid = requireGoogleUid(request.auth);
     const tankId = requireTankId(request.data?.tankId);
     const db = getFirestore();
     return evaluateTankAlerts(db, tankId, uid);
@@ -536,7 +538,7 @@ export const deleteTank = onCall(
     secrets: [livekitApiKey, livekitApiSecret],
   },
   async (request) => {
-    const uid = requireUid(request.auth?.uid);
+    const uid = requireGoogleUid(request.auth);
     const tankId = requireTankId(request.data?.tankId);
     const db = getFirestore();
     const tankRef = db.collection("tanks").doc(tankId);
@@ -662,9 +664,19 @@ async function removeTankFromLinkedUsers(
   }
 }
 
-function requireUid(uid: string | undefined): string {
-  if (!uid) throw new HttpsError("unauthenticated", "Sign in required.");
-  return uid;
+function requireGoogleUid(
+  auth: AuthContextData | undefined,
+): string {
+  if (typeof auth?.uid !== "string" || auth.uid.length === 0) {
+    throw new HttpsError("unauthenticated", "Google sign-in required.");
+  }
+  if (!hasGoogleSignInProvider(auth)) {
+    throw new HttpsError(
+      "permission-denied",
+      "Only Google-authenticated accounts may use OceanEyes.",
+    );
+  }
+  return auth.uid;
 }
 
 function requireTankId(value: unknown): string {

@@ -38,11 +38,11 @@ class OceanEyesProductionBindingCoordinator {
   String? _linkedTankTargetUid;
   String? _linkedTankSubscriptionUid;
   bool _initialized = false;
+  bool _notificationsInitialized = false;
 
   ProductionAuthUser? get currentUser => _auth?.currentUser;
   bool get isAvailable => _repository != null && _auth != null;
   bool get hasTankSubscriptions => _tankSubscriptions.isNotEmpty;
-  bool get hasLinkedAccount => _auth?.hasLinkedAccount ?? false;
   String? get currentNotificationToken => _notifications?.currentToken;
 
   Future<void> initialize({
@@ -70,6 +70,7 @@ class OceanEyesProductionBindingCoordinator {
             ),
           );
         }
+        if (user != null) unawaited(_initializeNotifications());
       }, onError: _onError),
     );
     await _rebindLinkedTankIds(
@@ -87,23 +88,45 @@ class OceanEyesProductionBindingCoordinator {
           onError: _onError,
         ),
       );
-      try {
-        await notifications.initialize(
-          saveToken: repository.saveFcmToken,
-          webVapidKey: _webPushVapidKey,
-        );
-      } catch (error, stackTrace) {
-        _onError(error, stackTrace);
-      }
     }
+    if (initialUser != null) await _initializeNotifications();
   }
 
-  Future<GoogleAccountLinkResult> linkGoogleAccount({String? fcmToken}) {
+  Future<GoogleSignInResult> signInWithGoogle() {
     final auth = _auth;
     if (auth == null) {
       throw StateError('Authentication is not available.');
     }
-    return auth.linkGoogleAccount(fcmToken: fcmToken);
+    return auth.signInWithGoogle();
+  }
+
+  Future<void> signOut({String? fcmToken}) {
+    final auth = _auth;
+    if (auth == null) {
+      throw StateError('Authentication is not available.');
+    }
+    return auth.signOut(fcmToken: fcmToken);
+  }
+
+  Future<void> _initializeNotifications() async {
+    final notifications = _notifications;
+    final repository = _repository;
+    if (_notificationsInitialized ||
+        notifications == null ||
+        repository == null ||
+        _isDisposed()) {
+      return;
+    }
+    _notificationsInitialized = true;
+    try {
+      await notifications.initialize(
+        saveToken: _saveTokenForAuthenticatedUser,
+        webVapidKey: _webPushVapidKey,
+      );
+    } catch (error, stackTrace) {
+      _notificationsInitialized = false;
+      _onError(error, stackTrace);
+    }
   }
 
   Future<bool> requestNotificationPermission() {
@@ -113,9 +136,14 @@ class OceanEyesProductionBindingCoordinator {
       return Future<bool>.value(false);
     }
     return notifications.requestPermission(
-      saveToken: repository.saveFcmToken,
+      saveToken: _saveTokenForAuthenticatedUser,
       webVapidKey: _webPushVapidKey,
     );
+  }
+
+  Future<void> _saveTokenForAuthenticatedUser(String token) async {
+    if (_auth?.currentUser == null || _isDisposed()) return;
+    await _repository!.saveFcmToken(token);
   }
 
   Future<void> bindTank({

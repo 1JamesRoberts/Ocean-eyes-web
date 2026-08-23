@@ -1,14 +1,8 @@
-enum GoogleAccountLinkStatus {
-  cancelled,
-  linkedAnonymousAccount,
-  signedIntoExistingAccount,
-  signedIn,
-}
+enum GoogleSignInStatus { cancelled, signedIn }
 
 class ProductionAuthUser {
   const ProductionAuthUser({
     required this.uid,
-    required this.isAnonymous,
     this.displayName,
     this.email,
     this.photoUrl,
@@ -16,53 +10,42 @@ class ProductionAuthUser {
   });
 
   final String uid;
-  final bool isAnonymous;
   final String? displayName;
   final String? email;
   final String? photoUrl;
   final List<String> providerIds;
+
+  bool get isGoogleUser => providerIds.contains('google.com');
 }
 
-class GoogleAccountLinkResult {
-  const GoogleAccountLinkResult({
-    required this.status,
-    this.user,
-    this.rejoinedTankIds = const [],
-    this.failedTankIds = const [],
-  });
+class GoogleSignInResult {
+  const GoogleSignInResult({required this.status, this.user});
 
-  const GoogleAccountLinkResult.cancelled()
-    : status = GoogleAccountLinkStatus.cancelled,
-      user = null,
-      rejoinedTankIds = const [],
-      failedTankIds = const [];
+  const GoogleSignInResult.cancelled()
+    : status = GoogleSignInStatus.cancelled,
+      user = null;
 
-  final GoogleAccountLinkStatus status;
+  final GoogleSignInStatus status;
   final ProductionAuthUser? user;
-  final List<String> rejoinedTankIds;
-  final List<String> failedTankIds;
 }
 
-/// The narrow data boundary used while moving an anonymous session to an
-/// already-linked Google account.
-abstract interface class AuthAccountDataPort {
-  Future<List<String>> linkedTankIdsForUser(String userId);
-
-  Future<bool> joinTank(String tankId);
-
+/// The account-data operation that must complete before an identity signs out.
+abstract interface class AuthTokenDataPort {
   Future<void> removeFcmToken(String token);
 }
 
 abstract interface class ProductionAuthGateway {
+  /// Returns a user only when the Firebase account has the Google provider.
   ProductionAuthUser? get currentUser;
 
-  bool get hasLinkedAccount;
+  bool get isSignedIn;
 
   Stream<ProductionAuthUser?> authStateChanges();
 
-  Future<ProductionAuthUser> ensureAnonymousSession();
+  /// Clears a persisted Firebase session that was not authenticated by Google.
+  Future<void> enforceGoogleOnlySession();
 
-  Future<GoogleAccountLinkResult> linkGoogleAccount({String? fcmToken});
+  Future<GoogleSignInResult> signInWithGoogle();
 
-  Future<ProductionAuthUser> signOutToAnonymous({String? fcmToken});
+  Future<void> signOut({String? fcmToken});
 }

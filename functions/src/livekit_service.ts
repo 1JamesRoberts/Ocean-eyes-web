@@ -16,7 +16,7 @@ export function liveKitHttpUrl(value: string): string {
 
 /**
  * One participant identity per tank/user/role keeps refreshes and reconnects
- * from accumulating anonymous LiveKit participants. The values are persisted
+ * from accumulating untracked LiveKit participants. The values are persisted
  * by the token callable so deleteTank can explicitly revoke them before the
  * room is removed.
  */

@@ -98,11 +98,11 @@ gestures unwind the same origin-aware route stack as visible back controls.
 
 ## Camera and backend boundary
 
-The production runtime uses anonymous Firebase Auth with optional Google
-linking, typed Firestore repositories and schema mappers, QR tank pairing,
-camera capture, an on-device three-model ONNX pipeline, FCM, Cloud Functions
-alerting, and LiveKit streaming. The default local preview keeps those
-services disabled and uses deterministic fixture state instead.
+The production runtime requires Google-backed Firebase Auth before exposing
+protected features. It uses typed Firestore repositories and schema mappers,
+QR tank pairing, camera capture, an on-device three-model ONNX pipeline, FCM,
+Cloud Functions alerting, and LiveKit streaming. The default local preview
+keeps those services disabled and uses deterministic fixture state instead.
 
 The current cross-device and recovery evidence is recorded in
 [`docs/current_state_validation.md`](docs/current_state_validation.md). It

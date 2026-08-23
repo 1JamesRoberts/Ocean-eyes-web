@@ -30,9 +30,8 @@ The integration was validated on Windows on August 20, 2026.
 The current Flutter application now uses a production runtime for:
 
 - Firebase Core initialization and Firebase App Check.
-- Anonymous Firebase Authentication and optional Google account linking.
-- Account-collision recovery when an anonymous user links a Google identity
-  that already belongs to another Firebase account.
+- Mandatory Google-backed Firebase Authentication with an unauthenticated
+  startup/login gate and token-safe sign-out.
 - Firestore-backed tanks, readings, fish inventory, alerts, users, live state,
   live-view requests, remote thresholds, and camera calibration.
 - Firebase Cloud Messaging registration, token refresh, foreground/background
@@ -98,7 +97,7 @@ OceanEyesProductionConfig
           -> validate platform configuration
           -> initialize Firebase and optional emulators
           -> activate App Check when enabled
-          -> establish anonymous auth session
+          -> restore a Google session or remain unauthenticated
           -> construct typed production adapters
           -> inject adapters into OceanEyesController
           -> initialize production subscriptions
@@ -145,15 +144,15 @@ The production facade and its coordinators now:
   transitions, camera operations, and LiveKit start/stop operations.
 - Cancels auth, linked-tank, reading, fish, alert, live-state, live-request,
   camera, notification, heartbeat, and lease subscriptions/timers on disposal.
-- Rebinds linked tanks after anonymous-to-Google account changes, including the
-  credential-collision path into an existing Google account.
+- Rebinds linked tanks after Google sign-in, sign-out, or a Google-account
+  change.
 
 ## File-level migration map
 
 | Legacy source | Integrated target | Result |
 | --- | --- | --- |
 | `lib/main.dart` | `lib/main.dart`, `lib/app/oceaneyes_bootstrap.dart` | Production/local composition moved behind explicit runtime selection. |
-| `lib/services/auth_service.dart` | `lib/integrations/firebase/firebase_auth_gateway.dart` | Anonymous-first auth, Google link, collision recovery, token detach, and tank rejoin are injectable. |
+| `lib/services/auth_service.dart` | `lib/integrations/firebase/firebase_auth_gateway.dart` | Mandatory Google sign-in, unsupported-session cleanup, and token-safe sign-out are injectable. |
 | `lib/services/firestore_service.dart` | `lib/integrations/firebase/firestore_oceaneyes_repository.dart` | Raw snapshots replaced by typed streams and tank-scoped commands. |
 | Legacy Firestore model factories | `lib/integrations/firebase/firestore_schema_mapper.dart` | Explicit tolerant mappings to current models and analytics projections. |
 | Legacy onboarding QR screen | `lib/models/tank_pairing_codec.dart`, `lib/ui/widgets/tank_pairing_sheet.dart` | Version-1 JSON compatibility, validation, scanning, and manual entry. |
@@ -209,13 +208,15 @@ Implemented:
 
 Authentication behavior:
 
-- Startup guarantees an anonymous Firebase session.
-- Google sign-in first attempts to link that anonymous account.
-- Cancellation preserves the anonymous session.
-- If the credential belongs to an existing account, the gateway records the
-  anonymous user's tanks, removes its FCM token, signs into the existing
-  account, rejoins accessible tanks, and reports successful/failed tank IDs.
-- Signing out removes the current token and creates a fresh anonymous session.
+- Startup restores a persisted Google Firebase session or remains
+  unauthenticated; it never creates a Firebase user.
+- Google sign-in authenticates directly with Firebase and cancellation leaves
+  the client unauthenticated.
+- Returning Google users resolve to the same Firebase UID and therefore the
+  same account-scoped tanks and data.
+- Signing out removes the current FCM token and returns to an unauthenticated
+  login gate.
+- Firestore rules and callable functions reject non-Google auth providers.
 - Auth-state changes rebuild user and linked-tank streams.
 
 Google OAuth behavior:
@@ -455,7 +456,7 @@ The audit identified and fixed:
 
 - Production plugins leaking into fixtures/direct construction.
 - Demo-only water/analytics getters in production.
-- Old-UID listeners after Google account collision.
+- Old-UID listeners after account changes.
 - Seed readings making new tanks appear healthy.
 - Remote fish snapshots resetting local visibility.
 - Duplicate billed reading listeners.
@@ -727,7 +728,7 @@ keyPassword=replace-locally
 ### Web
 
 - Firebase options must be supplied via Dart defines.
-- Google linking requires the web OAuth client ID.
+- Google sign-in requires the web OAuth client ID.
 - App Check requires a reCAPTCHA v3 site key when enabled.
 - Camera, App Check, and push testing require HTTPS/secure origin.
 - The tracked FCM service-worker example must be copied to the ignored live
@@ -947,7 +948,8 @@ Production tests cover:
 
 - Mapper coercion, aliases, clamping, ordering, timestamps, FNU/clarity
   separation, and catalog fallback.
-- Anonymous auth, Google link/cancel/collision, token detach, and tank rejoin.
+- Unauthenticated startup, Google sign-in/cancellation/persistence, provider
+  rejection, token detach, and sign-out.
 - QR encode/decode/manual validation and malformed payloads.
 - Production-disabled/fixture controllers making zero production calls.
 - Reading/fish/alert/live binding, replacement, and disposal.
@@ -985,8 +987,8 @@ separately.
 
 These checks need private accounts, credentials, signing material, or hardware:
 
-- Verify anonymous auth, Google linking/cancellation/collision, and App Check
-  against real Android, iOS, and web Firebase apps.
+- Verify Google sign-in/cancellation/persistence/sign-out, non-Google token
+  rejection, and App Check against real Android, iOS, and web Firebase apps.
 - Run all three models on representative physical Android/iOS devices.
 - Measure inference latency, memory, thermals, battery, and sustained polling.
 - Verify camera permissions, switching, lifecycle, calibration, QR handoff,
@@ -1182,7 +1184,7 @@ production documents together. They remain as shorter topic-specific guides.
 ### Before release
 
 - [ ] Complete physical Android/iOS camera and model performance testing.
-- [ ] Complete real App Check/Auth/Google collision testing.
+- [ ] Complete real App Check and Google auth persistence/rejection testing.
 - [ ] Complete FCM/APNs/web push testing in every lifecycle state.
 - [ ] Complete two-device LiveKit crash/expiry/revocation testing.
 - [ ] Run the 39-state visual matrix on a supported device.

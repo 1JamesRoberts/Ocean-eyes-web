@@ -29,7 +29,7 @@ production behavior and the deployed Firestore compatibility schema.
 | Legacy production source | Current/target file | Migration action |
 | --- | --- | --- |
 | `lib/main.dart` | `lib/main.dart`, `lib/app/oceaneyes_bootstrap.dart` | Make Firebase/App Check/auth startup the application composition root; leave system UI and app construction intact. |
-| `lib/services/auth_service.dart` | `lib/integrations/firebase/firebase_auth_gateway.dart` | Adapt anonymous-first auth, Google credential linking, collision recovery, and token cleanup behind an injectable gateway. |
+| `lib/services/auth_service.dart` | `lib/integrations/firebase/firebase_auth_gateway.dart` | Replace legacy auth with mandatory Google sign-in, unsupported-session cleanup, and token-safe sign-out behind an injectable gateway. |
 | `lib/services/firestore_service.dart` | `lib/integrations/firebase/firestore_oceaneyes_repository.dart` | Split raw Firestore access from mappings; expose typed streams/commands, not snapshots. |
 | Firestore factories in `lib/models/mock_data.dart` | `lib/integrations/firebase/firestore_schema_mapper.dart` | Replace snapshot factories with explicit, tolerant mappings to current `FishEntry`, `AlertItem`, `HistoryReading`, water metrics, and analytics projections. |
 | QR parsing in `lib/screens/onboarding/qr_scan_screen.dart` | `lib/models/tank_pairing_codec.dart`, `lib/ui/widgets/tank_pairing_sheet.dart` | Preserve v1 JSON compatibility, add typed validation/manual entry, and invoke pairing through the controller without copying legacy visuals. |
@@ -127,13 +127,13 @@ defines or emulators.
 
 ### 2. Auth and tank pairing
 
-- Initialize/restore anonymous auth before protected operations.
-- Link Google credentials to the anonymous user; recover existing-account
-  collisions without silently transferring ownership.
+- Start unauthenticated unless Firebase restores a Google-backed session.
+- Require direct Google sign-in before binding protected data and enforce the
+  provider claim in Firestore rules and callable functions.
 - Add v1 QR codec, scanning/manual entry, linked-tank selection, and safe unlink.
 
-Exit: controller tests cover anonymous, linked, cancelled, collision, malformed
-QR, missing tank, and unlink behavior.
+Exit: controller tests cover unauthenticated startup, Google sign-in/sign-out,
+provider rejection, malformed QR, missing tank, and unlink behavior.
 
 ### 3. Firestore repositories and controller integration
 

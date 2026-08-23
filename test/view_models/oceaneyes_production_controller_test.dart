@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image/image.dart' as image;
+import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/integrations/camera/camera_capture_gateway.dart';
 import 'package:oceaneyes/integrations/livekit/livekit_gateway.dart';
 import 'package:oceaneyes/integrations/ml/onnx_fish_inference.dart';
@@ -39,6 +40,65 @@ void main() {
 
     direct.dispose();
     fixture.dispose();
+    await repository.close();
+    await auth.close();
+  });
+
+  test(
+    'production stays gated until Google auth and returns there on sign-out',
+    () async {
+      final repository = _FakeProductionRepository();
+      final auth = _FakeProductionAuth(user: null);
+      final controller = _productionController(repository, auth);
+
+      await controller.initializeProduction();
+
+      expect(controller.isAuthenticated, isFalse);
+      expect(controller.productionUser, isNull);
+      expect(repository.callCount('watchLinkedTankIds'), 0);
+
+      auth.emitUser(_user);
+      await _drainMicrotasks();
+      expect(controller.isAuthenticated, isTrue);
+      expect(controller.productionUser?.uid, _user.uid);
+      expect(repository.callCount('watchLinkedTankIds'), 1);
+
+      await controller.signOut();
+      await _drainMicrotasks();
+      expect(controller.isAuthenticated, isFalse);
+      expect(controller.productionUser, isNull);
+      expect(repository.linkedTankIdsHasListenerFor(_user.uid), isFalse);
+
+      controller.dispose();
+      await _drainMicrotasks();
+      await repository.close();
+      await auth.close();
+    },
+  );
+
+  testWidgets('account sign-out restores the full-screen Google login gate', (
+    tester,
+  ) async {
+    final repository = _FakeProductionRepository();
+    final auth = _FakeProductionAuth(user: _user);
+    final controller = _productionController(repository, auth)
+      ..activeTab = PrimaryTab.account;
+    await controller.initializeProduction();
+
+    await tester.pumpWidget(OceanEyesApp(controller: controller));
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.text('Signed in with Google'), findsOneWidget);
+
+    await tester.tap(find.text('Sign out'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(controller.isAuthenticated, isFalse);
+    expect(find.text('Continue with Google'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    controller.dispose();
+    await tester.pump();
     await repository.close();
     await auth.close();
   });
@@ -288,7 +348,6 @@ void main() {
 
     const linkedUser = ProductionAuthUser(
       uid: 'user-2',
-      isAnonymous: false,
       providerIds: ['google.com'],
     );
     repository.currentUid = linkedUser.uid;
@@ -303,7 +362,7 @@ void main() {
     expect(controller.activeTankId, isNull);
     expect(controller.tankConnected, isFalse);
 
-    // A late event from the anonymous document cannot retake the selection.
+    // A late event from the previous account cannot retake the selection.
     repository.emitLinkedTankIds(const ['tank-stale'], uid: _user.uid);
     repository.emitLinkedTankIds(const ['tank-new'], uid: linkedUser.uid);
     await _drainMicrotasks();
@@ -890,7 +949,7 @@ Future<void> _waitUntil(bool Function() condition) async {
   fail('Timed out waiting for an asynchronous controller transition.');
 }
 
-const _user = ProductionAuthUser(uid: 'user-1', isAnonymous: true);
+const _user = ProductionAuthUser(uid: 'user-1', providerIds: ['google.com']);
 
 ProductionTank _tank(String id, {required String name}) {
   return ProductionTank(
@@ -994,14 +1053,14 @@ final _readingBundle = ProductionReadingBundle(
 );
 
 final class _FakeProductionAuth implements ProductionAuthGateway {
-  _FakeProductionAuth({required ProductionAuthUser user}) : _user = user {
+  _FakeProductionAuth({required ProductionAuthUser? user}) : _user = user {
     _authStates = StreamController<ProductionAuthUser?>.broadcast(
       sync: true,
       onCancel: () => authStateCancellations++,
     );
   }
 
-  ProductionAuthUser _user;
+  ProductionAuthUser? _user;
   late final StreamController<ProductionAuthUser?> _authStates;
   int interactions = 0;
   int authStateCancellations = 0;
@@ -1015,9 +1074,9 @@ final class _FakeProductionAuth implements ProductionAuthGateway {
   }
 
   @override
-  bool get hasLinkedAccount {
+  bool get isSignedIn {
     interactions++;
-    return !_user.isAnonymous;
+    return _user != null;
   }
 
   @override
@@ -1027,26 +1086,21 @@ final class _FakeProductionAuth implements ProductionAuthGateway {
   }
 
   @override
-  Future<ProductionAuthUser> ensureAnonymousSession() async {
+  Future<void> enforceGoogleOnlySession() async {
     interactions++;
-    return _user;
   }
 
   @override
-  Future<GoogleAccountLinkResult> linkGoogleAccount({String? fcmToken}) async {
+  Future<GoogleSignInResult> signInWithGoogle() async {
     interactions++;
-    return GoogleAccountLinkResult(
-      status: GoogleAccountLinkStatus.linkedAnonymousAccount,
-      user: _user,
-    );
+    return GoogleSignInResult(status: GoogleSignInStatus.signedIn, user: _user);
   }
 
   @override
-  Future<ProductionAuthUser> signOutToAnonymous({String? fcmToken}) async {
+  Future<void> signOut({String? fcmToken}) async {
     interactions++;
-    _user = const ProductionAuthUser(uid: 'anonymous-2', isAnonymous: true);
-    _authStates.add(_user);
-    return _user;
+    _user = null;
+    _authStates.add(null);
   }
 
   void emitUser(ProductionAuthUser user) {

@@ -68,8 +68,9 @@ runtime/dependency upgrade for a separately staged migration.
 These checks cannot be represented honestly without private external state and
 must be completed in the target staging project before release:
 
-- Verify anonymous auth, Google linking, App Check, and account-collision tank
-  restoration using staging Firebase apps.
+- Verify fresh unauthenticated startup, Google sign-in persistence, sign-out,
+  Google-only rule/callable rejection, and App Check using staging Firebase
+  apps.
 - Run camera plus all three approved ONNX models on physical Android and iOS
   devices; measure memory, latency, thermals, and sustained polling behavior.
 - Verify foreground/background/terminated FCM delivery, APNs provisioning, and

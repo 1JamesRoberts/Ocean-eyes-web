@@ -3,6 +3,7 @@ const test = require('node:test');
 
 const {
   canEvaluateAlerts,
+  hasGoogleSignInProvider,
   memberRole,
 } = require('../lib/authorization.js');
 
@@ -17,6 +18,25 @@ test('only owners and registered monitors may evaluate alerts', () => {
   assert.equal(canEvaluateAlerts(tank, 'monitor'), true);
   assert.equal(canEvaluateAlerts(tank, 'viewer'), false);
   assert.equal(canEvaluateAlerts(tank, 'stranger'), false);
+});
+
+test('only Google sign-in claims satisfy the production auth boundary', () => {
+  assert.equal(hasGoogleSignInProvider(undefined), false);
+  assert.equal(hasGoogleSignInProvider({uid: 'user-a', token: {}}), false);
+  assert.equal(
+    hasGoogleSignInProvider({
+      uid: 'user-a',
+      token: {firebase: {sign_in_provider: 'anonymous'}},
+    }),
+    false,
+  );
+  assert.equal(
+    hasGoogleSignInProvider({
+      uid: 'user-a',
+      token: {firebase: {sign_in_provider: 'google.com'}},
+    }),
+    true,
+  );
 });
 
 test('membership roles remain least privilege', () => {

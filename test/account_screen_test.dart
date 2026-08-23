@@ -42,7 +42,7 @@ void main() {
     expect(find.text('Stream Image Adjustments'), findsOneWidget);
     expect(find.text('Background Canvas'), findsOneWidget);
     expect(find.byIcon(LucideIcons.image), findsOneWidget);
-    expect(find.text('Protect this account'), findsNothing);
+    expect(find.text('Signed in with Google'), findsNothing);
 
     await tester.ensureVisible(find.text('IoT Scanner Console'));
     await tester.tap(find.text('IoT Scanner Console'));
@@ -184,7 +184,8 @@ void main() {
     addTearDown(controller.dispose);
     await pumpAccount(tester, controller);
 
-    expect(find.text('Protect this account'), findsOneWidget);
+    expect(find.text('Signed in with Google'), findsOneWidget);
+    expect(find.text('Sign out'), findsOneWidget);
     expect(find.text('IoT Scanner Console'), findsOneWidget);
     expect(find.text('Stream Image Adjustments'), findsOneWidget);
     expect(find.text('Background Canvas'), findsOneWidget);

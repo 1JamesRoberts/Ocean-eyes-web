@@ -79,7 +79,18 @@ class _OceanEyesAppState extends State<OceanEyesApp>
   }
 
   void _handleAuthentication() {
-    if (!_controller.isAuthenticated || !_showLogin || _loginExiting) return;
+    if (!_controller.isAuthenticated) {
+      _loginExitTimer?.cancel();
+      _dashboardEntrance.value = 0;
+      if (!_showLogin || _loginExiting) {
+        setState(() {
+          _showLogin = true;
+          _loginExiting = false;
+        });
+      }
+      return;
+    }
+    if (!_showLogin || _loginExiting) return;
     _dashboardEntrance.forward(from: 0);
     setState(() => _loginExiting = true);
     _loginExitTimer?.cancel();

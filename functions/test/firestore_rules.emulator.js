@@ -69,8 +69,31 @@ function tankData({
 }
 
 function authenticatedDb(uid) {
-  return environment.authenticatedContext(uid).firestore();
+  return environment.authenticatedContext(uid, {
+    firebase: {sign_in_provider: 'google.com'},
+  }).firestore();
 }
+
+function nonGoogleDb(uid) {
+  return environment.authenticatedContext(uid, {
+    firebase: {sign_in_provider: 'anonymous'},
+  }).firestore();
+}
+
+test('non-Google Firebase identities cannot access protected data', async () => {
+  await seed(['tanks', 'tank-a'], tankData());
+  await seed(['users', 'owner-a'], {tanks: ['tank-a']});
+  const unsupported = nonGoogleDb('owner-a');
+
+  await assertFails(getDoc(doc(unsupported, 'tanks', 'tank-a')));
+  await assertFails(getDoc(doc(unsupported, 'users', 'owner-a')));
+  await assertFails(
+    setDoc(doc(unsupported, 'tank_fish', 'fish-a'), {
+      tank_id: 'tank-a',
+      name: 'Blocked fish',
+    }),
+  );
+});
 
 test('tank pairing allows only an exact self join and self leave', async () => {
   await seed(['tanks', 'tank-a'], tankData());

@@ -75,7 +75,7 @@ disabled App Check.
 The production Firebase/Google stack is supported on Android, iOS, and web.
 The Windows desktop target is not a customer production target.
 
-Google linking needs OAuth client configuration in addition to Firebase app
+Google sign-in needs OAuth client configuration in addition to Firebase app
 options. With native Google service files, keep the generated Android web
 client entry and iOS URL scheme. For a Dart-define-only build, set
 `OCEANEYES_GOOGLE_WEB_CLIENT_ID` to the **Web application** OAuth client ID
@@ -247,7 +247,7 @@ falling back to the fixture app; it is not a customer build. Invalid values
 that get past compilation still show the blocking startup error.
 
 Configured validation additionally needs physical Android/iOS devices for App
-Check, Google linking, camera/ONNX memory and thermal behavior, background FCM,
+Check, Google sign-in, camera/ONNX memory and thermal behavior, background FCM,
 and two-device LiveKit publishing/subscribing. Web camera and FCM testing must
 use a secure origin. See `docs/production_validation.md` for the checked and
 configuration-dependent validation matrix.

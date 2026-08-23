@@ -39,7 +39,8 @@ tanks bypasses onboarding and keeps the existing tank-selection behavior.
 
 - Onboarding is presented only after production auth and the initial linked-tank
   stream result resolve.
-- Existing pairing, tank management, and Google linking remain in Account.
+- Existing pairing and tank management remain in Account; Google sign-out is
+  available there after authentication.
 - Monitoring camera, ONNX, LiveKit, and notification permission remain deferred
   until explicit feature use. QR scanning has its own just-in-time permission
   request.

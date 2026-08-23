@@ -5,7 +5,21 @@ export interface TankMembershipData {
   deleting_at?: unknown;
 }
 
+export interface AuthContextData {
+  uid?: unknown;
+  token?: unknown;
+}
+
 export type TankMemberRole = "viewer" | "monitor";
+
+export function hasGoogleSignInProvider(
+  auth: AuthContextData | undefined,
+): boolean {
+  if (typeof auth?.uid !== "string" || auth.uid.length === 0) return false;
+  const token = recordValue(auth.token);
+  const firebase = recordValue(token.firebase);
+  return firebase.sign_in_provider === "google.com";
+}
 
 export function memberRole(
   tank: TankMembershipData,
@@ -37,4 +51,10 @@ function stringArray(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
     : [];
+}
+
+function recordValue(value: unknown): Record<string, unknown> {
+  return value != null && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
 }

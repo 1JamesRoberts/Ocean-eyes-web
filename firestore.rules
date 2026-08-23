@@ -2,8 +2,9 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    function authed() {
-      return request.auth != null;
+    function googleAuthed() {
+      return request.auth != null &&
+        request.auth.token.firebase.sign_in_provider == 'google.com';
     }
 
     function tankPath(tankId) {
@@ -37,25 +38,25 @@ service cloud.firestore {
     }
 
     function isOwner(tankId) {
-      return authed() && tankIsActive(tankId) &&
+      return googleAuthed() && tankIsActive(tankId) &&
         tank(tankId).owner_id == request.auth.uid;
     }
 
     function isMonitor(tankId) {
       return isOwner(tankId) ||
-        (authed() && tankIsActive(tankId) &&
+        (googleAuthed() && tankIsActive(tankId) &&
           request.auth.uid in tank(tankId).get('monitor_uids', []));
     }
 
     function isMonitorAfter(tankId) {
-      return authed() && tankIsActiveAfter(tankId) &&
+      return googleAuthed() && tankIsActiveAfter(tankId) &&
         (tankAfter(tankId).owner_id == request.auth.uid ||
           request.auth.uid in tankAfter(tankId).get('monitor_uids', []));
     }
 
     function isMember(tankId) {
       return isMonitor(tankId) ||
-        (authed() && tankIsActive(tankId) &&
+        (googleAuthed() && tankIsActive(tankId) &&
           request.auth.uid in tank(tankId).get('viewers', []));
     }
 
@@ -94,10 +95,10 @@ service cloud.firestore {
     }
 
     match /users/{uid} {
-      allow read, delete: if authed() && request.auth.uid == uid;
-      allow create: if authed() && request.auth.uid == uid &&
+      allow read, delete: if googleAuthed() && request.auth.uid == uid;
+      allow create: if googleAuthed() && request.auth.uid == uid &&
         validFcmTokens();
-      allow update: if authed() && request.auth.uid == uid && (
+      allow update: if googleAuthed() && request.auth.uid == uid && (
         !request.resource.data.diff(resource.data).affectedKeys().hasAny([
           'fcm_token',
           'fcm_tokens'
@@ -106,7 +107,7 @@ service cloud.firestore {
     }
 
     match /tanks/{tankId} {
-      allow create: if authed() &&
+      allow create: if googleAuthed() &&
         request.resource.data.owner_id == request.auth.uid &&
         request.resource.data.viewers is list &&
         request.resource.data.viewers.size() == 0 &&
@@ -117,10 +118,10 @@ service cloud.firestore {
 
       // A random tank ID is the v1 QR pairing capability. Listing tanks is
       // never allowed; a signed-in scanner may only fetch a specific ID.
-      allow get: if authed();
+      allow get: if googleAuthed();
       allow list: if false;
 
-      allow update: if authed() && tankIsActive(tankId) && (
+      allow update: if googleAuthed() && tankIsActive(tankId) && (
         selfJoinOnly() ||
         selfLeaveOnly() ||
         (isMonitor(tankId) &&
