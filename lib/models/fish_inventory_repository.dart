@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'aquarium_models.dart';
-import 'demo_fixtures.dart';
 
 /// Model-layer persistence boundary for the user's complete fish inventory.
 abstract interface class FishInventoryRepository {
@@ -22,14 +21,13 @@ class SharedPreferencesFishInventoryRepository
   SharedPreferencesFishInventoryRepository(this._preferences);
 
   static const storageKey = 'fishInventory.v1';
-  static const _legacyCountsKey = 'fishCounts';
 
   final SharedPreferences _preferences;
 
   @override
   List<FishEntry>? load() {
     final encoded = _preferences.getString(storageKey);
-    if (encoded == null) return _loadLegacyCounts();
+    if (encoded == null) return null;
 
     try {
       final decoded = jsonDecode(encoded);
@@ -50,32 +48,6 @@ class SharedPreferencesFishInventoryRepository
   Future<void> save(List<FishEntry> fish) async {
     final encoded = jsonEncode(fish.map(_fishToJson).toList(growable: false));
     await _preferences.setString(storageKey, encoded);
-    await _preferences.remove(_legacyCountsKey);
-  }
-
-  List<FishEntry>? _loadLegacyCounts() {
-    final counts = _preferences.getStringList(_legacyCountsKey);
-    if (counts == null) return null;
-
-    final parsed = <String, int>{};
-    for (final item in counts) {
-      final separator = item.lastIndexOf(':');
-      if (separator <= 0 || separator == item.length - 1) continue;
-      final count = int.tryParse(item.substring(separator + 1));
-      if (count != null) parsed[item.substring(0, separator)] = count;
-    }
-
-    return DemoFixtures.populatedFish()
-        .map((entry) {
-          final persistedCount = parsed[entry.speciesId];
-          if (persistedCount == null) return entry;
-          final count = persistedCount.clamp(1, 99);
-          return entry.copyWith(
-            count: count,
-            detected: entry.detected.clamp(0, count),
-          );
-        })
-        .toList(growable: false);
   }
 
   static Map<String, Object?> _fishToJson(FishEntry fish) => {

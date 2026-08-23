@@ -45,7 +45,7 @@ class StartupErrorScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: OceanSpacing.sm),
                     Text(
-                      'The customer release configuration is missing or '
+                      'The production configuration is missing or '
                       'invalid.',
                       style: OceanTypography.bodyMuted,
                     ),

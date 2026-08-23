@@ -30,28 +30,5 @@
     "ui": {
       "enabled": true
     }
-  },
-  "flutter": {
-    "platforms": {
-      "android": {
-        "buildConfigurations": {
-          ".": {
-            "projectId": "ocean-eyes-webapp",
-            "appId": "1:1072877532089:android:d7aac1fb54b47d8d2fbc68",
-            "fileOutput": "android/app/google-services.json"
-          }
-        }
-      },
-      "dart": {
-        "lib/firebase_options.dart": {
-          "projectId": "ocean-eyes-webapp",
-          "configurations": {
-            "android": "1:1072877532089:android:d7aac1fb54b47d8d2fbc68",
-            "ios": "1:1072877532089:ios:360237b46af319ea2fbc68",
-            "web": "1:1072877532089:web:4c99a42a94950cb72fbc68"
-          }
-        }
-      }
-    }
   }
 }

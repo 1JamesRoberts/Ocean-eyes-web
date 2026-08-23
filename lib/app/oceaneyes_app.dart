@@ -16,21 +16,20 @@ import '../view_models/oceaneyes_controller.dart';
 class OceanEyesApp extends StatefulWidget {
   const OceanEyesApp({
     super.key,
-    this.controller,
+    required this.controller,
     this.disposeController = false,
   });
 
-  final OceanEyesController? controller;
+  final OceanEyesController controller;
   final bool disposeController;
 
   @override
   State<OceanEyesApp> createState() => _OceanEyesAppState();
 }
 
-/// The only surface shown when a customer release cannot compose its
-/// production services. It deliberately does not construct an
-/// [OceanEyesController], so a broken release cannot look like the fixture
-/// app or expose partially initialized production controls.
+/// The only surface shown when the production services cannot be composed. It
+/// deliberately does not construct an [OceanEyesController], so a broken
+/// startup cannot expose partially initialized controls.
 class OceanEyesStartupErrorApp extends StatelessWidget {
   const OceanEyesStartupErrorApp({super.key, required this.message});
 
@@ -50,10 +49,8 @@ class OceanEyesStartupErrorApp extends StatelessWidget {
 
 class _OceanEyesAppState extends State<OceanEyesApp>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  late final OceanEyesController _controller =
-      widget.controller ?? OceanEyesController();
-  late final bool _ownsController =
-      widget.controller == null || widget.disposeController;
+  late final OceanEyesController _controller = widget.controller;
+  late final bool _ownsController = widget.disposeController;
   late final OceanEyesProductionConfig _productionConfig =
       OceanEyesProductionConfig.fromEnvironment();
   late bool _showLogin = !_controller.isAuthenticated;

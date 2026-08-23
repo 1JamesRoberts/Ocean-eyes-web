@@ -1,10 +1,9 @@
 # Project Overview
 
-OceanEyes is a Flutter/Dart aquarium-monitoring client for Android, iOS, and
-Flutter web. It uses deterministic fixtures for camera-, AI-, and
-backend-dependent states so the interface remains testable without production
-services. Production integrations are enabled explicitly with
-`OCEANEYES_PRODUCTION=true`.
+OceanEyes is a production-first Flutter/Dart aquarium-monitoring client for
+Android, iOS, and Flutter web. The shipped app always composes its Firebase,
+camera, AI, messaging, and LiveKit integrations. Deterministic fixtures are
+test-only seams and never a runtime fallback.
 
 ## Tech Stack
 
@@ -40,5 +39,6 @@ services. Production integrations are enabled explicitly with
 Preserve the MVVM boundary and keep domain policy out of widgets. Prefer shared
 tokens and reusable UI primitives over repeated raw values. Before handoff,
 run `dart format`, `flutter analyze`, relevant tests, and documented builds.
-Keep production services behind the runtime switch; fixture URLs must remain
-independent of Firebase, camera, messaging, LiveKit, and ONNX.
+Keep deterministic fixtures in tests only; the application must fail clearly
+when its production configuration is missing rather than falling back to demo
+state.

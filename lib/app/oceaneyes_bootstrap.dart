@@ -20,9 +20,9 @@ import '../models/onboarding_repository.dart';
 import '../view_models/oceaneyes_controller.dart';
 import 'production_config.dart';
 
-/// A production build cannot safely fall back to the fixture shell when its
-/// Firebase or service configuration is invalid. The app catches this error
-/// at the composition root and renders a blocking startup screen instead.
+/// A production app cannot safely continue when its service configuration is
+/// invalid. The app catches this error at the composition root and renders a
+/// blocking startup screen instead.
 class OceanEyesBootstrapException implements Exception {
   const OceanEyesBootstrapException(this.message, {this.cause});
 
@@ -33,27 +33,15 @@ class OceanEyesBootstrapException implements Exception {
   String toString() => message;
 }
 
-/// Composes the production Firebase/auth/Firestore/camera/ML/FCM/LiveKit/
-/// wake-lock stack for the running application.
+/// Composes the Firebase/auth/Firestore/camera/ML/FCM/LiveKit/wake-lock stack.
 Future<OceanEyesController> bootstrapOceanEyesController({
   Uri? launchUri,
 }) async {
   final uri = launchUri ?? Uri.base;
-  final controllerUri = _productionControllerUri(uri);
   final preferences = await SharedPreferences.getInstance();
   final inventory = SharedPreferencesFishInventoryRepository(preferences);
   final settings = SharedPreferencesOceanEyesSettingsRepository(preferences);
   final config = OceanEyesProductionConfig.fromEnvironment();
-
-  if (!config.enabled) {
-    return OceanEyesController(
-      preferences: preferences,
-      inventoryRepository: inventory,
-      settingsRepository: settings,
-      onboardingRepository: SharedPreferencesOnboardingRepository(preferences),
-      launchUri: uri,
-    );
-  }
 
   final validationError = config.validate();
   if (validationError != null) {
@@ -62,11 +50,11 @@ Future<OceanEyesController> bootstrapOceanEyesController({
 
   try {
     final bootstrap = await initializeOceanEyesFirebase(config);
-    final firebaseAuth = FirebaseAuth.instanceFor(app: bootstrap.app);
-    final firestore = FirebaseFirestore.instanceFor(app: bootstrap.app);
+    final firebaseAuth = FirebaseAuth.instanceFor(app: bootstrap);
+    final firestore = FirebaseFirestore.instanceFor(app: bootstrap);
     final functions = FirebaseFunctions.instanceFor(
-      app: bootstrap.app,
-      region: config.functionsRegion,
+      app: bootstrap,
+      region: OceanEyesProductionConfig.functionsRegion,
     );
     final repository = FirestoreOceanEyesRepository(
       firestore: firestore,
@@ -86,7 +74,7 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       inventoryRepository: inventory,
       settingsRepository: settings,
       onboardingRepository: SharedPreferencesOnboardingRepository(preferences),
-      launchUri: controllerUri,
+      launchUri: uri,
       productionEnabled: true,
       productionRepository: repository,
       productionAuth: auth,
@@ -104,17 +92,11 @@ Future<OceanEyesController> bootstrapOceanEyesController({
   } catch (error, stackTrace) {
     debugPrint('OceanEyes production startup failed: $error\n$stackTrace');
     throw OceanEyesBootstrapException(
-      'OceanEyes could not start the customer release services. '
+      'OceanEyes could not start its production services. '
       'Check the private production configuration and service availability.',
       cause: error,
     );
   }
-}
-
-Uri _productionControllerUri(Uri uri) {
-  final queryParameters = Map<String, String>.from(uri.queryParameters)
-    ..remove('fixture');
-  return uri.replace(queryParameters: queryParameters);
 }
 
 GoogleSignIn _googleSignInFor(OceanEyesProductionConfig config) {

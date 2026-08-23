@@ -2,10 +2,9 @@
 
 ## Deterministic test fixtures
 
-The default local preview also accepts these fixture URLs. Production
-integrations remain disabled unless `OCEANEYES_PRODUCTION=true` is supplied.
-Screenshot automation constructs `OceanEyesController` directly and uses these
-query parameters as test-harness inputs:
+The shipped app is production-only. Screenshot automation constructs
+`OceanEyesController` directly and uses these fixture query parameters only as
+test-harness inputs:
 
 ```text
 /?fixture=login

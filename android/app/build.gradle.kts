@@ -42,46 +42,6 @@ if (releaseTaskRequested && !releaseKeystorePropertiesFile.isFile) {
     )
 }
 
-// Keep credential-free fixture and CI builds working. Production setups place
-// the gitignored file here (normally via `flutterfire configure`).
-if (file("google-services.json").exists()) {
-    apply(plugin = "com.google.gms.google-services")
-}
-
-// Flutter writes GeneratedPluginRegistrant.java into the app source tree.
-// A normal release build filters dev-only plugins, but a prior pub get or an
-// IDE can leave the debug registrant in place when Gradle starts with cached
-// inputs. Regenerate it through Flutter immediately before release Java
-// compilation so integration_test never becomes a release compile dependency.
-val flutterSdkPath = rootProject.file("local.properties").let { localPropertiesFile ->
-    val localProperties = Properties()
-    localPropertiesFile.inputStream().use(localProperties::load)
-    localProperties.getProperty("flutter.sdk")
-        ?: error("flutter.sdk not set in local.properties")
-}
-val flutterExecutable = File(
-    flutterSdkPath,
-    "bin/flutter${if (System.getProperty("os.name").startsWith("Windows")) ".bat" else ""}",
-)
-val releaseFlutterConfig = tasks.register<Exec>("generateReleaseFlutterConfig") {
-    workingDir(rootProject.projectDir.parentFile)
-    commandLine(
-        flutterExecutable.absolutePath,
-        "build",
-        "apk",
-        "--release",
-        "--config-only",
-    )
-    inputs.file(rootProject.file("../.flutter-plugins-dependencies"))
-    outputs.file(file("src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java"))
-    outputs.upToDateWhen { false }
-}
-tasks.matching {
-    it.name == "compileReleaseJavaWithJavac" || it.name == "compileReleaseKotlin"
-}.configureEach {
-    dependsOn(releaseFlutterConfig)
-}
-
 android {
     namespace = "com.oceaneyes.oceaneyes"
     compileSdk = flutter.compileSdkVersion
