@@ -2,13 +2,21 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "OceanEyes (local preview)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "debug"
+    },
+    {
       "name": "OceanEyes (staging)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "flutterMode": "debug",
       "toolArgs": [
-        "--dart-define-from-file=C:\\secure\\oceaneyes-staging.json"
+        "--dart-define-from-file=C:\\secure\\oceaneyes-staging.json",
+        "--dart-define=OCEANEYES_PRODUCTION=true"
       ]
     }
   ]

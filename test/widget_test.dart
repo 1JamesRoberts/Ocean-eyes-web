@@ -3,18 +3,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
 import 'package:oceaneyes/ui/widgets/screen_primitives.dart';
-import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import 'support/oceaneyes_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<OceanEyesController> pumpReferenceApp(WidgetTester tester) async {
+  Future<FixtureOceanEyesController> pumpReferenceApp(
+    WidgetTester tester,
+  ) async {
     tester.view.physicalSize = const Size(393, 852);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse('https://oceaneyes.test/?fixture=populated'),
     );
     addTearDown(controller.dispose);
@@ -98,7 +100,7 @@ void main() {
     for (final size in const [Size(360, 640), Size(430, 932)]) {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
-      final controller = OceanEyesController();
+      final controller = FixtureOceanEyesController();
       await tester.pumpWidget(OceanEyesApp(controller: controller));
       await tester.pumpAndSettle();
 
@@ -333,7 +335,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse(
         'https://oceaneyes.test/?fixture=populated&tab=my_fish',
       ),

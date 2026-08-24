@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as image;
 import 'package:oceaneyes/models/classifiable_species.dart';
-import 'package:oceaneyes/models/demo_fixtures.dart';
-import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import 'support/oceaneyes_fixture.dart';
 
 void main() {
   const expectedClassifierIds = <String>[
@@ -80,7 +79,7 @@ void main() {
   });
 
   test('controller exposes only the classifier projection', () {
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse('https://oceaneyes.test/?fixture=populated'),
     );
     addTearDown(controller.dispose);

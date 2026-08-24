@@ -1,4 +1,5 @@
 {
+  "OCEANEYES_PRODUCTION": true,
   "OCEANEYES_GOOGLE_WEB_CLIENT_ID": "replace-with-your-web-oauth-client-id.apps.googleusercontent.com",
   "OCEANEYES_GOOGLE_IOS_CLIENT_ID": "replace-with-your-ios-oauth-client-id.apps.googleusercontent.com",
   "OCEANEYES_WEB_PUSH_VAPID_KEY": "replace-with-your-public-web-push-vapid-key",

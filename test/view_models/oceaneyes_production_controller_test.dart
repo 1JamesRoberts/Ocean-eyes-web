@@ -16,30 +16,33 @@ import 'package:oceaneyes/models/tank_pairing_codec.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 
 void main() {
-  test('direct and fixture controllers perform no production work', () async {
+  test('local preview never invokes composed production gateways', () async {
     final repository = _FakeProductionRepository();
     final auth = _FakeProductionAuth(user: _user);
-    final direct = OceanEyesController(
+    final controller = OceanEyesController(
+      localPreviewEnabled: true,
       productionRepository: repository,
       productionAuth: auth,
     );
-    final fixture = OceanEyesController(
-      productionRepository: repository,
-      productionAuth: auth,
-      launchUri: Uri.parse('https://oceaneyes.test/?fixture=populated'),
-    );
 
-    await direct.initializeProduction();
-    await fixture.initializeProduction();
+    await controller.initializeProduction();
+    final paired = await controller.pairTankPayload('tank-paired');
 
+    expect(paired, isTrue);
+    expect(controller.isAuthenticated, isTrue);
+    expect(controller.activeTankId, 'tank-paired');
     expect(repository.interactions, 0);
     expect(auth.interactions, 0);
-    expect(direct.productionEnabled, isFalse);
-    expect(fixture.productionEnabled, isFalse);
-    expect(fixture.fixtureScenario, FixtureScenario.populated);
 
-    direct.dispose();
-    fixture.dispose();
+    controller.disconnectTank();
+    final created = await controller.createProductionTank('Local Reef');
+
+    expect(created, 'tank-preview');
+    expect(controller.tankName, 'Local Reef');
+    expect(repository.interactions, 0);
+    expect(auth.interactions, 0);
+
+    controller.dispose();
     await repository.close();
     await auth.close();
   });
@@ -103,48 +106,6 @@ void main() {
     await auth.close();
   });
 
-  test(
-    'fixture pairing and creation stay local while matching production flow',
-    () async {
-      final repository = _FakeProductionRepository();
-      final auth = _FakeProductionAuth(user: _user);
-      final controller = OceanEyesController(
-        productionRepository: repository,
-        productionAuth: auth,
-        launchUri: Uri.parse('https://oceaneyes.test/'),
-      );
-
-      controller.disconnectTank();
-      expect(controller.tankConnected, isFalse);
-
-      final paired = await controller.pairTankPayload(
-        TankPairingCodec.encode(
-          const TankPairingPayload(tankId: 'tank-paired'),
-        ),
-      );
-
-      expect(paired, isTrue);
-      expect(controller.productionEnabled, isFalse);
-      expect(controller.tankConnected, isTrue);
-      expect(controller.cameraStage, CameraStage.active);
-      expect(controller.tankReferenceCode, 'tank-demo');
-      expect(repository.interactions, 0);
-
-      controller.disconnectTank();
-      final created = await controller.createProductionTank('Local Reef');
-
-      expect(created, 'tank-demo');
-      expect(controller.tankConnected, isTrue);
-      expect(controller.tankName, 'Local Reef');
-      expect(controller.cameraStage, CameraStage.active);
-      expect(repository.interactions, 0);
-
-      controller.dispose();
-      await repository.close();
-      await auth.close();
-    },
-  );
-
   test('production onboarding waits for the linked-tank lookup', () async {
     final repository = _FakeProductionRepository();
     final auth = _FakeProductionAuth(user: _user);
@@ -192,12 +153,9 @@ void main() {
 
   test('production controllers ignore fixture query parameters', () {
     final controller = OceanEyesController(
-      productionEnabled: true,
       launchUri: Uri.parse('https://oceaneyes.test/?fixture=populated'),
     );
 
-    expect(controller.productionEnabled, isTrue);
-    expect(controller.fixtureScenario, FixtureScenario.dashboardWaiting);
     expect(controller.fish, isEmpty);
 
     controller.dispose();
@@ -922,7 +880,6 @@ OceanEyesController _productionController(
   CameraHandoffDelay? cameraHandoffDelay,
 }) {
   return OceanEyesController(
-    productionEnabled: true,
     productionRepository: repository,
     productionAuth: auth,
     cameraGateway: cameraGateway,

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
-import 'package:oceaneyes/models/analytics_series_service.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
-import 'package:oceaneyes/models/demo_fixtures.dart';
+import 'support/oceaneyes_fixture.dart';
 import 'package:oceaneyes/models/fish_insights_service.dart';
 import 'package:oceaneyes/models/fish_inventory_repository.dart';
 import 'package:oceaneyes/ui/widgets/data_visuals.dart';
@@ -56,7 +55,7 @@ void main() {
       'controller preserves additions, deletions, and detected counts',
       () async {
         final repository = _MemoryFishInventoryRepository();
-        final first = OceanEyesController(
+        final first = FixtureOceanEyesController(
           inventoryRepository: repository,
           launchUri: Uri.parse('https://oceaneyes.test/'),
         )..applyFixture(FixtureScenario.populated, notify: false);
@@ -130,32 +129,34 @@ void main() {
       );
     });
 
-    test('analytics projections respect the selected inventory species', () {
-      final fish = DemoFixtures.populatedFish();
-      final cardinal = AnalyticsSeriesService.fishCount(fish, 'Cardinal Tetra');
-      final spread = AnalyticsSeriesService.spread(fish, 'Cardinal Tetra');
+    test('fixture analytics respect the selected inventory species', () {
+      final controller = FixtureOceanEyesController();
+      addTearDown(controller.dispose);
 
-      expect(cardinal.map((point) => point.value), [7, 8, 7, 8, 8, 8, 8]);
-      expect(spread.first.value, 34.4);
-      expect(AnalyticsSeriesService.fishCount(fish, 'Unknown'), isEmpty);
-      expect(AnalyticsSeriesService.spread(fish, 'Unknown'), isEmpty);
-      expect(
-        AnalyticsSeriesService.fishCount(const [], 'All species'),
-        isEmpty,
-      );
-      expect(AnalyticsSeriesService.spread(const [], 'All species'), isEmpty);
+      controller.setSelectedSpecies('Cardinal Tetra');
+      expect(controller.fishCountPoints.map((point) => point.value), [
+        7,
+        8,
+        7,
+        8,
+        8,
+        8,
+        8,
+      ]);
+      expect(controller.spreadPoints.first.value, 34.4);
 
-      final diagnostics = AnalyticsSeriesService.diagnostics(
-        fish,
-        'All species',
-      );
-      expect(diagnostics, hasLength(2));
-      expect(diagnostics.first.confidence, 96);
-      expect(diagnostics.last.confidence, 93);
+      controller.selectedSpecies = 'Unknown';
+      expect(controller.fishCountPoints, isEmpty);
+      expect(controller.spreadPoints, isEmpty);
+
+      controller.selectedSpecies = 'All species';
+      expect(controller.fishDiagnostics, hasLength(2));
+      expect(controller.fishDiagnostics.first.confidence, 96);
+      expect(controller.fishDiagnostics.last.confidence, 93);
     });
   });
 
-  test('fixture query ignores preferences and repository state', () async {
+  test('test fixture overlays persisted production state', () async {
     SharedPreferences.setMockInitialValues({
       'aiEnabled': false,
       'showDetections': false,
@@ -178,7 +179,7 @@ void main() {
       ),
     ]);
 
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       preferences: preferences,
       inventoryRepository: repository,
       launchUri: Uri.parse(
@@ -186,19 +187,19 @@ void main() {
       ),
     );
 
-    expect(repository.loadCount, 0);
+    expect(repository.loadCount, 1);
     expect(controller.aiEnabled, isTrue);
-    expect(controller.showDetections, isTrue);
-    expect(controller.brightness, 1);
-    expect(controller.ambientBlur, 48);
-    expect(controller.ambientOpacity, 1);
+    expect(controller.showDetections, isFalse);
+    expect(controller.brightness, 0.7);
+    expect(controller.ambientBlur, 0);
+    expect(controller.ambientOpacity, 0);
     expect(controller.totalFish, 20);
     expect(controller.fish.any((fish) => fish.id == 'persisted-only'), isFalse);
     controller.dispose();
   });
 
   test('direct alert details capture the current primary origin', () {
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse('https://oceaneyes.test/?fixture=populated'),
     );
 
@@ -214,7 +215,7 @@ void main() {
   });
 
   test('deleting the selected species resets the analytics filter', () {
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse('https://oceaneyes.test/?fixture=populated'),
     );
 
@@ -264,7 +265,7 @@ void main() {
   test('settings preview commits once and tank controls restore', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       preferences: preferences,
       launchUri: Uri.parse('https://oceaneyes.test/'),
     );
@@ -315,7 +316,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      final controller = OceanEyesController(
+      final controller = FixtureOceanEyesController(
         launchUri: Uri.parse(
           'https://oceaneyes.test/?fixture=fish_empty&tab=my_fish',
         ),

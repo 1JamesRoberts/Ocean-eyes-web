@@ -21,21 +21,6 @@ enum CameraStage {
 
 enum AlertSeverity { info, warning, critical }
 
-enum FixtureScenario {
-  populated,
-  dashboardWaiting,
-  dashboardWarning,
-  fishEmpty,
-  analyticsLoading,
-  analyticsEmpty,
-  analyticsError,
-  cameraPermission,
-  cameraDenied,
-  cameraUnavailable,
-  alertsEmpty,
-  historyEmpty,
-}
-
 /// A detection center expressed in normalized source-image coordinates.
 ///
 /// Keeping this type free of Flutter geometry classes lets inference/history

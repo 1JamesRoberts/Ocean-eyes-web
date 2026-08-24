@@ -97,15 +97,6 @@ class OceanEyesOnboardingCoordinator {
     _dismissibleAtWelcome = false;
   }
 
-  /// Provides the local preview/fixture equivalent of a resolved tank lookup.
-  void setLocalTankAvailability(bool connected) {
-    _tankLookupResolved = true;
-    _hasLinkedTank = connected;
-    _routeOpen = false;
-    _handoffVisible = false;
-    _dismissibleAtWelcome = false;
-  }
-
   void open({bool dismissibleAtWelcome = true}) {
     if (!_tankLookupResolved || _hasLinkedTank) return;
     _dismissibleAtWelcome = dismissibleAtWelcome;

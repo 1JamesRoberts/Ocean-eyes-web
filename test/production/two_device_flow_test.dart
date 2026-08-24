@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/integrations/camera/camera_capture_models.dart';
 import 'package:oceaneyes/integrations/livekit/livekit_gateway.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
-import 'package:oceaneyes/models/demo_fixtures.dart';
+import '../support/demo_fixtures.dart';
 import 'package:oceaneyes/models/production_auth.dart';
 import 'package:oceaneyes/models/production_data.dart';
 import 'package:oceaneyes/models/production_repository.dart';
@@ -171,7 +171,6 @@ OceanEyesController _controller(
   ProductionAuthGateway auth, {
   required OceanEyesLiveGateway live,
 }) => OceanEyesController(
-  productionEnabled: true,
   productionRepository: repository,
   productionAuth: auth,
   liveGateway: live,
@@ -388,7 +387,7 @@ final class _SharedProductionBackend {
         .map(
           (reading) => HistoryReading(
             date: reading.timestamp!,
-            clarity: reading.clarityScore!,
+            clarity: reading.turbidityFnu!,
             fishCount: reading.fishCount,
             summary: 'Shared production reading.',
             ph: reading.ph,

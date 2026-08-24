@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:oceaneyes/models/demo_fixtures.dart';
+import 'support/demo_fixtures.dart';
 import 'package:oceaneyes/models/fish_motion_scene.dart';
 
 void main() {

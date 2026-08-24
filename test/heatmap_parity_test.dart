@@ -1,8 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
-import 'package:oceaneyes/models/demo_fixtures.dart';
+import 'support/oceaneyes_fixture.dart';
 import 'package:oceaneyes/ui/widgets/data_visuals.dart';
-import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 
 void main() {
   group('reference heatmap raster', () {
@@ -81,7 +80,7 @@ void main() {
 
   group('heatmap fixture projection', () {
     test('filters populated centers by the selected inventory species', () {
-      final controller = OceanEyesController()
+      final controller = FixtureOceanEyesController()
         ..applyFixture(FixtureScenario.populated, notify: false);
 
       expect(controller.selectedHeatmapCenters, hasLength(7));
@@ -102,7 +101,7 @@ void main() {
     });
 
     test('clears centers for every no-data analytics fixture', () {
-      final controller = OceanEyesController();
+      final controller = FixtureOceanEyesController();
       for (final scenario in [
         FixtureScenario.dashboardWaiting,
         FixtureScenario.analyticsLoading,

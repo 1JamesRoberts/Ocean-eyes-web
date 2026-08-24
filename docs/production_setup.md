@@ -1,7 +1,8 @@
 # Production setup
 
-OceanEyes has one application runtime: the Firebase-backed production stack.
-Tests use injected fakes, but the shipped app never falls back to fixture data.
+OceanEyes ships a Firebase-backed production stack. Debug/profile runs also
+have a credential-free local preview for UI development; release builds never
+use that preview. Tests use injected fakes.
 
 ## Firebase client configuration
 
@@ -45,13 +46,25 @@ flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-pr
 flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
 
+For local UI development, run the app normally:
+
+```powershell
+flutter run
+```
+
+Debug and profile runs default to a credential-free local preview. To run the
+Firebase-backed staging stack from debug mode, the define file must include
+`"OCEANEYES_PRODUCTION": true` (or pass
+`--dart-define=OCEANEYES_PRODUCTION=true`).
+
 The shared VS Code Run/Debug configuration launches `lib/main.dart` in debug
 mode with `C:\secure\oceaneyes-staging.json`. Keep that private staging file at
-the configured path; it remains outside version control. A bare `flutter run`
-still intentionally fails closed when required OAuth values are absent.
+the configured path; it remains outside version control. The local preview
+configuration is available alongside it in the Run and Debug menu.
 
-The application validates these values before initializing Firebase. There is
-no separate production flag, release guard, emulator mode, or wrapper script.
+Production mode validates these values before initializing Firebase. The
+`OCEANEYES_PRODUCTION` flag selects production for debug/profile runs, while
+release builds always use production regardless of that flag.
 
 ## App Check and Google sign-in
 

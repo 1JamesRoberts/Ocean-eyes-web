@@ -6,6 +6,7 @@ import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
 import 'package:oceaneyes/models/onboarding_models.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import '../test/support/oceaneyes_fixture.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -82,22 +83,22 @@ void main() {
 
     await capture(
       tester,
-      OceanEyesController(
+      FixtureOceanEyesController(
         launchUri: Uri.parse('https://oceaneyes.test/?fixture=login'),
       ),
       'login__idle',
     );
 
-    final onboardingWelcome = OceanEyesController()..disconnectTank();
+    final onboardingWelcome = FixtureOceanEyesController()..disconnectTank();
     onboardingWelcome.openOnboarding();
     await capture(tester, onboardingWelcome, 'onboarding__welcome');
 
-    final onboardingChoice = OceanEyesController()..disconnectTank();
+    final onboardingChoice = FixtureOceanEyesController()..disconnectTank();
     onboardingChoice.openOnboarding();
     onboardingChoice.continueOnboardingFromWelcome();
     await capture(tester, onboardingChoice, 'onboarding__choice');
 
-    final onboardingManual = OceanEyesController()..disconnectTank();
+    final onboardingManual = FixtureOceanEyesController()..disconnectTank();
     onboardingManual.openOnboarding();
     onboardingManual.continueOnboardingFromWelcome();
     onboardingManual.chooseOnboardingPath(OnboardingPath.joinExisting);
@@ -111,14 +112,14 @@ void main() {
       },
     );
 
-    final onboardingOwner = OceanEyesController()..disconnectTank();
+    final onboardingOwner = FixtureOceanEyesController()..disconnectTank();
     onboardingOwner.openOnboarding();
     onboardingOwner.continueOnboardingFromWelcome();
     onboardingOwner.chooseOnboardingPath(OnboardingPath.newTank);
     await onboardingOwner.createProductionTank('My Aquarium');
     await capture(tester, onboardingOwner, 'onboarding__owner-success');
 
-    final noTankDashboard = OceanEyesController()..disconnectTank();
+    final noTankDashboard = FixtureOceanEyesController()..disconnectTank();
     await capture(tester, noTankDashboard, 'dashboard__no-tank');
 
     for (final entry in <(FixtureScenario, String)>[
@@ -126,11 +127,11 @@ void main() {
       (FixtureScenario.populated, 'dashboard__healthy'),
       (FixtureScenario.dashboardWarning, 'dashboard__warning'),
     ]) {
-      final controller = OceanEyesController()
+      final controller = FixtureOceanEyesController()
         ..applyFixture(entry.$1, notify: false);
       await capture(tester, controller, entry.$2);
     }
-    final dashboardNoAlerts = OceanEyesController()
+    final dashboardNoAlerts = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..alerts = const [];
     await capture(tester, dashboardNoAlerts, 'dashboard__no-alerts');
@@ -139,12 +140,12 @@ void main() {
       (FixtureScenario.fishEmpty, 'my-fish__empty'),
       (FixtureScenario.populated, 'my-fish__populated'),
     ]) {
-      final controller = OceanEyesController()
+      final controller = FixtureOceanEyesController()
         ..applyFixture(entry.$1, notify: false)
         ..activeTab = PrimaryTab.myFish;
       await capture(tester, controller, entry.$2);
     }
-    final expandedFish = OceanEyesController()
+    final expandedFish = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.myFish
       ..expandedFishId = 'fish-cardinal';
@@ -156,7 +157,7 @@ void main() {
       (FixtureScenario.analyticsError, 'analytics__error'),
       (FixtureScenario.populated, 'analytics__populated'),
     ]) {
-      final controller = OceanEyesController()
+      final controller = FixtureOceanEyesController()
         ..applyFixture(entry.$1, notify: false)
         ..activeTab = PrimaryTab.analytics;
       await capture(tester, controller, entry.$2);
@@ -168,19 +169,19 @@ void main() {
       (FixtureScenario.cameraUnavailable, 'account__unavailable'),
       (FixtureScenario.populated, 'account__active-camera'),
     ]) {
-      final controller = OceanEyesController()
+      final controller = FixtureOceanEyesController()
         ..applyFixture(entry.$1, notify: false)
         ..activeTab = PrimaryTab.account;
       await capture(tester, controller, entry.$2);
     }
 
-    final disconnectedAccount = OceanEyesController()
+    final disconnectedAccount = FixtureOceanEyesController()
       ..activeTab = PrimaryTab.account
       ..tankConnected = false
       ..cameraStage = CameraStage.unavailable;
     await capture(tester, disconnectedAccount, 'account__disconnected');
 
-    final pairingSheet = OceanEyesController()
+    final pairingSheet = FixtureOceanEyesController()
       ..activeTab = PrimaryTab.account
       ..tankConnected = false
       ..cameraStage = CameraStage.unavailable;
@@ -198,7 +199,7 @@ void main() {
       },
     );
 
-    final streamDisclosure = OceanEyesController()
+    final streamDisclosure = FixtureOceanEyesController()
       ..activeTab = PrimaryTab.account;
     await capture(
       tester,
@@ -214,7 +215,7 @@ void main() {
       },
     );
 
-    final thresholdDisclosure = OceanEyesController()
+    final thresholdDisclosure = FixtureOceanEyesController()
       ..activeTab = PrimaryTab.account;
     await capture(
       tester,
@@ -234,7 +235,8 @@ void main() {
       },
     );
 
-    final aiPreferences = OceanEyesController()..activeTab = PrimaryTab.account;
+    final aiPreferences = FixtureOceanEyesController()
+      ..activeTab = PrimaryTab.account;
     await capture(
       tester,
       aiPreferences,
@@ -253,30 +255,30 @@ void main() {
       },
     );
 
-    final alertList = OceanEyesController()
+    final alertList = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..secondaryRoute = SecondaryRoute.alerts;
     await capture(tester, alertList, 'alerts__list');
-    final alertEmpty = OceanEyesController()
+    final alertEmpty = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.alertsEmpty, notify: false)
       ..secondaryRoute = SecondaryRoute.alerts;
     await capture(tester, alertEmpty, 'alerts__empty');
-    final alertDetail = OceanEyesController()
+    final alertDetail = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..secondaryRoute = SecondaryRoute.alerts
       ..selectedAlertId = 'alert-turbidity';
     await capture(tester, alertDetail, 'alerts__detail');
 
-    final history = OceanEyesController()
+    final history = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..secondaryRoute = SecondaryRoute.history;
     await capture(tester, history, 'history__populated');
-    final historyEmpty = OceanEyesController()
+    final historyEmpty = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.historyEmpty, notify: false)
       ..secondaryRoute = SecondaryRoute.history;
     await capture(tester, historyEmpty, 'history__empty');
 
-    final addFish = OceanEyesController()..activeTab = PrimaryTab.myFish;
+    final addFish = FixtureOceanEyesController()..activeTab = PrimaryTab.myFish;
     await capture(
       tester,
       addFish,
@@ -288,7 +290,7 @@ void main() {
       },
     );
 
-    final countAdjusted = OceanEyesController()
+    final countAdjusted = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.myFish
       ..expandedFishId = 'fish-cardinal';
@@ -304,7 +306,7 @@ void main() {
       },
     );
 
-    final deleteFish = OceanEyesController()
+    final deleteFish = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.myFish
       ..expandedFishId = 'fish-cardinal';
@@ -321,7 +323,7 @@ void main() {
       },
     );
 
-    final speciesSelector = OceanEyesController()
+    final speciesSelector = FixtureOceanEyesController()
       ..activeTab = PrimaryTab.analytics;
     await capture(
       tester,
@@ -336,7 +338,8 @@ void main() {
       },
     );
 
-    final calendar = OceanEyesController()..activeTab = PrimaryTab.analytics;
+    final calendar = FixtureOceanEyesController()
+      ..activeTab = PrimaryTab.analytics;
     await capture(
       tester,
       calendar,
@@ -351,7 +354,8 @@ void main() {
       },
     );
 
-    final timeWheel = OceanEyesController()..activeTab = PrimaryTab.analytics;
+    final timeWheel = FixtureOceanEyesController()
+      ..activeTab = PrimaryTab.analytics;
     await capture(
       tester,
       timeWheel,
@@ -365,13 +369,13 @@ void main() {
       },
     );
 
-    final aiDisabled = OceanEyesController()
+    final aiDisabled = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.account
       ..aiEnabled = false;
     await capture(tester, aiDisabled, 'account__ai-disabled');
 
-    final turbidity = OceanEyesController()
+    final turbidity = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.account;
     await capture(
@@ -385,20 +389,20 @@ void main() {
       },
     );
 
-    final fullscreen = OceanEyesController()
+    final fullscreen = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.account
       ..fullscreenCamera = true;
     await capture(tester, fullscreen, 'account__fullscreen');
 
-    final fullscreenInventory = OceanEyesController()
+    final fullscreenInventory = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..activeTab = PrimaryTab.account
       ..fullscreenCamera = true
       ..inventoryDrawerOpen = true;
     await capture(tester, fullscreenInventory, 'account__fullscreen-inventory');
 
-    final resolvedAlert = OceanEyesController()
+    final resolvedAlert = FixtureOceanEyesController()
       ..applyFixture(FixtureScenario.populated, notify: false)
       ..secondaryRoute = SecondaryRoute.alerts
       ..selectedAlertId = 'alert-turbidity';
@@ -422,7 +426,8 @@ void main() {
     );
 
     tester.view.viewInsets = const FakeViewPadding(bottom: 280);
-    final keyboard = OceanEyesController()..activeTab = PrimaryTab.myFish;
+    final keyboard = FixtureOceanEyesController()
+      ..activeTab = PrimaryTab.myFish;
     await capture(
       tester,
       keyboard,
@@ -438,17 +443,18 @@ void main() {
     const safeArea = FakeViewPadding(top: 47, bottom: 34);
     tester.view.padding = safeArea;
     tester.view.viewPadding = safeArea;
-    await capture(tester, OceanEyesController(), 'global__safe-area');
+    await capture(tester, FixtureOceanEyesController(), 'global__safe-area');
     tester.view.padding = FakeViewPadding.zero;
     tester.view.viewPadding = FakeViewPadding.zero;
 
     tester.platformDispatcher.textScaleFactorTestValue = 1.6;
-    await capture(tester, OceanEyesController(), 'global__large-text');
+    await capture(tester, FixtureOceanEyesController(), 'global__large-text');
     tester.platformDispatcher.clearTextScaleFactorTestValue();
 
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
-    final reducedMotion = OceanEyesController()..activeTab = PrimaryTab.myFish;
+    final reducedMotion = FixtureOceanEyesController()
+      ..activeTab = PrimaryTab.myFish;
     await capture(tester, reducedMotion, 'global__reduced-motion');
     tester.platformDispatcher.clearAccessibilityFeaturesTestValue();
   });

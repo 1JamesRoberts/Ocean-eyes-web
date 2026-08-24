@@ -4,7 +4,7 @@ import 'package:oceaneyes/models/aquarium_models.dart';
 import 'package:oceaneyes/ui/screens/alerts_screen.dart';
 import 'package:oceaneyes/ui/screens/history_screen.dart';
 import 'package:oceaneyes/ui/widgets/data_visuals.dart';
-import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import 'support/oceaneyes_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +34,7 @@ void main() {
   testWidgets('alert detail exposes diagnostics and reference large action', (
     tester,
   ) async {
-    final controller = OceanEyesController();
+    final controller = FixtureOceanEyesController();
     addTearDown(controller.dispose);
     controller.applyFixture(FixtureScenario.populated, notify: false);
     final alert = controller.alerts.first;
@@ -67,7 +67,7 @@ void main() {
   testWidgets('history uses latest seven and matches reading row content', (
     tester,
   ) async {
-    final controller = OceanEyesController();
+    final controller = FixtureOceanEyesController();
     addTearDown(controller.dispose);
     final newest = DateTime(2026, 8, 1, 12);
     controller.history = List<HistoryReading>.generate(
@@ -108,7 +108,7 @@ void main() {
   testWidgets('alerts and history remain overflow-free at 360px', (
     tester,
   ) async {
-    final controller = OceanEyesController();
+    final controller = FixtureOceanEyesController();
     addTearDown(controller.dispose);
     controller.applyFixture(FixtureScenario.populated, notify: false);
 

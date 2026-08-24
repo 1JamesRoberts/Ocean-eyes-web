@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/ui/widgets/aquarium_hero.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import 'support/oceaneyes_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,7 @@ void main() {
   testWidgets('Dev mode keeps the deterministic aquarium artwork', (
     tester,
   ) async {
-    final controller = OceanEyesController();
+    final controller = FixtureOceanEyesController();
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
@@ -57,7 +58,7 @@ void main() {
   testWidgets('production mode never falls back to demo aquarium artwork', (
     tester,
   ) async {
-    final controller = OceanEyesController(productionEnabled: true);
+    final controller = OceanEyesController();
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(

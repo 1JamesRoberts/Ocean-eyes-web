@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
-import 'package:oceaneyes/models/demo_fixtures.dart';
+import 'support/oceaneyes_fixture.dart';
 import 'package:oceaneyes/ui/widgets/glass.dart';
 import 'package:oceaneyes/ui/widgets/screen_primitives.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
@@ -31,7 +31,7 @@ void main() {
   testWidgets('fixture Account screen uses the release tank controls', (
     tester,
   ) async {
-    final controller = OceanEyesController();
+    final controller = FixtureOceanEyesController();
     addTearDown(controller.dispose);
     await pumpAccount(tester, controller);
 
@@ -54,7 +54,7 @@ void main() {
   testWidgets('Account screen subcards use transparent surfaces', (
     tester,
   ) async {
-    final controller = OceanEyesController();
+    final controller = FixtureOceanEyesController();
     addTearDown(controller.dispose);
     await pumpAccount(tester, controller);
 
@@ -84,7 +84,7 @@ void main() {
   });
 
   testWidgets('AI species entries keep their borders', (tester) async {
-    final controller = OceanEyesController()
+    final controller = FixtureOceanEyesController()
       ..cameraStage = CameraStage.active
       ..fish = DemoFixtures.populatedFish();
     addTearDown(controller.dispose);
@@ -110,7 +110,7 @@ void main() {
   testWidgets('fixture pairing entry opens the shared pairing sheet', (
     tester,
   ) async {
-    final controller = OceanEyesController()
+    final controller = FixtureOceanEyesController()
       ..tankConnected = false
       ..cameraStage = CameraStage.unavailable;
     addTearDown(controller.dispose);
@@ -131,21 +131,22 @@ void main() {
     expect(find.text('Connect a tank'), findsOneWidget);
   });
 
-  testWidgets('fixture tank controls expose a local demo pairing QR', (
+  testWidgets('tank controls expose the active tank pairing QR', (
     tester,
   ) async {
-    final controller = OceanEyesController();
+    final controller = FixtureOceanEyesController()..activeTankId = 'tank-test';
     addTearDown(controller.dispose);
     await pumpAccount(tester, controller);
 
     final qrButton = find.byTooltip('Show tank pairing QR code');
     expect(qrButton, findsOneWidget);
 
+    await tester.ensureVisible(qrButton);
     await tester.tap(qrButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Tank pairing code'), findsOneWidget);
-    expect(find.text('tank-demo'), findsOneWidget);
+    expect(find.text('tank-test'), findsOneWidget);
     final qr = find.byType(QrImageView);
     expect(qr, findsOneWidget);
     final qrSemantics = tester
@@ -153,13 +154,13 @@ void main() {
           find.ancestor(of: qr, matching: find.byType(Semantics)),
         )
         .map((semantics) => semantics.properties.label);
-    expect(qrSemantics, contains('QR code for tank tank-demo'));
+    expect(qrSemantics, contains('QR code for tank tank-test'));
   });
 
   testWidgets('disconnect keeps shared settings available in fixture mode', (
     tester,
   ) async {
-    final controller = OceanEyesController();
+    final controller = FixtureOceanEyesController();
     addTearDown(controller.dispose);
     await pumpAccount(tester, controller);
 
@@ -180,7 +181,7 @@ void main() {
   testWidgets('production retains gated account controls and shared settings', (
     tester,
   ) async {
-    final controller = OceanEyesController(productionEnabled: true);
+    final controller = OceanEyesController()..tankConnected = true;
     addTearDown(controller.dispose);
     await pumpAccount(tester, controller);
 

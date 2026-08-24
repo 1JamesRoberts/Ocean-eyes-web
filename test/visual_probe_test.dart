@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
-import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import 'support/oceaneyes_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -12,7 +12,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse(
         'https://oceaneyes.test/?fixture=populated&tab=dashboard',
       ),

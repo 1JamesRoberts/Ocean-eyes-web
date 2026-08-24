@@ -14,6 +14,16 @@ platform registrations change:
 flutterfire configure --project ocean-eyes-webapp
 ```
 
+Run the credential-free local preview during UI development:
+
+```powershell
+flutter pub get
+flutter run
+```
+
+Debug and profile runs use the local preview by default. The VS Code Run/Debug
+menu includes the same `OceanEyes (local preview)` configuration.
+
 Copy `config/production.example.json` to a secure location outside the
 repository and replace its placeholders. The file contains only OAuth, web
 messaging/App Check, Functions, and legal-link values; Firebase application
@@ -65,11 +75,13 @@ and wake-lock lifecycles out of widgets. Models contain no Flutter UI code.
 
 ## Production boundary
 
-The application always starts through the Firebase/auth/Firestore composition
-root. Firebase options are generated once by FlutterFire; runtime defines are
-limited to the values that cannot be represented there. App Check uses the
-production provider on Android, iOS, and web. Missing configuration stops
-startup with an actionable error instead of silently showing demo data.
+Release builds always start through the Firebase/auth/Firestore production
+composition root. Firebase options are generated once by FlutterFire; runtime
+defines are limited to the values that cannot be represented there. App Check
+uses the production provider on Android, iOS, and web. Missing production
+configuration stops startup with an actionable error instead of silently
+showing demo data. Debug/profile local preview runs deliberately skip Firebase
+composition and do not require production credentials.
 
 The production validation record is in
 [`docs/production_validation.md`](docs/production_validation.md). Backend

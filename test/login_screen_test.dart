@@ -2,7 +2,7 @@ import 'dart:ui' show Size;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/app/oceaneyes_app.dart';
-import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import 'support/oceaneyes_fixture.dart';
 
 void main() {
   testWidgets('login fixture matches the mock Google transition', (
@@ -13,7 +13,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse('https://oceaneyes.test/?fixture=login'),
     );
     addTearDown(controller.dispose);
@@ -47,7 +47,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse('https://oceaneyes.test/?route=login'),
     );
     addTearDown(controller.dispose);

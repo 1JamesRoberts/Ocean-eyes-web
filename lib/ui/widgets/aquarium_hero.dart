@@ -155,8 +155,7 @@ class _AmbientBottomSample extends StatelessWidget {
   }
 }
 
-/// Applies the same stream adjustments everywhere the frozen camera fixture is
-/// rendered so the hero and fullscreen view cannot drift apart.
+/// Applies the same stream adjustments in the hero and fullscreen view.
 class AquariumStreamImage extends StatelessWidget {
   const AquariumStreamImage({
     super.key,
@@ -196,14 +195,14 @@ class AquariumStreamImage extends StatelessWidget {
         alignment: alignment,
         gaplessPlayback: true,
       );
-    } else if (controller.productionEnabled) {
-      streamImage = const _ProductionUnavailableFeed();
-    } else {
+    } else if (controller.localPreviewEnabled) {
       streamImage = Image.asset(
         'assets/images/aquarium_hero.png',
         fit: fit,
         alignment: alignment,
       );
+    } else {
+      streamImage = const _ProductionUnavailableFeed();
     }
 
     Widget image = ColorFiltered(

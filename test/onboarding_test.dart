@@ -4,6 +4,7 @@ import 'package:oceaneyes/app/oceaneyes_app.dart';
 import 'package:oceaneyes/models/onboarding_models.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'support/oceaneyes_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,9 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = OceanEyesController()..disconnectTank();
+    final controller = FixtureOceanEyesController(
+      launchUri: Uri.parse('https://oceaneyes.test/?fixture=dashboard_waiting'),
+    )..disconnectTank();
     controller.openOnboarding();
     addTearDown(controller.dispose);
     await tester.pumpWidget(OceanEyesApp(controller: controller));
@@ -65,7 +68,7 @@ void main() {
     expect(controller.onboardingState.status, OnboardingStatus.completed);
     expect(controller.onboardingState.step, OnboardingStep.ownerPairing);
     expect(find.text('Your tank is ready'), findsOneWidget);
-    expect(find.text('tank-demo'), findsOneWidget);
+    expect(find.text('tank-preview'), findsOneWidget);
     expect(find.text('Go to dashboard'), findsOneWidget);
 
     final copyButton = find.byKey(const ValueKey('onboarding-copy-tank-id'));
@@ -150,7 +153,7 @@ void main() {
     for (final size in const [Size(360, 640), Size(430, 932)]) {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
-      final controller = OceanEyesController()..disconnectTank();
+      final controller = FixtureOceanEyesController()..disconnectTank();
       controller.openOnboarding();
       await tester.pumpWidget(OceanEyesApp(controller: controller));
       await tester.pump(const Duration(milliseconds: 400));
@@ -174,7 +177,7 @@ void main() {
   test('onboarding persistence does not store raw pairing values', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
-    final controller = OceanEyesController(preferences: preferences)
+    final controller = FixtureOceanEyesController(preferences: preferences)
       ..disconnectTank();
     controller.openOnboarding();
     controller.continueOnboardingFromWelcome();

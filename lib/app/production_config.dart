@@ -13,10 +13,13 @@ class OceanEyesProductionConfig {
     required this.recaptchaV3SiteKey,
     required this.privacyPolicyUrl,
     required this.termsOfServiceUrl,
+    this.productionEnabled = true,
   });
 
   factory OceanEyesProductionConfig.fromEnvironment() {
     return const OceanEyesProductionConfig(
+      productionEnabled:
+          bool.fromEnvironment('OCEANEYES_PRODUCTION') || kReleaseMode,
       googleWebClientId: String.fromEnvironment(
         'OCEANEYES_GOOGLE_WEB_CLIENT_ID',
       ),
@@ -33,6 +36,11 @@ class OceanEyesProductionConfig {
   }
 
   static const functionsRegion = 'us-central1';
+
+  /// Debug/profile runs are local previews unless production is explicitly
+  /// enabled. Release builds default to production and therefore still fail
+  /// closed when their private configuration is missing.
+  final bool productionEnabled;
   final String googleWebClientId;
   final String iosClientId;
   final String webPushVapidKey;
@@ -43,6 +51,8 @@ class OceanEyesProductionConfig {
   /// Returns a concise startup error instead of allowing a partially
   /// configured customer build to continue into Firebase initialization.
   String? validate() {
+    if (!productionEnabled) return null;
+
     final errors = <String>[];
     if (!kIsWeb &&
         defaultTargetPlatform != TargetPlatform.android &&

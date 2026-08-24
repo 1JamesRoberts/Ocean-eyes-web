@@ -1,5 +1,5 @@
-import 'aquarium_models.dart';
-import 'classifiable_species.dart';
+import 'package:oceaneyes/models/aquarium_models.dart';
+import 'package:oceaneyes/models/classifiable_species.dart';
 
 abstract final class DemoFixtures {
   static final species = ClassifiableSpeciesCatalog.options;

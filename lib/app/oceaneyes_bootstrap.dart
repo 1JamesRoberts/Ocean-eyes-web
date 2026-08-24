@@ -43,6 +43,21 @@ Future<OceanEyesController> bootstrapOceanEyesController({
   final settings = SharedPreferencesOceanEyesSettingsRepository(preferences);
   final config = OceanEyesProductionConfig.fromEnvironment();
 
+  if (!config.productionEnabled) {
+    final controller = OceanEyesController(
+      preferences: preferences,
+      inventoryRepository: inventory,
+      settingsRepository: settings,
+      onboardingRepository: SharedPreferencesOnboardingRepository(preferences),
+      launchUri: uri,
+      localPreviewEnabled: true,
+    );
+    // Local preview has no auth gateway, so keep the shell available for
+    // development without requiring Firebase credentials.
+    controller.isAuthenticated = true;
+    return controller;
+  }
+
   final validationError = config.validate();
   if (validationError != null) {
     throw OceanEyesBootstrapException(validationError);
@@ -75,7 +90,6 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       settingsRepository: settings,
       onboardingRepository: SharedPreferencesOnboardingRepository(preferences),
       launchUri: uri,
-      productionEnabled: true,
       productionRepository: repository,
       productionAuth: auth,
       cameraGateway: ProductionCameraCaptureGateway(),

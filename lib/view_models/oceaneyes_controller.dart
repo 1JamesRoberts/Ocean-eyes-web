@@ -11,9 +11,8 @@ import '../integrations/firebase/firebase_notification_service.dart';
 import '../integrations/livekit/livekit_gateway.dart';
 import '../integrations/ml/onnx_fish_inference.dart';
 import '../integrations/power/wake_lock_gateway.dart';
-import '../models/analytics_series_service.dart';
 import '../models/aquarium_models.dart';
-import '../models/demo_fixtures.dart';
+import '../models/classifiable_species.dart';
 import '../models/customer_error_message.dart';
 import '../models/fish_insights_service.dart';
 import '../models/fish_inventory_repository.dart';
@@ -25,7 +24,6 @@ import '../models/production_data.dart';
 import '../models/production_repository.dart';
 import '../models/tank_pairing_codec.dart';
 import 'oceaneyes_camera_coordinator.dart';
-import 'oceaneyes_fixture_coordinator.dart';
 import 'oceaneyes_live_session_coordinator.dart';
 import 'oceaneyes_navigation_coordinator.dart';
 import 'oceaneyes_onboarding_coordinator.dart';
@@ -41,8 +39,7 @@ class OceanEyesController extends ChangeNotifier
     OceanEyesSettingsRepository? settingsRepository,
     OnboardingRepository? onboardingRepository,
     Uri? launchUri,
-    bool requireLogin = false,
-    this.productionEnabled = false,
+    this.localPreviewEnabled = false,
     ProductionOceanEyesRepository? productionRepository,
     ProductionAuthGateway? productionAuth,
     CameraCaptureGateway? cameraGateway,
@@ -83,7 +80,7 @@ class OceanEyesController extends ChangeNotifier
       onError: _recordProductionError,
     );
     _camera = OceanEyesCameraCoordinator(
-      enabled: productionEnabled,
+      enabled: !localPreviewEnabled,
       host: this,
       repository: _productionRepository,
       gateway: cameraGateway,
@@ -98,7 +95,7 @@ class OceanEyesController extends ChangeNotifier
       onChanged: _notify,
     );
     _liveSession = OceanEyesLiveSessionCoordinator(
-      enabled: productionEnabled,
+      enabled: !localPreviewEnabled,
       repository: _productionRepository,
       camera: cameraGateway,
       gateway: liveGateway,
@@ -122,30 +119,23 @@ class OceanEyesController extends ChangeNotifier
       onError: _recordProductionError,
     );
     final uri = launchUri ?? Uri.base;
-    final requestedFixture = uri.queryParameters['fixture'];
-    final forceLogin =
-        requestedFixture?.toLowerCase().replaceAll('-', '_') == 'login' ||
-        uri.queryParameters['route'] == 'login';
-    isAuthenticated = productionEnabled
-        ? productionAuth?.currentUser != null
-        : !(forceLogin || (requireLogin && requestedFixture == null));
-    final shouldApplyFixture =
-        !productionEnabled && requestedFixture != null && !forceLogin;
-    if (shouldApplyFixture) {
-      applyFixtureName(requestedFixture, notify: false);
-    } else {
-      _restorePreferences();
-    }
+    isAuthenticated =
+        localPreviewEnabled || productionAuth?.currentUser != null;
+    _restorePreferences();
     _onboarding.loadForAccount(_onboardingAccountNamespace);
-    _onboarding.setLocalTankAvailability(tankConnected);
+    if (localPreviewEnabled) {
+      _onboarding.resolveTankLookup(
+        tankConnected ? const ['tank-preview'] : const [],
+        autoPresent: false,
+      );
+    }
     _navigation.configureLaunch(uri);
   }
 
-  /// Starts production subscriptions after Firebase auth has been composed by
-  /// the app bootstrap. This is deliberately separate from
-  /// the synchronous constructor used by unit tests and deterministic URLs.
+  /// Starts service subscriptions after the app bootstrap has composed the
+  /// controller's gateways.
   Future<void> initializeProduction() async {
-    if (!productionEnabled || _productionInitialized || _disposed) return;
+    if (localPreviewEnabled || _productionInitialized || _disposed) return;
     if (!_productionBindings.isAvailable) {
       productionError ??= 'Production services are not available.';
       _notify();
@@ -472,7 +462,7 @@ class OceanEyesController extends ChangeNotifier
   Future<void> stopLiveStream() => _liveSession.stop();
 
   void _queueProductionWrite(Future<void> Function() operation) {
-    if (!productionEnabled || _productionRepository == null) return;
+    if (_productionRepository == null) return;
     _productionWriteQueue = _productionWriteQueue.then((_) async {
       try {
         await operation();
@@ -577,8 +567,6 @@ class OceanEyesController extends ChangeNotifier
 
   static const String _activeTankPreferenceKey =
       'oceaneyes.production.active_tank.v1';
-  static const OceanEyesFixtureCoordinator _fixtures =
-      OceanEyesFixtureCoordinator();
   late final OceanEyesNavigationCoordinator _navigation;
 
   PrimaryTab get activeTab => _navigation.activeTab;
@@ -598,10 +586,10 @@ class OceanEyesController extends ChangeNotifier
   bool notificationPermissionGranted = false;
   bool notificationPermissionRequesting = false;
 
-  /// True only when the application composition explicitly enables the
-  /// production runtime. Direct test controllers default to false and can
-  /// continue to use deterministic fixture URLs without platform plugins.
-  final bool productionEnabled;
+  /// Enables a credential-free shell for UI development. Test fixtures add
+  /// deterministic data outside `lib/`; release builds never enable this.
+  final bool localPreviewEnabled;
+
   @override
   String? productionError;
   bool pairingInProgress = false;
@@ -616,7 +604,6 @@ class OceanEyesController extends ChangeNotifier
   @override
   Uint8List? latestCameraFrameBytes;
 
-  FixtureScenario fixtureScenario = FixtureScenario.dashboardWaiting;
   DashboardHealthState dashboardHealth = DashboardHealthState.waiting;
   AnalyticsContentState analyticsState = AnalyticsContentState.empty;
   @override
@@ -631,7 +618,7 @@ class OceanEyesController extends ChangeNotifier
   List<NormalizedDetectionCenter> heatmapCenters = const [];
   @override
   DetectionFrameDimensions heatmapSourceDimensions =
-      DemoFixtures.heatmapSourceDimensions;
+      const DetectionFrameDimensions(width: 1, height: 1);
 
   String? expandedFishId;
   String selectedSpecies = 'All species';
@@ -675,30 +662,30 @@ class OceanEyesController extends ChangeNotifier
   double ambientFadeEnd = 100;
   double heroFadeStart = 70;
   @override
-  String? lastTurbidityResult = '1.5 FNU';
-  String tankName = 'Living Room Reef';
+  String? lastTurbidityResult;
+  String tankName = 'My Aquarium';
   @override
-  bool tankConnected = true;
+  bool tankConnected = false;
   @override
   bool usingFrontCamera = false;
 
   Future<void> signInWithGoogle() async {
-    if (productionEnabled) {
-      await _signInProductionWithGoogle();
+    if (localPreviewEnabled) {
+      if (isAuthenticated || isAuthenticating) return;
+      isAuthenticating = true;
+      _notify();
+      await Future<void>.delayed(const Duration(milliseconds: 650));
+      if (_disposed) return;
+      isAuthenticating = false;
+      isAuthenticated = true;
+      _notify();
       return;
     }
-    if (isAuthenticated || isAuthenticating) return;
-    isAuthenticating = true;
-    _notify();
-    await Future<void>.delayed(const Duration(milliseconds: 650));
-    if (_disposed) return;
-    isAuthenticating = false;
-    isAuthenticated = true;
-    _notify();
+    await _signInProductionWithGoogle();
   }
 
   Future<void> _signInProductionWithGoogle() async {
-    if (!productionEnabled || isAuthenticated || isAuthenticating) {
+    if (isAuthenticated || isAuthenticating) {
       return;
     }
     if (!_productionBindings.isAvailable) {
@@ -732,7 +719,8 @@ class OceanEyesController extends ChangeNotifier
   }
 
   Future<void> signOut() async {
-    if (!productionEnabled || !isAuthenticated || isAuthenticating) return;
+    if (localPreviewEnabled) return;
+    if (!isAuthenticated || isAuthenticating) return;
     if (!_productionBindings.isAvailable) {
       productionError =
           'Sign-out is unavailable because authentication did not start.';
@@ -757,8 +745,7 @@ class OceanEyesController extends ChangeNotifier
   }
 
   Future<void> requestNotificationPermission() async {
-    if (!productionEnabled ||
-        !isAuthenticated ||
+    if (!isAuthenticated ||
         notificationPermissionRequesting ||
         !_productionBindings.isAvailable) {
       return;
@@ -784,7 +771,7 @@ class OceanEyesController extends ChangeNotifier
 
   Future<bool> pairTankPayload(String value) async {
     final repository = _productionRepository;
-    if ((productionEnabled && repository == null) || pairingInProgress) {
+    if ((!localPreviewEnabled && repository == null) || pairingInProgress) {
       return false;
     }
     final keepOnboardingOpen = shouldShowOnboarding;
@@ -796,14 +783,13 @@ class OceanEyesController extends ChangeNotifier
       final tankId = trimmed.startsWith('{')
           ? TankPairingCodec.decode(trimmed).tankId
           : TankPairingCodec.normalizeTankId(trimmed);
-      if (!productionEnabled) {
-        _connectFixtureTank();
+      if (localPreviewEnabled) {
+        _connectLocalPreviewTank(tankId: tankId);
         _onboarding.markJoined(keepRouteOpen: keepOnboardingOpen);
         return true;
       }
-      final productionRepository = repository;
-      if (productionRepository == null) return false;
-      final joined = await productionRepository.joinTank(tankId);
+      if (repository == null) return false;
+      final joined = await repository.joinTank(tankId);
       if (!joined) {
         throw StateError('No tank was found for that pairing code.');
       }
@@ -821,7 +807,7 @@ class OceanEyesController extends ChangeNotifier
 
   Future<String?> createProductionTank(String name) async {
     final repository = _productionRepository;
-    if ((productionEnabled && repository == null) || pairingInProgress) {
+    if ((!localPreviewEnabled && repository == null) || pairingInProgress) {
       return null;
     }
     final keepOnboardingOpen = shouldShowOnboarding;
@@ -833,14 +819,14 @@ class OceanEyesController extends ChangeNotifier
       if (trimmedName.isEmpty) {
         throw ArgumentError('Tank name cannot be empty.');
       }
-      if (!productionEnabled) {
-        _connectFixtureTank(name: trimmedName);
+      if (localPreviewEnabled) {
+        const tankId = 'tank-preview';
+        _connectLocalPreviewTank(name: trimmedName, tankId: tankId);
         _onboarding.markCreated(keepRouteOpen: keepOnboardingOpen);
-        return 'tank-demo';
+        return tankId;
       }
-      final productionRepository = repository;
-      if (productionRepository == null) return null;
-      final tankId = await productionRepository.createTank(trimmedName);
+      if (repository == null) return null;
+      final tankId = await repository.createTank(trimmedName);
       await _bindTank(tankId);
       _onboarding.markCreated(keepRouteOpen: keepOnboardingOpen);
       return tankId;
@@ -855,14 +841,11 @@ class OceanEyesController extends ChangeNotifier
 
   OnboardingState get onboardingState => _onboarding.state;
   bool get shouldShowOnboarding => _onboarding.showRoute;
-  bool get showTankSetupBanner =>
-      !tankConnected && (!productionEnabled || _onboarding.showSetupBanner);
+  bool get showTankSetupBanner => !tankConnected && _onboarding.showSetupBanner;
 
   void openOnboarding() {
     if (tankConnected) return;
-    if (!productionEnabled) {
-      _onboarding.setLocalTankAvailability(false);
-    } else if (!_onboarding.tankLookupResolved) {
+    if (!_onboarding.tankLookupResolved) {
       return;
     }
     _onboarding.open();
@@ -899,7 +882,7 @@ class OceanEyesController extends ChangeNotifier
 
   void requestTankRecalibration() {
     final tankId = activeTankId;
-    if (!productionEnabled || tankId == null || !canCalibrateTank) return;
+    if (tankId == null || !canCalibrateTank) return;
     recalibrationRequested = true;
     _notify();
     _queueProductionWrite(
@@ -909,7 +892,7 @@ class OceanEyesController extends ChangeNotifier
 
   void setWaterLineCalibration(double normalizedY) {
     final tankId = activeTankId;
-    if (!productionEnabled || tankId == null || !canCalibrateTank) return;
+    if (tankId == null || !canCalibrateTank) return;
     final waterLineY = normalizedY.clamp(0, 1).toDouble();
     _waterLineY = waterLineY;
     recalibrationRequested = false;
@@ -922,59 +905,31 @@ class OceanEyesController extends ChangeNotifier
 
   void previewWaterLineCalibration(double normalizedY) {
     final tankId = activeTankId;
-    if (!productionEnabled || tankId == null || !canCalibrateTank) return;
+    if (tankId == null || !canCalibrateTank) return;
     _waterLineY = normalizedY.clamp(0, 1).toDouble();
     _notify();
   }
 
   int get totalFish => fish.fold(0, (sum, entry) => sum + entry.count);
   int get detectedFish => fish.fold(0, (sum, entry) => sum + entry.detected);
-  List<WaterMetric> get waterMetrics => productionEnabled
-      ? _productionWaterMetrics
-      : dashboardHealth == DashboardHealthState.warning
-      ? DemoFixtures.warningWaterMetrics
-      : DemoFixtures.waterMetrics;
-  List<SpeciesOption> get availableSpecies => DemoFixtures.species;
-  List<ChartPoint> get claritySeries => productionEnabled
-      ? _productionClaritySeries
-      : AnalyticsSeriesService.filterByRange(
-          DemoFixtures.claritySeries,
-          rangeStart: analyticsRange.start,
-          rangeEnd: analyticsRange.end,
-        );
+  List<WaterMetric> get waterMetrics => _productionWaterMetrics;
+  List<SpeciesOption> get availableSpecies =>
+      ClassifiableSpeciesCatalog.options;
+  List<ChartPoint> get claritySeries => _productionClaritySeries;
   List<ChartPoint> get fishCountPoints {
-    if (productionEnabled) {
-      if (selectedSpecies == 'All species') {
-        return _productionFishCountSeries;
-      }
-      for (final entry in fish) {
-        if (entry.name == selectedSpecies) {
-          return _productionSpeciesSeries[entry.speciesId] ?? const [];
-        }
-      }
-      return const [];
+    if (selectedSpecies == 'All species') {
+      return _productionFishCountSeries;
     }
-    return AnalyticsSeriesService.fishCount(
-      fish,
-      selectedSpecies,
-      rangeStart: analyticsRange.start,
-      rangeEnd: analyticsRange.end,
-    );
+    for (final entry in fish) {
+      if (entry.name == selectedSpecies) {
+        return _productionSpeciesSeries[entry.speciesId] ?? const [];
+      }
+    }
+    return const [];
   }
 
-  List<ChartPoint> get spreadPoints => AnalyticsSeriesService.spread(
-    fish,
-    selectedSpecies,
-    rangeStart: analyticsRange.start,
-    rangeEnd: analyticsRange.end,
-  );
-  List<FishDiagnostic> get fishDiagnostics =>
-      AnalyticsSeriesService.diagnostics(
-        fish,
-        selectedSpecies,
-        rangeStart: analyticsRange.start,
-        rangeEnd: analyticsRange.end,
-      );
+  List<ChartPoint> get spreadPoints => const [];
+  List<FishDiagnostic> get fishDiagnostics => const [];
   List<NormalizedDetectionCenter> get selectedHeatmapCenters {
     if (selectedSpecies == 'All species') return heatmapCenters;
 
@@ -1007,11 +962,11 @@ class OceanEyesController extends ChangeNotifier
   }
 
   bool get productionServicesAvailable => _productionBindings.isAvailable;
-  String get tankReferenceCode => activeTankId ?? 'tank-demo';
+  String get tankReferenceCode => activeTankId ?? '';
   bool get canEditTankSettings =>
-      !productionEnabled || _tankRole == ProductionTankMemberRole.owner;
+      localPreviewEnabled || _tankRole == ProductionTankMemberRole.owner;
   bool get canCalibrateTank =>
-      !productionEnabled ||
+      localPreviewEnabled ||
       _tankRole == ProductionTankMemberRole.owner ||
       _tankRole == ProductionTankMemberRole.monitor;
   double get waterLineCalibration =>
@@ -1072,13 +1027,11 @@ class OceanEyesController extends ChangeNotifier
           );
         })
         .toList(growable: false);
-    if (productionEnabled) {
-      final updated = fish.where((entry) => entry.id == id).firstOrNull;
-      if (updated != null) {
-        _queueProductionWrite(
-          () => _productionRepository!.updateFishCount(id, updated.count),
-        );
-      }
+    final updated = fish.where((entry) => entry.id == id).firstOrNull;
+    if (updated != null) {
+      _queueProductionWrite(
+        () => _productionRepository!.updateFishCount(id, updated.count),
+      );
     }
     _savePreferences();
     _notify();
@@ -1121,7 +1074,7 @@ class OceanEyesController extends ChangeNotifier
       ),
     ];
     final tankId = activeTankId;
-    if (productionEnabled && tankId != null) {
+    if (tankId != null) {
       _queueProductionWrite(
         () => _productionRepository!.addFish(
           ProductionFishDraft(
@@ -1143,9 +1096,7 @@ class OceanEyesController extends ChangeNotifier
     fish = fish.where((entry) => entry.id != id).toList(growable: false);
     if (expandedFishId == id) expandedFishId = null;
     if (removedSelectedSpecies) selectedSpecies = 'All species';
-    if (productionEnabled) {
-      _queueProductionWrite(() => _productionRepository!.removeFish(id));
-    }
+    _queueProductionWrite(() => _productionRepository!.removeFish(id));
     _savePreferences();
     _notify();
   }
@@ -1173,7 +1124,7 @@ class OceanEyesController extends ChangeNotifier
         start ?? TimeOfDay(hour: range.start.hour, minute: range.start.minute);
     analyticsEndTime =
         end ?? TimeOfDay(hour: range.end.hour, minute: range.end.minute);
-    if (productionEnabled && _productionAnalytics.points.isNotEmpty) {
+    if (_productionAnalytics.points.isNotEmpty) {
       final visibleAnalytics = _refreshProductionAnalyticsProjection();
       analyticsState = visibleAnalytics.points.isEmpty
           ? AnalyticsContentState.empty
@@ -1200,40 +1151,28 @@ class OceanEyesController extends ChangeNotifier
     analyticsState = AnalyticsContentState.loading;
     heatmapCenters = const [];
     _notify();
-    if (productionEnabled) {
-      // Firestore snapshot streams retry transient failures themselves. Keep
-      // the production surface in its loading state until a real snapshot
-      // arrives; deterministic fixture values must never cross this boundary.
-      return;
-    }
-    unawaited(
-      _completeAfter(const Duration(milliseconds: 650), () {
-        analyticsState = AnalyticsContentState.populated;
-        heatmapCenters = DemoFixtures.heatmapCenters;
-      }),
-    );
+    // Firestore snapshot streams retry transient failures themselves. Keep
+    // the surface loading until a real snapshot arrives.
   }
 
   Future<void> requestCameraPermission() async {
-    if (productionEnabled) {
-      await _camera.requestPermission();
+    if (localPreviewEnabled) {
+      cameraStage = CameraStage.requestingPermission;
+      _notify();
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      if (_disposed) return;
+      cameraStage = cameraPermissionWillGrant
+          ? CameraStage.active
+          : CameraStage.denied;
+      _notify();
       return;
     }
-    cameraStage = CameraStage.requestingPermission;
-    _notify();
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-    if (_disposed) return;
-    cameraStage = cameraPermissionWillGrant
-        ? CameraStage.active
-        : CameraStage.denied;
-    _notify();
+    await _camera.requestPermission();
   }
 
   /// Connects the camera feed from whatever non-streaming state it is in.
   ///
-  /// Production camera state is owned by [OceanEyesCameraCoordinator]. The
-  /// fixture path mirrors the same transitions without touching platform
-  /// camera plugins.
+  /// Camera state is owned by [OceanEyesCameraCoordinator].
   Future<void> connectStream() async {
     switch (cameraStage) {
       case CameraStage.requestingPermission:
@@ -1242,11 +1181,11 @@ class OceanEyesController extends ChangeNotifier
       case CameraStage.measuringTurbidity:
         return;
       case CameraStage.idle:
-        if (productionEnabled) {
-          await _camera.resume();
-        } else {
+        if (localPreviewEnabled) {
           setCameraStage(CameraStage.active);
+          return;
         }
+        await _camera.resume();
       case CameraStage.beforePermission:
         await requestCameraPermission();
       case CameraStage.denied:
@@ -1256,11 +1195,7 @@ class OceanEyesController extends ChangeNotifier
   }
 
   void retryCamera() {
-    if (productionEnabled) {
-      unawaited(requestCameraPermission());
-      return;
-    }
-    cameraPermissionWillGrant = true;
+    if (localPreviewEnabled) cameraPermissionWillGrant = true;
     unawaited(requestCameraPermission());
   }
 
@@ -1270,61 +1205,61 @@ class OceanEyesController extends ChangeNotifier
   }
 
   void switchCamera() {
-    if (productionEnabled) {
-      unawaited(_camera.switchLens());
+    if (localPreviewEnabled) {
+      usingFrontCamera = !usingFrontCamera;
+      _savePreferences();
+      _notify();
       return;
     }
-    usingFrontCamera = !usingFrontCamera;
-    _savePreferences();
-    _notify();
+    unawaited(_camera.switchLens());
   }
 
   void toggleAI(bool enabled) {
     aiEnabled = enabled;
-    if (productionEnabled) {
-      _savePreferences();
-      _camera.configureAutomaticInference();
-      _notify();
+    if (localPreviewEnabled) {
       if (enabled && cameraStage == CameraStage.active) {
-        unawaited(_camera.captureAndAnalyze(measurementOnly: false));
+        cameraStage = CameraStage.aiProcessing;
+        _notify();
+        unawaited(
+          _completeAfter(const Duration(milliseconds: 900), () {
+            cameraStage = CameraStage.active;
+          }),
+        );
+        return;
       }
+      _savePreferences();
+      _notify();
       return;
     }
+    _savePreferences();
+    _camera.configureAutomaticInference();
+    _notify();
     if (enabled && cameraStage == CameraStage.active) {
-      cameraStage = CameraStage.aiProcessing;
+      unawaited(_camera.captureAndAnalyze(measurementOnly: false));
+    }
+  }
+
+  void measureTurbidity() {
+    if (localPreviewEnabled) {
+      cameraStage = CameraStage.measuringTurbidity;
+      lastTurbidityResult = null;
       _notify();
       unawaited(
-        _completeAfter(const Duration(milliseconds: 900), () {
+        _completeAfter(const Duration(milliseconds: 1100), () {
           cameraStage = CameraStage.active;
+          lastTurbidityResult = '1.5 FNU';
         }),
       );
       return;
     }
-    _savePreferences();
-    _notify();
-  }
-
-  void measureTurbidity() {
-    if (productionEnabled) {
-      unawaited(_camera.captureAndAnalyze(measurementOnly: true));
-      return;
-    }
-    cameraStage = CameraStage.measuringTurbidity;
-    lastTurbidityResult = null;
-    _notify();
-    unawaited(
-      _completeAfter(const Duration(milliseconds: 1100), () {
-        cameraStage = CameraStage.active;
-        lastTurbidityResult = '1.5 FNU';
-      }),
-    );
+    unawaited(_camera.captureAndAnalyze(measurementOnly: true));
   }
 
   void setFullscreenCamera(bool value) {
     fullscreenCamera = value;
     if (!value) inventoryDrawerOpen = false;
     _notify();
-    if (productionEnabled && _tankRole == ProductionTankMemberRole.viewer) {
+    if (_tankRole == ProductionTankMemberRole.viewer) {
       if (value) {
         unawaited(_liveSession.startViewer());
       } else {
@@ -1340,11 +1275,11 @@ class OceanEyesController extends ChangeNotifier
 
   void renameTank(String value) {
     final trimmed = value.trim();
-    if (productionEnabled && !canEditTankSettings) return;
+    if (!canEditTankSettings) return;
     if (trimmed.isEmpty || trimmed == tankName) return;
     tankName = trimmed;
     final tankId = activeTankId;
-    if (productionEnabled && tankId != null) {
+    if (tankId != null) {
       _queueProductionWrite(
         () => _productionRepository!.updateTankName(tankId, trimmed),
       );
@@ -1362,7 +1297,7 @@ class OceanEyesController extends ChangeNotifier
     inventoryDrawerOpen = false;
     if (tankId != null) {
       activeTankId = null;
-      if (productionEnabled) {
+      if (!localPreviewEnabled) {
         _clearProductionTankData();
         dashboardHealth = DashboardHealthState.waiting;
         analyticsState = AnalyticsContentState.empty;
@@ -1371,26 +1306,20 @@ class OceanEyesController extends ChangeNotifier
       }
     }
     _onboarding.resetForDisconnectedTank();
-    _onboarding.setLocalTankAvailability(false);
-    if (productionEnabled && !onboardingLookupResolved) {
+    _onboarding.resolveTankLookup(const []);
+    if (!localPreviewEnabled && !onboardingLookupResolved) {
       _onboarding.beginTankLookup();
     }
     _savePreferences();
     _notify();
   }
 
-  void connectDemoTank() {
-    if (productionEnabled) return;
-    _connectFixtureTank();
-    _notify();
-  }
-
-  void _connectFixtureTank({String? name}) {
+  void _connectLocalPreviewTank({required String tankId, String? name}) {
     if (name != null) tankName = name;
-    activeTankId = null;
+    activeTankId = tankId;
     tankConnected = true;
     cameraStage = CameraStage.active;
-    _onboarding.setLocalTankAvailability(true);
+    _onboarding.resolveTankLookup([tankId], autoPresent: false);
     _savePreferences();
   }
 
@@ -1398,9 +1327,7 @@ class OceanEyesController extends ChangeNotifier
     alerts = alerts
         .map((alert) => alert.id == id ? alert.copyWith(resolved: true) : alert)
         .toList(growable: false);
-    if (productionEnabled) {
-      _queueProductionWrite(() => _productionRepository!.resolveAlert(id));
-    }
+    _queueProductionWrite(() => _productionRepository!.resolveAlert(id));
     _notify();
   }
 
@@ -1425,6 +1352,14 @@ class OceanEyesController extends ChangeNotifier
     _notify();
   }
 
+  Future<void> _completeAfter(Duration duration, VoidCallback mutate) async {
+    await Future<void>.delayed(duration);
+    if (_disposed) return;
+    mutate();
+    _savePreferences();
+    _notify();
+  }
+
   void previewSetting(String name, double value) {
     _applySetting(name, value);
     _notify();
@@ -1433,11 +1368,10 @@ class OceanEyesController extends ChangeNotifier
   void commitSetting(String name, double value) {
     _applySetting(name, value);
     _savePreferences();
-    if (productionEnabled &&
-        (name == 'clarityThreshold' || name == 'visibleFishThreshold')) {
+    if (name == 'clarityThreshold' || name == 'visibleFishThreshold') {
       _persistProductionThresholds();
     }
-    if (productionEnabled && name == 'pollingIntervalMs') {
+    if (name == 'pollingIntervalMs') {
       _camera.configureAutomaticInference();
     }
     _notify();
@@ -1517,7 +1451,7 @@ class OceanEyesController extends ChangeNotifier
   void setAutoConnect(bool value) {
     autoConnect = value;
     _savePreferences();
-    if (productionEnabled) _camera.configureAutomaticInference();
+    _camera.configureAutomaticInference();
     _notify();
   }
 
@@ -1528,71 +1462,6 @@ class OceanEyesController extends ChangeNotifier
     ambientFadeStart = 50;
     ambientFadeEnd = 100;
     heroFadeStart = 70;
-    _notify();
-  }
-
-  void applyFixture(FixtureScenario scenario, {bool notify = true}) {
-    final snapshot = _fixtures.build(scenario);
-    fixtureScenario = snapshot.scenario;
-    selectedSpecies = 'All species';
-    _analyticsRangeEdited = false;
-    analyticsRange = snapshot.analyticsRange;
-    analyticsStartTime = const TimeOfDay(hour: 0, minute: 0);
-    analyticsEndTime = const TimeOfDay(hour: 23, minute: 59);
-    dashboardHealth = snapshot.dashboardHealth;
-    analyticsState = snapshot.analyticsState;
-    cameraStage = snapshot.cameraStage;
-    cameraPermissionWillGrant = snapshot.cameraPermissionWillGrant;
-    aiEnabled = snapshot.aiEnabled;
-    showDetections = true;
-    inventoryDrawerOpen = false;
-    fullscreenCamera = false;
-    tankSectionOpen = false;
-    streamSectionOpen = false;
-    thresholdSectionOpen = false;
-    aiPreferencesOpen = false;
-    debugSectionOpen = false;
-    brightness = 1;
-    contrast = 1;
-    saturation = 1;
-    temperature = 0;
-    tint = 0;
-    autoConnect = false;
-    pollingIntervalMs = 10000;
-    detectionConfidenceThreshold = 0.35;
-    speciesConfidenceThreshold = 0.35;
-    diagnosisMinConfidence = 0.60;
-    clarityThreshold = 5;
-    visibleFishThreshold = 50;
-    ambientBlur = 48;
-    ambientOpacity = 1;
-    ambientBaseGrey = 255;
-    ambientFadeStart = 50;
-    ambientFadeEnd = 100;
-    heroFadeStart = 70;
-    lastTurbidityResult = snapshot.lastTurbidityResult;
-    tankName = 'Living Room Reef';
-    tankConnected = true;
-    usingFrontCamera = false;
-    fish = snapshot.fish;
-    alerts = snapshot.alerts;
-    history = snapshot.history;
-    heatmapCenters = snapshot.heatmapCenters;
-    heatmapSourceDimensions = DemoFixtures.heatmapSourceDimensions;
-    expandedFishId = null;
-    _navigation.resetTransientIntents();
-    if (notify) _notify();
-  }
-
-  void applyFixtureName(String fixture, {bool notify = true}) {
-    applyFixture(_fixtures.resolveName(fixture), notify: notify);
-  }
-
-  Future<void> _completeAfter(Duration duration, VoidCallback mutate) async {
-    await Future<void>.delayed(duration);
-    if (_disposed) return;
-    mutate();
-    _savePreferences();
     _notify();
   }
 

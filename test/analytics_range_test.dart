@@ -5,10 +5,11 @@ import 'package:oceaneyes/models/analytics_series_service.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
 import 'package:oceaneyes/models/production_data.dart';
 import 'package:oceaneyes/view_models/oceaneyes_controller.dart';
+import 'support/oceaneyes_fixture.dart';
 
 void main() {
   test('fixture analytics projections consume the selected range', () {
-    final controller = OceanEyesController(
+    final controller = FixtureOceanEyesController(
       launchUri: Uri.parse('https://oceaneyes.test/?fixture=populated'),
     );
     addTearDown(controller.dispose);
@@ -117,6 +118,7 @@ ProductionReading _productionReading({
     tankId: 'tank',
     timestamp: timestamp,
     clarityScore: 8,
+    turbidityFnu: 2,
     fishCount: fishCount,
     fishCountConfidence: 1,
     speciesDetected: const {'guppy': 1},

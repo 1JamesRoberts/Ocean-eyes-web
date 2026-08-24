@@ -92,9 +92,7 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _showTankPairingCode() async {
-    final tankId = controller.productionEnabled
-        ? controller.activeTankId
-        : 'tank-demo';
+    final tankId = controller.activeTankId;
     if (tankId == null) return;
     final payload = TankPairingCodec.encode(TankPairingPayload(tankId: tankId));
     await showDialog<void>(
@@ -158,7 +156,6 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   String get _tankReferenceCode {
-    if (!controller.productionEnabled) return 'tank-demo';
     final code = controller.tankReferenceCode.trim();
     return code.isEmpty ? 'Pending' : code;
   }
@@ -205,12 +202,12 @@ class _AccountScreenState extends State<AccountScreen> {
             icon: LucideIcons.shieldAlert,
             divider: true,
           ),
-          if (controller.productionEnabled &&
+          if (!controller.localPreviewEnabled &&
               _productionErrorMessage != null) ...[
             _buildProductionError(_productionErrorMessage!),
             const SizedBox(height: 12),
           ],
-          if (controller.productionEnabled) ...[
+          if (!controller.localPreviewEnabled) ...[
             _buildGoogleAccount(),
             const SizedBox(height: 12),
             _buildNotificationPermission(),
@@ -328,9 +325,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           icon: LucideIcons.pencil,
                           compact: true,
                           style: GlassButtonStyle.outline,
-                          onPressed:
-                              controller.productionEnabled &&
-                                  !controller.canEditTankSettings
+                          onPressed: !controller.canEditTankSettings
                               ? null
                               : () => setState(() {
                                   _tankNameController.text =
@@ -353,8 +348,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 highlighted: true,
               ),
             ),
-            if (controller.productionEnabled &&
-                controller.canCalibrateTank) ...[
+            if (controller.canCalibrateTank) ...[
               const SizedBox(height: 12),
               GlassPanel(
                 color: Colors.transparent,
@@ -738,15 +732,9 @@ class _AccountScreenState extends State<AccountScreen> {
             expanded: controller.thresholdSectionOpen,
             onChanged: (value) => controller.setDisclosure('threshold', value),
             child: IgnorePointer(
-              ignoring:
-                  controller.productionEnabled &&
-                  !controller.canEditTankSettings,
+              ignoring: !controller.canEditTankSettings,
               child: Opacity(
-                opacity:
-                    controller.productionEnabled &&
-                        !controller.canEditTankSettings
-                    ? 0.55
-                    : 1,
+                opacity: !controller.canEditTankSettings ? 0.55 : 1,
                 child: Column(
                   children: [
                     OceanSlider(
