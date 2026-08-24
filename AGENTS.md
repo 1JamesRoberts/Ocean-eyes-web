@@ -1,10 +1,10 @@
 # Project Overview
 
-OceanEyes is a Flutter aquarium-monitoring application for
-Android, iOS, and Flutter web. The shipped app has Firebase,
-camera, ML models, messaging, and LiveKit integrations. The idea of the app is to have 2 mobile phone: one as monitor(camera) to livestream and ML inference fish tank video, and one as the viewer through this single app.
+OceanEyes is a Flutter-based aquarium monitoring application for Android, iOS, and web. The production app integrates Firebase, camera access, on-device ML models, messaging, and LiveKit.
 
-The current state of app is in MVP product, so the main focus of development is to ship this to early-access testers as soon as possible while having AI features and cloud auth. The first platform priority of the development is Android mobile phone.
+The core concept uses two mobile phones within the same app: one acts as the monitor, using its camera to livestream the aquarium and run ML inference on the fish-tank video, while the other acts as the viewer, allowing the user to remotely watch the stream of the aquarium.
+
+The app is currently an MVP. Prioritize shipping to early-access testers as quickly as possible while retaining the essential AI features and cloud authentication. Android mobile is the first and primary platform. Avoid work that does not directly support the MVP release, unless I ask for them.
 
 ## Tech Stack
 
@@ -21,4 +21,6 @@ The current state of app is in MVP product, so the main focus of development is 
 - Preserve the MVVM boundary and keep domain policy out of widgets. Prefer shared
 tokens and reusable UI primitives over repeated raw values.
 
-- Simplicity First, Minimum code that solves the problem. Nothing speculative. Combat the tendency toward overengineering.
+- Simplicity First: Use the minimum code necessary to solve the current problem. Avoid speculative abstractions, and unnecessary complexity. Actively resist overengineering.
+
+- When talking with me, assume I’m a technical manager rather than a deeply technical person. Keep explanations high-level, practical, and focused on what matters, why it matters, and what action or decision is needed. Avoid unnecessary technical details unless I ask for them.
