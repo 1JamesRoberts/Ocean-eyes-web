@@ -1,9 +1,14 @@
 # Production ONNX models
 
-The Flutter production integration expects three private ONNX assets in this
+The optional Flutter AI integration can use three private ONNX assets in this
 directory. Model binaries are deliberately excluded from Git: the full set is
 about 285 MB, two files exceed GitHub's 100 MB per-file limit, and the artifacts
 belong to the FishAI training pipeline rather than this presentation repository.
+
+The current production build intentionally omits the ONNX engine so the app's
+Firebase, camera, and LiveKit flows work without these artifacts. Add the files
+and restore the engine in `lib/app/oceaneyes_bootstrap.dart` when AI capture is
+ready to return.
 
 ## Required files
 
@@ -27,9 +32,7 @@ Do not commit the copied files. Before a release, obtain the model files from
 the project owner through the approved private artifact channel and verify their
 checksums against that release's artifact manifest.
 
-The app can still run deterministic fixtures and web builds without the files.
-Native production startup reports ML initialization as failed until all three
-are installed. ONNX execution is intentionally unavailable in the web build.
+ONNX execution is intentionally unavailable in the web build.
 
 ## Exact model contract
 

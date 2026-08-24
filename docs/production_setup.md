@@ -33,9 +33,6 @@ Firebase options:
 
 - Google web OAuth client ID
 - iOS Google OAuth client ID (`OCEANEYES_GOOGLE_IOS_CLIENT_ID`)
-- Web Push VAPID key
-- Web reCAPTCHA v3 site key
-- Privacy Policy and Terms URLs
 
 Run or build with the private file:
 
@@ -62,15 +59,15 @@ mode with `C:\secure\oceaneyes-staging.json`. Keep that private staging file at
 the configured path; it remains outside version control. The local preview
 configuration is available alongside it in the Run and Debug menu.
 
-Production mode validates these values before initializing Firebase. The
+Production mode validates the platform service values before initializing Firebase. The
 `OCEANEYES_PRODUCTION` flag selects production for debug/profile runs, while
 release builds always use production regardless of that flag.
 
 ## App Check and Google sign-in
 
-App Check always uses Play Integrity on Android, App Attest with DeviceCheck
-fallback on iOS, and reCAPTCHA v3 on web. Register each production app in the
-Firebase console before testing authentication or protected Firestore data.
+App Check uses Play Integrity on Android and App Attest with DeviceCheck
+fallback on iOS. Web reCAPTCHA v3 App Check and web push are optional until
+their keys are configured; the web app still starts without them.
 
 Google sign-in uses the web OAuth client ID as the Android server client ID,
 the iOS client ID on Apple platforms, and the web client ID in the browser.
@@ -110,8 +107,9 @@ keyPassword=replace-me
 ```
 
 Place the approved keystore at the configured path. Release Gradle tasks fail
-closed when this file or the keystore is missing. The three ONNX model binaries
-must also be supplied under `assets/models/` before Android inference testing.
+closed when this file or the keystore is missing. ONNX model binaries are
+optional in the current production build; without them, AI capture is disabled
+while camera streaming and LiveKit remain available.
 
 ## Web notifications
 

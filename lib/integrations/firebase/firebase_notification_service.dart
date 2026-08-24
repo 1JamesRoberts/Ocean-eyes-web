@@ -160,6 +160,12 @@ class FirebaseNotificationService implements NotificationServiceGateway {
     String? webVapidKey,
   }) async {
     if (_disposed) return false;
+    final normalizedVapidKey = webVapidKey?.trim() ?? '';
+    final webPushConfigured =
+        normalizedVapidKey.isNotEmpty &&
+        !normalizedVapidKey.toLowerCase().contains('replace-with') &&
+        !normalizedVapidKey.toLowerCase().contains('placeholder');
+    if (kIsWeb && !webPushConfigured) return false;
     final settings = await _messaging.requestPermission(
       alert: true,
       badge: true,
@@ -172,9 +178,7 @@ class FirebaseNotificationService implements NotificationServiceGateway {
     if (!authorized) return false;
 
     final token = await _messaging.getToken(
-      vapidKey: webVapidKey == null || webVapidKey.trim().isEmpty
-          ? null
-          : webVapidKey,
+      vapidKey: normalizedVapidKey.isEmpty ? null : normalizedVapidKey,
     );
     if (token == null || token.isEmpty) return true;
     _token = token;

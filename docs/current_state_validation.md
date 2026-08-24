@@ -67,8 +67,7 @@ The following cannot be honestly proven by the repository-only tests:
   subscription, reconnect, short-lived token expiry, and concurrent viewers.
 - OS-level background/terminated behavior, camera permission dialogs, FCM/APNs
   delivery, and actual process crashes followed by app restart.
-- Physical camera/ONNX performance, thermal behavior, and signed release
-  builds.
+- Physical camera performance, thermal behavior, and signed release builds.
 
 Those checks remain release/staging work because this workspace has no private
 Firebase or LiveKit configuration and no attached Android/iOS devices. The

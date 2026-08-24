@@ -3,16 +3,13 @@ import 'package:flutter/foundation.dart';
 /// Small set of values that cannot come from the generated FlutterFire file.
 ///
 /// Firebase application options live in `firebase_options.dart`. Dart defines
-/// are reserved for OAuth, web messaging/App Check, and customer-facing legal
-/// links.
+/// are reserved for OAuth plus optional web messaging/App Check features.
 class OceanEyesProductionConfig {
   const OceanEyesProductionConfig({
     required this.googleWebClientId,
     required this.iosClientId,
     required this.webPushVapidKey,
     required this.recaptchaV3SiteKey,
-    required this.privacyPolicyUrl,
-    required this.termsOfServiceUrl,
     this.productionEnabled = true,
   });
 
@@ -28,10 +25,6 @@ class OceanEyesProductionConfig {
       recaptchaV3SiteKey: String.fromEnvironment(
         'OCEANEYES_RECAPTCHA_V3_SITE_KEY',
       ),
-      privacyPolicyUrl: String.fromEnvironment('OCEANEYES_PRIVACY_POLICY_URL'),
-      termsOfServiceUrl: String.fromEnvironment(
-        'OCEANEYES_TERMS_OF_SERVICE_URL',
-      ),
     );
   }
 
@@ -45,11 +38,9 @@ class OceanEyesProductionConfig {
   final String iosClientId;
   final String webPushVapidKey;
   final String recaptchaV3SiteKey;
-  final String privacyPolicyUrl;
-  final String termsOfServiceUrl;
 
-  /// Returns a concise startup error instead of allowing a partially
-  /// configured customer build to continue into Firebase initialization.
+  /// Returns a concise startup error for service configuration required by
+  /// the selected platform.
   String? validate() {
     if (!productionEnabled) return null;
 
@@ -69,25 +60,6 @@ class OceanEyesProductionConfig {
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
       _requireConfigured('OCEANEYES_GOOGLE_IOS_CLIENT_ID', iosClientId, errors);
     }
-    if (kIsWeb) {
-      _requireConfigured(
-        'OCEANEYES_WEB_PUSH_VAPID_KEY',
-        webPushVapidKey,
-        errors,
-      );
-      _requireConfigured(
-        'OCEANEYES_RECAPTCHA_V3_SITE_KEY',
-        recaptchaV3SiteKey,
-        errors,
-      );
-    }
-    _requireHttpsUrl('OCEANEYES_PRIVACY_POLICY_URL', privacyPolicyUrl, errors);
-    _requireHttpsUrl(
-      'OCEANEYES_TERMS_OF_SERVICE_URL',
-      termsOfServiceUrl,
-      errors,
-    );
-
     if (errors.isEmpty) return null;
     return errors.map((error) => '- $error').join('\n');
   }
@@ -103,13 +75,6 @@ class OceanEyesProductionConfig {
         normalized.contains('replace_me') ||
         normalized.contains('placeholder')) {
       errors.add('$name must contain a real production value.');
-    }
-  }
-
-  static void _requireHttpsUrl(String name, String value, List<String> errors) {
-    final uri = Uri.tryParse(value.trim());
-    if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
-      errors.add('$name must be a real HTTPS URL.');
     }
   }
 }

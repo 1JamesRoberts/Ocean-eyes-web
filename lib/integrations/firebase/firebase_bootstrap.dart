@@ -19,10 +19,20 @@ Future<FirebaseApp> initializeOceanEyesFirebase(
           options: DefaultFirebaseOptions.currentPlatform,
         );
 
-  await FirebaseAppCheck.instanceFor(app: app).activate(
-    webProvider: kIsWeb ? ReCaptchaV3Provider(config.recaptchaV3SiteKey) : null,
-    androidProvider: AndroidProvider.playIntegrity,
-    appleProvider: AppleProvider.appAttestWithDeviceCheckFallback,
-  );
+  // Web App Check is optional until its site key is configured. Native
+  // production builds continue to use their platform-backed providers.
+  final webAppCheckConfigured =
+      config.recaptchaV3SiteKey.trim().isNotEmpty &&
+      !config.recaptchaV3SiteKey.toLowerCase().contains('replace-with') &&
+      !config.recaptchaV3SiteKey.toLowerCase().contains('placeholder');
+  if (!kIsWeb || webAppCheckConfigured) {
+    await FirebaseAppCheck.instanceFor(app: app).activate(
+      webProvider: kIsWeb
+          ? ReCaptchaV3Provider(config.recaptchaV3SiteKey)
+          : null,
+      androidProvider: AndroidProvider.playIntegrity,
+      appleProvider: AppleProvider.appAttestWithDeviceCheckFallback,
+    );
+  }
   return app;
 }
