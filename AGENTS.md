@@ -1,9 +1,10 @@
 # Project Overview
 
-OceanEyes is a production-first Flutter/Dart aquarium-monitoring client for
-Android, iOS, and Flutter web. The shipped app always composes its Firebase,
-camera, AI, messaging, and LiveKit integrations. Deterministic fixtures are
-test-only seams and never a runtime fallback.
+OceanEyes is a Flutter aquarium-monitoring application for
+Android, iOS, and Flutter web. The shipped app has Firebase,
+camera, ML models, messaging, and LiveKit integrations. The idea of the app is to have 2 mobile phone: one as monitor(camera) to livestream and ML inference fish tank video, and one as the viewer through this single app.
+
+The current state of app is in MVP product, so the main focus of development is to ship this to early-access testers as soon as possible while having AI features and cloud auth. The first platform priority of the development is Android mobile phone.
 
 ## Tech Stack
 
@@ -15,30 +16,9 @@ test-only seams and never a runtime fallback.
   Firebase Cloud Functions
 - Architecture: MVVM
 
-## Project Structure
-
-- `lib/app/` contains app bootstrap, navigation, and production configuration.
-- `lib/models/` contains domain entities, repositories, persistence, and pure
-  services and deterministic fixtures. It must not import Flutter UI code.
-- `lib/view_models/` owns state, transitions, route intent, and coordinators;
-  `OceanEyesController` is the interface's public state API.
-- `lib/integrations/` contains Firebase, camera, ML, LiveKit, and wake-lock
-  gateways.
-- `lib/ui/` contains screens, shell layout, widgets, rendering, and event
-  wiring.
-- `lib/core/theme/` contains shared visual tokens and theme configuration.
-- `assets/` contains bundled fonts, images, and ML model assets.
-- `functions/` contains Firebase Cloud Functions and their tests.
-- `test/` contains unit, widget, and production-boundary tests;
-  `integration_test/` contains visual-matrix tests.
-- `docs/` contains production and visual validation documentation.
-- `tool/` contains project-specific validation utilities.
-
 ## Preferred Behavior
 
-Preserve the MVVM boundary and keep domain policy out of widgets. Prefer shared
-tokens and reusable UI primitives over repeated raw values. Before handoff,
-run `dart format`, `flutter analyze`, relevant tests, and documented builds.
-Keep deterministic fixtures in tests only; the application must fail clearly
-when its production configuration is missing rather than falling back to demo
-state.
+- Preserve the MVVM boundary and keep domain policy out of widgets. Prefer shared
+tokens and reusable UI primitives over repeated raw values.
+
+- Simplicity First, Minimum code that solves the problem. Nothing speculative. Combat the tendency toward overengineering.
