@@ -45,6 +45,7 @@ Future<OceanEyesController> bootstrapOceanEyesController({
   final runtimeConfig = config ?? OceanEyesProductionConfig.fromEnvironment();
 
   if (!runtimeConfig.productionEnabled) {
+    final cameraGateway = ProductionCameraCaptureGateway();
     final controller = OceanEyesController(
       preferences: preferences,
       inventoryRepository: inventory,
@@ -52,10 +53,14 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       onboardingRepository: SharedPreferencesOnboardingRepository(preferences),
       launchUri: uri,
       localPreviewEnabled: true,
+      cameraGateway: cameraGateway,
     );
     // Local preview has no auth gateway, so keep the shell available for
     // development without requiring Firebase credentials.
     controller.isAuthenticated = true;
+    if (controller.tankConnected) {
+      await controller.requestCameraPermission();
+    }
     return controller;
   }
 

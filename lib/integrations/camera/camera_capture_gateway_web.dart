@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:camera/camera.dart' as plugin;
+import 'package:flutter/widgets.dart';
 import 'package:image/image.dart' as image;
 
 import 'camera_capture_models.dart';
@@ -13,7 +14,8 @@ import 'water_line_cropper.dart';
 /// `availableCameras()` invokes `getUserMedia`, so it is both the permission
 /// request and device-enumeration operation on web. Browsers require HTTPS (or
 /// localhost) and may not expose zoom unless the Image Capture API supports it.
-final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
+final class ProductionCameraCaptureGateway
+    implements CameraCaptureGateway, CameraPreviewSource {
   ProductionCameraCaptureGateway({
     this.configuration = const CameraCaptureConfiguration(),
     DateTime Function()? clock,
@@ -38,6 +40,13 @@ final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
 
   @override
   bool get isSupported => true;
+
+  @override
+  Widget? get cameraPreview {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return null;
+    return plugin.CameraPreview(controller);
+  }
 
   @override
   CameraCaptureSnapshot get snapshot => _snapshot;

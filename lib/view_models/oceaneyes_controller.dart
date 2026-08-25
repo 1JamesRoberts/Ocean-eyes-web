@@ -70,6 +70,7 @@ class OceanEyesController extends ChangeNotifier
                  ? InMemoryOnboardingRepository()
                  : SharedPreferencesOnboardingRepository(preferences)),
        ),
+       _cameraGateway = cameraGateway,
        _preferences = preferences,
        _productionRepository = productionRepository,
        _cameraHandoffConfiguration = cameraHandoffConfiguration,
@@ -80,7 +81,7 @@ class OceanEyesController extends ChangeNotifier
       onError: _recordProductionError,
     );
     _camera = OceanEyesCameraCoordinator(
-      enabled: !localPreviewEnabled,
+      enabled: !localPreviewEnabled || cameraGateway != null,
       host: this,
       repository: _productionRepository,
       gateway: cameraGateway,
@@ -505,6 +506,7 @@ class OceanEyesController extends ChangeNotifier
 
   final OceanEyesPersistenceCoordinator _persistence;
   final OceanEyesOnboardingCoordinator _onboarding;
+  final CameraCaptureGateway? _cameraGateway;
   final SharedPreferences? _preferences;
   final ProductionOceanEyesRepository? _productionRepository;
   late final OceanEyesCameraCoordinator _camera;
@@ -603,6 +605,7 @@ class OceanEyesController extends ChangeNotifier
   ProductionLiveState? liveState;
   Object? get remoteVideoTrack => _liveSession.remoteVideoTrack;
   Object? get localVideoTrack => _liveSession.localVideoTrack;
+  Widget? get cameraPreview => _camera.cameraPreview;
   OceanEyesLiveConnectionState get liveConnectionState =>
       _liveSession.connectionState;
   @override
@@ -1163,7 +1166,7 @@ class OceanEyesController extends ChangeNotifier
   }
 
   Future<void> requestCameraPermission() async {
-    if (localPreviewEnabled) {
+    if (localPreviewEnabled && _cameraGateway == null) {
       cameraStage = CameraStage.requestingPermission;
       _notify();
       await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -1174,6 +1177,7 @@ class OceanEyesController extends ChangeNotifier
       _notify();
       return;
     }
+    _camera.initialize();
     await _camera.requestPermission();
   }
 
@@ -1188,7 +1192,7 @@ class OceanEyesController extends ChangeNotifier
       case CameraStage.measuringTurbidity:
         return;
       case CameraStage.idle:
-        if (localPreviewEnabled) {
+        if (localPreviewEnabled && _cameraGateway == null) {
           setCameraStage(CameraStage.active);
           return;
         }
@@ -1202,7 +1206,9 @@ class OceanEyesController extends ChangeNotifier
   }
 
   void retryCamera() {
-    if (localPreviewEnabled) cameraPermissionWillGrant = true;
+    if (localPreviewEnabled && _cameraGateway == null) {
+      cameraPermissionWillGrant = true;
+    }
     unawaited(requestCameraPermission());
   }
 
@@ -1212,7 +1218,7 @@ class OceanEyesController extends ChangeNotifier
   }
 
   void switchCamera() {
-    if (localPreviewEnabled) {
+    if (localPreviewEnabled && _cameraGateway == null) {
       usingFrontCamera = !usingFrontCamera;
       _savePreferences();
       _notify();
@@ -1326,6 +1332,7 @@ class OceanEyesController extends ChangeNotifier
     activeTankId = tankId;
     tankConnected = true;
     cameraStage = CameraStage.active;
+    if (_cameraGateway != null) unawaited(requestCameraPermission());
     _onboarding.resolveTankLookup([tankId], autoPresent: false);
     _savePreferences();
   }

@@ -185,6 +185,7 @@ class AquariumStreamImage extends StatelessWidget {
 
     final remoteTrack = controller.remoteVideoTrack;
     final localTrack = controller.localVideoTrack;
+    final cameraPreview = controller.cameraPreview;
     final capturedFrame = controller.latestCameraFrameBytes;
     final Widget streamImage;
     if (remoteTrack is VideoTrack) {
@@ -197,6 +198,8 @@ class AquariumStreamImage extends StatelessWidget {
         localTrack,
         fit: fit == BoxFit.contain ? VideoViewFit.contain : VideoViewFit.cover,
       );
+    } else if (cameraPreview != null) {
+      streamImage = cameraPreview;
     } else if (capturedFrame != null) {
       streamImage = Image.memory(
         capturedFrame,

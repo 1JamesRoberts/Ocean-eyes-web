@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/widgets.dart';
 import 'package:image/image.dart' as image;
 
 /// Coarse lifecycle state for the production camera.
@@ -226,6 +227,12 @@ abstract interface class CameraCaptureGateway {
   Future<CameraCaptureSnapshot> resume();
 
   Future<void> dispose();
+}
+
+/// Optional live preview supplied by camera implementations that own a camera
+/// controller. LiveKit tracks remain the preferred source when available.
+abstract interface class CameraPreviewSource {
+  Widget? get cameraPreview;
 }
 
 class CameraCaptureException implements Exception {

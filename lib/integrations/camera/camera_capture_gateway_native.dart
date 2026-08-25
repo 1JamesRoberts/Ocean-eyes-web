@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart' as plugin;
+import 'package:flutter/widgets.dart';
 import 'package:image/image.dart' as image;
 import 'package:permission_handler/permission_handler.dart';
 
@@ -13,7 +14,8 @@ import 'water_line_cropper.dart';
 ///
 /// The camera plugin stays behind this gateway so the controller can coordinate
 /// capture and LiveKit ownership without importing plugin types into MVVM state.
-final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
+final class ProductionCameraCaptureGateway
+    implements CameraCaptureGateway, CameraPreviewSource {
   ProductionCameraCaptureGateway({
     this.configuration = const CameraCaptureConfiguration(),
     DateTime Function()? clock,
@@ -37,6 +39,13 @@ final class ProductionCameraCaptureGateway implements CameraCaptureGateway {
 
   @override
   bool get isSupported => true;
+
+  @override
+  Widget? get cameraPreview {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return null;
+    return plugin.CameraPreview(controller);
+  }
 
   @override
   CameraCaptureSnapshot get snapshot => _snapshot;

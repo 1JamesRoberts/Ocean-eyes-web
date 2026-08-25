@@ -93,6 +93,12 @@ class OceanEyesCameraCoordinator {
   int _pairingSuspensionDepth = 0;
   bool _resumeAfterPairing = false;
 
+  Widget? get cameraPreview {
+    final gateway = _gateway;
+    if (gateway is! CameraPreviewSource) return null;
+    return (gateway as CameraPreviewSource).cameraPreview;
+  }
+
   void initialize() {
     final gateway = _gateway;
     if (!_enabled || gateway == null || _subscription != null) return;
