@@ -13,7 +13,7 @@ import 'inference_single_flight.dart';
 /// Models and camera pixels are fetched/transferred only within the browser;
 /// no inference request is sent to an OceanEyes service.
 final class OnnxFishInference
-    implements FishInferenceEngine, FishInferenceDiagnostics {
+    implements FishInferenceEngine, FishInferenceAutomaticInferencePolicy {
   OnnxFishInference({
     this.configuration = const FishInferenceConfiguration(),
     AssetBundle? assetBundle,
@@ -25,7 +25,7 @@ final class OnnxFishInference
     this.preferWebGpu = true,
   }) : _log = log,
        _automaticInferenceEnabled = enableAutomaticInference {
-    _capabilities = _readCapabilities();
+    _isSupported = _readCapabilities();
   }
 
   final FishInferenceConfiguration configuration;
@@ -33,19 +33,15 @@ final class OnnxFishInference
   final void Function(String message)? _log;
   final bool _automaticInferenceEnabled;
   final InferenceSingleFlight _singleFlight = InferenceSingleFlight();
-  final StreamController<FishInferenceProgress> _progress =
-      StreamController<FishInferenceProgress>.broadcast(sync: true);
 
-  late FishInferenceCapabilities _capabilities;
+  late bool _isSupported;
   FishInferenceAvailability _availability =
       FishInferenceAvailability.uninitialized;
   Object? _lastError;
   Future<void>? _initializing;
-  Duration? _lastInferenceDuration;
-  int? _activeRequestId;
 
   @override
-  bool get isSupported => _capabilities.supportsBrowserInference;
+  bool get isSupported => _isSupported;
 
   @override
   bool get isBusy => _singleFlight.isBusy;
@@ -55,15 +51,6 @@ final class OnnxFishInference
 
   @override
   Object? get lastError => _lastError;
-
-  @override
-  FishInferenceCapabilities get capabilities => _capabilities;
-
-  @override
-  Stream<FishInferenceProgress> get progress => _progress.stream;
-
-  @override
-  Duration? get lastInferenceDuration => _lastInferenceDuration;
 
   @override
   bool get automaticInferenceEnabled => _automaticInferenceEnabled;
@@ -85,34 +72,20 @@ final class OnnxFishInference
   }
 
   Future<void> _initialize() async {
-    _capabilities = _readCapabilities();
+    _isSupported = _readCapabilities();
     if (!isSupported) {
       _availability = FishInferenceAvailability.unsupported;
       _lastError = UnsupportedError(
         'Browser AI needs Web Workers, WebAssembly, and OffscreenCanvas.',
-      );
-      _emit(
-        const FishInferenceProgress(
-          stage: FishInferenceProgressStage.failed,
-          message:
-              'This browser cannot run on-device AI. Camera preview remains available.',
-        ),
       );
       return;
     }
 
     _availability = FishInferenceAvailability.initializing;
     _lastError = null;
-    _emit(
-      const FishInferenceProgress(
-        stage: FishInferenceProgressStage.loadingRuntime,
-        message: 'Starting the browser AI worker…',
-      ),
-    );
     try {
       final response = await _initializeWorker(
         jsonEncode(_configurationJson()).toJS,
-        _onProgress.toJS,
       ).toDart;
       if (_availability == FishInferenceAvailability.disposed) return;
       final decoded = jsonDecode(response.toDart) as Map<String, dynamic>;
@@ -123,12 +96,6 @@ final class OnnxFishInference
         );
       }
       _availability = FishInferenceAvailability.ready;
-      _emit(
-        const FishInferenceProgress(
-          stage: FishInferenceProgressStage.ready,
-          message: 'Browser AI is ready; models will load when first used.',
-        ),
-      );
     } catch (error) {
       if (_availability == FishInferenceAvailability.disposed) rethrow;
       final failure = error is FishInferenceException
@@ -200,9 +167,7 @@ final class OnnxFishInference
           'detectionConfidence': thresholds.detectionConfidence,
           'classificationConfidence': thresholds.classificationConfidence,
         }).toJS,
-        _onProgress.toJS,
       );
-      _activeRequestId = _lastWorkerRequestId();
       final response = await promise.toDart;
       final data = jsonDecode(response.toDart) as Map<String, dynamic>;
       if (data['contractVersion'] != 1) {
@@ -214,7 +179,6 @@ final class OnnxFishInference
       final result = _decodeResult(data);
       _lastError = null;
       timer.stop();
-      _lastInferenceDuration = timer.elapsed;
       _log?.call(
         'ONNX Runtime Web inference completed in '
         '${timer.elapsedMilliseconds} ms using ${data['providers']}.',
@@ -236,8 +200,6 @@ final class OnnxFishInference
             );
       _lastError = failure;
       throw failure;
-    } finally {
-      _activeRequestId = null;
     }
   }
 
@@ -318,43 +280,11 @@ final class OnnxFishInference
   String _assetUrl(String asset) =>
       Uri.base.resolve('assets/$asset').toString();
 
-  void _onProgress(JSString encoded) {
-    try {
-      final value = jsonDecode(encoded.toDart) as Map<String, dynamic>;
-      final fraction = value['fraction'];
-      _emit(
-        FishInferenceProgress(
-          stage: _progressStage(value['stage'] as String?),
-          message: value['message'] as String? ?? 'Browser AI is working…',
-          model: value['model'] as String?,
-          fraction: fraction is num ? fraction.toDouble().clamp(0, 1) : null,
-        ),
-      );
-    } catch (error) {
-      _log?.call('Ignored invalid browser inference progress: $error');
-    }
-  }
-
-  void _emit(FishInferenceProgress value) {
-    if (_availability != FishInferenceAvailability.disposed &&
-        !_progress.isClosed) {
-      _progress.add(value);
-    }
-  }
-
-  /// Cancels the current request. ONNX Runtime itself is not interruptible, so
-  /// disposal additionally terminates the worker to release it immediately.
-  void cancelPendingInference() {
-    final requestId = _activeRequestId;
-    if (requestId != null) _cancelWorkerRequest(requestId);
-  }
-
   @override
   Future<void> dispose() async {
     if (_availability == FishInferenceAvailability.disposed) return;
     final pendingInitialization = _initializing;
     _availability = FishInferenceAvailability.disposed;
-    cancelPendingInference();
     _disposeWorker();
     try {
       await pendingInitialization;
@@ -362,7 +292,6 @@ final class OnnxFishInference
       // Worker termination rejects an in-flight initialization request.
     }
     await _singleFlight.waitUntilIdle();
-    await _progress.close();
   }
 
   void _ensureNotDisposed() {
@@ -372,31 +301,17 @@ final class OnnxFishInference
   }
 }
 
-FishInferenceCapabilities _readCapabilities() {
+bool _readCapabilities() {
   try {
     final value =
         jsonDecode(_capabilitiesJson().toDart) as Map<String, dynamic>;
-    return FishInferenceCapabilities(
-      webWorker: value['webWorker'] == true,
-      webAssembly: value['webAssembly'] == true,
-      offscreenCanvas: value['offscreenCanvas'] == true,
-      webGpu: value['webGpu'] == true,
-    );
+    return value['webWorker'] == true &&
+        value['webAssembly'] == true &&
+        value['offscreenCanvas'] == true;
   } catch (_) {
-    return const FishInferenceCapabilities.unknown();
+    return false;
   }
 }
-
-FishInferenceProgressStage _progressStage(String? value) => switch (value) {
-  'checkingCapabilities' => FishInferenceProgressStage.checkingCapabilities,
-  'loadingRuntime' => FishInferenceProgressStage.loadingRuntime,
-  'downloadingModel' => FishInferenceProgressStage.downloadingModel,
-  'creatingSession' => FishInferenceProgressStage.creatingSession,
-  'running' => FishInferenceProgressStage.running,
-  'ready' => FishInferenceProgressStage.ready,
-  'cancelled' => FishInferenceProgressStage.cancelled,
-  _ => FishInferenceProgressStage.failed,
-};
 
 double _number(Object? value) {
   if (value is num && value.toDouble().isFinite) return value.toDouble();
@@ -421,10 +336,7 @@ void _validateThresholds(FishInferenceThresholds thresholds) {
 external JSString _capabilitiesJson();
 
 @JS('oceanEyesInference.initialize')
-external JSPromise<JSString> _initializeWorker(
-  JSString configuration,
-  JSFunction onProgress,
-);
+external JSPromise<JSString> _initializeWorker(JSString configuration);
 
 @JS('oceanEyesInference.analyze')
 external JSPromise<JSString> _analyzeWorker(
@@ -437,14 +349,7 @@ external JSPromise<JSString> _analyzeWorker(
   int fullHeight,
   JSString region,
   JSString thresholds,
-  JSFunction onProgress,
 );
-
-@JS('oceanEyesInference.lastRequestId')
-external int _lastWorkerRequestId();
-
-@JS('oceanEyesInference.cancel')
-external void _cancelWorkerRequest(int requestId);
 
 @JS('oceanEyesInference.dispose')
 external void _disposeWorker();

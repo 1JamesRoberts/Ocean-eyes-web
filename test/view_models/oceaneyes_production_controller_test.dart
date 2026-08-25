@@ -1463,27 +1463,13 @@ final class _FakeCameraCaptureGateway implements CameraCaptureGateway {
 }
 
 final class _FakeInferenceEngine
-    implements FishInferenceEngine, FishInferenceDiagnostics {
+    implements FishInferenceEngine, FishInferenceAutomaticInferencePolicy {
   _FakeInferenceEngine({this.automaticInferenceEnabled = true});
 
   final analysisErrors = <Object>[];
 
   @override
   final bool automaticInferenceEnabled;
-
-  @override
-  FishInferenceCapabilities get capabilities => const FishInferenceCapabilities(
-    webWorker: true,
-    webAssembly: true,
-    offscreenCanvas: true,
-    webGpu: true,
-  );
-
-  @override
-  Duration? get lastInferenceDuration => null;
-
-  @override
-  Stream<FishInferenceProgress> get progress => const Stream.empty();
 
   @override
   FishInferenceAvailability get availability => FishInferenceAvailability.ready;

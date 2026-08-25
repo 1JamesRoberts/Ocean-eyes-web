@@ -32,66 +32,16 @@ let queue = Promise.resolve();
 let detectorSession = null;
 let classifierSession = null;
 let claritySession = null;
-const cancelled = new Set();
 
-function progress(id, stage, message, model = null, fraction = null) {
-  scope.postMessage({ id, type: 'progress', progress: { stage, message, model, fraction } });
-}
-
-function assertNotCancelled(id) {
-  if (cancelled.has(id)) throw new DOMException('Browser inference was cancelled.', 'AbortError');
-}
-
-async function fetchModel(id, name, url) {
-  progress(id, 'downloadingModel', `Downloading ${name} model…`, name, 0);
+async function fetchModel(name, url) {
   const response = await fetch(url, { cache: 'force-cache', credentials: 'same-origin' });
   if (!response.ok) throw new Error(`${name} model returned HTTP ${response.status}.`);
-  const total = Number(response.headers.get('content-length')) || 0;
-  if (!response.body) return response.arrayBuffer();
-  const reader = response.body.getReader();
-  let bytes = total > 0 ? new Uint8Array(total) : null;
-  const chunks = bytes ? null : [];
-  let received = 0;
-  while (true) {
-    assertNotCancelled(id);
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (bytes) {
-      if (received + value.byteLength > bytes.byteLength) {
-        const expanded = new Uint8Array(
-          Math.max(received + value.byteLength, bytes.byteLength * 2),
-        );
-        expanded.set(bytes);
-        bytes = expanded;
-      }
-      bytes.set(value, received);
-    } else {
-      chunks.push(value);
-    }
-    received += value.byteLength;
-    progress(
-      id,
-      'downloadingModel',
-      `Downloading ${name} model…`,
-      name,
-      total > 0 ? received / total : null,
-    );
-  }
-  if (bytes) return (bytes.byteLength === received ? bytes : bytes.slice(0, received)).buffer;
-  bytes = new Uint8Array(received);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return bytes.buffer;
+  return response.arrayBuffer();
 }
 
-async function createSession(id, key, preferWebGpu) {
+async function createSession(key, preferWebGpu) {
   const model = configuration.models[key];
-  const bytes = await fetchModel(id, model.name, model.url);
-  assertNotCancelled(id);
-  progress(id, 'creatingSession', `Preparing ${model.name} model…`, model.name, 1);
+  const bytes = await fetchModel(model.name, model.url);
   const common = { executionMode: 'sequential', graphOptimizationLevel: 'all' };
   if (preferWebGpu && configuration.preferWebGpu && 'gpu' in scope.navigator) {
     try {
@@ -113,14 +63,14 @@ async function createSession(id, key, preferWebGpu) {
   };
 }
 
-function getSession(id, key, preferWebGpu) {
+function getSession(key, preferWebGpu) {
   let cachedSession;
   if (key === 'detector') cachedSession = detectorSession;
   else if (key === 'classifier') cachedSession = classifierSession;
   else cachedSession = claritySession;
   if (cachedSession) return cachedSession;
 
-  const creation = createSession(id, key, preferWebGpu);
+  const creation = createSession(key, preferWebGpu);
   const retrySafe = creation.catch((error) => {
     if (key === 'detector' && detectorSession === retrySafe) detectorSession = null;
     if (key === 'classifier' && classifierSession === retrySafe) classifierSession = null;
@@ -274,18 +224,11 @@ function turbidity(probabilities) {
 }
 
 async function analyze(request) {
-  const started = performance.now();
-  const id = request.id;
-  assertNotCancelled(id);
-  progress(id, 'running', 'Preparing camera frames for AI…');
   const detectionSource = sourceCanvas(request.detection);
   const fullSource = sourceCanvas(request.full);
 
-  const detector = await getSession(id, 'detector', false);
-  assertNotCancelled(id);
-  const clarity = await getSession(id, 'clarity', false);
-  assertNotCancelled(id);
-  progress(id, 'running', 'Detecting fish and measuring water clarity…');
+  const detector = await getSession('detector', false);
+  const clarity = await getSession('clarity', false);
   const [detectorOutputs, clarityOutputs] = await Promise.all([
     detector.session.run({ input: fullTensor(detectionSource, request.configuration.detectorInputSize, true) }),
     clarity.session.run({ images: fullTensor(fullSource, request.configuration.waterClarityInputSize, false) }),
@@ -309,10 +252,8 @@ async function analyze(request) {
   const classificationCandidates = candidates.slice(0, request.configuration.maximumClassificationsPerFrame);
   let classifierProvider = null;
   if (classificationCandidates.length > 0) {
-    assertNotCancelled(id);
-    const classifier = await getSession(id, 'classifier', true);
+    const classifier = await getSession('classifier', true);
     classifierProvider = classifier.provider;
-    progress(id, 'running', 'Classifying detected fish…');
     const output = await classifier.session.run({
       input: classifierTensor(
         detectionSource,
@@ -334,9 +275,6 @@ async function analyze(request) {
       speciesCounts[speciesId] = (speciesCounts[speciesId] || 0) + 1;
     }
   }
-  assertNotCancelled(id);
-  const elapsedMilliseconds = performance.now() - started;
-  progress(id, 'ready', `Browser inference completed in ${Math.round(elapsedMilliseconds)} ms.`);
   return {
     fishCount: candidates.length,
     meanDetectionConfidence: candidates.length
@@ -346,7 +284,6 @@ async function analyze(request) {
     turbidityFnu: water.fnu,
     clarityScore: water.clarityScore,
     detections,
-    elapsedMilliseconds,
     providers: { detector: detector.provider, classifier: classifierProvider, clarity: clarity.provider },
     contractVersion: 1,
   };
@@ -356,7 +293,6 @@ async function process(request) {
   try {
     if (request.type === 'initialize') {
       configuration = request.configuration;
-      progress(request.id, 'checkingCapabilities', 'Browser AI capabilities are available.');
       scope.postMessage({
         id: request.id,
         ok: true,
@@ -369,27 +305,15 @@ async function process(request) {
     const result = await analyze(request);
     scope.postMessage({ id: request.id, ok: true, result });
   } catch (error) {
-    const cancelledRequest = error?.name === 'AbortError';
-    progress(
-      request.id,
-      cancelledRequest ? 'cancelled' : 'failed',
-      cancelledRequest ? 'Browser inference cancelled.' : 'Browser inference failed.',
-    );
     scope.postMessage({
       id: request.id,
       ok: false,
-      error: cancelledRequest ? 'Browser inference was cancelled.' : String(error?.message || error),
+      error: String(error?.message || error),
     });
-  } finally {
-    cancelled.delete(request.id);
   }
 }
 
 scope.addEventListener('message', (event) => {
   const request = event.data;
-  if (request.type === 'cancel') {
-    cancelled.add(request.id);
-    return;
-  }
   queue = queue.then(() => process(request));
 });

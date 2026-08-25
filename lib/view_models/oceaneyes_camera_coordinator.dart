@@ -330,8 +330,8 @@ class OceanEyesCameraCoordinator {
     _inferenceTimer = null;
     final inference = _inference;
     final automaticInferenceAllowed = switch (inference) {
-      FishInferenceDiagnostics diagnostics =>
-        diagnostics.automaticInferenceEnabled,
+      FishInferenceAutomaticInferencePolicy policy =>
+        policy.automaticInferenceEnabled,
       _ => true,
     };
     if (!_enabled ||
