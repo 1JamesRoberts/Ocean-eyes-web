@@ -8,7 +8,9 @@ import 'package:livekit_client/livekit_client.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/oceaneyes_tokens.dart';
+import '../../integrations/ml/onnx_fish_inference.dart';
 import '../../models/aquarium_models.dart';
+import '../../models/classifiable_species.dart';
 import '../../models/fish_motion_scene.dart';
 import '../../models/production_data.dart';
 import '../../view_models/oceaneyes_controller.dart';
@@ -402,10 +404,17 @@ class AquariumHero extends StatelessWidget {
           if (_isStreaming &&
               controller.aiEnabled &&
               controller.showDetections &&
+              controller.fishDetections.isNotEmpty &&
+              controller.heatmapSourceDimensions.isValid &&
               page == AppPage.primary &&
               controller.activeTab == PrimaryTab.account)
-            const Positioned.fill(
-              child: IgnorePointer(child: _DetectionBoxes()),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: _DetectionBoxes(
+                  detections: controller.fishDetections,
+                  sourceDimensions: controller.heatmapSourceDimensions,
+                ),
+              ),
             ),
           if (controller.activeTab == PrimaryTab.analytics &&
               page == AppPage.primary)
@@ -972,73 +981,66 @@ class _HeroCircleButton extends StatelessWidget {
 }
 
 class _DetectionBoxes extends StatelessWidget {
-  const _DetectionBoxes();
+  const _DetectionBoxes({
+    required this.detections,
+    required this.sourceDimensions,
+  });
+
+  final List<FishDetection> detections;
+  final DetectionFrameDimensions sourceDimensions;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: const [
-        _DetectionBox(
-          left: 0.12,
-          top: 0.33,
-          width: 0.15,
-          height: 0.18,
-          speciesId: 'cardinal_tetra',
-          label: 'Cardinal Tetra 94%',
-        ),
-        _DetectionBox(
-          left: 0.48,
-          top: 0.44,
-          width: 0.18,
-          height: 0.20,
-          speciesId: 'guppy',
-          label: 'Guppy 89%',
-        ),
-        _DetectionBox(
-          left: 0.72,
-          top: 0.25,
-          width: 0.13,
-          height: 0.17,
-          speciesId: 'corydoras',
-          label: 'Corydoras 82%',
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final imageRect = calculateHeatmapObjectCoverRect(
+          sourceWidth: sourceDimensions.width.toDouble(),
+          sourceHeight: sourceDimensions.height.toDouble(),
+          containerWidth: constraints.maxWidth,
+          containerHeight: constraints.maxHeight,
+        );
+        if (imageRect == Rect.zero) return const SizedBox.shrink();
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            for (final detection in detections)
+              _DetectionBox(
+                detection: detection,
+                rect: Rect.fromLTRB(
+                  imageRect.left + detection.box.left * imageRect.width,
+                  imageRect.top + detection.box.top * imageRect.height,
+                  imageRect.left + detection.box.right * imageRect.width,
+                  imageRect.top + detection.box.bottom * imageRect.height,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
 
 class _DetectionBox extends StatelessWidget {
-  const _DetectionBox({
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
-    required this.speciesId,
-    required this.label,
-  });
+  const _DetectionBox({required this.detection, required this.rect});
 
-  final double left;
-  final double top;
-  final double width;
-  final double height;
-  final String speciesId;
-  final String label;
+  final FishDetection detection;
+  final Rect rect;
 
   @override
   Widget build(BuildContext context) {
-    final referenceWidth = math.min(
-      MediaQuery.sizeOf(context).width,
-      OceanGeometry.referenceWidth,
-    );
-    final boxWidth = referenceWidth * width;
+    final speciesId = detection.speciesId;
+    final boxWidth = rect.width;
     final fontSize = (boxWidth * 0.12).clamp(10.0, 22.0).toDouble();
-    final boxColor = SpeciesDonut.colorForSpeciesId(speciesId);
+    final boxColor = speciesId == null || speciesId.trim().isEmpty
+        ? OceanColors.neonIce
+        : SpeciesDonut.colorForSpeciesId(
+            ClassifiableSpeciesCatalog.resolveId(speciesId),
+          );
+    final label = _detectionLabel(detection);
 
-    return Positioned(
-      left: referenceWidth * left,
-      top: OceanGeometry.heroHeight * top,
-      width: boxWidth,
-      height: OceanGeometry.heroHeight * height,
+    return Positioned.fromRect(
+      rect: rect,
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(color: boxColor, width: 1),
@@ -1075,6 +1077,30 @@ class _DetectionBox extends StatelessWidget {
       ),
     );
   }
+}
+
+String _detectionLabel(FishDetection detection) {
+  final speciesId = detection.speciesId;
+  final name = speciesId == null || speciesId.trim().isEmpty
+      ? 'Fish'
+      : _speciesDisplayName(ClassifiableSpeciesCatalog.resolveId(speciesId));
+  final confidence =
+      detection.classificationConfidence ?? detection.detectionConfidence;
+  if (!confidence.isFinite) return name;
+  return '$name ${(confidence.clamp(0.0, 1.0) * 100).round()}%';
+}
+
+String _speciesDisplayName(String speciesId) {
+  for (final species in ClassifiableSpeciesCatalog.options) {
+    if (species.id == speciesId) return species.name;
+  }
+  return speciesId
+      .split('_')
+      .where((word) => word.isNotEmpty)
+      .map(
+        (word) => '${word.substring(0, 1).toUpperCase()}${word.substring(1)}',
+      )
+      .join(' ');
 }
 
 class _FishMotionOverlay extends StatefulWidget {

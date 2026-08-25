@@ -1,3 +1,4 @@
+import '../integrations/ml/onnx_fish_inference.dart';
 import 'aquarium_models.dart';
 
 enum ProductionTankMemberRole { owner, monitor, viewer, none }
@@ -116,6 +117,7 @@ class ProductionReading {
     required this.speciesDetected,
     required this.frameUrl,
     required this.detections,
+    this.fishDetections = const [],
     this.timestamp,
     this.clarityScore,
     this.turbidityFnu,
@@ -145,6 +147,10 @@ class ProductionReading {
   final double? ammoniaPpm;
   final double? nitritePpm;
   final List<NormalizedDetectionCenter> detections;
+
+  /// Full inference boxes for the live overlay; centers remain the heatmap
+  /// compatibility format used by existing readings.
+  final List<FishDetection> fishDetections;
   final DetectionFrameDimensions? frameDimensions;
 
   /// Seed readings and writes with pending timestamps do not enter history or
@@ -167,6 +173,7 @@ class ProductionReadingDraft {
     this.ammoniaPpm,
     this.nitritePpm,
     this.detections = const [],
+    this.fishDetections = const [],
     this.frameDimensions,
   });
 
@@ -182,6 +189,7 @@ class ProductionReadingDraft {
   final double? ammoniaPpm;
   final double? nitritePpm;
   final List<NormalizedDetectionCenter> detections;
+  final List<FishDetection> fishDetections;
   final DetectionFrameDimensions? frameDimensions;
 }
 

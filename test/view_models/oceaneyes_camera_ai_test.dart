@@ -35,6 +35,11 @@ void main() {
         expect(reading.detections.single.ny, 0.625);
         expect(harness.repository.detectedUpdates, const {'fish-1': 2});
         expect(harness.host.lastTurbidityResult, '3.3 FNU');
+        expect(harness.host.fishDetections, hasLength(1));
+        expect(harness.host.fishDetections.single.box.centerX, 0.5);
+        expect(harness.host.fishDetections.single.box.centerY, 0.625);
+        expect(reading.fishDetections, hasLength(1));
+        expect(reading.fishDetections.single.box.width, closeTo(0.2, 0.0001));
         expect(harness.host.productionError, isNull);
       } finally {
         await harness.dispose();
@@ -221,6 +226,8 @@ final class _FakeCameraHost implements OceanEyesCameraHost {
   String? lastTurbidityResult;
   @override
   Uint8List? latestCameraFrameBytes;
+  @override
+  List<FishDetection> fishDetections = const [];
   @override
   List<NormalizedDetectionCenter> heatmapCenters = const [];
   @override

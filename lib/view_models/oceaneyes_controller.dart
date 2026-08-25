@@ -328,6 +328,7 @@ class OceanEyesController extends ChangeNotifier
     alerts = const [];
     history = const [];
     heatmapCenters = const [];
+    fishDetections = const [];
     _productionWaterMetrics = _unreportedWaterMetrics;
     _productionAnalytics = ProductionAnalyticsData.empty;
     _productionClaritySeries = const [];
@@ -414,6 +415,7 @@ class OceanEyesController extends ChangeNotifier
     if (reading.detections.isNotEmpty) {
       heatmapCenters = reading.detections;
     }
+    fishDetections = reading.fishDetections;
     final dimensions = reading.frameDimensions;
     if (dimensions != null) heatmapSourceDimensions = dimensions;
   }
@@ -603,6 +605,8 @@ class OceanEyesController extends ChangeNotifier
       _liveSession.connectionState;
   @override
   Uint8List? latestCameraFrameBytes;
+  @override
+  List<FishDetection> fishDetections = const [];
 
   DashboardHealthState dashboardHealth = DashboardHealthState.waiting;
   AnalyticsContentState analyticsState = AnalyticsContentState.empty;

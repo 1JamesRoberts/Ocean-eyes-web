@@ -33,6 +33,8 @@ abstract interface class OceanEyesCameraHost {
   set lastTurbidityResult(String? value);
   Uint8List? get latestCameraFrameBytes;
   set latestCameraFrameBytes(Uint8List? value);
+  List<FishDetection> get fishDetections;
+  set fishDetections(List<FishDetection> value);
   List<NormalizedDetectionCenter> get heatmapCenters;
   set heatmapCenters(List<NormalizedDetectionCenter> value);
   DetectionFrameDimensions get heatmapSourceDimensions;
@@ -272,6 +274,7 @@ class OceanEyesCameraCoordinator {
 
       _host.lastTurbidityResult =
           '${result.turbidityFnu.toStringAsFixed(1)} FNU';
+      _host.fishDetections = result.detections;
       _host.heatmapCenters = result.classifiedCenters
           .map(
             (center) => NormalizedDetectionCenter(
@@ -295,6 +298,7 @@ class OceanEyesCameraCoordinator {
             fishCountConfidence: result.meanDetectionConfidence,
             speciesDetected: result.speciesCounts,
             detections: _host.heatmapCenters,
+            fishDetections: result.detections,
             frameDimensions: _host.heatmapSourceDimensions,
           ),
         );

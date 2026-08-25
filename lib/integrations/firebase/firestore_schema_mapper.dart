@@ -6,6 +6,7 @@ import '../../models/aquarium_models.dart';
 import '../../models/classifiable_species.dart';
 import '../../models/production_data.dart';
 import '../../models/species_catalog.dart';
+import '../ml/onnx_fish_inference.dart';
 
 class FirestoreDocumentData {
   const FirestoreDocumentData({required this.id, required this.data});
@@ -137,6 +138,7 @@ class FirestoreSchemaMapper {
           .clamp(0, 1),
       speciesDetected: _speciesCounts(data['species_detected']),
       frameUrl: _string(data['frame_url']),
+      fishDetections: _fishDetections(data['detections']),
       ph: _firstDouble([data['ph'], chemistry['ph'], water['ph']]),
       temperatureCelsius: _firstDouble([
         data['temperature_c'],
@@ -494,6 +496,28 @@ class FirestoreSchemaMapper {
           )
           .toList(growable: false);
     }
+    if (reading.fishDetections.isNotEmpty) {
+      result['detections'] = reading.fishDetections
+          .map(
+            (detection) => <String, Object?>{
+              'left': detection.box.left.clamp(0, 1),
+              'top': detection.box.top.clamp(0, 1),
+              'right': detection.box.right.clamp(0, 1),
+              'bottom': detection.box.bottom.clamp(0, 1),
+              'nx': detection.box.centerX.clamp(0, 1),
+              'ny': detection.box.centerY.clamp(0, 1),
+              'species_id': detection.speciesId == null
+                  ? null
+                  : ClassifiableSpeciesCatalog.resolveId(
+                      _idFromName(detection.speciesId!),
+                    ),
+              'detection_confidence': detection.detectionConfidence.clamp(0, 1),
+              'classification_confidence': detection.classificationConfidence
+                  ?.clamp(0, 1),
+            },
+          )
+          .toList(growable: false);
+    }
     final dimensions = reading.frameDimensions;
     if (dimensions != null && dimensions.isValid) {
       result['frame_dimensions'] = <String, int>{
@@ -619,6 +643,50 @@ class FirestoreSchemaMapper {
           speciesId: ClassifiableSpeciesCatalog.resolveId(
             _idFromName(speciesId),
           ),
+        ),
+      );
+    }
+    return List.unmodifiable(result);
+  }
+
+  List<FishDetection> _fishDetections(Object? value) {
+    if (value is! Iterable) return const [];
+    final result = <FishDetection>[];
+    for (final entry in value) {
+      final detection = _map(entry);
+      final box = _map(detection['box']);
+      final left = _firstDouble([detection['left'], box['left']]);
+      final top = _firstDouble([detection['top'], box['top']]);
+      final right = _firstDouble([detection['right'], box['right']]);
+      final bottom = _firstDouble([detection['bottom'], box['bottom']]);
+      if (left == null || top == null || right == null || bottom == null) {
+        continue;
+      }
+      final rawSpeciesId = _nonEmptyString(
+        detection['species_id'] ?? detection['speciesId'],
+      );
+      final speciesId = rawSpeciesId == null
+          ? null
+          : ClassifiableSpeciesCatalog.resolveId(_idFromName(rawSpeciesId));
+      result.add(
+        FishDetection(
+          box: NormalizedFishBox.fromEdges(
+            left: left,
+            top: top,
+            right: right,
+            bottom: bottom,
+          ),
+          detectionConfidence:
+              _firstDouble([
+                detection['detection_confidence'],
+                detection['detectionConfidence'],
+              ]) ??
+              0,
+          speciesId: speciesId,
+          classificationConfidence: _firstDouble([
+            detection['classification_confidence'],
+            detection['classificationConfidence'],
+          ]),
         ),
       );
     }

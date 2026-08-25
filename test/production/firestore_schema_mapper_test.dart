@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/integrations/firebase/firestore_schema_mapper.dart';
+import 'package:oceaneyes/integrations/ml/onnx_fish_inference.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
 import 'package:oceaneyes/models/production_data.dart';
 
@@ -328,6 +329,57 @@ void main() {
       expect(data['clarity_score'], 8.4);
       expect(data['turbidity_fnu'], 2.7);
       expect(data['species_detected'], <String, int>{'plecostomus': 1});
+    });
+
+    test('writes and reads detection boxes with confidence metadata', () {
+      final draft = ProductionReadingDraft(
+        tankId: 'tank',
+        clarityScore: 8.4,
+        fishCount: 1,
+        speciesDetected: const <String, int>{'cardinal_tetra': 1},
+        fishDetections: [
+          FishDetection(
+            box: NormalizedFishBox.fromEdges(
+              left: 0.35,
+              top: 0.40,
+              right: 0.65,
+              bottom: 0.60,
+            ),
+            detectionConfidence: 0.81,
+            speciesId: 'cardinal_tetra',
+            classificationConfidence: 0.94,
+          ),
+        ],
+        frameDimensions: const DetectionFrameDimensions(
+          width: 1920,
+          height: 1080,
+        ),
+      );
+
+      final data = mapper.readingData(draft, serverTimestamp: 'server-time');
+      final detections = data['detections'] as List<Object?>;
+      final detection = detections.single as Map<String, Object?>;
+
+      expect(detection['left'], 0.35);
+      expect(detection['right'], 0.65);
+      expect(detection['detection_confidence'], 0.81);
+      expect(detection['classification_confidence'], 0.94);
+
+      final reading = mapper.readingFromDocument(
+        FirestoreDocumentData(
+          id: 'reading',
+          data: <String, dynamic>{...data, 'timestamp': now},
+        ),
+      );
+
+      expect(reading.fishDetections, hasLength(1));
+      expect(reading.fishDetections.single.box.left, closeTo(0.35, 0.0001));
+      expect(reading.fishDetections.single.speciesId, 'cardinal_tetra');
+      expect(
+        reading.fishDetections.single.classificationConfidence,
+        closeTo(0.94, 0.0001),
+      );
+      expect(reading.frameDimensions?.width, 1920);
     });
 
     test('writes both current and converted legacy threshold fields', () {
