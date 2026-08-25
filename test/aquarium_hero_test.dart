@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:oceaneyes/integrations/camera/camera_capture_models.dart';
 import 'package:oceaneyes/integrations/ml/onnx_fish_inference.dart';
 import 'package:oceaneyes/models/aquarium_models.dart';
 import 'package:oceaneyes/models/production_data.dart';
@@ -83,6 +84,26 @@ void main() {
     },
   );
 
+  testWidgets('hero keeps a live camera preview out of the fade mask', (
+    tester,
+  ) async {
+    final controller = OceanEyesController(
+        localPreviewEnabled: true,
+        cameraGateway: _PreviewCameraGateway(),
+      )
+      ..cameraStage = CameraStage.active;
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AquariumHero(controller: controller, page: AppPage.primary),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey('test-camera-preview')), findsOneWidget);
+    expect(find.byType(ShaderMask), findsNothing);
+  });
+
   test('owner and monitor roles map to the monitor side', () {
     expect(ProductionTankMemberRole.owner.liveRole, ProductionLiveRole.monitor);
     expect(
@@ -91,4 +112,45 @@ void main() {
     );
     expect(ProductionTankMemberRole.viewer.liveRole, ProductionLiveRole.viewer);
   });
+}
+
+final class _PreviewCameraGateway
+    implements CameraCaptureGateway, CameraPreviewSource {
+  @override
+  Widget get cameraPreview => const ColoredBox(
+    key: ValueKey('test-camera-preview'),
+    color: Colors.deepPurple,
+  );
+
+  @override
+  bool get isSupported => true;
+
+  @override
+  CameraCaptureSnapshot get snapshot => const CameraCaptureSnapshot.initial();
+
+  @override
+  Stream<CameraCaptureSnapshot> get states => Stream<CameraCaptureSnapshot>.empty();
+
+  @override
+  Future<CameraCaptureSnapshot> initialize({bool requestPermission = true}) =>
+      Future.value(snapshot);
+
+  @override
+  Future<CapturedCameraFrame?> capture({double? normalizedWaterLineY}) =>
+      Future.value(null);
+
+  @override
+  Future<CameraCaptureSnapshot> switchLens() => Future.value(snapshot);
+
+  @override
+  Future<CameraCaptureSnapshot> setZoom(double zoom) => Future.value(snapshot);
+
+  @override
+  Future<void> suspend() => Future<void>.value();
+
+  @override
+  Future<CameraCaptureSnapshot> resume() => Future.value(snapshot);
+
+  @override
+  Future<void> dispose() => Future<void>.value();
 }

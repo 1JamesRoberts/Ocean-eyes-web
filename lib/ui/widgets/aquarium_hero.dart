@@ -40,6 +40,10 @@ class AquariumAmbientBackdrop extends StatelessWidget {
       CameraStage.measuringTurbidity => true,
       _ => false,
     };
+    final hasPlatformVideo =
+        controller.remoteVideoTrack is VideoTrack ||
+        controller.localVideoTrack is VideoTrack ||
+        controller.cameraPreview != null;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -54,7 +58,7 @@ class AquariumAmbientBackdrop extends StatelessWidget {
               clipBehavior: Clip.none,
               fit: StackFit.expand,
               children: [
-                if (streaming && !reducedMotion)
+                if (streaming && !reducedMotion && !hasPlatformVideo)
                   Positioned(
                     left: -32,
                     top: -32,
@@ -165,11 +169,13 @@ class AquariumStreamImage extends StatelessWidget {
     required this.controller,
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
+    this.applyAdjustments = true,
   });
 
   final OceanEyesController controller;
   final BoxFit fit;
   final AlignmentGeometry alignment;
+  final bool applyAdjustments;
 
   @override
   Widget build(BuildContext context) {
@@ -216,6 +222,9 @@ class AquariumStreamImage extends StatelessWidget {
     } else {
       streamImage = const _ProductionUnavailableFeed();
     }
+
+    // Texture/HTML video surfaces must stay out of post-processing layers.
+    if (!applyAdjustments) return streamImage;
 
     Widget image = ColorFiltered(
       colorFilter: ColorFilter.matrix([
@@ -345,6 +354,15 @@ class AquariumHero extends StatelessWidget {
     _ => false,
   };
 
+  /// Camera and WebRTC previews are platform-backed surfaces. They cannot be
+  /// reliably rendered through the hero's destination-in mask, so keep those
+  /// surfaces in the normal compositing path.
+  bool get _hasPlatformVideo =>
+      _isStreaming &&
+      (controller.remoteVideoTrack is VideoTrack ||
+          controller.localVideoTrack is VideoTrack ||
+          controller.cameraPreview != null);
+
   String get _eyebrow {
     if (page == AppPage.alerts) return 'ALERTS';
     if (page == AppPage.alertDetail) return 'ALERT DIAGNOSTICS';
@@ -374,32 +392,51 @@ class AquariumHero extends StatelessWidget {
         clipBehavior: Clip.none,
         fit: StackFit.expand,
         children: [
-          ShaderMask(
-            blendMode: BlendMode.dstIn,
-            shaderCallback: (bounds) => LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black,
-                Colors.black,
-                Color(0xB3000000),
-                Color(0x33000000),
-                Color(0x1A000000),
-                Colors.transparent,
+          if (_hasPlatformVideo)
+            Stack(
+              fit: StackFit.expand,
+              children: [
+                ColoredBox(
+                  color: OceanColors.prussianBlue,
+                  child: _isStreaming
+                      ? AquariumStreamImage(
+                          controller: controller,
+                          fit: BoxFit.cover,
+                          alignment: Alignment.center,
+                          applyAdjustments: false,
+                        )
+                      : const SizedBox.expand(),
+                ),
+                _HeroPlatformVideoFade(controller: controller),
               ],
-              stops: fadeStops,
-            ).createShader(bounds),
-            child: ColoredBox(
-              color: OceanColors.prussianBlue,
-              child: _isStreaming
-                  ? AquariumStreamImage(
-                      controller: controller,
-                      fit: BoxFit.cover,
-                      alignment: Alignment.center,
-                    )
-                  : const SizedBox.expand(),
+            )
+          else
+            ShaderMask(
+              blendMode: BlendMode.dstIn,
+              shaderCallback: (bounds) => LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black,
+                  Colors.black,
+                  Color(0xB3000000),
+                  Color(0x33000000),
+                  Color(0x1A000000),
+                  Colors.transparent,
+                ],
+                stops: fadeStops,
+              ).createShader(bounds),
+              child: ColoredBox(
+                color: OceanColors.prussianBlue,
+                child: _isStreaming
+                    ? AquariumStreamImage(
+                        controller: controller,
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
+                      )
+                    : const SizedBox.expand(),
+              ),
             ),
-          ),
           if (_isStreaming)
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -556,6 +593,48 @@ class AquariumHero extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HeroPlatformVideoFade extends StatelessWidget {
+  const _HeroPlatformVideoFade({required this.controller});
+
+  final OceanEyesController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final fadeStart = (controller.heroFadeStart / 100).clamp(0.0, 0.80);
+    final grey = controller.ambientBaseGrey.round().clamp(0, 255);
+    final background = grey == 255
+        ? OceanColors.azureMist
+        : Color.fromARGB(255, grey, grey, grey);
+    final stops = <double>[
+      0,
+      fadeStart,
+      fadeStart + (1 - fadeStart) * 0.20,
+      fadeStart + (1 - fadeStart) * 0.50,
+      fadeStart + (1 - fadeStart) * 0.80,
+      1,
+    ];
+    return IgnorePointer(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.transparent,
+              background.withValues(alpha: 0.25),
+              background.withValues(alpha: 0.60),
+              background.withValues(alpha: 0.84),
+              background,
+            ],
+            stops: stops,
+          ),
+        ),
       ),
     );
   }
