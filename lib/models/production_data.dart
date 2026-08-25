@@ -2,6 +2,17 @@ import 'aquarium_models.dart';
 
 enum ProductionTankMemberRole { owner, monitor, viewer, none }
 
+enum ProductionLiveRole { monitor, viewer }
+
+extension ProductionTankMemberRoleLiveRole on ProductionTankMemberRole {
+  /// Owners and monitors publish the aquarium feed from the monitor side.
+  /// Unknown roles keep the monitor-side fallback used by local preview.
+  ProductionLiveRole get liveRole => switch (this) {
+    ProductionTankMemberRole.viewer => ProductionLiveRole.viewer,
+    _ => ProductionLiveRole.monitor,
+  };
+}
+
 /// Tank alert thresholds in both the current and deployed compatibility units.
 ///
 /// The deployed application stores a minimum clarity score on a 1-10 scale.

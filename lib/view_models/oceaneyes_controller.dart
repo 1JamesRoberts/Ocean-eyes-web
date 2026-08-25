@@ -963,6 +963,7 @@ class OceanEyesController extends ChangeNotifier
 
   bool get productionServicesAvailable => _productionBindings.isAvailable;
   String get tankReferenceCode => activeTankId ?? '';
+  ProductionLiveRole get liveRole => _tankRole.liveRole;
   bool get canEditTankSettings =>
       localPreviewEnabled || _tankRole == ProductionTankMemberRole.owner;
   bool get canCalibrateTank =>

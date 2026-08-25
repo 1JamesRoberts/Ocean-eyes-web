@@ -10,6 +10,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/theme/oceaneyes_tokens.dart';
 import '../../models/aquarium_models.dart';
 import '../../models/fish_motion_scene.dart';
+import '../../models/production_data.dart';
 import '../../view_models/oceaneyes_controller.dart';
 import 'data_visuals.dart';
 
@@ -449,10 +450,7 @@ class AquariumHero extends StatelessWidget {
                         left: 16,
                         child: Row(
                           children: [
-                            _HeroPill(
-                              semanticLabel: 'Camera is live',
-                              child: const Text('Live'),
-                            ),
+                            LiveRoleChip(role: controller.liveRole),
                             const SizedBox(width: 8),
                             _HeroPill(
                               semanticLabel:
@@ -545,21 +543,58 @@ class AquariumHero extends StatelessWidget {
   }
 }
 
+class LiveRoleChip extends StatelessWidget {
+  const LiveRoleChip({super.key, required this.role});
+
+  final ProductionLiveRole role;
+
+  IconData get _icon => switch (role) {
+    ProductionLiveRole.monitor => LucideIcons.smartphone,
+    ProductionLiveRole.viewer => LucideIcons.eye,
+  };
+
+  String get _semanticLabel => switch (role) {
+    ProductionLiveRole.monitor => 'Live Monitor side',
+    ProductionLiveRole.viewer => 'Live Viewer side',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return _HeroPill(
+      semanticLabel: _semanticLabel,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(_icon, size: 13),
+          const SizedBox(width: 4),
+          const Text('Live'),
+        ],
+      ),
+    );
+  }
+}
+
 class _HeroPill extends StatelessWidget {
   const _HeroPill({
     super.key,
     required this.child,
     required this.semanticLabel,
     this.onTap,
+    this.active = false,
+    this.circle = false,
+    this.includeSemantics = true,
   });
 
   final Widget child;
   final String semanticLabel;
   final VoidCallback? onTap;
+  final bool active;
+  final bool circle;
+  final bool includeSemantics;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(OceanRadii.pill);
+    final radius = BorderRadius.circular(circle ? 16 : OceanRadii.pill);
     Widget pill = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: radius,
@@ -578,9 +613,16 @@ class _HeroPill extends StatelessWidget {
           child: Stack(
             children: [
               Container(
-                constraints: const BoxConstraints(minHeight: 32),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                constraints: circle
+                    ? const BoxConstraints.tightFor(width: 32, height: 32)
+                    : const BoxConstraints(minHeight: 32),
+                padding: circle
+                    ? EdgeInsets.zero
+                    : const EdgeInsets.symmetric(horizontal: 8),
                 alignment: Alignment.center,
+                color: active
+                    ? OceanColors.turquoise.withValues(alpha: 0.06)
+                    : null,
                 child: DefaultTextStyle(
                   style: const TextStyle(
                     fontFamily: 'Inter',
@@ -625,7 +667,14 @@ class _HeroPill extends StatelessWidget {
         ),
       );
     }
-    return Semantics(label: semanticLabel, button: onTap != null, child: pill);
+    if (!includeSemantics) return pill;
+    return Semantics(
+      container: true,
+      excludeSemantics: true,
+      label: semanticLabel,
+      button: onTap != null,
+      child: pill,
+    );
   }
 }
 
@@ -893,25 +942,14 @@ class _HeroCircleButton extends StatelessWidget {
             onTap: onTap,
             customBorder: const CircleBorder(),
             child: Center(
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: active
-                      ? OceanColors.turquoise.withValues(alpha: 0.06)
-                      : Colors.transparent,
-                  boxShadow: [
-                    BoxShadow(
-                      color: OceanColors.prussianBlue.withValues(alpha: 0.12),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+              child: _HeroPill(
+                semanticLabel: tooltip,
+                active: active,
+                circle: true,
+                includeSemantics: false,
                 child: loading
-                    ? const Padding(
-                        padding: EdgeInsets.all(8),
+                    ? const SizedBox.square(
+                        dimension: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: OceanColors.white,
