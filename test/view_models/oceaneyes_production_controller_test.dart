@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/widgets.dart';
@@ -396,6 +397,89 @@ void main() {
     await repository.close();
     await auth.close();
   });
+
+  test('browser validation gate prevents automatic inference', () async {
+    final repository = _FakeProductionRepository();
+    final auth = _FakeProductionAuth(user: _user);
+    final wakeLock = _FakeWakeLockGateway();
+    final controller = _productionController(
+      repository,
+      auth,
+      cameraGateway: _FakeCameraCaptureGateway(),
+      inferenceEngine: _FakeInferenceEngine(automaticInferenceEnabled: false),
+      wakeLockGateway: wakeLock,
+    );
+
+    await controller.initializeProduction();
+    repository.emitLinkedTankIds(const ['tank-a']);
+    await _drainMicrotasks();
+    controller.setAutoConnect(true);
+    await _drainMicrotasks();
+
+    expect(wakeLock.enabledValues, isNot(contains(true)));
+
+    controller.dispose();
+    await _drainMicrotasks();
+    await repository.close();
+    await auth.close();
+  });
+
+  test(
+    'lazy browser model-load failure stops polling and releases the wake lock',
+    () async {
+      final repository = _FakeProductionRepository();
+      final auth = _FakeProductionAuth(user: _user);
+      final wakeLock = _FakeWakeLockGateway();
+      final camera = _FakeCameraCaptureGateway(returnFrame: true);
+      final inference = _FakeInferenceEngine();
+      inference.analysisErrors.add(
+        const FishInferenceException(
+          'model download failed',
+          kind: FishInferenceFailureKind.modelLoad,
+        ),
+      );
+      final controller = _productionController(
+        repository,
+        auth,
+        cameraGateway: camera,
+        inferenceEngine: inference,
+        wakeLockGateway: wakeLock,
+      );
+
+      await controller.initializeProduction();
+      repository.emitLinkedTankIds(const ['tank-a']);
+      await _drainMicrotasks();
+      controller.pollingIntervalMs = 1000;
+      controller.setAutoConnect(true);
+      await _drainMicrotasks();
+      expect(wakeLock.enabledValues.last, isTrue);
+
+      controller.measureTurbidity();
+      await _waitUntil(
+        () =>
+            camera.captureCalls == 1 &&
+            wakeLock.enabledValues.isNotEmpty &&
+            !wakeLock.enabledValues.last,
+      );
+      expect(repository.callCount('writeReading'), 0);
+
+      await Future<void>.delayed(const Duration(milliseconds: 1100));
+      expect(camera.captureCalls, 1);
+      expect(wakeLock.enabledValues.last, isFalse);
+
+      // A user-triggered retry must remain available after automatic polling
+      // has been stopped for the lazy model failure.
+      controller.measureTurbidity();
+      await _waitUntil(() => camera.captureCalls == 2);
+      await _drainMicrotasks();
+      expect(repository.callCount('writeReading'), 1);
+
+      controller.dispose();
+      await _drainMicrotasks();
+      await repository.close();
+      await auth.close();
+    },
+  );
 
   test('terminal camera states release automatic-monitor wake lock', () async {
     final repository = _FakeProductionRepository();
@@ -1079,6 +1163,7 @@ final class _FakeProductionRepository implements ProductionOceanEyesRepository {
   final List<String> clearedLiveRequestTankIds = [];
   final List<double> calibrationValues = [];
   final List<bool> recalibrationValues = [];
+  final List<ProductionReadingDraft> readings = [];
   int interactions = 0;
   int linkedTankIdsCancellations = 0;
   bool joinResult = true;
@@ -1212,6 +1297,17 @@ final class _FakeProductionRepository implements ProductionOceanEyesRepository {
   }
 
   @override
+  Future<void> writeReading(ProductionReadingDraft reading) async {
+    _record('writeReading');
+    readings.add(reading);
+  }
+
+  @override
+  Future<void> updateDetectedFish(String fishId, int detected) async {
+    _record('updateDetectedFish:$fishId');
+  }
+
+  @override
   dynamic noSuchMethod(Invocation invocation) {
     interactions++;
     return super.noSuchMethod(invocation);
@@ -1287,6 +1383,9 @@ final class _FakeWakeLockGateway implements WakeLockGateway {
 }
 
 final class _FakeCameraCaptureGateway implements CameraCaptureGateway {
+  _FakeCameraCaptureGateway({this.returnFrame = false});
+
+  final bool returnFrame;
   final StreamController<CameraCaptureSnapshot> _states =
       StreamController<CameraCaptureSnapshot>.broadcast(sync: true);
   CameraCaptureSnapshot _snapshot = const CameraCaptureSnapshot(
@@ -1295,6 +1394,7 @@ final class _FakeCameraCaptureGateway implements CameraCaptureGateway {
   );
   int suspendCalls = 0;
   int resumeCalls = 0;
+  int captureCalls = 0;
 
   @override
   bool get isSupported => true;
@@ -1316,8 +1416,25 @@ final class _FakeCameraCaptureGateway implements CameraCaptureGateway {
   }) async => _snapshot;
 
   @override
-  Future<CapturedCameraFrame?> capture({double? normalizedWaterLineY}) async =>
-      null;
+  Future<CapturedCameraFrame?> capture({double? normalizedWaterLineY}) async {
+    captureCalls += 1;
+    if (!returnFrame) return null;
+    final fullFrame = image.Image(width: 100, height: 80);
+    return CapturedCameraFrame(
+      encodedBytes: Uint8List.fromList(const [1, 2, 3]),
+      fullFrame: fullFrame,
+      waterRegion: image.copyCrop(
+        fullFrame,
+        x: 0,
+        y: 20,
+        width: 100,
+        height: 60,
+      ),
+      waterRegionTopPixels: 20,
+      waterRegionTopNormalized: 0.25,
+      capturedAt: DateTime.utc(2026, 8, 25),
+    );
+  }
 
   @override
   Future<CameraCaptureSnapshot> setZoom(double zoom) async => _snapshot;
@@ -1345,7 +1462,29 @@ final class _FakeCameraCaptureGateway implements CameraCaptureGateway {
   }
 }
 
-final class _FakeInferenceEngine implements FishInferenceEngine {
+final class _FakeInferenceEngine
+    implements FishInferenceEngine, FishInferenceDiagnostics {
+  _FakeInferenceEngine({this.automaticInferenceEnabled = true});
+
+  final analysisErrors = <Object>[];
+
+  @override
+  final bool automaticInferenceEnabled;
+
+  @override
+  FishInferenceCapabilities get capabilities => const FishInferenceCapabilities(
+    webWorker: true,
+    webAssembly: true,
+    offscreenCanvas: true,
+    webGpu: true,
+  );
+
+  @override
+  Duration? get lastInferenceDuration => null;
+
+  @override
+  Stream<FishInferenceProgress> get progress => const Stream.empty();
+
   @override
   FishInferenceAvailability get availability => FishInferenceAvailability.ready;
 
@@ -1368,7 +1507,17 @@ final class _FakeInferenceEngine implements FishInferenceEngine {
     NormalizedImageRegion detectionRegionInFullFrame =
         NormalizedImageRegion.full,
     FishInferenceThresholds? thresholds,
-  }) async => null;
+  }) async {
+    if (analysisErrors.isNotEmpty) throw analysisErrors.removeAt(0);
+    return FishInferenceResult(
+      fishCount: 0,
+      meanDetectionConfidence: 0,
+      speciesCounts: {},
+      turbidityFnu: 1,
+      clarityScore: 10,
+      detections: [],
+    );
+  }
 
   @override
   Future<void> dispose() async {}

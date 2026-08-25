@@ -248,20 +248,20 @@ class OceanEyesCameraCoordinator {
           ),
         );
       } catch (error, stackTrace) {
-        if (error is FishInferenceException &&
-            error.kind == FishInferenceFailureKind.modelContract) {
+        final kind = error is FishInferenceException
+            ? error.kind
+            : FishInferenceFailureKind.execution;
+        if (kind == FishInferenceFailureKind.modelLoad ||
+            kind == FishInferenceFailureKind.modelContract) {
           _modelLoadBlocked = true;
           stopAutomaticInference();
         }
         _onError(
           FishInferenceException(
-            error is FishInferenceException &&
-                    error.kind == FishInferenceFailureKind.modelContract
+            kind == FishInferenceFailureKind.modelContract
                 ? 'AI model contract validation failed.'
                 : 'Aquarium AI analysis failed.',
-            kind: error is FishInferenceException
-                ? error.kind
-                : FishInferenceFailureKind.execution,
+            kind: kind,
             cause: error,
           ),
           stackTrace,
@@ -328,13 +328,20 @@ class OceanEyesCameraCoordinator {
   void configureAutomaticInference() {
     _inferenceTimer?.cancel();
     _inferenceTimer = null;
+    final inference = _inference;
+    final automaticInferenceAllowed = switch (inference) {
+      FishInferenceDiagnostics diagnostics =>
+        diagnostics.automaticInferenceEnabled,
+      _ => true,
+    };
     if (!_enabled ||
         !_host.aiEnabled ||
         !_host.autoConnect ||
         _host.activeTankId == null ||
         _repository == null ||
         _modelLoadBlocked ||
-        _inference?.isSupported != true ||
+        inference?.isSupported != true ||
+        !automaticInferenceAllowed ||
         _gateway?.snapshot.phase != CameraCapturePhase.ready) {
       _wakeLock.setInferenceActive(false);
       return;

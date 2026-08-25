@@ -1,4 +1,65 @@
+import 'dart:async';
+
 import 'package:image/image.dart' as image;
+
+enum FishInferenceProgressStage {
+  checkingCapabilities,
+  loadingRuntime,
+  downloadingModel,
+  creatingSession,
+  running,
+  ready,
+  cancelled,
+  failed,
+}
+
+class FishInferenceProgress {
+  const FishInferenceProgress({
+    required this.stage,
+    required this.message,
+    this.model,
+    this.fraction,
+  });
+
+  final FishInferenceProgressStage stage;
+  final String message;
+  final String? model;
+  final double? fraction;
+}
+
+class FishInferenceCapabilities {
+  const FishInferenceCapabilities({
+    required this.webWorker,
+    required this.webAssembly,
+    required this.offscreenCanvas,
+    required this.webGpu,
+  });
+
+  const FishInferenceCapabilities.unknown()
+    : webWorker = false,
+      webAssembly = false,
+      offscreenCanvas = false,
+      webGpu = false;
+
+  final bool webWorker;
+  final bool webAssembly;
+  final bool offscreenCanvas;
+  final bool webGpu;
+
+  bool get supportsBrowserInference =>
+      webWorker && webAssembly && offscreenCanvas;
+}
+
+/// Optional browser diagnostics without widening [FishInferenceEngine].
+///
+/// Browser implementations can expose whether automatic capture is enabled
+/// independently of the platform-neutral inference contract.
+abstract interface class FishInferenceDiagnostics {
+  FishInferenceCapabilities get capabilities;
+  Stream<FishInferenceProgress> get progress;
+  Duration? get lastInferenceDuration;
+  bool get automaticInferenceEnabled;
+}
 
 enum FishInferenceAvailability {
   uninitialized,

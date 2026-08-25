@@ -1,8 +1,14 @@
 # Production ONNX models
 
-OceanEyes bundles three ONNX models for native on-device aquarium analysis.
-Android is the primary target. Web uses the unsupported inference stub and does
-not execute these models.
+OceanEyes bundles three ONNX models for native and browser on-device aquarium
+analysis. Android remains the primary target. Flutter Web selects a dedicated
+ONNX Runtime Web worker implementation; other unsupported platforms retain the
+stub.
+
+Web model sessions load lazily. Camera pixels and results remain in the browser,
+with WASM as the compatibility path and optional WebGPU acceleration. Automatic
+browser polling is enabled by default and can be disabled with the documented
+build flag; see `docs/web-ai-inference-validation.md`.
 
 The binaries total roughly 285 MB and are tracked with Git LFS. Install Git LFS
 before cloning or checking out a release:
