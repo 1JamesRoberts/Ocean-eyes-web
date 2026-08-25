@@ -69,6 +69,7 @@ class OceanEyesLiveSessionCoordinator {
   bool _disconnectRecoveryPending = false;
 
   Object? remoteVideoTrack;
+  Object? localVideoTrack;
   OceanEyesLiveConnectionState connectionState =
       OceanEyesLiveConnectionState.disconnected;
 
@@ -283,6 +284,7 @@ class OceanEyesLiveSessionCoordinator {
     final previousState = connectionState;
     connectionState = snapshot.state;
     remoteVideoTrack = snapshot.remoteVideoTrack;
+    localVideoTrack = snapshot.localVideoTrack;
     if (snapshot.error != null) {
       _onError('Live stream: ${snapshot.error}');
     }

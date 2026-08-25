@@ -17,11 +17,13 @@ class OceanEyesLiveSnapshot {
   const OceanEyesLiveSnapshot({
     required this.state,
     this.remoteVideoTrack,
+    this.localVideoTrack,
     this.error,
   });
 
   final OceanEyesLiveConnectionState state;
   final Object? remoteVideoTrack;
+  final Object? localVideoTrack;
   final Object? error;
 }
 
@@ -57,6 +59,7 @@ class LiveKitGateway implements OceanEyesLiveGateway {
   Room? _room;
   EventsListener<RoomEvent>? _listener;
   VideoTrack? _remoteVideoTrack;
+  LocalVideoTrack? _localVideoTrack;
   OceanEyesLiveConnectionState _state =
       OceanEyesLiveConnectionState.disconnected;
   Object? _lastError;
@@ -68,6 +71,7 @@ class LiveKitGateway implements OceanEyesLiveGateway {
   OceanEyesLiveSnapshot get current => OceanEyesLiveSnapshot(
     state: _state,
     remoteVideoTrack: _remoteVideoTrack,
+    localVideoTrack: _localVideoTrack,
     error: _lastError,
   );
   @override
@@ -114,6 +118,19 @@ class LiveKitGateway implements OceanEyesLiveGateway {
             _emit();
           }
         })
+        ..on<LocalTrackPublishedEvent>((event) {
+          final track = event.publication.track;
+          if (track is LocalVideoTrack) {
+            _localVideoTrack = track;
+            _emit();
+          }
+        })
+        ..on<LocalTrackUnpublishedEvent>((event) {
+          if (identical(_localVideoTrack, event.publication.track)) {
+            _localVideoTrack = null;
+            _emit();
+          }
+        })
         ..on<RoomReconnectingEvent>((_) {
           _setState(OceanEyesLiveConnectionState.reconnecting);
         })
@@ -123,6 +140,7 @@ class LiveKitGateway implements OceanEyesLiveGateway {
         })
         ..on<RoomDisconnectedEvent>((event) {
           _remoteVideoTrack = null;
+          _localVideoTrack = null;
           _setState(
             OceanEyesLiveConnectionState.disconnected,
             error: event.reason,
@@ -175,6 +193,7 @@ class LiveKitGateway implements OceanEyesLiveGateway {
   }
 
   Future<void> _cleanRoom() async {
+    _localVideoTrack = null;
     await _listener?.dispose();
     _listener = null;
     final room = _room;

@@ -341,6 +341,7 @@ class OceanEyesController extends ChangeNotifier
     latestCameraFrameBytes = null;
     liveState = null;
     _liveSession.remoteVideoTrack = null;
+    _liveSession.localVideoTrack = null;
     lastTurbidityResult = null;
     _waterLineY = null;
     recalibrationRequested = false;
@@ -601,6 +602,7 @@ class OceanEyesController extends ChangeNotifier
   ProductionAuthUser? productionUser;
   ProductionLiveState? liveState;
   Object? get remoteVideoTrack => _liveSession.remoteVideoTrack;
+  Object? get localVideoTrack => _liveSession.localVideoTrack;
   OceanEyesLiveConnectionState get liveConnectionState =>
       _liveSession.connectionState;
   @override

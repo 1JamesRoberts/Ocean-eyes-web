@@ -184,11 +184,17 @@ class AquariumStreamImage extends StatelessWidget {
     const blueLuminance = 0.0722;
 
     final remoteTrack = controller.remoteVideoTrack;
+    final localTrack = controller.localVideoTrack;
     final capturedFrame = controller.latestCameraFrameBytes;
     final Widget streamImage;
     if (remoteTrack is VideoTrack) {
       streamImage = VideoTrackRenderer(
         remoteTrack,
+        fit: fit == BoxFit.contain ? VideoViewFit.contain : VideoViewFit.cover,
+      );
+    } else if (localTrack is VideoTrack) {
+      streamImage = VideoTrackRenderer(
+        localTrack,
         fit: fit == BoxFit.contain ? VideoViewFit.contain : VideoViewFit.cover,
       );
     } else if (capturedFrame != null) {
