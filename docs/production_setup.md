@@ -1,8 +1,8 @@
 # Production setup
 
-OceanEyes ships a Firebase-backed production stack. Debug/profile runs also
-have a credential-free local preview for UI development; release builds never
-use that preview. Tests use injected fakes.
+OceanEyes ships a Firebase-backed production stack. Debug, profile, and release
+runs use the real integrations by default. Tests use injected fakes, and an
+explicit local-preview flag remains available for isolated UI development.
 
 ## Firebase client configuration
 
@@ -27,9 +27,9 @@ App Check debug tokens in the repository.
 
 ## Runtime values
 
-Copy `config/production.example.json` outside the repository and replace its
-placeholders. It contains only values that are not part of the generated
-Firebase options:
+The Firebase project's OAuth client IDs have non-secret defaults in the app
+configuration. Use `config/production.example.json` only when a build must
+override those defaults for another Firebase project. It can also provide:
 
 - Google web OAuth client ID
 - iOS Google OAuth client ID (`OCEANEYES_GOOGLE_IOS_CLIENT_ID`)
@@ -43,25 +43,26 @@ flutter build appbundle --release --dart-define-from-file=C:\secure\oceaneyes-pr
 flutter build ipa --release --dart-define-from-file=C:\secure\oceaneyes-production.json
 ```
 
-For local UI development, run the app normally:
+For normal development with Firebase, the physical camera, ONNX inference,
+FCM, LiveKit, and wake lock, run the app normally:
 
 ```powershell
 flutter run
 ```
 
-Debug and profile runs default to a credential-free local preview. To run the
-Firebase-backed staging stack from debug mode, the define file must include
-`"OCEANEYES_PRODUCTION": true` (or pass
-`--dart-define=OCEANEYES_PRODUCTION=true`).
+To explicitly run the credential-free mocked UI preview instead:
 
-The shared VS Code Run/Debug configuration launches `lib/main.dart` in debug
-mode with `C:\secure\oceaneyes-staging.json`. Keep that private staging file at
-the configured path; it remains outside version control. The local preview
-configuration is available alongside it in the Run and Debug menu.
+```powershell
+flutter run --dart-define=OCEANEYES_LOCAL_PREVIEW=true
+```
 
-Production mode validates the platform service values before initializing Firebase. The
-`OCEANEYES_PRODUCTION` flag selects production for debug/profile runs, while
-release builds always use production regardless of that flag.
+The first shared VS Code Run/Debug configuration uses real integrations with
+no extra arguments. The explicit local-preview configuration is available
+alongside it in the Run and Debug menu.
+
+Real-service mode validates platform service values before initializing
+Firebase. `OCEANEYES_LOCAL_PREVIEW=true` is honored in debug/profile builds;
+release builds always use real integrations.
 
 ## App Check and Google sign-in
 

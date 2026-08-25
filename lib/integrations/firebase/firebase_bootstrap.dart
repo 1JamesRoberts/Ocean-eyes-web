@@ -30,8 +30,14 @@ Future<FirebaseApp> initializeOceanEyesFirebase(
       webProvider: kIsWeb
           ? ReCaptchaV3Provider(config.recaptchaV3SiteKey)
           : null,
-      androidProvider: AndroidProvider.playIntegrity,
-      appleProvider: AppleProvider.appAttestWithDeviceCheckFallback,
+      // Debug attestation keeps local builds connected to the real Firebase
+      // project without pretending they were installed through an app store.
+      androidProvider: kDebugMode
+          ? AndroidProvider.debug
+          : AndroidProvider.playIntegrity,
+      appleProvider: kDebugMode
+          ? AppleProvider.debug
+          : AppleProvider.appAttestWithDeviceCheckFallback,
     );
   }
   return app;

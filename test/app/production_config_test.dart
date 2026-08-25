@@ -3,6 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:oceaneyes/app/production_config.dart';
 
 void main() {
+  test('debug builds use real integrations by default', () {
+    final config = OceanEyesProductionConfig.fromEnvironment();
+
+    expect(config.productionEnabled, isTrue);
+    expect(config.googleWebClientId, isNotEmpty);
+    expect(config.iosClientId, isNotEmpty);
+  });
+
   test('local preview skips production validation', () {
     const config = OceanEyesProductionConfig(
       googleWebClientId: '',

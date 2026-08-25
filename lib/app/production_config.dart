@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 /// Small set of values that cannot come from the generated FlutterFire file.
 ///
 /// Firebase application options live in `firebase_options.dart`. Dart defines
-/// are reserved for OAuth plus optional web messaging/App Check features.
+/// can override OAuth and optional web features, or explicitly select the
+/// isolated local preview in non-release builds.
 class OceanEyesProductionConfig {
   const OceanEyesProductionConfig({
     required this.googleWebClientId,
@@ -16,11 +17,17 @@ class OceanEyesProductionConfig {
   factory OceanEyesProductionConfig.fromEnvironment() {
     return const OceanEyesProductionConfig(
       productionEnabled:
-          bool.fromEnvironment('OCEANEYES_PRODUCTION') || kReleaseMode,
+          kReleaseMode || !bool.fromEnvironment('OCEANEYES_LOCAL_PREVIEW'),
       googleWebClientId: String.fromEnvironment(
         'OCEANEYES_GOOGLE_WEB_CLIENT_ID',
+        defaultValue:
+            '1072877532089-v30cb58f31bqi7fb4hhsmfi1hm4o50do.apps.googleusercontent.com',
       ),
-      iosClientId: String.fromEnvironment('OCEANEYES_GOOGLE_IOS_CLIENT_ID'),
+      iosClientId: String.fromEnvironment(
+        'OCEANEYES_GOOGLE_IOS_CLIENT_ID',
+        defaultValue:
+            '1072877532089-2g61s4i4urjeirjis1cddegenseupg5m.apps.googleusercontent.com',
+      ),
       webPushVapidKey: String.fromEnvironment('OCEANEYES_WEB_PUSH_VAPID_KEY'),
       recaptchaV3SiteKey: String.fromEnvironment(
         'OCEANEYES_RECAPTCHA_V3_SITE_KEY',
@@ -30,9 +37,8 @@ class OceanEyesProductionConfig {
 
   static const functionsRegion = 'us-central1';
 
-  /// Debug/profile runs are local previews unless production is explicitly
-  /// enabled. Release builds default to production and therefore still fail
-  /// closed when their private configuration is missing.
+  /// All app builds use real services by default. Mocked behavior is reserved
+  /// for tests and the explicitly selected local-preview mode.
   final bool productionEnabled;
   final String googleWebClientId;
   final String iosClientId;

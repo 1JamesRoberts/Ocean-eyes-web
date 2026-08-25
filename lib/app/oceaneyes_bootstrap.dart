@@ -36,14 +36,15 @@ class OceanEyesBootstrapException implements Exception {
 /// Composes the Firebase/auth/Firestore/camera/ML/FCM/LiveKit/wake-lock stack.
 Future<OceanEyesController> bootstrapOceanEyesController({
   Uri? launchUri,
+  OceanEyesProductionConfig? config,
 }) async {
   final uri = launchUri ?? Uri.base;
   final preferences = await SharedPreferences.getInstance();
   final inventory = SharedPreferencesFishInventoryRepository(preferences);
   final settings = SharedPreferencesOceanEyesSettingsRepository(preferences);
-  final config = OceanEyesProductionConfig.fromEnvironment();
+  final runtimeConfig = config ?? OceanEyesProductionConfig.fromEnvironment();
 
-  if (!config.productionEnabled) {
+  if (!runtimeConfig.productionEnabled) {
     final controller = OceanEyesController(
       preferences: preferences,
       inventoryRepository: inventory,
@@ -58,13 +59,13 @@ Future<OceanEyesController> bootstrapOceanEyesController({
     return controller;
   }
 
-  final validationError = config.validate();
+  final validationError = runtimeConfig.validate();
   if (validationError != null) {
     throw OceanEyesBootstrapException(validationError);
   }
 
   try {
-    final bootstrap = await initializeOceanEyesFirebase(config);
+    final bootstrap = await initializeOceanEyesFirebase(runtimeConfig);
     final firebaseAuth = FirebaseAuth.instanceFor(app: bootstrap);
     final firestore = FirebaseFirestore.instanceFor(app: bootstrap);
     final functions = FirebaseFunctions.instanceFor(
@@ -79,7 +80,7 @@ Future<OceanEyesController> bootstrapOceanEyesController({
     final auth = FirebaseAuthGateway(
       accountData: repository,
       auth: firebaseAuth,
-      googleSignIn: _googleSignInFor(config),
+      googleSignIn: _googleSignInFor(runtimeConfig),
       log: debugPrint,
     );
     await auth.enforceGoogleOnlySession();
@@ -101,7 +102,7 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       ),
       liveGateway: LiveKitGateway(functions: functions),
       wakeLockGateway: ProductionWakeLockGateway(),
-      webPushVapidKey: config.webPushVapidKey,
+      webPushVapidKey: runtimeConfig.webPushVapidKey,
     );
     await controller.initializeProduction();
     return controller;
