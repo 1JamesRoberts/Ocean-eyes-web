@@ -67,6 +67,7 @@ final class OnnxFishInference implements FishInferenceEngine {
   }
 
   Future<void> _initialize() async {
+    final timer = Stopwatch()..start();
     _availability = FishInferenceAvailability.initializing;
     _lastError = null;
     OrtSession? detector;
@@ -89,35 +90,13 @@ final class OnnxFishInference implements FishInferenceEngine {
         sessionOptions,
       );
 
-      _detectorInputName = detector.inputNames.isNotEmpty
-          ? detector.inputNames.first
-          : 'input';
-      _classifierInputName = classifier.inputNames.isNotEmpty
-          ? classifier.inputNames.first
-          : 'input';
-      _waterClarityInputName = clarity.inputNames.isNotEmpty
-          ? clarity.inputNames.first
-          : 'images';
-      _detectorBoxesOutputIndex = _namedOutputIndex(
-        detector,
-        'dets',
-        fallback: 0,
-      );
-      _detectorLabelsOutputIndex = _namedOutputIndex(
-        detector,
-        'labels',
-        fallback: 1,
-      );
-      _classifierOutputIndex = _namedOutputIndex(
-        classifier,
-        'output',
-        fallback: 0,
-      );
-      _waterClarityOutputIndex = _namedOutputIndex(
-        clarity,
-        'output0',
-        fallback: 0,
-      );
+      _detectorInputName = _requiredInput(detector, 'input');
+      _classifierInputName = _requiredInput(classifier, 'input');
+      _waterClarityInputName = _requiredInput(clarity, 'images');
+      _detectorBoxesOutputIndex = _requiredOutput(detector, 'dets');
+      _detectorLabelsOutputIndex = _requiredOutput(detector, 'labels');
+      _classifierOutputIndex = _requiredOutput(classifier, 'output');
+      _waterClarityOutputIndex = _requiredOutput(clarity, 'output0');
 
       _releaseSessions();
       _detectorSession = detector;
@@ -127,8 +106,10 @@ final class OnnxFishInference implements FishInferenceEngine {
       classifier = null;
       clarity = null;
       _availability = FishInferenceAvailability.ready;
+      timer.stop();
       _log?.call(
-        'ONNX fish pipeline ready: detector=${_detectorSession!.outputNames}, '
+        'ONNX fish pipeline ready in ${timer.elapsedMilliseconds} ms: '
+        'detector=${_detectorSession!.outputNames}, '
         'classifier=${_classifierSession!.outputNames}, '
         'clarity=${_waterClaritySession!.outputNames}.',
       );
@@ -137,12 +118,16 @@ final class OnnxFishInference implements FishInferenceEngine {
       classifier?.release();
       clarity?.release();
       _availability = FishInferenceAvailability.failed;
-      _lastError = error;
-      throw FishInferenceException(
-        'Could not load the three ONNX model assets. See '
-        'assets/models/README.md.',
-        error,
-      );
+      final failure = error is FishInferenceException
+          ? error
+          : FishInferenceException(
+              'Could not load the three ONNX model assets. See '
+              'assets/models/README.md.',
+              kind: FishInferenceFailureKind.modelLoad,
+              cause: error,
+            );
+      _lastError = failure;
+      throw failure;
     } finally {
       sessionOptions?.release();
     }
@@ -189,6 +174,7 @@ final class OnnxFishInference implements FishInferenceEngine {
     required NormalizedImageRegion detectionRegionInFullFrame,
     required FishInferenceThresholds thresholds,
   }) async {
+    final timer = Stopwatch()..start();
     final detector = _detectorSession!;
     final classifier = _classifierSession!;
     final clarity = _waterClaritySession!;
@@ -242,6 +228,11 @@ final class OnnxFishInference implements FishInferenceEngine {
         clarityOutputs[_waterClarityOutputIndex],
         modelName: 'water clarity',
       );
+      _validateVector(
+        probabilities,
+        modelName: 'water clarity',
+        expectedLength: 11,
+      );
       final turbidityFnu = FishInferencePreprocessing.turbidityFnu(
         probabilities,
       );
@@ -256,6 +247,18 @@ final class OnnxFishInference implements FishInferenceEngine {
       final detectorLogits = _batchedRows(
         detectorOutputs[_detectorLabelsOutputIndex],
         modelName: 'fish detector labels',
+      );
+      _validateRows(
+        detectorBoxes,
+        modelName: 'fish detector boxes',
+        expectedRows: 300,
+        expectedColumns: 4,
+      );
+      _validateRows(
+        detectorLogits,
+        modelName: 'fish detector labels',
+        expectedRows: 300,
+        expectedColumns: 2,
       );
       final candidates = FishInferencePreprocessing.detectorCandidates(
         boxes: detectorBoxes,
@@ -319,6 +322,12 @@ final class OnnxFishInference implements FishInferenceEngine {
         classifierOutputs[_classifierOutputIndex],
         modelName: 'species classifier',
       );
+      _validateRows(
+        classifierRows,
+        modelName: 'species classifier',
+        expectedRows: classificationCount,
+        expectedColumns: FishInferencePreprocessing.classifierSpecies.length,
+      );
 
       final classifiedDetections = List<FishDetection>.of(detections);
       final speciesCounts = <String, int>{};
@@ -352,8 +361,10 @@ final class OnnxFishInference implements FishInferenceEngine {
       }
 
       _lastError = null;
+      timer.stop();
       _log?.call(
-        'ONNX inference: ${candidates.length} fish, $speciesCounts, '
+        'ONNX inference completed in ${timer.elapsedMilliseconds} ms: '
+        '${candidates.length} fish, $speciesCounts, '
         '${turbidityFnu.toStringAsFixed(2)} FNU, '
         'clarity ${clarityScore.toStringAsFixed(1)}/10.',
       );
@@ -368,7 +379,7 @@ final class OnnxFishInference implements FishInferenceEngine {
     } catch (error) {
       _lastError = error;
       if (error is FishInferenceException) rethrow;
-      throw FishInferenceException('ONNX inference failed.', error);
+      throw FishInferenceException('ONNX inference failed.', cause: error);
     } finally {
       detectorInput?.release();
       detectorOptions?.release();
@@ -405,7 +416,10 @@ final class OnnxFishInference implements FishInferenceEngine {
   }) {
     final raw = value?.value;
     if (raw is! List || raw.isEmpty || raw.first is! List) {
-      throw FishInferenceException('$modelName returned an invalid tensor.');
+      throw FishInferenceException(
+        '$modelName returned an invalid tensor.',
+        kind: FishInferenceFailureKind.modelContract,
+      );
     }
     return List<Object?>.from(raw.first as List);
   }
@@ -416,11 +430,17 @@ final class OnnxFishInference implements FishInferenceEngine {
   }) {
     final raw = value?.value;
     if (raw is! List || raw.isEmpty || raw.first is! List) {
-      throw FishInferenceException('$modelName returned an invalid tensor.');
+      throw FishInferenceException(
+        '$modelName returned an invalid tensor.',
+        kind: FishInferenceFailureKind.modelContract,
+      );
     }
     final batch = raw.first;
     if (batch is! List) {
-      throw FishInferenceException('$modelName returned an invalid batch.');
+      throw FishInferenceException(
+        '$modelName returned an invalid batch.',
+        kind: FishInferenceFailureKind.modelContract,
+      );
     }
     return List<Object?>.from(batch);
   }
@@ -428,22 +448,66 @@ final class OnnxFishInference implements FishInferenceEngine {
   static List<Object?> _rows(OrtValue? value, {required String modelName}) {
     final raw = value?.value;
     if (raw is! List) {
-      throw FishInferenceException('$modelName returned an invalid tensor.');
+      throw FishInferenceException(
+        '$modelName returned an invalid tensor.',
+        kind: FishInferenceFailureKind.modelContract,
+      );
     }
     return List<Object?>.from(raw);
   }
 
-  static int _namedOutputIndex(
-    OrtSession session,
-    String name, {
-    required int fallback,
-  }) {
+  static String _requiredInput(OrtSession session, String name) {
+    if (session.inputNames.contains(name)) return name;
+    throw FishInferenceException(
+      'Model input "$name" is missing from ${session.inputNames}.',
+      kind: FishInferenceFailureKind.modelContract,
+    );
+  }
+
+  static int _requiredOutput(OrtSession session, String name) {
     final index = session.outputNames.indexOf(name);
     if (index >= 0) return index;
-    if (fallback >= 0 && fallback < session.outputNames.length) return fallback;
     throw FishInferenceException(
       'Model output "$name" is missing from ${session.outputNames}.',
+      kind: FishInferenceFailureKind.modelContract,
     );
+  }
+
+  static void _validateVector(
+    List<Object?> values, {
+    required String modelName,
+    required int expectedLength,
+  }) {
+    if (values.length != expectedLength ||
+        values.any((value) => value is! num || !value.toDouble().isFinite)) {
+      throw FishInferenceException(
+        '$modelName output must contain $expectedLength finite values.',
+        kind: FishInferenceFailureKind.modelContract,
+      );
+    }
+  }
+
+  static void _validateRows(
+    List<Object?> rows, {
+    required String modelName,
+    required int expectedRows,
+    required int expectedColumns,
+  }) {
+    final valid =
+        rows.length == expectedRows &&
+        rows.every(
+          (row) =>
+              row is List &&
+              row.length == expectedColumns &&
+              row.every((value) => value is num && value.toDouble().isFinite),
+        );
+    if (!valid) {
+      throw FishInferenceException(
+        '$modelName output must have shape '
+        '[$expectedRows,$expectedColumns] with finite values.',
+        kind: FishInferenceFailureKind.modelContract,
+      );
+    }
   }
 
   static void _validateThresholds(FishInferenceThresholds thresholds) {

@@ -12,6 +12,7 @@ import '../integrations/firebase/firebase_bootstrap.dart';
 import '../integrations/firebase/firebase_notification_service.dart';
 import '../integrations/firebase/firestore_oceaneyes_repository.dart';
 import '../integrations/livekit/livekit_gateway.dart';
+import '../integrations/ml/onnx_fish_inference.dart';
 import '../integrations/power/wake_lock_gateway.dart';
 import '../models/fish_inventory_repository.dart';
 import '../models/oceaneyes_settings_repository.dart';
@@ -92,11 +93,9 @@ Future<OceanEyesController> bootstrapOceanEyesController({
       productionRepository: repository,
       productionAuth: auth,
       cameraGateway: ProductionCameraCaptureGateway(),
-      // The ONNX model bundle is optional while the production model exports
-      // are being prepared. Camera capture and LiveKit publishing remain
-      // available; AI capture is inactive until this engine is added back
-      // with the approved model assets.
-      inferenceEngine: null,
+      // ONNX sessions initialize lazily on the first analysis so camera,
+      // authentication, and LiveKit startup do not wait for the large models.
+      inferenceEngine: OnnxFishInference(log: debugPrint),
       notificationService: FirebaseNotificationService(
         messaging: FirebaseMessaging.instance,
       ),

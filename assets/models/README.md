@@ -1,64 +1,67 @@
 # Production ONNX models
 
-The optional Flutter AI integration can use three private ONNX assets in this
-directory. Model binaries are deliberately excluded from Git: the full set is
-about 285 MB, two files exceed GitHub's 100 MB per-file limit, and the artifacts
-belong to the FishAI training pipeline rather than this presentation repository.
+OceanEyes bundles three ONNX models for native on-device aquarium analysis.
+Android is the primary target. Web uses the unsupported inference stub and does
+not execute these models.
 
-The current production build intentionally omits the ONNX engine so the app's
-Firebase, camera, and LiveKit flows work without these artifacts. Add the files
-and restore the engine in `lib/app/oceaneyes_bootstrap.dart` when AI capture is
-ready to return.
-
-## Required files
-
-Copy the approved training exports into place and use these exact names:
-
-```text
-assets/models/fish_detector.onnx          # ~115 MB
-assets/models/species_classifier.onnx     # ~32 MB
-assets/models/water_clarity.onnx          # ~138 MB
-```
-
-Example local-only setup:
+The binaries total roughly 285 MB and are tracked with Git LFS. Install Git LFS
+before cloning or checking out a release:
 
 ```sh
-cp <private-training-output>/fish_detection.onnx assets/models/fish_detector.onnx
-cp <private-training-output>/species_classifier.onnx assets/models/species_classifier.onnx
-cp <private-training-output>/turbidity.onnx assets/models/water_clarity.onnx
+git lfs install
+git lfs pull
 ```
 
-Do not commit the copied files. Before a release, obtain the model files from
-the project owner through the approved private artifact channel and verify their
-checksums against that release's artifact manifest.
+After checkout, `git lfs ls-files` must list all three files below. A small text
+file beginning with `version https://git-lfs.github.com/spec/v1` is an LFS
+pointer, not a usable model binary.
 
-ONNX execution is intentionally unavailable in the web build.
+## Required assets and checksums
 
-## Exact model contract
+Use these exact runtime names and approved SHA-256 hashes:
+
+```text
+assets/models/fish_detector.onnx
+84aca2b5d45dec8c3e4d045d419850e9cf765240fa6a1603fa60e68457157004
+
+assets/models/species_classifier.onnx
+e1627d87a85dc55a25e485b7a01ffaa1c206558753ed6d0268b5e1d34029c2c8
+
+assets/models/water_clarity.onnx
+9c32530b9787512b6514fefcb78e9225c0156549f32d0219f3627f40bf266c7a
+```
+
+The Android Gradle build keeps `.onnx` assets uncompressed so ONNX Runtime can
+load them reliably. The resulting release is intended for direct APK or
+Firebase App Distribution during early access. The model bundle is too large
+for a Google Play base module; Play distribution will require Play Asset
+Delivery or a controlled post-install model download.
+
+## Exact graph contract
+
+All three exports use ONNX opset 17 and float32 tensors.
 
 ### `fish_detector.onnx` — RF-DETR-Medium
 
-- Input `input`: `[1,3,576,576]`, NCHW float32.
+- Input `input`: `[1,3,576,576]`, NCHW.
 - Preprocessing: resize to 576×576, RGB `/255`, then ImageNet normalization
   with mean `[0.485,0.456,0.406]` and standard deviation
   `[0.229,0.224,0.225]`.
 - Output `dets`: `[1,300,4]` normalized `cx,cy,width,height` boxes.
 - Output `labels`: `[1,300,2]` logits.
-- A query is a fish when `sigmoid(max(labels[query]))` meets the configurable
-  detection threshold (legacy default `0.3`). The deployed pipeline does not
-  apply NMS.
+- A query is retained when `sigmoid(max(labels[query]))` meets the configurable
+  detection threshold. The deployed pipeline does not apply NMS.
 
 ### `species_classifier.onnx` — MobileNetV4
 
-- Input `input`: `[N,3,224,224]`, dynamic-batch NCHW float32.
+- Input `input`: `[N,3,224,224]`, dynamic-batch NCHW.
 - Preprocessing per detector crop: resize the shorter side to 256, center-crop
-  224×224, then apply the same ImageNet normalization as the detector.
-- Output `output`: `[N,24]` logits; softmax argmax is retained when it meets the
-  configurable classification threshold (legacy default `0.3`).
-- Batch work is capped at 64 crops per frame by default. The total detector
-  count still includes every passing detector query.
+  224×224, then apply ImageNet normalization.
+- Output `output`: `[N,24]` logits. Softmax argmax is retained when it meets the
+  configurable classification threshold.
+- Classification work is capped at 64 crops per frame by default.
 
-Class order is fixed and must match the training metadata:
+Class order is fixed:
 
 ```text
 angelfish, betta, black_skirt_tetra, cardinal_tetra, cherry_barb,
@@ -68,15 +71,11 @@ otocinclus, platy, plecostomus, rummy_nose_tetra,
 siamese_algae_eater, swordtail, tiger_barb, zebra_danio
 ```
 
-These names are canonical classifier/species IDs. Firestore compatibility
-mappers are responsible for resolving any legacy catalog aliases.
-
 ### `water_clarity.onnx` — YOLO turbidity classifier
 
-- Input `images`: `[1,3,224,224]`, NCHW float32.
-- Preprocessing: resize the full, uncropped frame to 224×224 and divide RGB by
-  255 only. Do not apply ImageNet normalization.
-- Output `output0`: `[1,11]` already-softmaxed turbidity-range probabilities.
+- Input `images`: `[1,3,224,224]`, NCHW.
+- Preprocessing: resize the full frame to 224×224 and divide RGB by 255 only.
+- Output `output0`: `[1,11]` softmaxed turbidity-range probabilities.
 - Raw turbidity is calculated as:
 
   ```text
@@ -85,9 +84,6 @@ mappers are responsible for resolving any legacy catalog aliases.
                   77.63, 85.64, 94.0, 102.85, 114.32]
   ```
 
-- The compatibility clarity score maps approximately `0.44..53.42 FNU` to
-  `10..1`, clamps to that range, and rounds to one decimal place.
-
-Production readings must persist both `turbidity_fnu` (the raw result) and the
-legacy-compatible `clarity`/`clarity_score` value. Fish boxes are normalized to
-the full captured frame after water-line ROI inference.
+Production readings persist both `turbidity_fnu` and the legacy-compatible
+`clarity`/`clarity_score`. Fish centers are normalized to the full captured
+frame after water-line ROI inference.

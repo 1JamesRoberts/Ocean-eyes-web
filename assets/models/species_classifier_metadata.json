@@ -1,0 +1,81 @@
+{
+  "model_name": "species_classifier",
+  "description": "FishAI species classification model (MobileNetV4)",
+  "architecture": "mobilenetv4_conv_medium.e500_r224_in1k",
+  "input": {
+    "shape": [
+      "batch_size",
+      3,
+      224,
+      224
+    ],
+    "dtype": "float32",
+    "format": "NCHW",
+    "preprocessing": {
+      "resize": 224,
+      "center_crop": true,
+      "normalize": {
+        "mean": [
+          0.485,
+          0.456,
+          0.406
+        ],
+        "std": [
+          0.229,
+          0.224,
+          0.225
+        ]
+      },
+      "note": "PIL Image -> Resize(256) -> CenterCrop(224) -> ToTensor -> Normalize"
+    }
+  },
+  "output": {
+    "shape": [
+      "batch_size",
+      24
+    ],
+    "dtype": "float32",
+    "description": "Class logits (not softmaxed)",
+    "postprocessing": {
+      "softmax": "Apply softmax to get probabilities",
+      "argmax": "Index of highest probability = predicted species",
+      "confidence": "Max probability value"
+    }
+  },
+  "classes": {
+    "0": "angelfish",
+    "1": "betta",
+    "2": "black_skirt_tetra",
+    "3": "cardinal_tetra",
+    "4": "cherry_barb",
+    "5": "clown_loach",
+    "6": "corydoras",
+    "7": "discus",
+    "8": "dwarf_gourami",
+    "9": "german_blue_ram",
+    "10": "goldfish",
+    "11": "guppy",
+    "12": "harlequin_rasbora",
+    "13": "molly",
+    "14": "neon_tetra",
+    "15": "oscar",
+    "16": "otocinclus",
+    "17": "platy",
+    "18": "plecostomus",
+    "19": "rummy_nose_tetra",
+    "20": "siamese_algae_eater",
+    "21": "swordtail",
+    "22": "tiger_barb",
+    "23": "zebra_danio"
+  },
+  "confidence_threshold": 0.3,
+  "num_classes": 24,
+  "best_val_acc": 0.7575757575757576,
+  "test_acc": 0.7626262626262627,
+  "onnx_info": {
+    "opset_version": 17,
+    "dynamic_axes": {
+      "batch_size": "Variable batch dimension for multi-crop classification"
+    }
+  }
+}

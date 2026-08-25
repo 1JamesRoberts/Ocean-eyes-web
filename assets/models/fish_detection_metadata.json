@@ -1,0 +1,82 @@
+{
+  "model_name": "fish_detection",
+  "description": "FishAI fish detection model (RF-DETR Medium)",
+  "architecture": "RF-DETR-Medium",
+  "source_checkpoint": "C:\\Users\\thamm\\OneDrive\\Documents\\1 - Projects\\FishAI\\models\\detection\\rfdetr_fish-1\\checkpoint_best_ema.pth",
+  "input": {
+    "shape": [
+      1,
+      3,
+      576,
+      576
+    ],
+    "dtype": "float32",
+    "format": "NCHW",
+    "preprocessing": {
+      "resize": [
+        576,
+        576
+      ],
+      "normalize": {
+        "mean": [
+          0.485,
+          0.456,
+          0.406
+        ],
+        "std": [
+          0.229,
+          0.224,
+          0.225
+        ],
+        "note": "ImageNet normalization (same as training)"
+      },
+      "note": "Resize to 576x576, normalize with ImageNet stats"
+    }
+  },
+  "outputs": {
+    "dets": {
+      "name": "dets",
+      "shape": [
+        1,
+        300,
+        4
+      ],
+      "dtype": "float32",
+      "description": "Bounding boxes in cxcywh format (center_x, center_y, width, height)",
+      "postprocessing": {
+        "format_conversion": "cxcywh -> xyxy",
+        "formula": [
+          "x1 = cx - w/2",
+          "y1 = cy - h/2",
+          "x2 = cx + w/2",
+          "y2 = cy + h/2"
+        ]
+      }
+    },
+    "labels": {
+      "name": "labels",
+      "shape": [
+        1,
+        300,
+        2
+      ],
+      "dtype": "float32",
+      "description": "Class logits for single-class 'fish' detection",
+      "postprocessing": {
+        "confidence": "Apply sigmoid to logits to get confidence scores",
+        "filter": "Apply confidence threshold (e.g., 0.3) to filter detections"
+      }
+    }
+  },
+  "num_classes": 1,
+  "class_names": [
+    "fish"
+  ],
+  "num_queries": 300,
+  "onnx_info": {
+    "opset_version": 17,
+    "batch_size": 1,
+    "static_axes": "All dimensions fixed for mobile inference"
+  },
+  "pipeline_note": "Feed full 576x576 frame -> get boxes -> crop -> classify with species_classifier.onnx"
+}

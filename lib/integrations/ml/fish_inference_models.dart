@@ -292,10 +292,17 @@ abstract interface class FishInferenceEngine {
   Future<void> dispose();
 }
 
+enum FishInferenceFailureKind { modelLoad, modelContract, execution }
+
 class FishInferenceException implements Exception {
-  const FishInferenceException(this.message, [this.cause]);
+  const FishInferenceException(
+    this.message, {
+    this.kind = FishInferenceFailureKind.execution,
+    this.cause,
+  });
 
   final String message;
+  final FishInferenceFailureKind kind;
   final Object? cause;
 
   @override

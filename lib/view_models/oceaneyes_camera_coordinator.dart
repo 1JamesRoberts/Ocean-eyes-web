@@ -87,6 +87,7 @@ class OceanEyesCameraCoordinator {
   StreamSubscription<CameraCaptureSnapshot>? _subscription;
   Timer? _inferenceTimer;
   bool _captureInProgress = false;
+  bool _modelLoadBlocked = false;
   int _pairingSuspensionDepth = 0;
   bool _resumeAfterPairing = false;
 
@@ -137,17 +138,50 @@ class OceanEyesCameraCoordinator {
     }
   }
 
-  Future<void> captureAndAnalyze({required bool measurementOnly}) async {
+  Future<void> captureAndAnalyze({
+    required bool measurementOnly,
+    bool userInitiated = true,
+  }) async {
     final gateway = _gateway;
     final inference = _inference;
     final repository = _repository;
     final tankId = _host.activeTankId;
-    if (_captureInProgress ||
-        gateway == null ||
-        inference == null ||
-        repository == null ||
-        tankId == null ||
-        gateway.snapshot.phase != CameraCapturePhase.ready) {
+    if (_captureInProgress) return;
+    if (gateway == null) {
+      if (userInitiated) {
+        _onError(
+          const CameraCaptureException(
+            'Camera capture is unavailable on this platform.',
+          ),
+        );
+      }
+      return;
+    }
+    if (inference == null || !inference.isSupported) {
+      if (userInitiated) {
+        _onError(
+          const FishInferenceException(
+            'AI model initialization is unavailable on this platform.',
+            kind: FishInferenceFailureKind.modelLoad,
+          ),
+        );
+      }
+      return;
+    }
+    if (repository == null || tankId == null) {
+      if (userInitiated) {
+        _onError(StateError('No tank is connected for aquarium analysis.'));
+      }
+      return;
+    }
+    if (gateway.snapshot.phase != CameraCapturePhase.ready) {
+      if (userInitiated) {
+        _onError(
+          const CameraCaptureException(
+            'Camera is not ready to capture an aquarium frame.',
+          ),
+        );
+      }
       return;
     }
     _captureInProgress = true;
@@ -155,27 +189,87 @@ class OceanEyesCameraCoordinator {
     _host.cameraStage = measurementOnly
         ? CameraStage.measuringTurbidity
         : CameraStage.aiProcessing;
-    if (measurementOnly) _host.lastTurbidityResult = null;
     _onChanged();
+    CapturedCameraFrame? frame;
     try {
-      final frame = await gateway.capture(
-        normalizedWaterLineY: _host.cameraWaterLineY,
-      );
-      if (frame == null) return;
+      try {
+        frame = await gateway.capture(
+          normalizedWaterLineY: _host.cameraWaterLineY,
+        );
+      } catch (error, stackTrace) {
+        _onError(error, stackTrace);
+        return;
+      }
+      if (frame == null) {
+        if (userInitiated) {
+          _onError(
+            const CameraCaptureException(
+              'Camera capture did not return an aquarium frame.',
+            ),
+          );
+        }
+        return;
+      }
+
       _host.latestCameraFrameBytes = Uint8List.fromList(frame.encodedBytes);
-      await inference.initialize();
-      final result = await inference.analyze(
-        detectionRegion: frame.waterRegion,
-        fullFrame: frame.fullFrame,
-        detectionRegionInFullFrame: NormalizedImageRegion.belowWaterLine(
-          frame.waterRegionTopNormalized,
-        ),
-        thresholds: FishInferenceThresholds(
-          detectionConfidence: _host.detectionConfidenceThreshold,
-          classificationConfidence: _host.speciesConfidenceThreshold,
-        ),
-      );
+      try {
+        await inference.initialize();
+        _modelLoadBlocked = false;
+      } catch (error, stackTrace) {
+        _modelLoadBlocked = true;
+        stopAutomaticInference();
+        final kind = error is FishInferenceException
+            ? error.kind
+            : FishInferenceFailureKind.modelLoad;
+        _onError(
+          FishInferenceException(
+            kind == FishInferenceFailureKind.modelContract
+                ? 'AI model contract validation failed.'
+                : 'AI model initialization failed.',
+            kind: kind,
+            cause: error,
+          ),
+          stackTrace,
+        );
+        return;
+      }
+
+      FishInferenceResult? result;
+      try {
+        result = await inference.analyze(
+          detectionRegion: frame.waterRegion,
+          fullFrame: frame.fullFrame,
+          detectionRegionInFullFrame: NormalizedImageRegion.belowWaterLine(
+            frame.waterRegionTopNormalized,
+          ),
+          thresholds: FishInferenceThresholds(
+            detectionConfidence: _host.detectionConfidenceThreshold,
+            classificationConfidence: _host.speciesConfidenceThreshold,
+          ),
+        );
+      } catch (error, stackTrace) {
+        if (error is FishInferenceException &&
+            error.kind == FishInferenceFailureKind.modelContract) {
+          _modelLoadBlocked = true;
+          stopAutomaticInference();
+        }
+        _onError(
+          FishInferenceException(
+            error is FishInferenceException &&
+                    error.kind == FishInferenceFailureKind.modelContract
+                ? 'AI model contract validation failed.'
+                : 'Aquarium AI analysis failed.',
+            kind: error is FishInferenceException
+                ? error.kind
+                : FishInferenceFailureKind.execution,
+            cause: error,
+          ),
+          stackTrace,
+        );
+        return;
+      }
       if (result == null) return;
+
       _host.lastTurbidityResult =
           '${result.turbidityFnu.toStringAsFixed(1)} FNU';
       _host.heatmapCenters = result.classifiedCenters
@@ -191,24 +285,33 @@ class OceanEyesCameraCoordinator {
         width: frame.fullFrame.width,
         height: frame.fullFrame.height,
       );
-      await repository.writeReading(
-        ProductionReadingDraft(
-          tankId: tankId,
-          clarityScore: result.clarityScore,
-          turbidityFnu: result.turbidityFnu,
-          fishCount: result.fishCount,
-          fishCountConfidence: result.meanDetectionConfidence,
-          speciesDetected: result.speciesCounts,
-          detections: _host.heatmapCenters,
-          frameDimensions: _host.heatmapSourceDimensions,
-        ),
-      );
-      for (final entry in _host.fish) {
-        final detected = (result.speciesCounts[entry.speciesId] ?? 0).clamp(
-          0,
-          entry.count,
+      try {
+        await repository.writeReading(
+          ProductionReadingDraft(
+            tankId: tankId,
+            clarityScore: result.clarityScore,
+            turbidityFnu: result.turbidityFnu,
+            fishCount: result.fishCount,
+            fishCountConfidence: result.meanDetectionConfidence,
+            speciesDetected: result.speciesCounts,
+            detections: _host.heatmapCenters,
+            frameDimensions: _host.heatmapSourceDimensions,
+          ),
         );
-        await repository.updateDetectedFish(entry.id, detected);
+        for (final entry in _host.fish) {
+          final detected = (result.speciesCounts[entry.speciesId] ?? 0).clamp(
+            0,
+            entry.count,
+          );
+          await repository.updateDetectedFish(entry.id, detected);
+        }
+      } catch (error, stackTrace) {
+        _onError(
+          StateError(
+            'Analysis completed but some results could not be saved: $error',
+          ),
+          stackTrace,
+        );
       }
     } catch (error, stackTrace) {
       _onError(error, stackTrace);
@@ -216,6 +319,7 @@ class OceanEyesCameraCoordinator {
       _captureInProgress = false;
       if (!_host.isDisposed) {
         _applySnapshot(gateway.snapshot);
+        if (!_modelLoadBlocked) configureAutomaticInference();
         _onChanged();
       }
     }
@@ -229,6 +333,7 @@ class OceanEyesCameraCoordinator {
         !_host.autoConnect ||
         _host.activeTankId == null ||
         _repository == null ||
+        _modelLoadBlocked ||
         _inference?.isSupported != true ||
         _gateway?.snapshot.phase != CameraCapturePhase.ready) {
       _wakeLock.setInferenceActive(false);
@@ -239,7 +344,9 @@ class OceanEyesCameraCoordinator {
     );
     _inferenceTimer = Timer.periodic(interval, (_) {
       if (_host.cameraStage == CameraStage.active) {
-        unawaited(captureAndAnalyze(measurementOnly: false));
+        unawaited(
+          captureAndAnalyze(measurementOnly: false, userInitiated: false),
+        );
       }
     });
     _wakeLock.setInferenceActive(true);

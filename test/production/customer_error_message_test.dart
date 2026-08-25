@@ -27,4 +27,25 @@ void main() {
       contains('Camera access'),
     );
   });
+
+  test('distinguishes AI load, inference, and persistence failures', () {
+    expect(
+      oceanEyesCustomerErrorMessage(
+        StateError('AI model initialization failed: private/path/model.onnx'),
+      ),
+      allOf(contains('could not load'), isNot(contains('private/path'))),
+    );
+    expect(
+      oceanEyesCustomerErrorMessage(
+        StateError('Aquarium AI analysis failed: tensor details'),
+      ),
+      allOf(contains('could not process'), isNot(contains('tensor details'))),
+    );
+    expect(
+      oceanEyesCustomerErrorMessage(
+        StateError('Analysis completed but some results could not be saved'),
+      ),
+      contains('could not be saved'),
+    );
+  });
 }

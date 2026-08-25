@@ -62,7 +62,6 @@ app.*.map.json
 *.jks
 *.keystore
 
-# On-device inference assets are distributed separately (roughly 285 MB)
-/assets/models/*.onnx
+# Alternate on-device inference formats are not part of the Android bundle.
 /assets/models/*.ort
 /assets/models/*.tflite

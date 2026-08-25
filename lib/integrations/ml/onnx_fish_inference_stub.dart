@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:image/image.dart' as image;
 
 import 'fish_inference_models.dart';
@@ -6,6 +7,7 @@ import 'fish_inference_models.dart';
 final class OnnxFishInference implements FishInferenceEngine {
   OnnxFishInference({
     this.configuration = const FishInferenceConfiguration(),
+    AssetBundle? assetBundle,
     void Function(String message)? log,
   });
 

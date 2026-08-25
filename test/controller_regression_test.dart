@@ -281,6 +281,7 @@ void main() {
     controller.commitSetting('detectionConfidenceThreshold', 0.45);
     controller.commitSetting('speciesConfidenceThreshold', 0.50);
     controller.commitSetting('diagnosisMinConfidence', 0.70);
+    controller.toggleAI(false);
     controller.setAutoConnect(true);
     controller.renameTank('Studio Reef');
     controller.switchCamera();
@@ -298,6 +299,7 @@ void main() {
     expect(restored.detectionConfidenceThreshold, 0.45);
     expect(restored.speciesConfidenceThreshold, 0.50);
     expect(restored.diagnosisMinConfidence, 0.70);
+    expect(restored.aiEnabled, isFalse);
     expect(restored.autoConnect, isTrue);
     expect(restored.tankName, 'Studio Reef');
     expect(restored.usingFrontCamera, isTrue);
